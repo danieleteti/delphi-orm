@@ -11,12 +11,15 @@ type
     FModel: string;
     FBrand: string;
     FPersonID: Integer;
+    FID: Integer;
     procedure SetBrand(const Value: string);
     procedure SetModel(const Value: string);
     procedure SetPersonID(const Value: Integer);
+    procedure SetID(const Value: Integer);
     //Private!!!
     property PersonID: Integer read FPersonID write SetPersonID;
-  published
+  public
+    property ID: Integer read FID write SetID;
     property Brand: string read FBrand write SetBrand;
     property Model: string read FModel write SetModel;
   end;
@@ -100,7 +103,7 @@ begin
   Result := TPerson.Create;
   Result.FirstName := 'Daniele';
   Result.LastName := 'Teti';
-  Result.Age := 30;
+  Result.Age := 32;
   Result.BornDate := EncodeDate(1979, 11, 4);
 end;
 
@@ -189,6 +192,11 @@ end;
 procedure TCar.SetBrand(const Value: string);
 begin
   FBrand := Value;
+end;
+
+procedure TCar.SetID(const Value: Integer);
+begin
+  FID := Value;
 end;
 
 procedure TCar.SetModel(const Value: string);

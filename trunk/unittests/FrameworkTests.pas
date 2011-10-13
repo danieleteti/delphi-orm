@@ -29,7 +29,7 @@ uses
   Classes,
   SysUtils,
   DateUtils,
-  dorm.Utils, dorm.tests.bo.Person;
+  dorm.Utils, dorm.tests.bo;
 
 { TFrameworkTests }
 
@@ -80,7 +80,7 @@ procedure TFrameworkTests.TestClone;
 var
   p1, p2: TPerson;
 begin
-  p1 := TPerson.NewPersona;
+  p1 := TPerson.NewPerson;
   p2 := Session.Clone<TPerson>(p1);
   CheckEquals(p1.FirstName, p2.FirstName);
   CheckEquals(p1.Age, p2.Age);
@@ -132,10 +132,31 @@ var
   Coll: TdormCollection;
   Criteria: TdormCriteria;
   m_id: Int64;
+  p: TPerson;
 begin
+  Session.DeleteAll(TPerson);
+
+  p := TPerson.NewPerson;
+  try
+    p.Age := 32;
+    Session.Save(p);
+  finally
+    p.Free;
+  end;
+
+  p := TPerson.NewPerson;
+  try
+    p.Age := 30;
+    p.FirstName := 'Jack';
+    Session.Save(p);
+  finally
+    p.Free;
+  end;
+
   Criteria := TdormCriteria.Create;
   try
-    Criteria.Add('Codice', Equal, 'MAT01');
+    Criteria.Add('FirstName', Equal, 'Daniele').AddAnd('FirstName',
+      Different, 'Jack');
     Coll := Session.List<TPerson>(Criteria, false);
     try
       CheckEquals(1, Coll.Count);
@@ -168,28 +189,42 @@ procedure TFrameworkTests.TestLoadByAttributeWithRelationOperators;
 var
   Coll: TdormCollection;
   Criteria: TdormCriteria;
-  m_id: Int64;
+  p: TPerson;
 begin
-  Criteria := TdormCriteria.Create;
+  Session.DeleteAll(TPerson);
+
+  p := TPerson.NewPerson;
   try
-    Criteria.Add('Codice', Equal, 'MAT01').AddOr('Codice', Equal, 'MAT02');
-    Coll := Session.List<TPerson>(Criteria, false);
-    try
-      CheckEquals(2, Coll.Count);
-    finally
-      Coll.Free;
-    end;
-
-    Criteria.AddAnd('Codice', Equal, 'XXX');
-    Coll := Session.List<TPerson>(Criteria, false);
-    try
-      CheckEquals(1, Coll.Count);
-    finally
-      Coll.Free;
-    end;
-
+    p.Age := 32;
+    Session.Save(p);
   finally
-    Criteria.Free;
+    p.Free;
+  end;
+
+  p := TPerson.NewPerson;
+  try
+    p.Age := 30;
+    Session.Save(p);
+  finally
+    p.Free;
+  end;
+
+  Criteria := TdormCriteria
+    .NewCriteria('FirstName', Equal, 'Daniele')
+    .AddOr('LastName', Equal, 'Teti');
+  Coll := Session.List<TPerson>(Criteria, true);
+  try
+    CheckEquals(2, Coll.Count);
+  finally
+    Coll.Free;
+  end;
+
+  Criteria := TdormCriteria.NewCriteria('Age', Equal, 32);
+  Coll := Session.List<TPerson>(Criteria, true);
+  try
+    CheckEquals(1, Coll.Count);
+  finally
+    Coll.Free;
   end;
 end;
 

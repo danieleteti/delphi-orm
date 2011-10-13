@@ -9,6 +9,7 @@ uses
 type
   TTestDORM = class(TBaseTestCase)
   protected
+    procedure SetUp; override;
     function GetDORMConfigFileName: String; override;
   public
     procedure LoadPersonaPassingNilAsReturnObject;
@@ -16,8 +17,6 @@ type
     procedure TestSave;
     procedure TestUpdate;
     procedure TestCRUD;
-    procedure TestNoIdentityMap;
-    procedure TestIdentityMapExtractWithNilObject;
   end;
 
 implementation
@@ -31,15 +30,15 @@ uses
 
 procedure TTestDORM.TestCRUD;
 var
-  p1, p2: TPerson;
-  p1asstring, p2asstring: string;
+  p1: TPerson;
+  p1asstring: string;
   id: integer;
 begin
   p1 := TPerson.NewPerson;
   try
     Session.Save(p1);
     p1asstring := p1.ToString;
-    id := p1.ID;
+    id := p1.id;
     Session.Commit;
   finally
     p1.Free;
@@ -88,25 +87,6 @@ begin
   end;
 end;
 
-procedure TTestDORM.TestNoIdentityMap;
-var
-  p1, p2, p3: TPerson;
-  id: integer;
-begin
-  p1 := TPerson.NewPerson;
-  try
-    Session.Save(p1);
-    p2 := Session.Load<TPerson>(p1.ID);
-    CheckTrue(p1.ID = p2.ID, 'Saved and retrived object aren''t the same');
-    p3 := Session.Load<TPerson>(p1.ID);
-    CheckTrue(p2 = p3, 'Identitymap doesn''t work');
-    Session.Commit;
-  finally
-    p2.Free;
-    p1.Free;
-  end;
-end;
-
 function TTestDORM.GetDORMConfigFileName: String;
 begin
   Result := 'dorm.conf';
@@ -117,9 +97,10 @@ begin
   Session.Load<TPerson>(nil);
 end;
 
-procedure TTestDORM.TestIdentityMapExtractWithNilObject;
+procedure TTestDORM.SetUp;
 begin
-  CheckException(LoadPersonaPassingNilAsReturnObject, EdormException);
+  inherited;
+  Session.DeleteAll(TPerson);
 end;
 
 procedure TTestDORM.TestSave;

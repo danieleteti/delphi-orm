@@ -398,8 +398,9 @@ begin
     Query.Free;
   end;
   pk_idx := GetPKMappingIndex(AFieldsMapping);
-  rtti_type.GetProperty(AFieldsMapping[pk_idx].name)
-    .SetValue(AObject, pk_value);
+  TdormUtils.SetProperty(AObject, AFieldsMapping[pk_idx].name, pk_value);
+//  rtti_type.GetProperty(AFieldsMapping[pk_idx].name)
+//    .SetValue(AObject, pk_value);
 end;
 
 function TFirebirdPersistStrategy.InTransaction: Boolean;

@@ -93,6 +93,8 @@ type
       _child_field_name: string): string;
     procedure InsertHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
       AClassName: string; AObject: TObject);
+    procedure InsertHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
+      AClassName: string; AObject: TObject);
     procedure DeleteHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
       AClassName: string; AObject: TObject);
     function CreateChildLoaderSearch(AChildClassName, AChildTableName,
@@ -142,9 +144,11 @@ type
     procedure SetLazyLoadFor(ATypeInfo: PTypeInfo; const APropertyName: string;
       const Value: Boolean);
     function FindOne<T: class>(Criteria: TdormCriteria;
-      FreeCriteria: Boolean = true): T;
-    function List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria)
-      : TdormCollection; overload;
+      FreeCriteria: Boolean = true): T; overload;
+    function FindOne(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
+      FreeCriteria: Boolean = true): TObject; overload;
+    function List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
+      FreeCriteria: Boolean = false): TdormCollection; overload;
     function List(AdormSearchCriteria: IdormSearchCriteria)
       : TdormCollection; overload;
     function ListAll<T: class>(): TdormCollection;
@@ -436,6 +440,26 @@ begin
   // FIdentityMap.Extract(AOID);
 end;
 
+function TSession.FindOne(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
+FreeCriteria: Boolean): TObject;
+var
+  Coll: TdormCollection;
+begin
+  Result := nil;
+  Coll := List(AItemClassInfo, Criteria, FreeCriteria);
+  try
+    if Coll.Count > 1 then
+      raise EdormException.CreateFmt
+        ('FindOne MUST return one, and only one, record. Returned %d instead',
+        [Coll.Count]);
+    if Coll.Count = 1 then
+      Result := Coll.Extract(0);
+    // Non posso usare "as" per un buig nel compilatore :-(
+  finally
+    Coll.Free;
+  end;
+end;
+
 function TSession.FindOne<T>(Criteria: TdormCriteria; FreeCriteria: Boolean): T;
 var
   Coll: TdormCollection;
@@ -578,6 +602,8 @@ begin
   PKValue := GetPKValue(RttiType, GetTableMapping(AObject.ClassName), AObject);
   LoadHasManyRelationByPropertyName(PKValue, RttiType, AObject.ClassName,
     APropertyName, AObject);
+  LoadHasOneRelationByPropertyName(PKValue, RttiType, AObject.ClassName,
+    APropertyName, AObject);
 end;
 
 function TSession.List(AdormSearchCriteria: IdormSearchCriteria)
@@ -717,13 +743,7 @@ end;
 procedure TSession.LoadHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
 AClassName: string; AObject: TObject);
 var
-  // _child_field_name, _child_class_name: string;
   _has_one: TSuperArray;
-  // v, _pk_value: TValue;
-  // List: IList;
-  // O: TObject;
-  // _child_type: TRttiType;
-  // SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
 begin
   GetLogger.EnterLevel('has_one ' + AClassName);
@@ -770,16 +790,12 @@ procedure TSession.LoadHasOneRelationByPropertyName(APKValue: TValue;
 ARttiType: TRttiType; AClassName, APropertyName: string; var AObject: TObject);
 var
   _has_one: TSuperArray;
-  // _child_field_name,
   _child_class_name: string;
   v: TValue;
-  // , _pk_value: TValue;
-  // List: TdormCollection;
-  // O: TObject;
   _child_type: TRttiType;
-  // SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
   _parent_field_key_value: TValue;
+  _child_field_name: string;
 begin
   GetLogger.Debug('Loading HAS_ONE for ' + AClassName + '.' + APropertyName);
   _has_one := FMapping.O['mapping'].O[AObject.ClassName].A['has_one'];
@@ -788,16 +804,23 @@ begin
     i := GetRelationMappingIndexByPropertyName(_has_one, APropertyName);
     if i >= 0 then
     begin
-      _child_class_name := _has_one[i].AsObject.s['class_name'];
-      _child_type := FCTX.FindType(Qualified(_child_class_name));
-      if not assigned(_child_type) then
-        raise Exception.Create('Unknown type ' + _child_class_name);
-      _parent_field_key_value := TdormUtils.GetField(AObject,
-        _has_one[i].AsObject.s['parent_field_name']);
+      if not _has_one[i].B['lazy_load'] then
+      begin
+        _child_class_name := _has_one[i].AsObject.s['class_name'];
+        _child_type := FCTX.FindType(Qualified(_child_class_name));
+        _child_field_name := _has_one[i].AsObject.s['child_field_name'];
+        if not assigned(_child_type) then
+          raise Exception.Create('Unknown type ' + _child_class_name);
+        if _child_field_name = EmptyStr then
+          raise Exception.Create('Empty child_field_name for ' +
+            _child_class_name);
 
-      v := Load(FCTX.FindType(Qualified(_child_class_name)).Handle,
-        _parent_field_key_value);
-      TdormUtils.SetField(AObject, _has_one[i].AsObject.s['name'], v);
+        v := FindOne(_child_type.Handle,
+          TdormCriteria.NewCriteria(_child_field_name,
+          TdormCompareOperator.Equal, APKValue), true);
+        // v := Load(FCTX.FindType(Qualified(_child_class_name)).Handle, APKValue);
+        TdormUtils.SetField(AObject, _has_one[i].AsObject.s['name'], v);
+      end;
     end
     else
       raise Exception.Create('Unknown property name ' + APropertyName);
@@ -836,16 +859,11 @@ procedure TSession.LoadBelongsToRelationByPropertyName(APKValue: TValue;
 ARttiType: TRttiType; AClassName, APropertyName: string; var AObject: TObject);
 var
   _belongs_to: TSuperArray;
-  // _ref_field_name,
   _belong_class_name: string;
   v: TValue;
-  // , _pk_value: TValue;
-  // O: TObject;
   _belong_type: TRttiType;
-  // SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
   _belong_field_key_value: TValue;
-  // prop: TRttiProperty;
 begin
   GetLogger.Debug('Loading BELONGS_TO for ' + AClassName + '.' + APropertyName);
   _belongs_to := FMapping.O['mapping'].O[AObject.ClassName].A['belongs_to'];
@@ -858,15 +876,8 @@ begin
       _belong_type := FCTX.FindType(Qualified(_belong_class_name));
       if not assigned(_belong_type) then
         raise Exception.Create('Unknown type ' + _belong_class_name);
-
-      // prop := ARttiType.GetProperty(_belongs_to[i].AsObject.s['ref_field_name']);
-      // if not assigned(prop) then
-      // raise EdormException.CreateFmt('Cannot find property [%s.%s]',
-      // [ARttiType.ToString, _belongs_to[i].AsObject.s['ref_field_name']]);
-      // _belong_field_key_value := prop.GetValue(AObject);
       _belong_field_key_value := TdormUtils.GetField(AObject,
         _belongs_to[i].AsObject.s['ref_field_name']);
-
       v := Load(FCTX.FindType(Qualified(_belong_class_name)).Handle,
         _belong_field_key_value);
       TdormUtils.SetField(AObject, _belongs_to[i].AsObject.s['name'], v);
@@ -910,6 +921,8 @@ begin
     GetStrategy.Insert(_type, AObject, _table, fields);
     InsertHasManyRelation(GetPKValue(_type, fields, AObject), _type,
       _class_name, AObject);
+    InsertHasOneRelation(GetPKValue(_type, fields, AObject), _type,
+      _class_name, AObject);
   end
   else
     raise EdormException.CreateFmt('Cannot insert object with an ID [%s]',
@@ -935,8 +948,6 @@ var
   i: Integer;
   RttiType: TRttiType;
   _has_many: TSuperArray;
-  // _class_name: string;
-  // fields: TArray<TdormFieldMapping>;
 begin
   RttiType := FCTX.GetType(ATypeInfo);
   _has_many := FMapping.O['mapping'].O[RttiType.ToString].A['has_many'];
@@ -1003,6 +1014,45 @@ begin
     end;
   end;
   GetLogger.ExitLevel('has_many ' + AClassName);
+end;
+
+procedure TSession.InsertHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
+AClassName: string; AObject: TObject);
+var
+  _child_field_name, _child_class_name: string;
+  _has_one: TSuperArray;
+  v: TValue;
+  List: TdormCollection;
+  _child_type: TRttiType;
+  i, j: Integer;
+  Obj: TObject;
+begin
+  GetLogger.EnterLevel('has_one ' + AClassName);
+  _has_one := FMapping.O['mapping'].O[AClassName].A['has_one'];
+  if assigned(_has_one) then
+  begin
+    GetLogger.Debug('Saving _has_one for ' + AClassName);
+    for i := 0 to _has_one.Length - 1 do
+    begin
+      v := TdormUtils.GetField(AObject, _has_one[i].AsObject.s['name']);
+      _child_class_name := _has_one[i].AsObject.s['class_name'];
+      GetLogger.Debug('-- Inspecting for ' + _child_class_name);
+      _child_type := FCTX.FindType(Qualified(_child_class_name));
+      if not assigned(_child_type) then
+        raise Exception.Create('Unknown type ' + _child_class_name);
+      _child_field_name := _has_one[i].AsObject.s['child_field_name'];
+
+      Obj := v.AsObject;
+      if assigned(Obj) then
+      begin
+        GetLogger.Debug('-- Saving ' + _child_type.QualifiedName);
+        GetLogger.Debug('----> Setting property ' + _child_field_name);
+        TdormUtils.SetField(Obj, _child_field_name, APKValue);
+        Save(Obj);
+      end;
+    end;
+  end;
+  GetLogger.ExitLevel('has_one ' + AClassName);
 end;
 
 procedure TSession.StartTransaction;
@@ -1102,8 +1152,8 @@ end;
 // end;
 // end;
 
-function TSession.List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria)
-  : TdormCollection;
+function TSession.List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
+FreeCriteria: Boolean): TdormCollection;
 var
   _table: string;
   SQL: string;
@@ -1166,6 +1216,8 @@ begin
 
   end;
   Result := List(TdormSimpleSearchCriteria.Create(AItemClassInfo, SQL));
+  if FreeCriteria then
+    FreeAndNil(Criteria);
 end;
 
 { TdormSimpleSearchCriteria }
