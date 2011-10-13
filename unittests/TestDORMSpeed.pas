@@ -9,7 +9,7 @@ uses
 type
   TTestDORMSpeed = class(TBaseTestCase)
   public
-    procedure Setup; override;
+    procedure SetUp; override;
     procedure TearDown; override;
   protected
     function GetDORMConfigFileName: String; override;
@@ -71,7 +71,6 @@ procedure TTestDORMSpeed.TestLotOfObjects;
 var
   I: Integer;
   p: TPerson;
-  et: Int64;
 begin
   for I := 1 to 1000 do
   begin

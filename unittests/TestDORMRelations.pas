@@ -9,11 +9,11 @@ uses
   dorm.Commons, BaseTestCase;
 
 type
-  TTestDORMHasMany = class(TBaseTestCase)
+  TTestDORMRelations = class(TBaseTestCase)
   protected
     function GetDORMConfigFileName: String; override;
   public
-    procedure Setup; override;
+    procedure SetUp; override;
     procedure TearDown; override;
   published
     procedure TestLoadHasMany;
@@ -27,24 +27,24 @@ uses
   Classes,
   dorm.Collections, dorm.tests.bo;
 
-{ TTestDORMHasMany }
+{ TTestDORMRelations }
 
-procedure TTestDORMHasMany.Setup;
+procedure TTestDORMRelations.Setup;
 begin
   inherited;
 end;
 
-procedure TTestDORMHasMany.TearDown;
+procedure TTestDORMRelations.TearDown;
 begin
   inherited;
 end;
 
-function TTestDORMHasMany.GetDORMConfigFileName: String;
+function TTestDORMRelations.GetDORMConfigFileName: String;
 begin
   Result := 'dorm.conf';
 end;
 
-procedure TTestDORMHasMany.TestHasManyLazyLoad;
+procedure TTestDORMRelations.TestHasManyLazyLoad;
 var
   p: TPerson;
   t: TPhone;
@@ -86,7 +86,7 @@ begin
   end;
 end;
 
-procedure TTestDORMHasMany.TestLoadHasMany;
+procedure TTestDORMRelations.TestLoadHasMany;
 var
   t, t1: TPhone;
   p: TPerson;
@@ -103,6 +103,9 @@ begin
     t1.Number := '555-7765123';
     t1.Model := 'Casa';
     p.Phones.Add(t1);
+    p.Car := TCar.Create;
+    p.Car.Brand := 'Ford';
+    p.Car.Model := 'Focus 1.8 TDCi';
     Session.Save(p); // save Person and telefoni
     id := p.id;
     Session.Commit;
@@ -114,6 +117,8 @@ begin
   p := Session.Load<TPerson>(id);
   try
     CheckEquals(2, p.Phones.Count);
+    CheckEquals('Ford',p.Car.Brand);
+    CheckEquals('Focus 1.8 TDCi',p.Car.Model);
     Session.Commit;
   finally
     p.Free;
@@ -122,7 +127,7 @@ end;
 
 initialization
 
-RegisterTest(TTestDORMHasMany.Suite);
+RegisterTest(TTestDORMRelations.Suite);
 
 finalization
 
