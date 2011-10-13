@@ -15,16 +15,6 @@ uses
 // ,dorm.Core.IdentityMap;
 
 type
-  TdormSimpleSearchCriteria = class(TdormInterfacedObject, IdormSearchCriteria)
-  protected
-    FSQL: string;
-    FItemClassInfo: PTypeInfo;
-  public
-    constructor Create(AItemClassInfo: PTypeInfo; ASQL: string); virtual;
-    function GetSQL: string;
-    function GetItemClassInfo: PTypeInfo;
-  end;
-
   TdormParam = class
   public
     Value: TValue;
@@ -34,16 +24,7 @@ type
 
   end;
 
-  TdormSearch = class(TdormSimpleSearchCriteria)
-  private
-    FParameters: TdormParameters;
-  public
-    constructor Create(AItemClassInfo: PTypeInfo; ASQL: string);
-    destructor Destroy; override;
-    property Parameters: TdormParameters read FParameters;
-  end;
-
-  TdormCriteria = class
+  TdormCriteria = class(TInterfacedObject)
   private
     FItems: TObjectList<TdormCriteriaItem>;
   public
@@ -58,10 +39,27 @@ type
       CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
     function Count: Integer;
     function GetCriteria(const index: Integer): TdormCriteriaItem;
-    class function NewCriteria(
-      const Attribute: string;
-      CompareOperator: TdormCompareOperator;
-      Value: TValue): TdormCriteria;
+    class function NewCriteria(const Attribute: string;
+      CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
+  end;
+
+  TdormSimpleSearchCriteria = class(TInterfacedObject, IdormSearchCriteria)
+  protected
+    FSQL: string;
+    FItemClassInfo: PTypeInfo;
+  public
+    constructor Create(AItemClassInfo: PTypeInfo; ASQL: string); virtual;
+    function GetSQL: string;
+    function GetItemClassInfo: PTypeInfo;
+  end;
+
+  TdormSearch = class(TdormSimpleSearchCriteria)
+  private
+    FParameters: TdormParameters;
+  public
+    constructor Create(AItemClassInfo: PTypeInfo; ASQL: string);
+    destructor Destroy; override;
+    property Parameters: TdormParameters read FParameters;
   end;
 
   TSession = class(TdormInterfacedObject)
@@ -127,8 +125,8 @@ type
     function GetMapping: ISuperObject;
     function GetLogger: IdormLogger;
     procedure Configure(TextReader: TTextReader);
-    function Save(AObject: TObject;
-      SaveType: TdormSaveType = stAllGraph): TValue; overload;
+    function Save(AObject: TObject; SaveType: TdormSaveType = stAllGraph)
+      : TValue; overload;
     procedure Update(AObject: TObject);
     procedure Save(dormUOW: TdormUOW); overload;
     procedure Delete(AObject: TObject);
@@ -157,9 +155,11 @@ type
     procedure StartTransaction;
     procedure Commit;
     procedure Rollback;
-    function GetPersistentClassesName(WithPackage: Boolean = false): TList<string>;
+    function GetPersistentClassesName(WithPackage: Boolean = false)
+      : TList<string>;
     function Strategy: IdormPersistStrategy;
-    class function CreateConfigured(TextReader: TTextReader; Environment: TdormEnvironment): TSession;
+    class function CreateConfigured(TextReader: TTextReader;
+      Environment: TdormEnvironment): TSession;
   end;
 
 implementation
@@ -261,7 +261,8 @@ begin
     AParentPKValue);
 end;
 
-class function TSession.CreateConfigured(TextReader: TTextReader; Environment: TdormEnvironment): TSession;
+class function TSession.CreateConfigured(TextReader: TTextReader;
+  Environment: TdormEnvironment): TSession;
 begin
   Result := TSession.Create(Environment);
   try
@@ -291,12 +292,12 @@ end;
 procedure TSession.Delete(AObject: TObject);
 var
   RttiType: TRttiType;
-//  oid,
+  // oid,
   _table, _class_name: string;
-//  json, _map: ISuperObject;
-//  m: TdormFieldMapping;
+  // json, _map: ISuperObject;
+  // m: TdormFieldMapping;
   fields: TArray<TdormFieldMapping>;
-//  i: Integer;
+  // i: Integer;
   PKValue: TValue;
 begin
   GetLogger.EnterLevel('Delete');
@@ -315,8 +316,8 @@ end;
 procedure TSession.DeleteAll(AClassType: TClass);
 var
   _table: string;
-//  _child_type, _type: TRttiType;
-//  fields: TArray<TdormFieldMapping>;
+  // _child_type, _type: TRttiType;
+  // fields: TArray<TdormFieldMapping>;
 begin
   _table := GetTableName(AClassType.ClassName);
   GetStrategy.DeleteAll(_table);
@@ -327,9 +328,9 @@ procedure TSession.DeleteHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
 var
   _child_field_name, _child_class_name: string;
   _has_many: TSuperArray;
-  v:TValue;
-//  , _pk_value: TValue;
-//  O: TObject;
+  v: TValue;
+  // , _pk_value: TValue;
+  // O: TObject;
   _child_type: TRttiType;
   i: Integer;
   Coll: TdormCollection;
@@ -353,9 +354,9 @@ begin
       if assigned(Coll) then
         Coll.ForEach<TObject>(
           procedure(O: TObject)
-        begin
-          Delete(O);
-        end);
+          begin
+            Delete(O);
+          end);
     end;
   end;
   GetLogger.ExitLevel('has_many ' + AClassName);
@@ -380,7 +381,8 @@ procedure TSession.DoDeleteValidation(AObject: TObject);
 begin
   if AObject is TdormObject then
   begin
-    if not(TdormObject(AObject).Validate and TdormObject(AObject).DeleteValidate) then
+    if not(TdormObject(AObject).Validate and TdormObject(AObject).DeleteValidate)
+    then
       raise EdormException.Create(TdormObject(AObject).ValidationErrors);
   end;
 end;
@@ -389,7 +391,8 @@ procedure TSession.DoInsertValidation(AObject: TObject);
 begin
   if AObject is TdormObject then
   begin
-    if not(TdormObject(AObject).Validate and TdormObject(AObject).InsertValidate) then
+    if not(TdormObject(AObject).Validate and TdormObject(AObject).InsertValidate)
+    then
       raise EdormException.Create(TdormObject(AObject).ValidationErrors);
   end;
 end;
@@ -422,7 +425,8 @@ procedure TSession.DoUpdateValidation(AObject: TObject);
 begin
   if AObject is TdormObject then
   begin
-    if not(TdormObject(AObject).Validate and TdormObject(AObject).UpdateValidate) then
+    if not(TdormObject(AObject).Validate and TdormObject(AObject).UpdateValidate)
+    then
       raise EdormException.Create(TdormObject(AObject).ValidationErrors);
   end;
 end;
@@ -432,16 +436,18 @@ begin
   // FIdentityMap.Extract(AOID);
 end;
 
-function TSession.FindOne<T>(Criteria: TdormCriteria;
-  FreeCriteria: Boolean): T;
+function TSession.FindOne<T>(Criteria: TdormCriteria; FreeCriteria: Boolean): T;
 var
   Coll: TdormCollection;
 begin
   Coll := List<T>(Criteria, FreeCriteria);
   try
     if Coll.Count <> 1 then
-      raise EdormException.CreateFmt('FindOne MUST return one, and only one, record. Returned %d instead', [Coll.Count]);
-    Result := T(Coll.Extract(0)); // Non posso usare "as" per un buig nel compilatore :-(
+      raise EdormException.CreateFmt
+        ('FindOne MUST return one, and only one, record. Returned %d instead',
+        [Coll.Count]);
+    Result := T(Coll.Extract(0));
+    // Non posso usare "as" per un buig nel compilatore :-(
   finally
     Coll.Free;
   end;
@@ -471,12 +477,13 @@ end;
 function TSession.GetStrategy: IdormPersistStrategy;
 var
   T: TRttiType;
-//  Obj: TObject;
-//  types: TArray<TRttiType>;
+  // Obj: TObject;
+  // types: TArray<TRttiType>;
 begin
   if not assigned(FPersistStrategy) then
   begin
-    T := FCTX.FindType(FMapping.O['persistence'].O[GetEnv].s['database_adapter']);
+    T := FCTX.FindType(FMapping.O['persistence'].O[GetEnv].s
+      ['database_adapter']);
     if assigned(T) then
     begin
       if Supports(T.AsInstance.MetaclassType, IdormPersistStrategy) then
@@ -564,8 +571,8 @@ procedure TSession.LazyLoadFor(const APropertyName: string; AObject: TObject);
 var
   PKValue: TValue;
   RttiType: TRttiType;
-//  _class_name: string;
-//  fields: TArray<TdormFieldMapping>;
+  // _class_name: string;
+  // fields: TArray<TdormFieldMapping>;
 begin
   RttiType := FCTX.GetType(AObject.ClassInfo);
   PKValue := GetPKValue(RttiType, GetTableMapping(AObject.ClassName), AObject);
@@ -606,8 +613,7 @@ var
   _table: string;
 begin
   _table := GetTableName(T.ClassName);
-  Result := List(TdormSimpleSearchCriteria.Create(TypeInfo(T),
-    'SELECT * FROM ' + _table));
+  Result := List<T>(TdormCriteria.Create);
 end;
 
 function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject;
@@ -645,15 +651,9 @@ begin
 end;
 
 procedure TSession.LoadHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
-  AClassName: string; AObject: TObject);
+AClassName: string; AObject: TObject);
 var
-//  _child_field_name, _child_class_name: string;
   _has_many: TSuperArray;
-//  v, _pk_value: TValue;
-//  List: IList;
-//  O: TObject;
-//  _child_type: TRttiType;
-//  SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
 begin
   GetLogger.EnterLevel('has_many ' + AClassName);
@@ -671,15 +671,13 @@ begin
 end;
 
 procedure TSession.LoadHasManyRelationByPropertyName(APKValue: TValue;
-  ARttiType: TRttiType; AClassName: string; APropertyName: string;
-  var AObject: TObject);
+ARttiType: TRttiType; AClassName: string; APropertyName: string;
+var AObject: TObject);
 var
   _has_many: TSuperArray;
   _child_field_name, _child_class_name, _child_db_field_name: string;
   v: TValue;
-//  , _pk_value: TValue;
   List: TdormCollection;
-//  O: TObject;
   _child_type: TRttiType;
   SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
@@ -717,15 +715,15 @@ begin
 end;
 
 procedure TSession.LoadHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
-  AClassName: string; AObject: TObject);
+AClassName: string; AObject: TObject);
 var
-//  _child_field_name, _child_class_name: string;
+  // _child_field_name, _child_class_name: string;
   _has_one: TSuperArray;
-//  v, _pk_value: TValue;
-//  List: IList;
-//  O: TObject;
-//  _child_type: TRttiType;
-//  SearchChildCriteria: IdormSearchCriteria;
+  // v, _pk_value: TValue;
+  // List: IList;
+  // O: TObject;
+  // _child_type: TRttiType;
+  // SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
 begin
   GetLogger.EnterLevel('has_one ' + AClassName);
@@ -743,15 +741,15 @@ begin
 end;
 
 procedure TSession.LoadBelongsToRelation(APKValue: TValue; ARttiType: TRttiType;
-  AClassName: string; AObject: TObject);
+AClassName: string; AObject: TObject);
 var
-//  _child_field_name, _child_class_name: string;
+  // _child_field_name, _child_class_name: string;
   _belongs_to: TSuperArray;
-//  v, _pk_value: TValue;
-//  List: IList;
-//  O: TObject;
-//  _child_type: TRttiType;
-//  SearchChildCriteria: IdormSearchCriteria;
+  // v, _pk_value: TValue;
+  // List: IList;
+  // O: TObject;
+  // _child_type: TRttiType;
+  // SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
 begin
   GetLogger.EnterLevel('belongs_to ' + AClassName);
@@ -769,18 +767,17 @@ begin
 end;
 
 procedure TSession.LoadHasOneRelationByPropertyName(APKValue: TValue;
-  ARttiType: TRttiType; AClassName, APropertyName: string;
-  var AObject: TObject);
+ARttiType: TRttiType; AClassName, APropertyName: string; var AObject: TObject);
 var
   _has_one: TSuperArray;
-//  _child_field_name,
+  // _child_field_name,
   _child_class_name: string;
   v: TValue;
-//  , _pk_value: TValue;
-//  List: TdormCollection;
-//  O: TObject;
+  // , _pk_value: TValue;
+  // List: TdormCollection;
+  // O: TObject;
   _child_type: TRttiType;
-//  SearchChildCriteria: IdormSearchCriteria;
+  // SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
   _parent_field_key_value: TValue;
 begin
@@ -795,7 +792,8 @@ begin
       _child_type := FCTX.FindType(Qualified(_child_class_name));
       if not assigned(_child_type) then
         raise Exception.Create('Unknown type ' + _child_class_name);
-      _parent_field_key_value := TdormUtils.GetField(AObject, _has_one[i].AsObject.s['parent_field_name']);
+      _parent_field_key_value := TdormUtils.GetField(AObject,
+        _has_one[i].AsObject.s['parent_field_name']);
 
       v := Load(FCTX.FindType(Qualified(_child_class_name)).Handle,
         _parent_field_key_value);
@@ -835,20 +833,19 @@ begin
 end;
 
 procedure TSession.LoadBelongsToRelationByPropertyName(APKValue: TValue;
-  ARttiType: TRttiType; AClassName, APropertyName: string;
-  var AObject: TObject);
+ARttiType: TRttiType; AClassName, APropertyName: string; var AObject: TObject);
 var
   _belongs_to: TSuperArray;
-//  _ref_field_name,
+  // _ref_field_name,
   _belong_class_name: string;
   v: TValue;
-//  , _pk_value: TValue;
-//  O: TObject;
+  // , _pk_value: TValue;
+  // O: TObject;
   _belong_type: TRttiType;
-//  SearchChildCriteria: IdormSearchCriteria;
+  // SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
   _belong_field_key_value: TValue;
-//  prop: TRttiProperty;
+  // prop: TRttiProperty;
 begin
   GetLogger.Debug('Loading BELONGS_TO for ' + AClassName + '.' + APropertyName);
   _belongs_to := FMapping.O['mapping'].O[AObject.ClassName].A['belongs_to'];
@@ -867,7 +864,8 @@ begin
       // raise EdormException.CreateFmt('Cannot find property [%s.%s]',
       // [ARttiType.ToString, _belongs_to[i].AsObject.s['ref_field_name']]);
       // _belong_field_key_value := prop.GetValue(AObject);
-      _belong_field_key_value := TdormUtils.GetField(AObject, _belongs_to[i].AsObject.s['ref_field_name']);
+      _belong_field_key_value := TdormUtils.GetField(AObject,
+        _belongs_to[i].AsObject.s['ref_field_name']);
 
       v := Load(FCTX.FindType(Qualified(_belong_class_name)).Handle,
         _belong_field_key_value);
@@ -892,18 +890,10 @@ end;
 
 function TSession.Save(AObject: TObject; SaveType: TdormSaveType): TValue;
 var
-//  _child_type,
   _type: TRttiType;
   _table, _class_name: string; // _child_field_name, _child_class_name,
-//  json, _map: ISuperObject;
-//  m: TdormFieldMapping;
   fields: TArray<TdormFieldMapping>;
-//  i: Integer;
-//  _has_many: TSuperArray;
-//  v,
   _pk_value: TValue;
-//  List: IList;
-//  O: TObject;
 begin
   GetLogger.EnterLevel(_class_name);
   DoInsertValidation(AObject);
@@ -922,7 +912,8 @@ begin
       _class_name, AObject);
   end
   else
-    raise EdormException.CreateFmt('Cannot insert object with an ID [%s]', [_class_name]);
+    raise EdormException.CreateFmt('Cannot insert object with an ID [%s]',
+      [_class_name]);
   GetLogger.ExitLevel(_class_name);
 end;
 
@@ -939,13 +930,13 @@ begin
 end;
 
 procedure TSession.SetLazyLoadFor(ATypeInfo: PTypeInfo;
-  const APropertyName: string; const Value: Boolean);
+const APropertyName: string; const Value: Boolean);
 var
   i: Integer;
   RttiType: TRttiType;
   _has_many: TSuperArray;
-//  _class_name: string;
-//  fields: TArray<TdormFieldMapping>;
+  // _class_name: string;
+  // fields: TArray<TdormFieldMapping>;
 begin
   RttiType := FCTX.GetType(ATypeInfo);
   _has_many := FMapping.O['mapping'].O[RttiType.ToString].A['has_many'];
@@ -961,7 +952,7 @@ end;
 
 procedure TSession.InsertCollection(Collection: TdormCollection);
 var
-//  Obj: TObject;
+  // Obj: TObject;
   i: Integer;
 begin
   for i := 0 to Collection.Count - 1 do
@@ -969,16 +960,16 @@ begin
 end;
 
 procedure TSession.InsertHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
-  AClassName: string; AObject: TObject);
+AClassName: string; AObject: TObject);
 var
   _child_field_name, _child_class_name: string;
   _has_many: TSuperArray;
-  v: TValue;                 //, _pk_value
+  v: TValue; // , _pk_value
   List: TdormCollection;
-//  O: TObject;
+  // O: TObject;
   _child_type: TRttiType;
   i, j: Integer;
-//  prop: TRttiProperty;
+  // prop: TRttiProperty;
 begin
   GetLogger.EnterLevel('has_many ' + AClassName);
   _has_many := FMapping.O['mapping'].O[AClassName].A['has_many'];
@@ -1027,18 +1018,18 @@ end;
 
 procedure TSession.Update(AObject: TObject);
 var
-//  _child_type,
+  // _child_type,
   _type: TRttiType;
-  _table, _class_name: string;    //_child_field_name, _child_class_name,
-//  json, _map: ISuperObject;
-//  m: TdormFieldMapping;
+  _table, _class_name: string; // _child_field_name, _child_class_name,
+  // json, _map: ISuperObject;
+  // m: TdormFieldMapping;
   fields: TArray<TdormFieldMapping>;
-//  i: Integer;
-//  _has_many: TSuperArray;
-//  v,
+  // i: Integer;
+  // _has_many: TSuperArray;
+  // v,
   _pk_value: TValue;
-//  List: IList;
-//  O: TObject;
+  // List: IList;
+  // O: TObject;
 begin
   GetLogger.EnterLevel(_class_name);
   DoUpdateValidation(AObject);
@@ -1057,7 +1048,8 @@ begin
     // _class_name, AObject);
   end
   else
-    raise EdormException.CreateFmt('Cannot update object without an ID [%s]', [_class_name]);
+    raise EdormException.CreateFmt('Cannot update object without an ID [%s]',
+      [_class_name]);
   // begin
   // FLogger.Info('Updating ' + AObject.ClassName);
   // GetStrategy.Update(_type, AObject, _table, fields);
@@ -1069,7 +1061,7 @@ end;
 
 procedure TSession.UpdateCollection(Collection: TdormCollection);
 var
-//  Obj: TObject;
+  // Obj: TObject;
   i: Integer;
 begin
   for i := 0 to Collection.Count - 1 do
@@ -1078,7 +1070,7 @@ end;
 
 procedure TSession.DeleteCollection(Collection: TdormCollection);
 var
-//  Obj: TObject;
+  // Obj: TObject;
   i: Integer;
 begin
   for i := 0 to Collection.Count - 1 do
@@ -1132,7 +1124,10 @@ var
 
 begin
   _table := GetTableName(string(AItemClassInfo.name));
-  SQL := 'SELECT * FROM ' + _table + ' WHERE ';
+  if Criteria.Count > 0 then
+    SQL := 'SELECT * FROM ' + _table + ' WHERE '
+  else
+    SQL := 'SELECT * FROM ' + _table + ' ';
   Mapping := GetTableMapping(string(AItemClassInfo.name));
 
   for i := 0 to Criteria.Count - 1 do
@@ -1176,7 +1171,7 @@ end;
 { TdormSimpleSearchCriteria }
 
 constructor TdormSimpleSearchCriteria.Create(AItemClassInfo: PTypeInfo;
-  ASQL: string);
+ASQL: string);
 begin
   inherited Create;
   FSQL := ASQL;
@@ -1196,8 +1191,8 @@ end;
 { TdormCriteria }
 
 function TdormCriteria.Add(const Attribute: string;
-  CompareOperator: TdormCompareOperator; Value: TValue;
-  LogicRelation: TdormLogicRelation): TdormCriteria;
+CompareOperator: TdormCompareOperator; Value: TValue;
+LogicRelation: TdormLogicRelation): TdormCriteria;
 var
   Item: TdormCriteriaItem;
 begin
@@ -1207,17 +1202,17 @@ begin
   Item.Value := Value;
   Item.LogicRelation := LogicRelation;
   FItems.Add(Item);
-  Result := Self;
+  Result := self;
 end;
 
 function TdormCriteria.AddOr(const Attribute: string;
-  CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
+CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
 begin
   Result := Add(Attribute, CompareOperator, Value, lrOr);
 end;
 
 function TdormCriteria.AddAnd(const Attribute: string;
-  CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
+CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
 begin
   Result := Add(Attribute, CompareOperator, Value, lrAnd);
 end;
@@ -1249,10 +1244,8 @@ begin
   Result := FItems[index];
 end;
 
-class function TdormCriteria.NewCriteria(
-  const Attribute: string;
-  CompareOperator: TdormCompareOperator;
-  Value: TValue): TdormCriteria;
+class function TdormCriteria.NewCriteria(const Attribute: string;
+CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
 begin
   Result := TdormCriteria.Create;
   Result.Add(Attribute, CompareOperator, Value);

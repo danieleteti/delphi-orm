@@ -25,12 +25,8 @@ implementation
 uses
   SysUtils,
   CodeSiteLogging;
-  var
-    Destination: TCodeSiteDestination;
-
 
 { TdormFileLog }
-
 
 procedure TdormFileLog.AfterConstruction;
 begin
@@ -80,19 +76,20 @@ begin
 end;
 
 initialization
-    CodeSite.Enabled := CodeSite.Installed;
-    {$IFNDEF DEBUG}
-    if CodeSite.Enabled then
-    begin
-      Destination := TCodeSiteDestination.Create(nil);
-      Destination.LogFile.Active := True;
-      Destination.LogFile.FileName :=
-        ChangeFileExt(ExtractFileName(paramstr(0)), '.csl');
-      Destination.LogFile.FilePath := ExtractFilepath(paramstr(0));
-      CodeSite.Destination := Destination;
-      CodeSite.Clear
-    end;
-   {$ENDIF}
+
+CodeSite.Enabled := CodeSite.Installed;
+{$IFNDEF DEBUG}
+if CodeSite.Enabled then
+begin
+  Destination := TCodeSiteDestination.Create(nil);
+  Destination.LogFile.Active := True;
+  Destination.LogFile.FileName :=
+    ChangeFileExt(ExtractFileName(paramstr(0)), '.csl');
+  Destination.LogFile.FilePath := ExtractFilepath(paramstr(0));
+  CodeSite.Destination := Destination;
+  CodeSite.Clear
+end;
+{$ENDIF}
 TdormFileLog.register;
 
 end.

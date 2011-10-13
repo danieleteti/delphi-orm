@@ -24,6 +24,12 @@
 			<CfgParent>Base</CfgParent>
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+			<Cfg_1_Win32>true</Cfg_1_Win32>
+			<CfgParent>Cfg_1</CfgParent>
+			<Cfg_1>true</Cfg_1>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
 			<Cfg_2>true</Cfg_2>
 			<CfgParent>Base</CfgParent>
@@ -52,6 +58,11 @@
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 			<DCC_DebugDCUs>true</DCC_DebugDCUs>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+			<Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
+			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<VerInfo_Locale>1033</VerInfo_Locale>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2)'!=''">
 			<DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
 			<DCC_Define>RELEASE;$(DCC_Define)</DCC_Define>
@@ -63,22 +74,23 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="MainForm.pas">
-				<Form>Form6</Form>
+				<Form>frmMain</Form>
 			</DCCReference>
-			<DCCReference Include="..\lib\dorm.DBCreator.pas"/>
-			<DCCReference Include="..\lib\dorm.DBCreator.Firebird.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.utils.Sequences.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.loggers.FileLog.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.Core.IdentityMap.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.Commons.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.Collections.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.adapter.Firebird.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.adapter.Firebird.Factory.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.loggers.CodeSite.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.Utils.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.UOW.pas"/>
-			<DCCReference Include="..\..\lib\DORM\dorm.InterposedObject.pas"/>
+			<DCCReference Include="..\..\source\dorm.adapter.Firebird.Factory.pas"/>
+			<DCCReference Include="..\..\source\dorm.adapter.Firebird.pas"/>
+			<DCCReference Include="..\..\source\dorm.Collections.pas"/>
+			<DCCReference Include="..\..\source\dorm.Commons.pas"/>
+			<DCCReference Include="..\..\source\dorm.Core.IdentityMap.pas"/>
+			<DCCReference Include="..\..\source\dorm.InterposedObject.pas"/>
+			<DCCReference Include="..\..\source\dorm.loggers.CodeSite.pas"/>
+			<DCCReference Include="..\..\source\dorm.loggers.FileLog.pas"/>
+			<DCCReference Include="..\..\source\dorm.pas"/>
+			<DCCReference Include="..\..\source\dorm.UOW.pas"/>
+			<DCCReference Include="..\..\source\dorm.Utils.pas"/>
+			<DCCReference Include="..\..\source\dorm.utils.Sequences.pas"/>
+			<DCCReference Include="..\..\lib\superobject\superobject.pas"/>
+			<DCCReference Include="lib\dorm.DBCreator.Firebird.pas"/>
+			<DCCReference Include="lib\dorm.DBCreator.pas"/>
 			<None Include="ModelSupport_dormDCGUI\default.txaPackage"/>
 			<None Include="ModelSupport_dormDCGUI\default.txvpck"/>
 			<None Include="ModelSupport_dormDCGUI\dorm\default.txvpck"/>
@@ -88,7 +100,6 @@
 			<None Include="ModelSupport_dormDCGUI\dorm\DBCreator\default.txaPackage"/>
 			<None Include="ModelSupport_dormDCGUI\dorm\default.txaPackage"/>
 			<None Include="ModelSupport_dormDCGUI\dorm\DBCreator\Firebird\default.txaPackage"/>
-			<None Include="..\bin\dormDCGUI.sql"/>
 			<BuildConfiguration Include="Release">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
@@ -139,13 +150,8 @@
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
 					<Excluded_Packages>
-						<Excluded_Packages Name="C:\Windows\system32\GridPackd2011.bpl">TMS Grid Pack</Excluded_Packages>
-						<Excluded_Packages Name="C:\Windows\system32\DBGridPackd2011.bpl">TMS DB Grid Pack</Excluded_Packages>
-						<Excluded_Packages Name="C:\ProgramData\tmssoftware\GridPack RSXE\gridpackxlsd2011.bpl">TMS Grid Pack Excel support</Excluded_Packages>
-						<Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\8.0\Bpl\B305vdXE.bpl">TurboPower Abbrevia 3.05 Design-time package - VCLXE</Excluded_Packages>
-						<Excluded_Packages Name="C:\ProgramData\tmssoftware\GridPack RSXE\dbgridpackded2011.bpl">TMS DB Grid Pack design time support</Excluded_Packages>
-						<Excluded_Packages Name="C:\Windows\system32\GridPackDEd2011.bpl">TMS Grid Pack design time support</Excluded_Packages>
-						<Excluded_Packages Name="$(BDSBIN)\DataSetManager150.bpl">Devart DataSet Manager</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
 					</Excluded_Packages>
 				</Delphi.Personality>
 				<Platforms>

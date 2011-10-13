@@ -12,23 +12,12 @@ implementation
 uses
   SysUtils;
 
-//class function TSequenceGUID.NewGUID: string;
-//var
-//  guid: TGUID;
-//begin
-//  CreateGUID(guid);
-//  Result := GUIDToString(guid);
-//end;
-
 class function TSequenceGUID.NewGUID: string;
 var
-  guid: string;
+  guid: TGUID;
 begin
-  Result := IntToStr(Random(100000));
+  CreateGUID(guid);
+  Result := GUIDToString(guid);
 end;
-
-
-initialization
-  Randomize;
 
 end.
