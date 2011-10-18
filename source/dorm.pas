@@ -162,6 +162,8 @@ type
     function GetPersistentClassesName(WithPackage: Boolean = false)
       : TList<string>;
     function Strategy: IdormPersistStrategy;
+    function OIDIsSet(Obj: TObject): Boolean;
+    procedure ClearOID(Obj: TObject);
     class function CreateConfigured(TextReader: TTextReader;
       Environment: TdormEnvironment): TSession;
   end;
@@ -176,22 +178,19 @@ uses
 
 { TSession }
 
+procedure TSession.ClearOID(Obj: TObject);
+var
+  rt: TRttiType;
+  pk_value: TValue;
+begin
+  rt := FCTX.GetType(Obj.ClassType);
+  TdormUtils.SetField(Obj, GetPKName(GetTableMapping(rt.ToString)),
+    GetStrategy.GetNullKeyValue);
+end;
+
 function TSession.Clone<T>(Obj: T): T;
-// var
-// _rtty_type: TRttiType;
-// field: TRttiField;
-// master, cloned: TObject;
 begin
   Result := T(TdormUtils.Clone(Obj));
-  // Exit;
-  // cloned := TdormUtils.CreateObject(FCTX.GetType(TypeInfo(T)));
-  // master := Obj;
-  // _rtty_type := FCTX.GetType(TypeInfo(T));
-  // for field in _rtty_type.GetFields do
-  // begin
-  // field.SetValue(cloned, field.GetValue(master));
-  // end;
-  // Result := T(cloned);
 end;
 
 procedure TSession.Commit;
@@ -227,8 +226,6 @@ begin
       raise;
     end;
   end;
-
-  // GetStrategy.StartTransaction;
 end;
 
 function TSession.Count(AClassType: TClass): Int64;
@@ -246,7 +243,6 @@ begin
   FDictTables := TDictionary<string, string>.Create(128);
   FDictMapping := TDictionary < string, TArray < TdormFieldMapping >>
     .Create(128);
-  // FIdentityMap := TIdentityMap.Create;
   FUOWInsert := TObjectList<TObject>.Create(true);
   FUOWUpdate := TObjectList<TObject>.Create(true);
   FUOWDelete := TObjectList<TObject>.Create(true);
@@ -296,12 +292,8 @@ end;
 procedure TSession.Delete(AObject: TObject);
 var
   RttiType: TRttiType;
-  // oid,
   _table, _class_name: string;
-  // json, _map: ISuperObject;
-  // m: TdormFieldMapping;
   fields: TArray<TdormFieldMapping>;
-  // i: Integer;
   PKValue: TValue;
 begin
   GetLogger.EnterLevel('Delete');
@@ -501,8 +493,6 @@ end;
 function TSession.GetStrategy: IdormPersistStrategy;
 var
   T: TRttiType;
-  // Obj: TObject;
-  // types: TArray<TRttiType>;
 begin
   if not assigned(FPersistStrategy) then
   begin
@@ -835,6 +825,16 @@ begin
     LoadRelations(AList.GetItem(i));
 end;
 
+function TSession.OIDIsSet(Obj: TObject): Boolean;
+var
+  rt: TRttiType;
+  pk_value: TValue;
+begin
+  rt := FCTX.GetType(Obj.ClassType);
+  pk_value := GetPKValue(rt, GetTableMapping(rt.ToString), Obj);
+  Result := not GetStrategy.IsNullKey(pk_value);
+end;
+
 procedure TSession.LoadRelations(AObject: TObject);
 var
   rt: TRttiType;
@@ -1100,18 +1100,11 @@ begin
   else
     raise EdormException.CreateFmt('Cannot update object without an ID [%s]',
       [_class_name]);
-  // begin
-  // FLogger.Info('Updating ' + AObject.ClassName);
-  // GetStrategy.Update(_type, AObject, _table, fields);
-  // UpdateHasManyRelation(GetPKValue(_type, fields, AObject), _type,
-  // _class_name, AObject);
-  // end;
   GetLogger.ExitLevel(_class_name);
 end;
 
 procedure TSession.UpdateCollection(Collection: TdormCollection);
 var
-  // Obj: TObject;
   i: Integer;
 begin
   for i := 0 to Collection.Count - 1 do
@@ -1120,37 +1113,11 @@ end;
 
 procedure TSession.DeleteCollection(Collection: TdormCollection);
 var
-  // Obj: TObject;
   i: Integer;
 begin
   for i := 0 to Collection.Count - 1 do
     Delete(Collection.GetItem(i));
 end;
-
-// procedure TSession.UpdateHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
-// AClassName: string; AObject: TObject);
-// var
-// _child_field_name, _child_class_name: string;
-// _has_many: TSuperArray;
-// v, _pk_value: TValue;
-// List: IList;
-// O: TObject;
-// _child_type: TRttiType;
-// begin
-// _has_many := FMapping.O['mapping'].O[AClassName].A['has_many'];
-// if assigned(_has_many) then
-// begin
-// v := ARttiType.GetProperty(_has_many[0].AsObject.s['name'])
-// .GetValue(AObject);
-// _child_class_name := _has_many[0].AsObject.s['class_name'];
-// _child_type := FCTX.FindType(Qualified(_child_class_name));
-// if not assigned(_child_type) then
-// raise Exception.Create('Unknown type ' + _child_class_name);
-// _child_field_name := _has_many[0].AsObject.s['child_field_name'];
-// TdormCollection(v.AsObject).ForEach<TObject>( procedure(O: TObject)
-// begin Save(O); end);
-// end;
-// end;
 
 function TSession.List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
 FreeCriteria: Boolean): TdormCollection;

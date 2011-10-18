@@ -84,6 +84,7 @@ type
     destructor Destroy; override;
     class procedure register;
     function IsNullKey(const Value: TValue): Boolean;
+    function GetNullKeyValue: TValue;
     function RawExecute(SQL: string): Int64;
   end;
 
@@ -94,7 +95,8 @@ type
   public
     function NewStringKey(const Entity: string): string;
     function NewIntegerKey(const Entity: string): UInt64;
-    property FirebirdConnection: TFBFactory read FFirebirdConnection write SetFirebirdConnection;
+    property FirebirdConnection: TFBFactory read FFirebirdConnection
+      write SetFirebirdConnection;
     class procedure RegisterClass;
   end;
 
@@ -107,7 +109,7 @@ function TFirebirdPersistStrategy.Update(rtti_type: TRttiType; AObject: TObject;
   ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>): TValue;
 var
   field: TdormFieldMapping;
-  //sql_fields_values,
+  // sql_fields_values,
   SQL: string;
   Query: TDBXCommand;
   I, pk_idx: Integer;
@@ -171,7 +173,8 @@ begin
     raise EdormException.Create('Unknown key generator ' +
       FKeysGeneratorClassName);
   obj := t.AsInstance.MetaclassType.Create;
-  TFirebirdTableSequence(obj).FFirebirdConnection := FB; // VERY VERY VERY BAD!!!
+  TFirebirdTableSequence(obj).FFirebirdConnection := FB;
+  // VERY VERY VERY BAD!!!
 
   if not Supports(obj, IdormKeysGenerator, FKeysGenerator) then
     raise EdormException.Create('Invalid keys generator ' +
@@ -240,7 +243,7 @@ var
   pk_value: TValue;
   pk_attribute_name, pk_field_name, SQL: string;
   cmd: TDBXCommand;
-//  reader: TDBXReader;
+  // reader: TDBXReader;
 begin
   pk_idx := GetPKMappingIndex(AFieldsMapping);
   if pk_idx = -1 then
@@ -314,7 +317,8 @@ begin
     end;
   except
     on E: Exception do
-      raise EdormException.Create('Error during fill primary key for query. ' + E.Message);
+      raise EdormException.Create('Error during fill primary key for query. ' +
+        E.Message);
   end;
 end;
 
@@ -356,9 +360,9 @@ var
   Query: TDBXCommand;
   I, pk_idx: Integer;
   v, pk_value: TValue;
-//  par: TDBXParameter;
-//  guid: string;
-//  d: TDBXDateValue;
+  // par: TDBXParameter;
+  // guid: string;
+  // d: TDBXDateValue;
 begin
   sql_fields_names := '';
   for field in AFieldsMapping do
@@ -399,8 +403,8 @@ begin
   end;
   pk_idx := GetPKMappingIndex(AFieldsMapping);
   TdormUtils.SetProperty(AObject, AFieldsMapping[pk_idx].name, pk_value);
-//  rtti_type.GetProperty(AFieldsMapping[pk_idx].name)
-//    .SetValue(AObject, pk_value);
+  // rtti_type.GetProperty(AFieldsMapping[pk_idx].name)
+  // .SetValue(AObject, pk_value);
 end;
 
 function TFirebirdPersistStrategy.InTransaction: Boolean;
@@ -420,11 +424,16 @@ begin
   end;
 end;
 
+function TFirebirdPersistStrategy.GetNullKeyValue: TValue;
+begin
+  Result := FNullKeyValue;
+end;
+
 function TFirebirdPersistStrategy.List(ARttiType: TRttiType; ATableName: string;
   AFieldsMapping: TArray<TdormFieldMapping>;
   AdormSearchCriteria: IdormSearchCriteria): TdormCollection;
 var
-//  pk_idx: Integer;
+  // pk_idx: Integer;
   SQL: string;
   cmd: TDBXCommand;
   reader: TDBXReader;
@@ -451,11 +460,11 @@ end;
 function TFirebirdPersistStrategy.Load(ARttiType: TRttiType; ATableName: string;
   AFieldsMapping: TArray<TdormFieldMapping>; const Value: TValue): TObject;
 var
-  pk_idx:integer;
-//  , pk_value: Integer;
+  pk_idx: Integer;
+  // , pk_value: Integer;
   pk_attribute_name, pk_field_name, SQL: string;
   cmd: TDBXCommand;
-//  v: TValue;
+  // v: TValue;
   reader: TDBXReader;
 begin
   Result := nil;
@@ -495,8 +504,8 @@ function TFirebirdPersistStrategy.Load(ARttiType: TRttiType; ATableName: string;
   AFieldsMapping: TArray<TdormFieldMapping>; const Value: string;
   out AObject: TObject): Boolean;
 var
-  pk_idx:integer;
-//  , pk_value: Integer;
+  pk_idx: Integer;
+  // , pk_value: Integer;
   pk_attribute_name, pk_field_name, SQL: string;
   cmd: TDBXCommand;
   reader: TDBXReader;
@@ -531,10 +540,10 @@ function TFirebirdPersistStrategy.LoadObjectFromDBXReader(ARttiType: TRttiType;
   AObject: TObject): Boolean;
 var
   obj: TObject;
-//  obj1: TStringBuilder;
+  // obj1: TStringBuilder;
   field: TdormFieldMapping;
   v: TValue;
-//  I: Integer;
+  // I: Integer;
 begin
   Result := False;
   obj := AObject;
@@ -567,7 +576,7 @@ function TFirebirdPersistStrategy.CreateObjectFromDBXReader
   AFieldsMapping: TArray<TdormFieldMapping>): TObject;
 var
   obj: TObject;
-//  obj1: TStringBuilder;
+  // obj1: TStringBuilder;
   field: TdormFieldMapping;
   v: TValue;
   t: TTimeStamp;
@@ -633,8 +642,8 @@ begin
       except
         on E: Exception do
         begin
-          raise EdormException.Create(E.Message + sLineBreak + '. Probably cannot read ' +
-            ARttiType.ToString + '.' + S);
+          raise EdormException.Create(E.Message + sLineBreak +
+            '. Probably cannot read ' + ARttiType.ToString + '.' + S);
         end;
       end;
     end;
@@ -727,7 +736,8 @@ begin
       str.CopyFrom(sourceStream, sourceStream.Size);
       str.Position := 0;
       aDBXValue.SetStream(str, true);
-      aDBXValue.ValueType.ValueTypeFlags := aDBXValue.ValueType.ValueTypeFlags or TDBXValueTypeFlags.ExtendedType;
+      aDBXValue.ValueType.ValueTypeFlags :=
+        aDBXValue.ValueType.ValueTypeFlags or TDBXValueTypeFlags.ExtendedType;
     end;
   end
   else if CompareText(aFieldType, 'decimal') = 0 then

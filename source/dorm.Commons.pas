@@ -127,6 +127,7 @@ type
     procedure Rollback;
     function InTransaction: boolean;
     function IsNullKey(const Value: TValue): boolean;
+    function GetNullKeyValue: TValue;
     procedure SetLogger(ALogger: IdormLogger);
     function RawExecute(SQL: string): Int64;
   end;

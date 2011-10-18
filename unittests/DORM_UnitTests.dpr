@@ -14,8 +14,6 @@ uses
   TestDORMSearchCriteria in 'TestDORMSearchCriteria.pas',
   TestDORMSpeed in 'TestDORMSpeed.pas',
   TestDORMRelations in 'TestDORMRelations.pas',
-  dorm.adapter.Firebird.Factory in '..\source\dorm.adapter.Firebird.Factory.pas',
-  dorm.adapter.Firebird in '..\source\dorm.adapter.Firebird.pas',
   dorm.Collections in '..\source\dorm.Collections.pas',
   dorm.Commons in '..\source\dorm.Commons.pas',
   dorm.Core.IdentityMap in '..\source\dorm.Core.IdentityMap.pas',
@@ -30,7 +28,9 @@ uses
   FindersTests in 'FindersTests.pas',
   FrameworkTests in 'FrameworkTests.pas',
   dorm.Finders in '..\source\dorm.Finders.pas',
-  dorm.loggers.CodeSite in '..\source\dorm.loggers.CodeSite.pas';
+  dorm.loggers.CodeSite in '..\source\dorm.loggers.CodeSite.pas',
+  dorm.adapter.Firebird.Factory in '..\source\dorm.adapter.Firebird.Factory.pas',
+  dorm.adapter.Firebird in '..\source\dorm.adapter.Firebird.pas';
 
 {$R *.RES}
 
