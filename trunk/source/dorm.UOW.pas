@@ -9,15 +9,16 @@ uses
 
 type
   TdormUOW = class
-  public
+  protected
     FUOWInsert, FUOWUpdate, FUOWDelete: TdormCollection;
   public
-    constructor Create;
-      virtual;
-    destructor Destroy;
-      override;
-    function AddInsertOrUpdate(Obj: TObject): TdormUOW;
+    constructor Create; virtual;
+    destructor Destroy; override;
+    function AddInsertOrUpdate(Obj: TObject;
+      const OIDPropertyName: String = 'ID'): TdormUOW;
     function AddDelete(Obj: TObject): TdormUOW;
+    function AddInsert(Obj: TObject): TdormUOW;
+    function AddUpdate(Obj: TObject): TdormUOW;
     function GetUOWInsert: TdormCollection;
     function GetUOWUpdate: TdormCollection;
     function GetUOWDelete: TdormCollection;
@@ -54,8 +55,18 @@ begin
   Result := Self;
 end;
 
-function TdormUOW.AddInsertOrUpdate(Obj: TObject): TdormUOW;
+function TdormUOW.AddInsert(Obj: TObject): TdormUOW;
+var
+  v: TValue;
+begin
+  Result := Self;
+  if (FUOWInsert.IndexOf(Obj) > -1) then
+    Exit;
+  FUOWInsert.Add(Obj)
+end;
 
+function TdormUOW.AddInsertOrUpdate(Obj: TObject; const OIDPropertyName: String)
+  : TdormUOW;
 var
   v: TValue;
 begin
@@ -65,7 +76,7 @@ begin
     Exit;
   end;
 
-  v := TdormUtils.GetField(Obj, 'ID');
+  v := TdormUtils.GetProperty(Obj, OIDPropertyName);
   if v.IsType<Int64> then
   begin
     if v.AsInt64 = 0 then
@@ -81,8 +92,19 @@ begin
       FUOWUpdate.Add(Obj);
   end
   else
-    raise EdormException.Create('Invalid key type in TdormUOW.AddInsertOrUpdate');
+    raise EdormException.Create
+      ('Invalid key type in TdormUOW.AddInsertOrUpdate');
   Result := Self;
+end;
+
+function TdormUOW.AddUpdate(Obj: TObject): TdormUOW;
+var
+  v: TValue;
+begin
+  Result := Self;
+  if (FUOWUpdate.IndexOf(Obj) > -1) then
+    Exit;
+  FUOWUpdate.Add(Obj);
 end;
 
 procedure TdormUOW.Cancel;

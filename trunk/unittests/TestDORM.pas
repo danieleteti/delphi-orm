@@ -17,6 +17,8 @@ type
     procedure TestSave;
     procedure TestUpdate;
     procedure TestCRUD;
+    procedure TestUOW;
+    procedure TestDormObject;
   end;
 
 implementation
@@ -24,7 +26,7 @@ implementation
 uses
   Classes,
   SysUtils,
-  dorm.Commons, dorm.tests.bo;
+  dorm.Commons, dorm.tests.bo, dorm.UOW;
 
 { TTestDORM }
 
@@ -87,6 +89,28 @@ begin
   end;
 end;
 
+procedure TTestDORM.TestDormObject;
+var
+  p: TPerson;
+begin
+  p := TPerson.NewPerson;
+  try
+    p.Email := TEmail.Create;
+    p.Email.Value := 'not_a_real_email';
+    try
+      Session.Save(p);
+      Fail('There should be an exception here. The email is not valid!');
+    except
+      on E: Exception do
+      begin
+        CheckTrue(E.ClassName = 'EdormException');
+      end;
+    end;
+  finally
+    p.Free;
+  end;
+end;
+
 function TTestDORM.GetDORMConfigFileName: String;
 begin
   Result := 'dorm.conf';
@@ -115,6 +139,54 @@ begin
     p.Free;
   end;
   CheckEquals(1, Session.Count(TPerson));
+end;
+
+procedure TTestDORM.TestUOW;
+var
+  UOW: TdormUOW;
+  p1: TPerson;
+  p2: TPerson;
+begin
+  UOW := TdormUOW.Create;
+  try
+    p1 := TPerson.NewPerson;
+    try
+      p1.FirstName := 'John';
+      p1.LastName := 'Doe';
+      p2 := TPerson.NewPerson;
+      try
+        p1.FirstName := 'Scott';
+        p1.LastName := 'Summer';
+        CheckFalse(Session.OIDIsSet(p1));
+        UOW.AddInsert(p1);
+        Session.Save(UOW);
+        CheckTrue(Session.OIDIsSet(p1));
+        UOW.Clear;
+        p1.FirstName := 'John';
+        UOW.AddUpdate(p1);
+        Session.Save(UOW);
+        CheckTrue(Session.OIDIsSet(p1));
+        UOW.Clear;
+        UOW.AddDelete(p1);
+        Session.Save(UOW);
+        UOW.GetUOWDelete.Extract(p1);
+        // otherwise, p1 is owned by the "delete" TdormCollection
+        Session.ClearOID(p1);
+        UOW.AddInsert(p1);
+        // This will not actually add the object to the collection.
+        UOW.AddInsert(p1);
+        CheckEquals(1, UOW.GetUOWInsert.Count);
+        Session.Save(UOW);
+        CheckTrue(Session.OIDIsSet(p1));
+      finally
+        p2.Free;
+      end;
+    finally
+      p1.Free;
+    end;
+  finally
+    UOW.Free;
+  end;
 end;
 
 procedure TTestDORM.TestUpdate;

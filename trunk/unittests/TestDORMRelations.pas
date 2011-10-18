@@ -29,7 +29,7 @@ uses
 
 { TTestDORMRelations }
 
-procedure TTestDORMRelations.Setup;
+procedure TTestDORMRelations.SetUp;
 begin
   inherited;
 end;
@@ -64,7 +64,7 @@ begin
 
   Session.StartTransaction;
   // Now Test with lazy load ON
-  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Telefoni', true);
+  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Phones', true);
   p := Session.Load<TPerson>(id);
   try
     CheckFalse(Assigned(p.Phones));
@@ -75,9 +75,8 @@ begin
 
   Session.StartTransaction;
   // Test with lazy load OFF
-  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Telefoni', false);
+  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Phones', false);
   p := Session.Load<TPerson>(id);
-  // Without commit, AV becouse IdentityMap doesn't work propely
   try
     CheckEquals(1, p.Phones.Count); // Child objects are loaded
     Session.Commit;
@@ -117,8 +116,8 @@ begin
   p := Session.Load<TPerson>(id);
   try
     CheckEquals(2, p.Phones.Count);
-    CheckEquals('Ford',p.Car.Brand);
-    CheckEquals('Focus 1.8 TDCi',p.Car.Model);
+    CheckEquals('Ford', p.Car.Brand);
+    CheckEquals('Focus 1.8 TDCi', p.Car.Model);
     Session.Commit;
   finally
     p.Free;

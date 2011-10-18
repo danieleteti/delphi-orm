@@ -3,8 +3,7 @@ unit TestDORMSpeed;
 interface
 
 uses
-  TestFramework,
-  dorm, BaseTestCase;
+  TestFramework, dorm, BaseTestCase;
 
 type
   TTestDORMSpeed = class(TBaseTestCase)
@@ -32,7 +31,7 @@ begin
   Result := 'dorm.conf';
 end;
 
-procedure TTestDORMSpeed.Setup;
+procedure TTestDORMSpeed.SetUp;
 begin
   inherited;
   Session.DeleteAll(TPerson);
@@ -47,7 +46,6 @@ procedure TTestDORMSpeed.TestList;
 var
   I: Integer;
   p: TPerson;
-  // persone: IList;
   persone: TdormCollection;
 begin
   for I := 1 to 1000 do
@@ -59,12 +57,13 @@ begin
   end;
   Session.Commit;
   Session.StartTransaction;
-  SetStartTime(0);
-
   persone := Session.ListAll<TPerson>;
-
-  CheckEquals(1000, persone.Count);
-  Session.Commit;
+  try
+    CheckEquals(1000, persone.Count);
+    Session.Commit;
+  finally
+    persone.Free;
+  end;
 end;
 
 procedure TTestDORMSpeed.TestLotOfObjects;

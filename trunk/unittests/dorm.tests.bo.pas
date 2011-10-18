@@ -3,7 +3,7 @@ unit dorm.tests.bo;
 interface
 
 uses
-  dorm.Commons, dorm.Collections;
+  dorm.Commons, dorm.Collections, dorm.InterposedObject;
 
 type
   TCar = class
@@ -16,12 +16,28 @@ type
     procedure SetModel(const Value: string);
     procedure SetPersonID(const Value: Integer);
     procedure SetID(const Value: Integer);
-    //Private!!!
+    // Private!!!
     property PersonID: Integer read FPersonID write SetPersonID;
   public
     property ID: Integer read FID write SetID;
     property Brand: string read FBrand write SetBrand;
     property Model: string read FModel write SetModel;
+  end;
+
+  TEmail = class(TdormObject)
+  private
+    FValue: String;
+    FPersonID: Integer;
+    FID: Integer;
+    procedure SetValue(const Value: String);
+    procedure SetPersonID(const Value: Integer);
+    procedure SetID(const Value: Integer);
+    // Private!!!
+    property PersonID: Integer read FPersonID write SetPersonID;
+  public
+    function Validate: Boolean; override;
+    property ID: Integer read FID write SetID;
+    property Value: String read FValue write SetValue;
   end;
 
   TPerson = class
@@ -33,6 +49,7 @@ type
     FBornDate: TDate;
     FPhones: TdormCollection;
     FCar: TCar;
+    FEmail: TEmail;
     procedure SetLastName(const Value: string);
     procedure SetAge(const Value: Int32);
     procedure SetFirstName(const Value: string);
@@ -40,6 +57,7 @@ type
     procedure SetBornDate(const Value: TDate);
     procedure SetPhones(const Value: TdormCollection);
     procedure SetCar(const Value: TCar);
+    procedure SetEmail(const Value: TEmail);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -53,6 +71,7 @@ type
     property BornDate: TDate read FBornDate write SetBornDate;
     property Phones: TdormCollection read FPhones write SetPhones;
     property Car: TCar read FCar write SetCar;
+    property Email: TEmail read FEmail write SetEmail;
   end;
 
   TPhone = class
@@ -65,7 +84,7 @@ type
     procedure SetModel(const Value: string);
     procedure SetID(const Value: Integer);
     procedure SetPersonID(const Value: Integer);
-    //Private!!!
+    // Private!!!
     property PersonID: Integer read FPersonID write SetPersonID;
   public
     class constructor Create;
@@ -82,6 +101,37 @@ implementation
 uses
   SysUtils;
 
+function IsValidEmail(const Value: string): Boolean;
+
+  function CheckAllowed(const s: string): Boolean;
+  var
+    i: Integer;
+  begin
+    Result := false;
+    for i := 1 to Length(s) do
+      if not(s[i] in ['a' .. 'z', 'A' .. 'Z', '0' .. '9', '_', '-', '.']) then
+        Exit;
+    Result := true;
+  end;
+
+var
+  i: Integer;
+  NamePart, ServerPart: string;
+begin
+  Result := false;
+  i := Pos('@', Value);
+  if i = 0 then
+    Exit;
+  NamePart := Copy(Value, 1, i - 1);
+  ServerPart := Copy(Value, i + 1, Length(Value));
+  if (Length(NamePart) = 0) or ((Length(ServerPart) < 5)) then
+    Exit;
+  i := Pos('.', ServerPart);
+  if (i = 0) or (i > (Length(ServerPart) - 2)) then
+    Exit;
+  Result := CheckAllowed(NamePart) and CheckAllowed(ServerPart);
+end;
+
 { TPerson }
 
 constructor TPerson.Create;
@@ -95,6 +145,7 @@ destructor TPerson.Destroy;
 begin
   FreeAndNil(FPhones);
   FreeAndNil(FCar);
+  FreeAndNil(FEmail);
   inherited;
 end;
 
@@ -110,6 +161,11 @@ end;
 procedure TPerson.SetCar(const Value: TCar);
 begin
   FCar := Value;
+end;
+
+procedure TPerson.SetEmail(const Value: TEmail);
+begin
+  FEmail := Value;
 end;
 
 procedure TPerson.SetLastName(const Value: string);
@@ -207,6 +263,29 @@ end;
 procedure TCar.SetPersonID(const Value: Integer);
 begin
   FPersonID := Value;
+end;
+
+{ TEmail }
+
+procedure TEmail.SetID(const Value: Integer);
+begin
+  FID := Value;
+end;
+
+procedure TEmail.SetPersonID(const Value: Integer);
+begin
+  FPersonID := Value;
+end;
+
+procedure TEmail.SetValue(const Value: String);
+begin
+  FValue := Value;
+end;
+
+function TEmail.Validate: Boolean;
+begin
+  if not IsValidEmail(Value) then
+    AddError('Invalid email');
 end;
 
 end.

@@ -95,8 +95,6 @@
 			<DCCReference Include="TestDORMSearchCriteria.pas"/>
 			<DCCReference Include="TestDORMSpeed.pas"/>
 			<DCCReference Include="TestDORMRelations.pas"/>
-			<DCCReference Include="..\source\dorm.adapter.Firebird.Factory.pas"/>
-			<DCCReference Include="..\source\dorm.adapter.Firebird.pas"/>
 			<DCCReference Include="..\source\dorm.Collections.pas"/>
 			<DCCReference Include="..\source\dorm.Commons.pas"/>
 			<DCCReference Include="..\source\dorm.Core.IdentityMap.pas"/>
@@ -112,6 +110,8 @@
 			<DCCReference Include="FrameworkTests.pas"/>
 			<DCCReference Include="..\source\dorm.Finders.pas"/>
 			<DCCReference Include="..\source\dorm.loggers.CodeSite.pas"/>
+			<DCCReference Include="..\source\dorm.adapter.Firebird.Factory.pas"/>
+			<DCCReference Include="..\source\dorm.adapter.Firebird.pas"/>
 			<BuildConfiguration Include="Debug">
 				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
