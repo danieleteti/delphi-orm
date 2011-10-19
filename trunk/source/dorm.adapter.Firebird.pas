@@ -726,18 +726,23 @@ begin
   end
   else if CompareText(aFieldType, 'blob') = 0 then
   begin
-    str := TBytesStream.Create;
     sourceStream := TStream(aValue.AsObject);
     if sourceStream = nil then
       aDBXValue.SetNull
     else
     begin
-      sourceStream.Position := 0;
-      str.CopyFrom(sourceStream, sourceStream.Size);
-      str.Position := 0;
-      aDBXValue.SetStream(str, true);
-      aDBXValue.ValueType.ValueTypeFlags :=
-        aDBXValue.ValueType.ValueTypeFlags or TDBXValueTypeFlags.ExtendedType;
+      str := TBytesStream.Create;
+      try
+        sourceStream.Position := 0;
+        str.CopyFrom(sourceStream, sourceStream.Size);
+        str.Position := 0;
+        aDBXValue.SetStream(str, true);
+        aDBXValue.ValueType.ValueTypeFlags :=
+          aDBXValue.ValueType.ValueTypeFlags or TDBXValueTypeFlags.ExtendedType;
+      except
+        str.Free;
+        raise;
+      end;
     end;
   end
   else if CompareText(aFieldType, 'decimal') = 0 then
