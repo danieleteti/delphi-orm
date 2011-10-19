@@ -124,6 +124,7 @@ type
     function GetEnv: string;
     // Core
     function Clone<T: class, constructor>(Obj: T): T;
+    procedure CopyObject(SourceObject, TargetObject: TObject);
     function GetTableName(AClassName: string): string;
     function GetTableMapping(AClassName: string): TArray<TdormFieldMapping>;
     function GetMapping: ISuperObject;
@@ -230,6 +231,11 @@ begin
       raise;
     end;
   end;
+end;
+
+procedure TSession.CopyObject(SourceObject, TargetObject: TObject);
+begin
+  TdormUtils.CopyObject(SourceObject, TargetObject);
 end;
 
 function TSession.Count(AClassType: TClass): Int64;
