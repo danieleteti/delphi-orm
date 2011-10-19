@@ -19,6 +19,7 @@ type
     procedure TestLoadByAttributeWithRelationOperators;
     procedure TestClone;
     procedure TestCloneWithStream;
+    procedure TestCopyObjectWithStream;
     procedure TestTDate;
     procedure TestTDateTime;
     procedure TestBlob;
@@ -99,6 +100,22 @@ begin
   end;
   md5after := MD5('reloaded_photo.png');
   CheckEquals(md5before, md5after);
+
+  p := Session.Load<TPerson>(oid);
+  try
+    p.Photo.Free;
+    p.Photo := nil;
+    Session.Update(p);
+  finally
+    p.Free;
+  end;
+
+  p := Session.Load<TPerson>(oid);
+  try
+    CheckNull(p.Photo);
+  finally
+    p.Free;
+  end;
 end;
 
 procedure TFrameworkTests.TestClone;
@@ -115,26 +132,85 @@ begin
 end;
 
 procedure TFrameworkTests.TestCloneWithStream;
-// var
-// all: TAllegatoRiga;
-// all2: TAllegatoRiga;
+var
+  p: TPerson;
+  fs: TFileStream;
+  oid: Integer;
+  md5before, md5after: string;
+  cloned_p: TPerson;
 begin
-  // all := TAllegatoRiga.CreateBy('Test.pdf', 2);
-  // try
-  // all2 := TdormUtils.Clone(all) as TAllegatoRiga;
-  // try
-  // CheckEquals(all.IDRiga, all2.IDRiga);
-  // CheckEquals(all.FileName, all2.FileName);
-  // CheckEquals(all.FullName, all2.FullName);
-  // CheckEquals(all.Allegato.Size, all2.Allegato.Size);
-  // CheckEquals(all.Allegato.Position, all2.Allegato.Position);
-  // CheckFalse(all.Allegato = all2.Allegato);
-  // finally
-  // all2.Free;
-  // end;
-  // finally
-  // all.Free;
-  // end;
+  p := TPerson.NewPerson;
+  try
+    p.Car := TCar.NewCar;
+    p.Email := TEmail.NewEmail;
+    p.Photo := TMemoryStream.Create;
+    p.Phones := NewList();
+    p.Phones.Add(TPhone.Create);
+    p.Phones.Add(TPhone.Create);
+    p.Phones.Add(TPhone.Create);
+    fs := TFileStream.Create('photo.png', fmOpenRead or fmShareDenyWrite);
+    try
+      p.Photo.CopyFrom(fs, 0);
+    finally
+      fs.Free;
+    end;
+    cloned_p := Session.Clone<TPerson>(p);
+    try
+      CheckEquals(p.ID, cloned_p.ID);
+      CheckEquals(p.FirstName, cloned_p.FirstName);
+      CheckEquals(p.LastName, cloned_p.LastName);
+      CheckEquals(p.Age, cloned_p.Age);
+      CheckEquals(p.BornDate, cloned_p.BornDate);
+      CheckEquals(p.BornTimeStamp, cloned_p.BornTimeStamp);
+      CheckEquals(p.Phones.Count, cloned_p.Phones.Count);
+      CheckEquals(p.Car.Brand, cloned_p.Car.Brand);
+      CheckEquals(p.Car.Model, cloned_p.Car.Model);
+      CheckEquals(p.Email.Value, cloned_p.Email.Value);
+      CheckEquals(p.Photo.Size, cloned_p.Photo.Size);
+    finally
+      cloned_p.Free;
+    end;
+  finally
+    p.Free;
+  end;
+
+end;
+
+procedure TFrameworkTests.TestCopyObjectWithStream;
+var
+  p: TPerson;
+  fs: TFileStream;
+  oid: Integer;
+  md5before, md5after: string;
+  cloned_p: TPerson;
+begin
+  p := TPerson.NewPerson;
+  try
+    p.Photo := TMemoryStream.Create;
+    fs := TFileStream.Create('photo.png', fmOpenRead or fmShareDenyWrite);
+    try
+      p.Photo.CopyFrom(fs, 0);
+    finally
+      fs.Free;
+    end;
+    cloned_p := TPerson.Create;
+    Session.CopyObject(p, cloned_p);
+    try
+      CheckEquals(p.ID, cloned_p.ID);
+      CheckEquals(p.FirstName, cloned_p.FirstName);
+      CheckEquals(p.LastName, cloned_p.LastName);
+      CheckEquals(p.Age, cloned_p.Age);
+      CheckEquals(p.BornDate, cloned_p.BornDate);
+      CheckEquals(p.BornTimeStamp, cloned_p.BornTimeStamp);
+      CheckNull(cloned_p.Phones);
+      CheckNull(cloned_p.Car);
+      CheckEquals(p.Photo.Size, cloned_p.Photo.Size);
+    finally
+      cloned_p.Free;
+    end;
+  finally
+    p.Free;
+  end;
 end;
 
 procedure TFrameworkTests.TestFirebirdGeneratorID;
