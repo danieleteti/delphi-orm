@@ -18,6 +18,8 @@ type
   published
     procedure TestLoadHasMany;
     procedure TestHasManyLazyLoad;
+    procedure TestBelongsTo;
+    procedure TestLoadRelations;
   end;
 
 implementation
@@ -44,11 +46,50 @@ begin
   Result := 'dorm.conf';
 end;
 
+procedure TTestDORMRelations.TestBelongsTo;
+var
+  Car: TCar;
+  CarOwner: TPerson;
+  car_id: Integer;
+begin
+  CarOwner := TPerson.NewPerson;
+  try
+    Session.Save(CarOwner);
+    Car := TCar.Create;
+    try
+      Car.Brand := 'Ford';
+      Car.Model := 'Focus 1.8 TDCi';
+      Car.Owner := CarOwner;
+      Session.Save(Car);
+      car_id := Car.ID;
+    finally
+      Car.Free;
+    end;
+  finally
+    CarOwner.Free;
+  end;
+
+  // LazyLoaded is enabled in the conf file
+  Car := Session.Load<TCar>(car_id);
+  try
+    CheckNull(Car.Owner);
+    Session.LoadRelations(Car);
+    CheckNull(Car.Owner);
+    Session.SetLazyLoadFor(TypeInfo(TCar), 'Owner', false);
+    Session.LoadRelations(Car);
+    CheckNotNull(Car.Owner);
+  finally
+    Car.Owner.Free;
+    Car.Free;
+  end;
+
+end;
+
 procedure TTestDORMRelations.TestHasManyLazyLoad;
 var
   p: TPerson;
   t: TPhone;
-  id: Integer;
+  ID: Integer;
 begin
   p := TPerson.NewPerson;
   try
@@ -56,7 +97,7 @@ begin
     t := TPhone.Create;
     p.Phones.Add(t);
     Session.Save(p);
-    id := p.id;
+    ID := p.ID;
     Session.Commit;
   finally
     p.Free;
@@ -65,7 +106,7 @@ begin
   Session.StartTransaction;
   // Now Test with lazy load ON
   Session.SetLazyLoadFor(TypeInfo(TPerson), 'Phones', true);
-  p := Session.Load<TPerson>(id);
+  p := Session.Load<TPerson>(ID);
   try
     CheckFalse(Assigned(p.Phones));
     Session.Commit;
@@ -76,7 +117,7 @@ begin
   Session.StartTransaction;
   // Test with lazy load OFF
   Session.SetLazyLoadFor(TypeInfo(TPerson), 'Phones', false);
-  p := Session.Load<TPerson>(id);
+  p := Session.Load<TPerson>(ID);
   try
     CheckEquals(1, p.Phones.Count); // Child objects are loaded
     Session.Commit;
@@ -89,7 +130,7 @@ procedure TTestDORMRelations.TestLoadHasMany;
 var
   t, t1: TPhone;
   p: TPerson;
-  id: Integer;
+  ID: Integer;
 begin
   p := TPerson.NewPerson;
   try
@@ -106,14 +147,14 @@ begin
     p.Car.Brand := 'Ford';
     p.Car.Model := 'Focus 1.8 TDCi';
     Session.Save(p); // save Person and telefoni
-    id := p.id;
+    ID := p.ID;
     Session.Commit;
   finally
     p.Free;
   end;
 
   Session.StartTransaction;
-  p := Session.Load<TPerson>(id);
+  p := Session.Load<TPerson>(ID);
   try
     CheckEquals(2, p.Phones.Count);
     CheckEquals('Ford', p.Car.Brand);
@@ -122,6 +163,50 @@ begin
   finally
     p.Free;
   end;
+end;
+
+procedure TTestDORMRelations.TestLoadRelations;
+var
+  p: TPerson;
+  oid: Integer;
+begin
+  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Car', true);
+  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Phones', true);
+  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Email', true);
+  p := TPerson.NewPerson;
+  try
+    p.Car := TCar.NewCar;
+    p.Email := TEmail.NewEmail;
+    Session.Save(p);
+    oid := p.ID;
+  finally
+    p.Free;
+  end;
+
+  p := Session.Load<TPerson>(oid);
+  try
+    Session.SetLazyLoadFor(TypeInfo(TPerson), 'Car', false);
+    Session.SetLazyLoadFor(TypeInfo(TPerson), 'Phones', false);
+    Session.SetLazyLoadFor(TypeInfo(TPerson), 'Email', false);
+    CheckNull(p.Car);
+    CheckNull(p.Phones);
+    CheckNull(p.Email);
+    Session.LoadRelations(p, [BelongsTo]);
+    CheckNull(p.Car);
+    CheckNull(p.Phones);
+    CheckNull(p.Email);
+    Session.LoadRelations(p, [HasMany]);
+    CheckNull(p.Car);
+    CheckNotNull(p.Phones);
+    CheckNull(p.Email);
+    Session.LoadRelations(p, [HasOne]);
+    CheckNotNull(p.Car);
+    CheckNotNull(p.Phones);
+    CheckNotNull(p.Email);
+  finally
+    p.Free;
+  end;
+
 end;
 
 initialization

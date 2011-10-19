@@ -1,27 +1,35 @@
 unit dorm.tests.bo;
 
+{$RTTI EXPLICIT FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished]) METHODS([vcPrivate, vcProtected, vcPublic, vcPublished]) PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
+
 interface
 
 uses
-  dorm.Commons, dorm.Collections, dorm.InterposedObject;
+  dorm.Commons, dorm.Collections, dorm.InterposedObject, System.Classes;
 
 type
+  TPerson = class;
+
   TCar = class
   private
     FModel: string;
     FBrand: string;
     FPersonID: Integer;
     FID: Integer;
+    FOwner: TPerson;
     procedure SetBrand(const Value: string);
     procedure SetModel(const Value: string);
     procedure SetPersonID(const Value: Integer);
     procedure SetID(const Value: Integer);
+    procedure SetOwner(const Value: TPerson);
     // Private!!!
     property PersonID: Integer read FPersonID write SetPersonID;
   public
+    class function NewCar: TCar;
     property ID: Integer read FID write SetID;
     property Brand: string read FBrand write SetBrand;
     property Model: string read FModel write SetModel;
+    property Owner: TPerson read FOwner write SetOwner;
   end;
 
   TEmail = class(TdormObject)
@@ -35,6 +43,7 @@ type
     // Private!!!
     property PersonID: Integer read FPersonID write SetPersonID;
   public
+    class function NewEmail: TEmail;
     function Validate: Boolean; override;
     property ID: Integer read FID write SetID;
     property Value: String read FValue write SetValue;
@@ -50,6 +59,8 @@ type
     FPhones: TdormCollection;
     FCar: TCar;
     FEmail: TEmail;
+    FBornTimeStamp: TDateTime;
+    FPhoto: TStream;
     procedure SetLastName(const Value: string);
     procedure SetAge(const Value: Int32);
     procedure SetFirstName(const Value: string);
@@ -58,6 +69,8 @@ type
     procedure SetPhones(const Value: TdormCollection);
     procedure SetCar(const Value: TCar);
     procedure SetEmail(const Value: TEmail);
+    procedure SetBornTimeStamp(const Value: TDateTime);
+    procedure SetPhoto(const Value: TStream);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -69,9 +82,12 @@ type
     property LastName: string read FLastName write SetLastName;
     property Age: Int32 read FAge write SetAge;
     property BornDate: TDate read FBornDate write SetBornDate;
+    property BornTimeStamp: TDateTime read FBornTimeStamp
+      write SetBornTimeStamp;
     property Phones: TdormCollection read FPhones write SetPhones;
     property Car: TCar read FCar write SetCar;
     property Email: TEmail read FEmail write SetEmail;
+    property Photo: TStream read FPhoto write SetPhoto;
   end;
 
   TPhone = class
@@ -99,7 +115,7 @@ type
 implementation
 
 uses
-  SysUtils;
+  SysUtils, DateUtils;
 
 function IsValidEmail(const Value: string): Boolean;
 
@@ -143,6 +159,7 @@ end;
 
 destructor TPerson.Destroy;
 begin
+  FreeAndNil(FPhoto);
   FreeAndNil(FPhones);
   FreeAndNil(FCar);
   FreeAndNil(FEmail);
@@ -156,6 +173,7 @@ begin
   Result.LastName := 'Teti';
   Result.Age := 32;
   Result.BornDate := EncodeDate(1979, 11, 4);
+  Result.BornTimeStamp := EncodeDateTime(1979, 11, 4, 16, 10, 00, 0);
 end;
 
 procedure TPerson.SetCar(const Value: TCar);
@@ -178,6 +196,11 @@ begin
   FBornDate := Value;
 end;
 
+procedure TPerson.SetBornTimeStamp(const Value: TDateTime);
+begin
+  FBornTimeStamp := Value;
+end;
+
 procedure TPerson.SetAge(const Value: Int32);
 begin
   FAge := Value;
@@ -196,6 +219,11 @@ end;
 procedure TPerson.SetPhones(const Value: TdormCollection);
 begin
   FPhones := Value;
+end;
+
+procedure TPerson.SetPhoto(const Value: TStream);
+begin
+  FPhoto := Value;
 end;
 
 function TPerson.ToString: string;
@@ -245,6 +273,13 @@ end;
 
 { TCar }
 
+class function TCar.NewCar: TCar;
+begin
+  Result := TCar.Create;
+  Result.Brand := 'Ford';
+  Result.Model := 'Fosuc 1.8 TDCi';
+end;
+
 procedure TCar.SetBrand(const Value: string);
 begin
   FBrand := Value;
@@ -260,12 +295,23 @@ begin
   FModel := Value;
 end;
 
+procedure TCar.SetOwner(const Value: TPerson);
+begin
+  FOwner := Value;
+end;
+
 procedure TCar.SetPersonID(const Value: Integer);
 begin
   FPersonID := Value;
 end;
 
 { TEmail }
+
+class function TEmail.NewEmail: TEmail;
+begin
+  Result := TEmail.Create;
+  Result.Value := 'd.teti@bittime.it';
+end;
 
 procedure TEmail.SetID(const Value: Integer);
 begin
@@ -284,7 +330,8 @@ end;
 
 function TEmail.Validate: Boolean;
 begin
-  if not IsValidEmail(Value) then
+  Result := IsValidEmail(Value);
+  if not Result then
     AddError('Invalid email');
 end;
 
