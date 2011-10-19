@@ -26,7 +26,7 @@ type
     );
   TdormLogicRelation = (lrAnd, lrOr);
   TdormCriteriaItem = class;
-
+  TdormRelations = set of (BelongsTo, HasMany, HasOne);
   TdormInterfacedObject = class(TInterfacedObject)
     constructor Create; virtual;
   end;

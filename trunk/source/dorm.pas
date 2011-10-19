@@ -95,6 +95,8 @@ type
       AClassName: string; AObject: TObject);
     procedure InsertHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
       AClassName: string; AObject: TObject);
+    procedure FixBelongsToRelation(APKValue: TValue; ARttiType: TRttiType;
+      AClassName: string; AObject: TObject);
     procedure DeleteHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
       AClassName: string; AObject: TObject);
     function CreateChildLoaderSearch(AChildClassName, AChildTableName,
@@ -136,8 +138,10 @@ type
     procedure UpdateCollection(Collection: TdormCollection);
     procedure DeleteCollection(Collection: TdormCollection);
     procedure Extract(AOID: string);
-    procedure LoadRelations(AObject: TObject); overload;
-    procedure LoadRelations(AList: TdormCollection); overload;
+    procedure LoadRelations(AObject: TObject;
+      ARelationsSet: TdormRelations = [BelongsTo, HasMany, HasOne]); overload;
+    procedure LoadRelations(AList: TdormCollection;
+      ARelationsSet: TdormRelations = [BelongsTo, HasMany, HasOne]); overload;
     function Load<T: class>(const Value: TValue): T; overload;
     // function Load<T: class>(const Value: string; AObject: T): Boolean; overload;
     procedure LazyLoadFor(const APropertyName: string; AObject: TObject);
@@ -817,12 +821,13 @@ begin
   end;
 end;
 
-procedure TSession.LoadRelations(AList: TdormCollection);
+procedure TSession.LoadRelations(AList: TdormCollection;
+ARelationsSet: TdormRelations);
 var
   i: Integer;
 begin
   for i := 0 to AList.Count - 1 do
-    LoadRelations(AList.GetItem(i));
+    LoadRelations(AList.GetItem(i), ARelationsSet);
 end;
 
 function TSession.OIDIsSet(Obj: TObject): Boolean;
@@ -835,7 +840,8 @@ begin
   Result := not GetStrategy.IsNullKey(pk_value);
 end;
 
-procedure TSession.LoadRelations(AObject: TObject);
+procedure TSession.LoadRelations(AObject: TObject;
+ARelationsSet: TdormRelations);
 var
   rt: TRttiType;
   _table: string;
@@ -846,12 +852,15 @@ begin
     rt := FCTX.GetType(AObject.ClassType);
     _table := GetTableName(rt.ToString);
     _fields := GetTableMapping(rt.ToString);
-    LoadBelongsToRelation(GetPKValue(rt, _fields, AObject), rt,
-      rt.ToString, AObject);
-    LoadHasManyRelation(GetPKValue(rt, _fields, AObject), rt,
-      rt.ToString, AObject);
-    LoadHasOneRelation(GetPKValue(rt, _fields, AObject), rt,
-      rt.ToString, AObject);
+    if BelongsTo in ARelationsSet then
+      LoadBelongsToRelation(GetPKValue(rt, _fields, AObject), rt,
+        rt.ToString, AObject);
+    if HasMany in ARelationsSet then
+      LoadHasManyRelation(GetPKValue(rt, _fields, AObject), rt,
+        rt.ToString, AObject);
+    if HasOne in ARelationsSet then
+      LoadHasOneRelation(GetPKValue(rt, _fields, AObject), rt,
+        rt.ToString, AObject);
   end;
 end;
 
@@ -876,12 +885,12 @@ begin
       _belong_type := FCTX.FindType(Qualified(_belong_class_name));
       if not assigned(_belong_type) then
         raise Exception.Create('Unknown type ' + _belong_class_name);
-      _belong_field_key_value := TdormUtils.GetField(AObject,
+      _belong_field_key_value := TdormUtils.GetProperty(AObject,
         _belongs_to[i].AsObject.s['ref_field_name']);
       v := Load(FCTX.FindType(Qualified(_belong_class_name)).Handle,
         _belong_field_key_value);
       TdormUtils.SetField(AObject, _belongs_to[i].AsObject.s['name'], v);
-      LoadRelations(v.AsObject);
+      // LoadRelations(v.AsObject); daniele
     end
     else
       raise Exception.Create('Unknown property name ' + APropertyName);
@@ -918,6 +927,8 @@ begin
   if GetStrategy.IsNullKey(_pk_value) then
   begin
     FLogger.Info('Inserting ' + AObject.ClassName);
+    FixBelongsToRelation(GetPKValue(_type, fields, AObject), _type,
+      _class_name, AObject);
     GetStrategy.Insert(_type, AObject, _table, fields);
     InsertHasManyRelation(GetPKValue(_type, fields, AObject), _type,
       _class_name, AObject);
@@ -947,18 +958,41 @@ const APropertyName: string; const Value: Boolean);
 var
   i: Integer;
   RttiType: TRttiType;
-  _has_many: TSuperArray;
+  _has_many, _belongs_to, _has_one: TSuperArray;
 begin
   RttiType := FCTX.GetType(ATypeInfo);
   _has_many := FMapping.O['mapping'].O[RttiType.ToString].A['has_many'];
-  for i := 0 to _has_many.Length - 1 do
-  begin
-    if CompareText(_has_many[i].s['name'], APropertyName) = 0 then
+  if assigned(_has_many) then
+    for i := 0 to _has_many.Length - 1 do
     begin
-      _has_many[i].B['lazy_load'] := Value;
-      Break;
+      if CompareText(_has_many[i].s['name'], APropertyName) = 0 then
+      begin
+        _has_many[i].B['lazy_load'] := Value;
+        Break;
+      end;
     end;
-  end;
+
+  _belongs_to := FMapping.O['mapping'].O[RttiType.ToString].A['belongs_to'];
+  if assigned(_belongs_to) then
+    for i := 0 to _belongs_to.Length - 1 do
+    begin
+      if CompareText(_belongs_to[i].s['name'], APropertyName) = 0 then
+      begin
+        _belongs_to[i].B['lazy_load'] := Value;
+        Break;
+      end;
+    end;
+
+  _has_one := FMapping.O['mapping'].O[RttiType.ToString].A['has_one'];
+  if assigned(_has_one) then
+    for i := 0 to _has_one.Length - 1 do
+    begin
+      if CompareText(_has_one[i].s['name'], APropertyName) = 0 then
+      begin
+        _has_one[i].B['lazy_load'] := Value;
+        Break;
+      end;
+    end;
 end;
 
 procedure TSession.InsertCollection(Collection: TdormCollection);
@@ -1055,6 +1089,44 @@ begin
   GetLogger.ExitLevel('has_one ' + AClassName);
 end;
 
+procedure TSession.FixBelongsToRelation(APKValue: TValue; ARttiType: TRttiType;
+AClassName: string; AObject: TObject);
+var
+  _parent_id_attribute_name, _parent_class_name: string;
+  _belongs_to: TSuperArray;
+  v: TValue;
+  List: TdormCollection;
+  _child_type: TRttiType;
+  i, j: Integer;
+  Obj: TObject;
+  _parent_type: TRttiType;
+  ParentObject: TObject;
+begin
+  GetLogger.EnterLevel('belongs_to ' + AClassName);
+  _belongs_to := FMapping.O['mapping'].O[AClassName].A['belongs_to'];
+  if assigned(_belongs_to) then
+  begin
+    GetLogger.Debug('Saving belongs_to for ' + AClassName);
+    for i := 0 to _belongs_to.Length - 1 do
+    begin
+      ParentObject := TdormUtils.GetProperty(AObject,
+        _belongs_to[i].AsObject.s['name']).AsObject;
+      if assigned(ParentObject) then
+      begin
+        _parent_id_attribute_name := _belongs_to[i].AsObject.s
+          ['ref_field_name'];
+        _parent_class_name := _belongs_to[i].AsObject.s['class_name'];
+        _parent_type := FCTX.FindType(Qualified(_parent_class_name));
+        if not assigned(_parent_type) then
+          raise Exception.Create('Unknown type ' + _parent_class_name);
+        v := GetPKValue(_parent_type, GetTableMapping(_parent_class_name),
+          ParentObject);
+        TdormUtils.SetProperty(AObject, _parent_id_attribute_name, v);
+      end;
+    end;
+  end;
+end;
+
 procedure TSession.StartTransaction;
 begin
   GetLogger.EnterLevel('TSession.StartTransaction');
@@ -1070,7 +1142,8 @@ procedure TSession.Update(AObject: TObject);
 var
   // _child_type,
   _type: TRttiType;
-  _table, _class_name: string; // _child_field_name, _child_class_name,
+  _table, _class_name: string;
+  // _child_field_name, _child_class_name,
   // json, _map: ISuperObject;
   // m: TdormFieldMapping;
   fields: TArray<TdormFieldMapping>;

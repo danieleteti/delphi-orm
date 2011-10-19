@@ -19,6 +19,7 @@ type
     procedure TestLoadByAttributeWithRelationOperators;
     procedure TestClone;
     procedure TestCloneWithStream;
+    procedure TestTDate;
     procedure TestTDateTime;
     procedure TestBlob;
   end;
@@ -29,51 +30,75 @@ uses
   Classes,
   SysUtils,
   DateUtils,
-  dorm.Utils, dorm.tests.bo;
+  dorm.Utils, dorm.tests.bo,
+  IdHashMessageDigest,
+  idHash;
+
+// returns MD5 has for a file
+function MD5(const fileName: string): string;
+var
+  idmd5: TIdHashMessageDigest5;
+  fs: TFileStream;
+begin
+  idmd5 := TIdHashMessageDigest5.Create;
+  try
+    fs := TFileStream.Create(fileName, fmOpenRead OR fmShareDenyWrite);
+    try
+      result := idmd5.HashStreamAsHex(fs);
+    finally
+      fs.Free;
+    end;
+  finally
+    idmd5.Free;
+  end;
+end;
 
 { TFrameworkTests }
 
 function TFrameworkTests.GetDORMConfigFileName: String;
 begin
-  Result := 'dorm.conf';
+  result := 'dorm.conf';
 end;
 
 procedure TFrameworkTests.TestBlob;
-// var
-// i: TInvioPreventivo;
-// dt: TDateTime;
-// i_id: Int64;
-// stream: TStreamReader;
-// s: string;
+var
+  p: TPerson;
+  fs: TFileStream;
+  oid: Integer;
+  md5before, md5after: string;
 begin
-  // dt := EncodeDateTime(2011, 10, 30, 12, 30, 30, 0);
-  // i := TInvioPreventivo.Create;
-  // try
-  // i.IDPreventivo := 1234;
-  // i.DataInvio := dt;
-  // // i.Allegato := TStringStream.Create('Hello World');
-  // // i.Note := 'Sono una nota'; //TEXT field_type still not suported. Use blob instead
-  // Session.Save(i);
-  // i_id := i.ID;
-  // finally
-  // i.Free;
-  // end;
-  //
-  // i := Session.Load<TInvioPreventivo>(i_id);
-  // try
-  // CheckEquals(dt, i.DataInvio);
-  // // stream := TStreamReader.Create(i.Allegato);
-  // // try
-  // // s := stream.ReadToEnd;
-  // // finally
-  // // stream.Free;
-  // // end;
-  // // CheckEquals('Hello World', s);
-  // // CheckEquals('Sono una nota', i.Note);
-  // Session.Delete(i);
-  // finally
-  // i.Free;
-  // end;
+  p := TPerson.NewPerson;
+  try
+    p.Photo := TMemoryStream.Create;
+    md5before := MD5('photo.png');
+    fs := TFileStream.Create('photo.png', fmOpenRead or fmShareDenyWrite);
+    try
+      p.Photo.CopyFrom(fs, 0);
+    finally
+      fs.Free;
+    end;
+    Session.Save(p);
+    Session.Commit;
+    oid := p.ID;
+  finally
+    p.Free;
+  end;
+
+  p := Session.Load<TPerson>(oid);
+  try
+    if FileExists('reloaded_photo.png') then
+      DeleteFile('reloaded_photo.png');
+    fs := TFileStream.Create('reloaded_photo.png', fmCreate);
+    try
+      fs.CopyFrom(p.Photo, 0);
+    finally
+      fs.Free;
+    end;
+  finally
+    p.Free;
+  end;
+  md5after := MD5('reloaded_photo.png');
+  CheckEquals(md5before, md5after);
 end;
 
 procedure TFrameworkTests.TestClone;
@@ -209,8 +234,7 @@ begin
     p.Free;
   end;
 
-  Criteria := TdormCriteria
-    .NewCriteria('FirstName', Equal, 'Daniele')
+  Criteria := TdormCriteria.NewCriteria('FirstName', Equal, 'Daniele')
     .AddOr('LastName', Equal, 'Teti');
   Coll := Session.List<TPerson>(Criteria, true);
   try
@@ -228,31 +252,58 @@ begin
   end;
 end;
 
-procedure TFrameworkTests.TestTDateTime;
-// var
-// i: TInvioPreventivo;
-// dt: TDateTime;
-// i_id: Int64;
+procedure TFrameworkTests.TestTDate;
+var
+  p: TPerson;
+  dt: TDateTime;
+  p_id: Int64;
 begin
-  // dt := EncodeDateTime(2011, 10, 30, 12, 30, 30, 0);
-  //
-  // i := TInvioPreventivo.Create;
-  // try
-  // i.IDPreventivo := 1234;
-  // i.DataInvio := dt;
-  // Session.Save(i);
-  // i_id := i.ID;
-  // finally
-  // i.Free;
-  // end;
-  //
-  // i := Session.Load<TInvioPreventivo>(i_id);
-  // try
-  // CheckEquals(dt, i.DataInvio);
-  // Session.Delete(i);
-  // finally
-  // i.Free;
-  // end;
+  dt := EncodeDate(2011, 10, 30);
+
+  p := TPerson.NewPerson;
+  try
+    p.BornDate := dt;
+    Session.Save(p);
+    p_id := p.ID;
+  finally
+    p.Free;
+  end;
+
+  p := Session.Load<TPerson>(p_id);
+  try
+    CheckEquals(dt, p.BornDate);
+    Session.Delete(p);
+  finally
+    p.Free;
+  end;
+end;
+
+procedure TFrameworkTests.TestTDateTime;
+var
+  p: TPerson;
+  dt: TDateTime;
+  p_id: Int64;
+begin
+  dt := EncodeDateTime(2011, 10, 30, 10, 20, 30, 0);
+  // do not support milliseconds...
+
+  p := TPerson.NewPerson;
+  try
+    p.BornTimeStamp := dt;
+    Session.Save(p);
+    p_id := p.ID;
+  finally
+    p.Free;
+  end;
+
+  p := Session.Load<TPerson>(p_id);
+  try
+    CheckEquals(dt, p.BornTimeStamp);
+    Session.Delete(p);
+  finally
+    p.Free;
+  end;
+
 end;
 
 initialization
