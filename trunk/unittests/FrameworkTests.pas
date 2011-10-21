@@ -23,6 +23,7 @@ type
     procedure TestTDate;
     procedure TestTDateTime;
     procedure TestBlob;
+    procedure TestEnumerableCollection;
   end;
 
 implementation
@@ -213,6 +214,42 @@ begin
   end;
 end;
 
+procedure TFrameworkTests.TestEnumerableCollection;
+var
+  people: TdormCollection;
+  person: TObject;
+  I: Integer;
+  x: Integer;
+  p: TPerson;
+begin
+  Session.DeleteAll(TPerson);
+  people := Session.ListAll<TPerson>;
+  try
+    for person in people do
+      Fail('There arent record!!!');
+  finally
+    people.Free;
+  end;
+
+  for I := 1 to 10 do
+  begin
+    p := TPerson.NewPerson;
+    p.FirstName := p.FirstName + inttostr(I);
+    Session.Save(p);
+    p.Free;
+  end;
+
+  people := Session.ListAll<TPerson>;
+  try
+    x := 0;
+    for person in people do
+      inc(x);
+    CheckEquals(10, x);
+  finally
+    people.Free;
+  end;
+end;
+
 procedure TFrameworkTests.TestFirebirdGeneratorID;
 // var
 // t: TTest01;
@@ -230,7 +267,7 @@ end;
 
 procedure TFrameworkTests.TestLoadByAttribute;
 var
-  Coll: TdormCollection;
+  coll: TdormCollection;
   Criteria: TdormCriteria;
   m_id: Int64;
   p: TPerson;
@@ -258,28 +295,28 @@ begin
   try
     Criteria.Add('FirstName', Equal, 'Daniele').AddAnd('FirstName',
       Different, 'Jack');
-    Coll := Session.List<TPerson>(Criteria, false);
+    coll := Session.List<TPerson>(Criteria, false);
     try
-      CheckEquals(1, Coll.Count);
-      m_id := TPerson(Coll.GetItem(0)).ID;
+      CheckEquals(1, coll.Count);
+      m_id := TPerson(coll.GetItem(0)).ID;
     finally
-      Coll.Free;
+      coll.Free;
     end;
 
     Criteria.Add('ID', Equal, m_id);
-    Coll := Session.List<TPerson>(Criteria, false);
+    coll := Session.List<TPerson>(Criteria, false);
     try
-      CheckEquals(1, Coll.Count);
+      CheckEquals(1, coll.Count);
     finally
-      Coll.Free;
+      coll.Free;
     end;
 
     Criteria.Add('ID', GreaterThan, m_id);
-    Coll := Session.List<TPerson>(Criteria, false);
+    coll := Session.List<TPerson>(Criteria, false);
     try
-      CheckEquals(0, Coll.Count);
+      CheckEquals(0, coll.Count);
     finally
-      Coll.Free;
+      coll.Free;
     end;
   finally
     Criteria.Free;
@@ -288,7 +325,7 @@ end;
 
 procedure TFrameworkTests.TestLoadByAttributeWithRelationOperators;
 var
-  Coll: TdormCollection;
+  coll: TdormCollection;
   Criteria: TdormCriteria;
   p: TPerson;
 begin
@@ -312,19 +349,19 @@ begin
 
   Criteria := TdormCriteria.NewCriteria('FirstName', Equal, 'Daniele')
     .AddOr('LastName', Equal, 'Teti');
-  Coll := Session.List<TPerson>(Criteria, true);
+  coll := Session.List<TPerson>(Criteria, true);
   try
-    CheckEquals(2, Coll.Count);
+    CheckEquals(2, coll.Count);
   finally
-    Coll.Free;
+    coll.Free;
   end;
 
   Criteria := TdormCriteria.NewCriteria('Age', Equal, 32);
-  Coll := Session.List<TPerson>(Criteria, true);
+  coll := Session.List<TPerson>(Criteria, true);
   try
-    CheckEquals(1, Coll.Count);
+    CheckEquals(1, coll.Count);
   finally
-    Coll.Free;
+    coll.Free;
   end;
 end;
 
