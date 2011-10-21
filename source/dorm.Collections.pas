@@ -10,52 +10,70 @@ uses
   Classes;
 
 type
+  TdormCollection = class;
+
+  TdormCollectionEnumerator = class
+  private
+    FCurrent: TObject;
+    FCollection: TdormCollection;
+  protected
+    FCurrentIndex: Int64;
+    constructor Create(Collection: TdormCollection);
+  public
+    function GetCurrent: TObject;
+    function MoveNext: Boolean;
+    property Current: TObject read GetCurrent;
+  end;
+
   TdormCollection = class
   private
     FItems: TObjectList<TObject>;
     FChilds: TObjectList<TObject>;
   public
+    function GetEnumerator: TdormCollectionEnumerator;
     function Add(const Value: TObject): TdormCollection;
     function First: TObject;
     function Last: TObject;
     procedure Clear;
-    function Append(Collection: TdormCollection; FreeAfterAppend: boolean = false): TdormCollection;
+    function Append(Collection: TdormCollection;
+      FreeAfterAppend: Boolean = false): TdormCollection;
     function Count: Integer;
     function Remove(const Value: TObject): Integer;
     function Extract(index: Integer): TObject; overload;
     function Extract(Obj: TObject): TObject; overload;
     procedure Delete(index: Integer);
     procedure DeleteRange(AIndex, ACount: Integer);
-    function contains(const Value: TObject): boolean;
+    function contains(const Value: TObject): Boolean;
     function IndexOf(const Value: TObject): Integer;
     function GetItem(index: Integer): TObject;
     procedure SetItem(index: Integer; const Value: TObject);
-    procedure SetOwnsObjects(Value: boolean);
+    procedure SetOwnsObjects(Value: Boolean);
     function AsObjectList<T: class>(): TObjectList<T>;
     procedure ForEach<T: class>(Proc: TProc<T>);
-    function FindFirst<T: class>(Filter: TFunc<T, boolean>): T;
+    function FindFirst<T: class>(Filter: TFunc<T, Boolean>): T;
 
     constructor Create; virtual;
     destructor Destroy; override;
     property Items[index: Integer]: TObject read GetItem write SetItem; default;
   end;
 
-function NewList(AOwnObjects: boolean = true): TdormCollection; overload;
-function NewList(Objects: array of TObject; AOwnObjects: boolean = true): TdormCollection; overload;
+function NewList(AOwnObjects: Boolean = true): TdormCollection; overload;
+function NewList(Objects: array of TObject; AOwnObjects: Boolean = true)
+  : TdormCollection; overload;
 
 implementation
 
 uses
   dorm.Utils;
 
-function NewList(AOwnObjects: boolean): TdormCollection;
-  overload;
+function NewList(AOwnObjects: Boolean): TdormCollection; overload;
 begin
   Result := TdormCollection.Create;
   Result.SetOwnsObjects(AOwnObjects);
 end;
 
-function NewList(Objects: array of TObject; AOwnObjects: boolean): TdormCollection;
+function NewList(Objects: array of TObject; AOwnObjects: Boolean)
+  : TdormCollection;
 overload
 
 var
@@ -76,7 +94,7 @@ begin
 end;
 
 function TdormCollection.Append(Collection: TdormCollection;
-  FreeAfterAppend: boolean): TdormCollection;
+  FreeAfterAppend: Boolean): TdormCollection;
 var
   I: Integer;
 begin
@@ -109,9 +127,9 @@ begin
   FItems.Clear;
 end;
 
-function TdormCollection.Contains(const Value: TObject): boolean;
+function TdormCollection.contains(const Value: TObject): Boolean;
 begin
-  Result := FItems.Contains(Value);
+  Result := FItems.contains(Value);
 end;
 
 function TdormCollection.Count: Integer;
@@ -153,7 +171,7 @@ begin
   Result := FItems.Extract(Obj);
 end;
 
-function TdormCollection.FindFirst<T>(Filter: TFunc<T, boolean>): T;
+function TdormCollection.FindFirst<T>(Filter: TFunc<T, Boolean>): T;
 var
   o: TObject;
 begin
@@ -175,6 +193,11 @@ var
 begin
   for o in FItems do
     Proc(o);
+end;
+
+function TdormCollection.GetEnumerator: TdormCollectionEnumerator;
+begin
+  Result := TdormCollectionEnumerator.Create(Self);
 end;
 
 function TdormCollection.GetItem(index: Integer): TObject;
@@ -204,10 +227,35 @@ begin
   FItems.Items[index] := Value;
 end;
 
-procedure TdormCollection.SetOwnsObjects(Value: boolean);
+procedure TdormCollection.SetOwnsObjects(Value: Boolean);
 begin
   FItems.OwnsObjects := Value;
 end;
 
+{ TdormCollectionEnumerator }
+
+constructor TdormCollectionEnumerator.Create(Collection: TdormCollection);
+begin
+  inherited Create;
+  FCurrentIndex := -1;
+  FCollection := Collection;
+end;
+
+function TdormCollectionEnumerator.GetCurrent: TObject;
+begin
+  if FCurrentIndex > -1 then
+    Result := FCollection[FCurrentIndex];
+end;
+
+function TdormCollectionEnumerator.MoveNext: Boolean;
+begin
+  if FCurrentIndex < FCollection.Count - 1 then
+  begin
+    inc(FCurrentIndex);
+    Result := true;
+  end
+  else
+    Result := false;
+end;
 
 end.
