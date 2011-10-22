@@ -17,6 +17,7 @@ type
     procedure TestSave;
     procedure TestUpdate;
     procedure TestCRUD;
+    procedure TestCRUDAndFree;
     procedure TestUOW;
     procedure TestDormObject;
   end;
@@ -84,6 +85,40 @@ begin
   try
     CheckNull(p1);
     Session.Commit;
+  finally
+    p1.Free;
+  end;
+end;
+
+procedure TTestDORM.TestCRUDAndFree;
+var
+  p1: TPerson;
+  p1asstring: string;
+  id: integer;
+begin
+  p1 := TPerson.NewPerson;
+  id := Session.SaveAndFree(p1).AsInt64;
+
+  p1 := Session.Load<TPerson>(id);
+  try
+    CheckEquals(id, p1.id);
+  finally
+    p1.Free;
+  end;
+
+  p1 := Session.Load<TPerson>(id);
+  p1.FirstName := 'Scott';
+  p1.LastName := 'Summer';
+  p1.Age := 45;
+  p1.BornDate := EncodeDate(1965, 1, 1);
+  Session.UpdateAndFree(p1);
+
+  p1 := Session.Load<TPerson>(id);
+  Session.DeleteAndFree(p1);
+
+  p1 := Session.Load<TPerson>(id);
+  try
+    CheckNull(p1);
   finally
     p1.Free;
   end;

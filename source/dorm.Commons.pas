@@ -117,6 +117,7 @@ type
       APKValue: TValue): IdormSearchCriteria;
     function Delete(ARttiType: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TObject;
+    function GetKeyType: TdormKeyType;
     procedure DeleteAll(ATableName: string);
     function Count(ATableName: string): Int64;
     function GetLastInsertID: Int64;

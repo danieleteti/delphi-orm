@@ -67,8 +67,7 @@ end;
 
 procedure TfrmMain.Button1Click(Sender: TObject);
 begin
-  Generate(ExtractFilePath(Application.ExeName) + 'preventivi.conf',
-    deDevelopment);
+  Generate(ConfigFileName, deDevelopment);
   ShowMessage('Finished');
 end;
 
