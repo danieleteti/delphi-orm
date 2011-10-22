@@ -130,15 +130,20 @@ type
     function GetMapping: ISuperObject;
     function GetLogger: IdormLogger;
     procedure Configure(TextReader: TTextReader);
-    function Save(AObject: TObject; SaveType: TdormSaveType = stAllGraph)
-      : TValue; overload;
+    procedure Persist(AObject: TObject);
+    function Save(AObject: TObject): TValue; overload;
+    function SaveAndFree(AObject: TObject): TValue;
     procedure Update(AObject: TObject);
+    procedure UpdateAndFree(AObject: TObject);
     procedure Save(dormUOW: TdormUOW); overload;
     procedure Delete(AObject: TObject);
+    procedure DeleteAndFree(AObject: TObject);
     procedure InsertCollection(Collection: TdormCollection);
     procedure UpdateCollection(Collection: TdormCollection);
     procedure DeleteCollection(Collection: TdormCollection);
     procedure Extract(AOID: string);
+    function GetPKValueFromObject(Obj: TObject;
+      var pktype: TdormKeyType): TValue;
     procedure LoadRelations(AObject: TObject;
       ARelationsSet: TdormRelations = [BelongsTo, HasMany, HasOne]); overload;
     procedure LoadRelations(AList: TdormCollection;
@@ -176,6 +181,7 @@ type
 implementation
 
 uses
+  dorm.loggers.CodeSite,
   dorm.adapter.Firebird,
   SysUtils,
   dorm.Utils,
@@ -327,6 +333,12 @@ var
 begin
   _table := GetTableName(AClassType.ClassName);
   GetStrategy.DeleteAll(_table);
+end;
+
+procedure TSession.DeleteAndFree(AObject: TObject);
+begin
+  Delete(AObject);
+  FreeAndNil(AObject);
 end;
 
 procedure TSession.DeleteHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
@@ -571,6 +583,17 @@ begin
       Result.Add(FMapping.O['mapping'].O[A.s[i]].s['package'] + '.' + A.s[i])
     else
       Result.Add(A.s[i]);
+end;
+
+function TSession.GetPKValueFromObject(Obj: TObject;
+var pktype: TdormKeyType): TValue;
+var
+  rt: TRttiType;
+  pk_value: TValue;
+begin
+  rt := FCTX.GetType(Obj.ClassType);
+  pktype := GetStrategy.GetKeyType;
+  Result := TdormUtils.GetField(Obj, GetPKName(GetTableMapping(rt.ToString)));
 end;
 
 function TSession.GetEnv: string;
@@ -846,6 +869,29 @@ begin
   Result := not GetStrategy.IsNullKey(pk_value);
 end;
 
+procedure TSession.Persist(AObject: TObject);
+var
+  rt: TRttiType;
+  pk_value: TValue;
+  pktype: TdormKeyType;
+begin
+  pk_value := GetPKValueFromObject(AObject, pktype);
+  if pktype = ktInteger then
+  begin
+    if pk_value.AsInteger = GetStrategy.GetNullKeyValue.AsInteger then
+      Save(AObject)
+    else
+      Update(AObject);
+  end
+  else
+  begin
+    if pk_value.AsString = GetStrategy.GetNullKeyValue.AsString then
+      Save(AObject)
+    else
+      Update(AObject);
+  end;
+end;
+
 procedure TSession.LoadRelations(AObject: TObject;
 ARelationsSet: TdormRelations);
 var
@@ -914,7 +960,7 @@ begin
   GetLogger.ExitLevel('TSession.Rollback');
 end;
 
-function TSession.Save(AObject: TObject; SaveType: TdormSaveType): TValue;
+function TSession.Save(AObject: TObject): TValue;
 var
   _type: TRttiType;
   _table, _class_name: string; // _child_field_name, _child_class_name,
@@ -935,7 +981,7 @@ begin
     FLogger.Info('Inserting ' + AObject.ClassName);
     FixBelongsToRelation(GetPKValue(_type, fields, AObject), _type,
       _class_name, AObject);
-    GetStrategy.Insert(_type, AObject, _table, fields);
+    Result := GetStrategy.Insert(_type, AObject, _table, fields);
     InsertHasManyRelation(GetPKValue(_type, fields, AObject), _type,
       _class_name, AObject);
     InsertHasOneRelation(GetPKValue(_type, fields, AObject), _type,
@@ -957,6 +1003,12 @@ begin
   UpdateCollection(c);
   c := dormUOW.GetUOWDelete;
   DeleteCollection(c);
+end;
+
+function TSession.SaveAndFree(AObject: TObject): TValue;
+begin
+  Result := Save(AObject);
+  FreeAndNil(AObject);
 end;
 
 procedure TSession.SetLazyLoadFor(ATypeInfo: PTypeInfo;
@@ -1180,6 +1232,12 @@ begin
     raise EdormException.CreateFmt('Cannot update object without an ID [%s]',
       [_class_name]);
   GetLogger.ExitLevel(_class_name);
+end;
+
+procedure TSession.UpdateAndFree(AObject: TObject);
+begin
+  Update(AObject);
+  FreeAndNil(AObject);
 end;
 
 procedure TSession.UpdateCollection(Collection: TdormCollection);

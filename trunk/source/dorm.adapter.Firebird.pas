@@ -85,6 +85,7 @@ type
     class procedure register;
     function IsNullKey(const Value: TValue): Boolean;
     function GetNullKeyValue: TValue;
+    function GetKeyType: TdormKeyType;
     function RawExecute(SQL: string): Int64;
   end;
 
@@ -115,15 +116,19 @@ var
   I, pk_idx: Integer;
   v: TValue;
   sql_fields_names: string;
+  pk_field: string;
 begin
   sql_fields_names := '';
   for field in AFieldsMapping do
     if not field.pk then
-      sql_fields_names := sql_fields_names + ',' + field.field + ' = ?';
+      sql_fields_names := sql_fields_names + ',"' + field.field + '" = ?';
   System.Delete(sql_fields_names, 1, 1);
 
+  pk_field := AFieldsMapping[GetPKMappingIndex(AFieldsMapping)].field;
   SQL := Format('UPDATE %S SET %S WHERE %S = ?', [ATableName, sql_fields_names,
-    AFieldsMapping[GetPKMappingIndex(AFieldsMapping)].name]);
+    pk_field]);
+
+  GetLogger.Debug(AFieldsMapping[GetPKMappingIndex(AFieldsMapping)].field);
 
   GetLogger.Debug('PREPARING: ' + SQL);
   Query := FB.Prepare(SQL);
@@ -327,6 +332,11 @@ begin
   Result := FKeysGenerator;
 end;
 
+function TFirebirdPersistStrategy.GetKeyType: TdormKeyType;
+begin
+  Result := FKeyType;
+end;
+
 function TFirebirdPersistStrategy.GetLastInsertID: Int64;
 begin
   // Result := FDB.GetLastInsertRowID;
@@ -343,7 +353,7 @@ var
   field: TdormFieldMapping;
 begin
   for field in AMapping do
-    Result := Result + ',' + field.field;
+    Result := Result + ',"' + field.field + '"';
   System.Delete(Result, 1, 1);
 end;
 
@@ -367,7 +377,7 @@ begin
   sql_fields_names := '';
   for field in AFieldsMapping do
     // if not field.pk then
-    sql_fields_names := sql_fields_names + ',' + field.field;
+    sql_fields_names := sql_fields_names + ',"' + field.field + '"';
 
   System.Delete(sql_fields_names, 1, 1);
 
@@ -403,8 +413,7 @@ begin
   end;
   pk_idx := GetPKMappingIndex(AFieldsMapping);
   TdormUtils.SetProperty(AObject, AFieldsMapping[pk_idx].name, pk_value);
-  // rtti_type.GetProperty(AFieldsMapping[pk_idx].name)
-  // .SetValue(AObject, pk_value);
+  Result := pk_value;
 end;
 
 function TFirebirdPersistStrategy.InTransaction: Boolean;
@@ -583,6 +592,7 @@ var
   S: string;
   sourceStream: TStream;
   targetStream: TMemoryStream;
+  v1: TValue;
 begin
   Result := nil;
   try
@@ -642,8 +652,9 @@ begin
       except
         on E: Exception do
         begin
+
           raise EdormException.Create(E.Message + sLineBreak +
-            '. Probably cannot read ' + ARttiType.ToString + '.' + S);
+            '. Probably cannot write ' + ARttiType.ToString + '.' + S);
         end;
       end;
     end;

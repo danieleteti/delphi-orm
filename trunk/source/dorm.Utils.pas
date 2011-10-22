@@ -4,7 +4,7 @@ interface
 
 uses
   RTTI,
-  DB;
+  DB, dorm.Commons;
 
 type
   TdormUtils = class sealed
@@ -42,36 +42,43 @@ end;
 class function TdormUtils.GetField(Obj: TObject;
   const PropertyName: string): TValue;
 var
-  prop: TRttiField;
+  Field: TRttiField;
+  Prop: TRttiProperty;
   rtti_type: TRttiType;
 begin
   rtti_type := ctx.GetType(Obj.ClassType);
   if not assigned(rtti_type) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [rtti_type.ToString]);
-  prop := rtti_type.GetField(FieldFor(PropertyName));
-  if not assigned(prop) then
-    raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
-      [rtti_type.ToString, PropertyName]);
-  Result := prop.GetValue(Obj)
+  Field := rtti_type.GetField(FieldFor(PropertyName));
+  if assigned(Field) then
+    Result := Field.GetValue(Obj)
+  else
+  begin
+    Prop := rtti_type.GetProperty(PropertyName);
+    if not assigned(Prop) then
+      raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
+        [rtti_type.ToString, PropertyName]);
+    Result := Prop.GetValue(Obj);
+  end;
 end;
 
 class function TdormUtils.GetProperty(Obj: TObject;
   const PropertyName: string): TValue;
 var
-  prop: TRttiProperty;
+  Prop: TRttiProperty;
   rtti_type: TRttiType;
 begin
   rtti_type := ctx.GetType(Obj.ClassType);
   if not assigned(rtti_type) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [rtti_type.ToString]);
-  prop := rtti_type.GetProperty(PropertyName);
-  if not assigned(prop) then
+  Prop := rtti_type.GetProperty(PropertyName);
+  if not assigned(Prop) then
     raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
       [rtti_type.ToString, PropertyName]);
-  if prop.IsReadable then
-    Result := prop.GetValue(Obj)
+  if Prop.IsReadable then
+    Result := Prop.GetValue(Obj)
   else
     raise Exception.CreateFmt('Property is not readable [%s.%s]',
       [rtti_type.ToString, PropertyName]);
@@ -80,36 +87,44 @@ end;
 class procedure TdormUtils.SetField(Obj: TObject; const PropertyName: string;
   const Value: TValue);
 var
-  prop: TRttiField;
+  Field: TRttiField;
+  Prop: TRttiProperty;
   rtti_type: TRttiType;
 begin
   rtti_type := ctx.GetType(Obj.ClassType);
   if not assigned(rtti_type) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [rtti_type.ToString]);
-  prop := rtti_type.GetField(FieldFor(PropertyName));
-  if not assigned(prop) then
-    raise Exception.CreateFmt('Cannot get RTTI for field [%s.%s]',
-      [rtti_type.ToString, PropertyName]);
-  prop.SetValue(Obj, Value);
+  Field := rtti_type.GetField(FieldFor(PropertyName));
+  if assigned(Field) then
+    Field.SetValue(Obj, Value)
+  else
+  begin
+    Prop := rtti_type.GetProperty(PropertyName);
+    if assigned(Prop) then
+      Prop.SetValue(Obj, Value)
+    else
+      raise Exception.CreateFmt('Cannot get RTTI for field or property [%s.%s]',
+        [rtti_type.ToString, PropertyName]);
+  end;
 end;
 
 class procedure TdormUtils.SetProperty(Obj: TObject; const PropertyName: string;
   const Value: TValue);
 var
-  prop: TRttiProperty;
+  Prop: TRttiProperty;
   rtti_type: TRttiType;
 begin
   rtti_type := ctx.GetType(Obj.ClassType);
   if not assigned(rtti_type) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [rtti_type.ToString]);
-  prop := rtti_type.GetProperty(PropertyName);
-  if not assigned(prop) then
+  Prop := rtti_type.GetProperty(PropertyName);
+  if not assigned(Prop) then
     raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
       [rtti_type.ToString, PropertyName]);
-  if prop.IsWritable then
-    prop.SetValue(Obj, Value)
+  if Prop.IsWritable then
+    Prop.SetValue(Obj, Value)
   else
     raise Exception.CreateFmt('Property is not writeable [%s.%s]',
       [rtti_type.ToString, PropertyName]);
@@ -125,21 +140,21 @@ class procedure TdormUtils.DatasetToObject(Dataset: TDataset; Obj: TObject);
 var
   rtti_type: TRttiType;
   props: TArray<TRttiProperty>;
-  prop: TRttiProperty;
+  Prop: TRttiProperty;
   f: TField;
 begin
   rtti_type := ctx.GetType(Obj.ClassType);
   props := rtti_type.GetProperties;
-  for prop in props do
-    if not SameText(prop.Name, 'ID') then
+  for Prop in props do
+    if not SameText(Prop.Name, 'ID') then
     begin
-      f := Dataset.FindField(prop.Name);
+      f := Dataset.FindField(Prop.Name);
       if assigned(f) and not f.ReadOnly then
       begin
         if f is TIntegerField then
-          SetProperty(Obj, prop.Name, TIntegerField(f).Value)
+          SetProperty(Obj, Prop.Name, TIntegerField(f).Value)
         else
-          SetProperty(Obj, prop.Name, TValue.From<Variant>(f.Value))
+          SetProperty(Obj, Prop.Name, TValue.From<Variant>(f.Value))
       end;
     end;
 end;
