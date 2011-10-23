@@ -8,7 +8,7 @@ uses
   SysUtils,
   DB,
   SqlExpr,
-  dorm.adapter.Firebird.Factory,
+  dorm.adapter.DBExpress.Factory,
   DBXClient,
   DBXCommon,
   dbclient,
@@ -29,7 +29,7 @@ type
     FKeysGenerator: IdormKeysGenerator;
     FKeyType: TdormKeyType;
     FNullKeyValue: TValue;
-    FB: TFBFactory;
+    FB: TDBXFactory;
   strict protected
     function CreateObjectFromDBXReader(ARttiType: TRttiType;
       AReader: TDBXReader; AFieldsMapping: TArray<TdormFieldMapping>): TObject;
@@ -87,17 +87,21 @@ type
     function GetNullKeyValue: TValue;
     function GetKeyType: TdormKeyType;
     function RawExecute(SQL: string): Int64;
+    function ExecuteAndGetFirst(SQL: string): Int64;
   end;
 
   TFirebirdTableSequence = class(TdormInterfacedObject, IdormKeysGenerator)
   private
-    FFirebirdConnection: TFBFactory;
-    procedure SetFirebirdConnection(const Value: TFBFactory);
+    // FFirebirdConnection: TDBXFactory;
+    FPersistStrategy: IdormPersistStrategy;
+    // procedure SetFirebirdConnection(const Value: TDBXFactory);
   public
     function NewStringKey(const Entity: string): string;
     function NewIntegerKey(const Entity: string): UInt64;
-    property FirebirdConnection: TFBFactory read FFirebirdConnection
-      write SetFirebirdConnection;
+    procedure SetPersistStrategy(const PersistentStrategy
+      : IdormPersistStrategy);
+    // property FirebirdConnection: TDBXFactory read FFirebirdConnection
+    // write SetFirebirdConnection;
     class procedure RegisterClass;
   end;
 
@@ -171,19 +175,19 @@ var
   t: TRttiType;
   obj: TObject;
 begin
-  FB := TFBFactory.Create(ConfigurationInfo);
+  FB := TDBXFactory.Create('firebird', ConfigurationInfo);
   FKeysGeneratorClassName := ConfigurationInfo.S['keys_generator'];
   t := ctx.FindType(FKeysGeneratorClassName);
   if t = nil then
     raise EdormException.Create('Unknown key generator ' +
       FKeysGeneratorClassName);
   obj := t.AsInstance.MetaclassType.Create;
-  TFirebirdTableSequence(obj).FFirebirdConnection := FB;
-  // VERY VERY VERY BAD!!!
-
   if not Supports(obj, IdormKeysGenerator, FKeysGenerator) then
-    raise EdormException.Create('Invalid keys generator ' +
-      FKeysGeneratorClassName);
+    raise EdormException.Create('Keys generator ' +
+      FKeysGeneratorClassName + ' doesn''t implements ''IdormKeysGenerator''');
+  FKeysGenerator.SetPersistStrategy(self);
+  self._Release;
+
   if (SameText(ConfigurationInfo.S['key_type'], 'integer')) then
   begin
     FKeyType := ktInteger;
@@ -283,6 +287,28 @@ destructor TFirebirdPersistStrategy.Destroy;
 begin
   FB.Free;
   inherited;
+end;
+
+function TFirebirdPersistStrategy.ExecuteAndGetFirst(SQL: string): Int64;
+var
+  rdr: TDBXReader;
+  cmd: TDBXCommand;
+begin
+  cmd := FB.Prepare(SQL);
+  try
+    rdr := cmd.ExecuteQuery;
+    try
+      if rdr.Next then
+        Result := rdr.Value[0].AsInt64
+      else
+        raise EdormException.Create('ExecuteAndGetFirst returns o rows');
+      rdr.Close;
+    finally
+      rdr.Free;
+    end;
+  finally
+    cmd.Free;
+  end;
 end;
 
 function TFirebirdPersistStrategy.GenerateAndFillPrimaryKeyParam
@@ -549,10 +575,8 @@ function TFirebirdPersistStrategy.LoadObjectFromDBXReader(ARttiType: TRttiType;
   AObject: TObject): Boolean;
 var
   obj: TObject;
-  // obj1: TStringBuilder;
   field: TdormFieldMapping;
   v: TValue;
-  // I: Integer;
 begin
   Result := False;
   obj := AObject;
@@ -758,18 +782,14 @@ begin
   end
   else if CompareText(aFieldType, 'decimal') = 0 then
   begin
-
     aDBXValue.AsDouble := aValue.AsExtended;
-
   end
   else if CompareText(aFieldType, 'boolean') = 0 then
   begin
-
     if aValue.AsBoolean then
       aDBXValue.AsInt16 := 1
     else
       aDBXValue.AsInt16 := 0;
-
   end
   else
     raise Exception.Create('Unsupported type ' + IntToStr(ord(aValue.Kind)));
@@ -792,33 +812,9 @@ end;
 { TFirebirdTableSequence }
 
 function TFirebirdTableSequence.NewIntegerKey(const Entity: string): UInt64;
-var
-  rdr: TDBXReader;
-  cmd: TDBXCommand;
 begin
-  try
-    cmd := FirebirdConnection.Prepare('SELECT GEN_ID(SEQ_' + Entity +
-      '_ID, 1) FROM RDB$DATABASE');
-    try
-      rdr := cmd.ExecuteQuery;
-      try
-        if rdr.Next then
-          Result := rdr.Value[0].AsInt64
-        else
-          raise EdormException.Create('Cannot get the key');
-        rdr.Close;
-      finally
-        rdr.Free;
-      end;
-    finally
-      cmd.Free;
-    end;
-  except
-    on E: Exception do
-    begin
-      raise EdormException.Create('Cannot get the key: ' + E.Message);
-    end;
-  end;
+  Result := FPersistStrategy.ExecuteAndGetFirst('SELECT GEN_ID(SEQ_' + Entity +
+    '_ID, 1) FROM RDB$DATABASE');
 end;
 
 function TFirebirdTableSequence.NewStringKey(const Entity: string): string;
@@ -831,9 +827,16 @@ begin
   // do nothing
 end;
 
-procedure TFirebirdTableSequence.SetFirebirdConnection(const Value: TFBFactory);
+// procedure TFirebirdTableSequence.SetFirebirdConnection
+// (const Value: TDBXFactory);
+// begin
+// FFirebirdConnection := Value;
+// end;
+
+procedure TFirebirdTableSequence.SetPersistStrategy(const PersistentStrategy
+  : IdormPersistStrategy);
 begin
-  FFirebirdConnection := Value;
+  FPersistStrategy := PersistentStrategy;
 end;
 
 initialization

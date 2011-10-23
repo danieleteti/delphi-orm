@@ -29,7 +29,7 @@ uses
   FrameworkTests in 'FrameworkTests.pas',
   dorm.Finders in '..\source\dorm.Finders.pas',
   dorm.loggers.CodeSite in '..\source\dorm.loggers.CodeSite.pas',
-  dorm.adapter.Firebird.Factory in '..\source\dorm.adapter.Firebird.Factory.pas',
+  dorm.adapter.DBExpress.Factory in '..\source\dorm.adapter.DBExpress.Factory.pas',
   dorm.adapter.Firebird in '..\source\dorm.adapter.Firebird.pas';
 
 {$R *.RES}

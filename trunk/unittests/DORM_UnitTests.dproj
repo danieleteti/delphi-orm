@@ -110,7 +110,7 @@
 			<DCCReference Include="FrameworkTests.pas"/>
 			<DCCReference Include="..\source\dorm.Finders.pas"/>
 			<DCCReference Include="..\source\dorm.loggers.CodeSite.pas"/>
-			<DCCReference Include="..\source\dorm.adapter.Firebird.Factory.pas"/>
+			<DCCReference Include="..\source\dorm.adapter.DBExpress.Factory.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Firebird.pas"/>
 			<BuildConfiguration Include="Debug">
 				<Key>Cfg_2</Key>
