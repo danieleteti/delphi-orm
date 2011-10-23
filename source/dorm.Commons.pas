@@ -21,12 +21,12 @@ type
   TdormIndexType = (itNone, itIndex, itUnique);
   TdormSaveType = (stAllGraph, stSingleObject);
   TdormKeyType = (ktInteger, ktString);
-  TdormCompareOperator = (
-    Equal, GreaterThan, LowerThan, GreaterOrEqual, LowerOrEqual, Different
-    );
+  TdormCompareOperator = (Equal, GreaterThan, LowerThan, GreaterOrEqual,
+    LowerOrEqual, Different);
   TdormLogicRelation = (lrAnd, lrOr);
   TdormCriteriaItem = class;
   TdormRelations = set of (BelongsTo, HasMany, HasOne);
+
   TdormInterfacedObject = class(TInterfacedObject)
     constructor Create; virtual;
   end;
@@ -60,11 +60,6 @@ type
     function ToString: string;
   end;
 
-  IdormKeysGenerator = interface
-    ['{476D88A6-E7A1-48A2-8673-C2B646A2E7F4}']
-    function NewStringKey(const Entity: string): string;
-    function NewIntegerKey(const Entity: string): UInt64;
-  end;
 
   TdormListEnumerator = class(TEnumerator<TObject>)
   private
@@ -101,8 +96,8 @@ type
     function Update(rtty_type: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TValue;
     function Load(ARttiType: TRttiType; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>; const Value: Integer): TObject;
-      overload;
+      AFieldsMapping: TArray<TdormFieldMapping>; const Value: Integer)
+      : TObject; overload;
     function Load(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>; const Value: TValue)
       : TObject; overload;
@@ -131,6 +126,15 @@ type
     function GetNullKeyValue: TValue;
     procedure SetLogger(ALogger: IdormLogger);
     function RawExecute(SQL: string): Int64;
+    function ExecuteAndGetFirst(SQL: string): Int64;
+  end;
+
+  IdormKeysGenerator = interface
+    ['{476D88A6-E7A1-48A2-8673-C2B646A2E7F4}']
+    function NewStringKey(const Entity: string): string;
+    function NewIntegerKey(const Entity: string): UInt64;
+    procedure SetPersistStrategy(const PersistentStrategy
+      : IdormPersistStrategy);
   end;
 
   TdormCriteriaItem = class
@@ -145,9 +149,11 @@ type
     procedure SetLogicRelation(const Value: TdormLogicRelation);
   public
     property Attribute: string read FAttribute write SetAttribute;
-    property CompareOperator: TdormCompareOperator read FCompareOperator write SetCompareOperator;
+    property CompareOperator: TdormCompareOperator read FCompareOperator
+      write SetCompareOperator;
     property Value: TValue read FValue write SetValue;
-    property LogicRelation: TdormLogicRelation read FLogicRelation write SetLogicRelation;
+    property LogicRelation: TdormLogicRelation read FLogicRelation
+      write SetLogicRelation;
   end;
 
 function GetPKMappingIndex(const AMapping: TArray<TdormFieldMapping>): Integer;
@@ -204,7 +210,8 @@ begin
   Exit(-1);
 end;
 
-procedure TdormFieldMapping.parseFieldMapping(json: ISuperObject; IsPK: boolean);
+procedure TdormFieldMapping.parseFieldMapping(json: ISuperObject;
+  IsPK: boolean);
 var
   S: string;
 begin
@@ -225,8 +232,8 @@ end;
 
 function TdormFieldMapping.ToString: string;
 begin
-  Result := Format('PK: %s, name: %s, field: %s, field type: %s', [BoolToStr(pk, True), name,
-    field, field_type]);
+  Result := Format('PK: %s, name: %s, field: %s, field type: %s',
+    [BoolToStr(pk, True), name, field, field_type]);
 end;
 
 { TdormListEnumerator }
@@ -263,7 +270,8 @@ begin
   FAttribute := Value;
 end;
 
-procedure TdormCriteriaItem.SetCompareOperator(const Value: TdormCompareOperator);
+procedure TdormCriteriaItem.SetCompareOperator(const Value
+  : TdormCompareOperator);
 begin
   FCompareOperator := Value;
 end;

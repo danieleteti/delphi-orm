@@ -1,4 +1,4 @@
-unit dorm.adapter.Firebird.Factory;
+unit dorm.adapter.DBExpress.Factory;
 
 interface
 
@@ -12,7 +12,7 @@ uses
   dorm.Commons;
 
 type
-  TFBFactory = class
+  TDBXFactory = class
   protected
   var
     FDBXConnection: TDBXConnection;
@@ -25,7 +25,8 @@ type
     username: string;
     password: string;
   public
-    constructor Create(ConfigurationInfo: ISuperObject);
+    constructor Create(const DriverName: String;
+      ConfigurationInfo: ISuperObject);
     destructor Destroy; override;
     function GetConnection: TDBXConnection;
     function Execute(ASQL: string): Int64; overload;
@@ -41,7 +42,7 @@ uses
 
 { Factory }
 
-function TFBFactory.Execute(ASQL: string): Int64;
+function TDBXFactory.Execute(ASQL: string): Int64;
 var
   Cmd: TDBXCommand;
 begin
@@ -55,7 +56,7 @@ begin
   end;
 end;
 
-function TFBFactory.Prepare(ASQL: string): TDBXCommand;
+function TDBXFactory.Prepare(ASQL: string): TDBXCommand;
 var
   Cmd: TDBXCommand;
 begin
@@ -70,14 +71,16 @@ begin
   Result := Cmd;
 end;
 
-procedure TFBFactory.Configure(ConfigurationInfo: ISuperObject);
+procedure TDBXFactory.Configure(ConfigurationInfo: ISuperObject);
 begin
-  database_connection_string := ConfigurationInfo.S['database_connection_string'];
+  database_connection_string := ConfigurationInfo.S
+    ['database_connection_string'];
   username := ConfigurationInfo.S['username'];
   password := ConfigurationInfo.S['password'];
 end;
 
-constructor TFBFactory.Create(ConfigurationInfo: ISuperObject);
+constructor TDBXFactory.Create(const DriverName: String;
+  ConfigurationInfo: ISuperObject);
 begin
   inherited Create;
   Configure(ConfigurationInfo);
@@ -87,15 +90,17 @@ begin
     FConnectionProps.Add(TDBXPropertyNames.username, username);
     FConnectionProps.Add(TDBXPropertyNames.password, password);
     FConnectionProps.Add('ServerCharSet', 'utf8');
-    FConnectionProps.Add(TDBXPropertyNames.Database, database_connection_string);
-    FConnectionProps.Add(TDBXPropertyNames.DriverName, 'firebird');
+    FConnectionProps.Add(TDBXPropertyNames.Database,
+      database_connection_string);
+    // FConnectionProps.Add(TDBXPropertyNames.DriverName, 'firebird');
+    FConnectionProps.Add(TDBXPropertyNames.DriverName, DriverName);
     FDBXConnection := FConnectionFactory.GetConnection(FConnectionProps);
   finally
     FConnectionProps.Free;
   end;
 end;
 
-destructor TFBFactory.Destroy;
+destructor TDBXFactory.Destroy;
 begin
   if assigned(FDBXConnection) then
   begin
@@ -106,21 +111,20 @@ begin
   inherited;
 end;
 
-function TFBFactory.Execute(ASQLCommand: TDBXCommand): Int64;
+function TDBXFactory.Execute(ASQLCommand: TDBXCommand): Int64;
 begin
   ASQLCommand.ExecuteUpdate;
   Result := ASQLCommand.RowsAffected;
 end;
 
-function TFBFactory.ExecuteQuery(ASQLCommand: TDBXCommand): TDBXReader;
+function TDBXFactory.ExecuteQuery(ASQLCommand: TDBXCommand): TDBXReader;
 begin
   raise EdormException.Create('Not implemented');
 end;
 
-function TFBFactory.GetConnection: TDBXConnection;
+function TDBXFactory.GetConnection: TDBXConnection;
 begin
   Result := FDBXConnection;
 end;
 
 end.
-
