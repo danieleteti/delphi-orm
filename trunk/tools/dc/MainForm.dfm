@@ -7,7 +7,7 @@ object frmMain: TfrmMain
   Margins.Bottom = 5
   BorderStyle = bsToolWindow
   Caption = 'dormDatabaseCreator'
-  ClientHeight = 261
+  ClientHeight = 325
   ClientWidth = 324
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -42,29 +42,14 @@ object frmMain: TfrmMain
   end
   object Label2: TLabel
     Left = 8
-    Top = 111
+    Top = 207
     Width = 124
     Height = 13
     Caption = 'Configuration file full path'
   end
-  object Label3: TLabel
-    Left = 0
-    Top = 242
-    Width = 324
-    Height = 19
-    Align = alBottom
-    Caption = 'WARNING! Current version is firebird specific!'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clRed
-    Font.Height = -16
-    Font.Name = 'Tahoma'
-    Font.Style = []
-    ParentFont = False
-    ExplicitTop = 223
-  end
   object Button1: TButton
     Left = 8
-    Top = 164
+    Top = 251
     Width = 150
     Height = 30
     Caption = 'DEV'
@@ -73,7 +58,7 @@ object frmMain: TfrmMain
   end
   object Button2: TButton
     Left = 8
-    Top = 200
+    Top = 287
     Width = 150
     Height = 30
     Caption = 'TEST'
@@ -82,7 +67,7 @@ object frmMain: TfrmMain
   end
   object Button3: TButton
     Left = 164
-    Top = 200
+    Top = 287
     Width = 150
     Height = 30
     Caption = 'Open Last SCRIPT'
@@ -91,7 +76,7 @@ object frmMain: TfrmMain
   end
   object Button4: TButton
     Left = 164
-    Top = 164
+    Top = 251
     Width = 150
     Height = 30
     Caption = 'RELEASE'
@@ -100,9 +85,17 @@ object frmMain: TfrmMain
   end
   object Edit1: TEdit
     Left = 8
-    Top = 128
+    Top = 224
     Width = 306
     Height = 21
     TabOrder = 4
+  end
+  object ListBox1: TListBox
+    Left = 8
+    Top = 96
+    Width = 306
+    Height = 97
+    ItemHeight = 13
+    TabOrder = 5
   end
 end

@@ -1,3 +1,19 @@
+{ *******************************************************************************
+  Copyright 2010-2011 Daniele Teti
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ******************************************************************************** }
+
 unit dorm.adapter.Firebird;
 
 interface
@@ -22,15 +38,15 @@ uses
 
 type
   TFirebirdPersistStrategy = class(TdormInterfacedObject, IdormPersistStrategy)
-  strict private
+  strict protected
+    FB: TDBXFactory;
     FLogger: IdormLogger;
     FCurTransaction: TDBXTransaction;
     FKeysGeneratorClassName: string;
     FKeysGenerator: IdormKeysGenerator;
     FKeyType: TdormKeyType;
     FNullKeyValue: TValue;
-    FB: TDBXFactory;
-  strict protected
+    function CreateDBXFactory(Conf: ISuperObject): TDBXFactory; virtual;
     function CreateObjectFromDBXReader(ARttiType: TRttiType;
       AReader: TDBXReader; AFieldsMapping: TArray<TdormFieldMapping>): TObject;
     function LoadObjectFromDBXReader(ARttiType: TRttiType; AReader: TDBXReader;
@@ -46,7 +62,6 @@ type
       const Entity: string): TValue; overload;
     function FillPrimaryKeyParam(PKParam: TDBXParameter;
       const Value: TValue): TValue;
-    // function FillPrimaryKeyParam(PKParam: TDBXParameter; const Value: string): TValue; overload;
     function GetLastInsertID: Int64;
     function GetKeysGenerator: IdormKeysGenerator;
     function Insert(rtti_type: TRttiType; AObject: TObject; ATableName: string;
@@ -62,11 +77,9 @@ type
     function Load(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>; const Value: Integer)
       : TObject; overload;
-
     function List(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>;
       AdormSearchCriteria: IdormSearchCriteria): TdormCollection; overload;
-
     function CreateChildLoaderSearch(AChildClassTypeInfo: PTypeInfo;
       AChildClassName, AChildTableName, AChildRelationField: string;
       APKValue: TValue): IdormSearchCriteria;
@@ -74,7 +87,7 @@ type
       AFieldsMapping: TArray<TdormFieldMapping>): TObject;
     procedure DeleteAll(ATableName: string);
     function Count(ATableName: string): Int64;
-    procedure ConfigureStrategy(ConfigurationInfo: ISuperObject);
+    procedure ConfigureStrategy(ConfigurationInfo: ISuperObject); virtual;
     procedure InitStrategy;
     procedure StartTransaction;
     procedure Commit;
@@ -92,16 +105,12 @@ type
 
   TFirebirdTableSequence = class(TdormInterfacedObject, IdormKeysGenerator)
   private
-    // FFirebirdConnection: TDBXFactory;
     FPersistStrategy: IdormPersistStrategy;
-    // procedure SetFirebirdConnection(const Value: TDBXFactory);
   public
     function NewStringKey(const Entity: string): string;
     function NewIntegerKey(const Entity: string): UInt64;
     procedure SetPersistStrategy(const PersistentStrategy
       : IdormPersistStrategy);
-    // property FirebirdConnection: TDBXFactory read FFirebirdConnection
-    // write SetFirebirdConnection;
     class procedure RegisterClass;
   end;
 
@@ -114,7 +123,6 @@ function TFirebirdPersistStrategy.Update(rtti_type: TRttiType; AObject: TObject;
   ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>): TValue;
 var
   field: TdormFieldMapping;
-  // sql_fields_values,
   SQL: string;
   Query: TDBXCommand;
   I, pk_idx: Integer;
@@ -175,7 +183,7 @@ var
   t: TRttiType;
   obj: TObject;
 begin
-  FB := TDBXFactory.Create('firebird', ConfigurationInfo);
+  FB := CreateDBXFactory(ConfigurationInfo);
   FKeysGeneratorClassName := ConfigurationInfo.S['keys_generator'];
   t := ctx.FindType(FKeysGeneratorClassName);
   if t = nil then
@@ -183,8 +191,8 @@ begin
       FKeysGeneratorClassName);
   obj := t.AsInstance.MetaclassType.Create;
   if not Supports(obj, IdormKeysGenerator, FKeysGenerator) then
-    raise EdormException.Create('Keys generator ' +
-      FKeysGeneratorClassName + ' doesn''t implements ''IdormKeysGenerator''');
+    raise EdormException.Create('Keys generator ' + FKeysGeneratorClassName +
+      ' doesn''t implements ''IdormKeysGenerator''');
   FKeysGenerator.SetPersistStrategy(self);
   self._Release;
 
@@ -238,11 +246,18 @@ begin
     ktInteger:
       SQL := SQL + IntToStr(APKValue.AsInt64);
     ktString:
-      SQL := SQL + '''' + APKValue.AsString + '''';
+      SQL := SQL + '''' + StringReplace(APKValue.AsString, '''', '''''',
+        [rfReplaceAll]) + '''';
   end;
 
   GetLogger.Debug('CreateChildLoaderSearch: ' + SQL);
   Result := TdormSimpleSearchCriteria.Create(nil, SQL);
+end;
+
+function TFirebirdPersistStrategy.CreateDBXFactory(Conf: ISuperObject)
+  : TDBXFactory;
+begin
+  Result := TDBXFactory.Create('dbxfb.dll', 'firebird', Conf);
 end;
 
 function TFirebirdPersistStrategy.Delete(ARttiType: TRttiType; AObject: TObject;
@@ -265,7 +280,6 @@ begin
   cmd := FB.Prepare(SQL);
   try
     FillPrimaryKeyParam(cmd.Parameters[pk_idx], pk_value);
-    // cmd.Parameters[0].Value.SetAnsiString(pk_value);
     GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
     cmd.ExecuteUpdate;
   finally
@@ -322,9 +336,8 @@ begin
       end;
     ktInteger:
       begin
-        PKParam.Value.SetBcd
-          (IntegerToBcd(FKeysGenerator.NewIntegerKey(Entity)));
-        Result := BcdToInteger(PKParam.Value.GetBcd);
+        PKParam.Value.AsInt64 := FKeysGenerator.NewIntegerKey(Entity);
+        Result := PKParam.Value.AsInt64;
       end;
   end;
 
@@ -342,8 +355,8 @@ begin
         end;
       ktInteger:
         begin
-          PKParam.Value.SetBcd(IntegerToBcd(Value.AsInt64));
-          Result := BcdToInteger(PKParam.Value.GetBcd);
+          PKParam.Value.AsInt64 := Value.AsInt64;
+          Result := PKParam.Value.AsInt64;
         end;
     end;
   except
@@ -396,20 +409,15 @@ var
   Query: TDBXCommand;
   I, pk_idx: Integer;
   v, pk_value: TValue;
-  // par: TDBXParameter;
-  // guid: string;
-  // d: TDBXDateValue;
 begin
   sql_fields_names := '';
   for field in AFieldsMapping do
-    // if not field.pk then
     sql_fields_names := sql_fields_names + ',"' + field.field + '"';
 
   System.Delete(sql_fields_names, 1, 1);
 
   sql_fields_values := '';
   for field in AFieldsMapping do
-    // if not field.pk then
     sql_fields_values := sql_fields_values + ',?';
   System.Delete(sql_fields_values, 1, 1);
 
@@ -468,7 +476,6 @@ function TFirebirdPersistStrategy.List(ARttiType: TRttiType; ATableName: string;
   AFieldsMapping: TArray<TdormFieldMapping>;
   AdormSearchCriteria: IdormSearchCriteria): TdormCollection;
 var
-  // pk_idx: Integer;
   SQL: string;
   cmd: TDBXCommand;
   reader: TDBXReader;

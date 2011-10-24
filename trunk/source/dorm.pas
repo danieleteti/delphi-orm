@@ -1,3 +1,19 @@
+{ *******************************************************************************
+  Copyright 2010-2011 Daniele Teti
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ******************************************************************************** }
+
 unit dorm;
 
 interface
@@ -12,7 +28,6 @@ uses
   Rtti,
   dorm.Collections,
   dorm.UOW;
-// ,dorm.Core.IdentityMap;
 
 type
   TdormParam = class
@@ -515,11 +530,13 @@ end;
 function TSession.GetStrategy: IdormPersistStrategy;
 var
   T: TRttiType;
+  AdapterClassName: SOString;
 begin
   if not assigned(FPersistStrategy) then
   begin
-    T := FCTX.FindType(FMapping.O['persistence'].O[GetEnv].s
-      ['database_adapter']);
+    AdapterClassName := FMapping.O['persistence'].O[GetEnv].s
+      ['database_adapter'];
+    T := FCTX.FindType(AdapterClassName);
     if assigned(T) then
     begin
       if Supports(T.AsInstance.MetaclassType, IdormPersistStrategy) then
@@ -530,10 +547,12 @@ begin
         FPersistStrategy.SetLogger(FLogger);
       end
       else
-        raise Exception.Create('Adapter does not support IdormPersistStrategy');
+        raise Exception.CreateFmt
+          ('Adapter [%s] does not support IdormPersistStrategy',
+          [AdapterClassName]);
     end
     else
-      raise Exception.Create('Adapter not found');
+      raise Exception.CreateFmt('Adapter [%s] not found', [AdapterClassName]);
   end
   else
     Result := FPersistStrategy;

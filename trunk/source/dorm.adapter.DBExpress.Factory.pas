@@ -1,3 +1,19 @@
+{ *******************************************************************************
+  Copyright 2010-2011 Daniele Teti
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ******************************************************************************** }
+
 unit dorm.adapter.DBExpress.Factory;
 
 interface
@@ -25,7 +41,7 @@ type
     username: string;
     password: string;
   public
-    constructor Create(const DriverName: String;
+    constructor Create(const DBXLibraryName: String; const DriverName: String;
       ConfigurationInfo: ISuperObject);
     destructor Destroy; override;
     function GetConnection: TDBXConnection;
@@ -79,8 +95,8 @@ begin
   password := ConfigurationInfo.S['password'];
 end;
 
-constructor TDBXFactory.Create(const DriverName: String;
-  ConfigurationInfo: ISuperObject);
+constructor TDBXFactory.Create(const DBXLibraryName: String;
+  const DriverName: String; ConfigurationInfo: ISuperObject);
 begin
   inherited Create;
   Configure(ConfigurationInfo);
@@ -92,8 +108,8 @@ begin
     FConnectionProps.Add('ServerCharSet', 'utf8');
     FConnectionProps.Add(TDBXPropertyNames.Database,
       database_connection_string);
-    // FConnectionProps.Add(TDBXPropertyNames.DriverName, 'firebird');
     FConnectionProps.Add(TDBXPropertyNames.DriverName, DriverName);
+    FConnectionProps.Add(TDBXPropertyNames.LibraryName, DBXLibraryName);
     FDBXConnection := FConnectionFactory.GetConnection(FConnectionProps);
   finally
     FConnectionProps.Free;

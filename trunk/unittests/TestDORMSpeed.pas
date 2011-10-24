@@ -1,3 +1,19 @@
+{ *******************************************************************************
+  Copyright 2010-2011 Daniele Teti
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ******************************************************************************** }
+
 unit TestDORMSpeed;
 
 interface
@@ -10,8 +26,6 @@ type
   public
     procedure SetUp; override;
     procedure TearDown; override;
-  protected
-    function GetDORMConfigFileName: String; override;
   published
     procedure TestLotOfObjects;
     procedure TestList;
@@ -20,16 +34,12 @@ type
 implementation
 
 uses
+  windows,
   Classes,
   SysUtils,
-  dorm.Commons, dorm.Collections, dorm.tests.bo;
+  dorm.Commons, dorm.Collections, dorm.tests.bo, System.DateUtils;
 
 { TTestDORMSpeed }
-
-function TTestDORMSpeed.GetDORMConfigFileName: String;
-begin
-  Result := 'dorm.conf';
-end;
 
 procedure TTestDORMSpeed.SetUp;
 begin
@@ -47,7 +57,9 @@ var
   I: Integer;
   p: TPerson;
   persone: TdormCollection;
+  start: TDateTime;
 begin
+  start := now;
   for I := 1 to 1000 do
   begin
     p := TPerson.NewPerson;
@@ -64,13 +76,17 @@ begin
   finally
     persone.Free;
   end;
+  CheckTrue(MilliSecondsBetween(now, start) < 15000,
+    'Too slow: ' + inttostr(MilliSecondsBetween(now, start)));
 end;
 
 procedure TTestDORMSpeed.TestLotOfObjects;
 var
   I: Integer;
   p: TPerson;
+  start: TDateTime;
 begin
+  start := now;
   for I := 1 to 1000 do
   begin
     p := TPerson.NewPerson;
@@ -80,6 +96,8 @@ begin
   end;
   Session.Commit;
   CheckEquals(1000, Session.Count(TPerson));
+  CheckTrue(MilliSecondsBetween(now, start) < 15000,
+    'Too slow: ' + inttostr(MilliSecondsBetween(now, start)));
 end;
 
 initialization
