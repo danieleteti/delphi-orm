@@ -1,3 +1,19 @@
+{ *******************************************************************************
+  Copyright 2010-2011 Daniele Teti
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  ******************************************************************************** }
+
 unit dorm.Commons;
 
 interface
@@ -60,18 +76,6 @@ type
     function ToString: string;
   end;
 
-
-  TdormListEnumerator = class(TEnumerator<TObject>)
-  private
-    FList: TdormCollection;
-    FCurrent: Integer;
-  protected
-    function DoGetCurrent: TObject; override;
-    function DoMoveNext: boolean; override;
-  public
-    constructor Create(AList: TdormCollection);
-  end;
-
   IList = interface
     ['{2A1BCB3C-17A2-4F8D-B6FB-32B2A1BFE840}']
     function Add(const Value: TObject): Integer;
@@ -86,7 +90,6 @@ type
     function IndexOf(const Value: TObject): Integer;
     function GetItem(index: Integer): TObject;
     procedure SetItem(index: Integer; const Value: TObject);
-    function GetEnumerator: TdormListEnumerator;
   end;
 
   IdormPersistStrategy = interface
@@ -162,18 +165,12 @@ function GetPKValue(AType: TRttiType; const AMapping: TArray<TdormFieldMapping>;
   AObject: TObject): TValue;
 function GetRelationMappingIndexByPropertyName(AHasManyMapping: TSuperArray;
   APropertyName: string): Integer;
-// function CreateObject(ARttiType: TRttiType): TObject;
 
 implementation
 
 uses
   dorm,
   dorm.Utils;
-
-// function CreateObject(ARttiType: TRttiType): TObject;
-// begin
-// Result := ARttiType.GetMethod('Create').Invoke(ARttiType.AsInstance.MetaclassType, []).AsObject;
-// end;
 
 function GetRelationMappingIndexByPropertyName(AHasManyMapping: TSuperArray;
   APropertyName: string): Integer;
@@ -234,28 +231,6 @@ function TdormFieldMapping.ToString: string;
 begin
   Result := Format('PK: %s, name: %s, field: %s, field type: %s',
     [BoolToStr(pk, True), name, field, field_type]);
-end;
-
-{ TdormListEnumerator }
-
-constructor TdormListEnumerator.Create(AList: TdormCollection);
-begin
-  inherited Create;
-  FList := AList;
-  FCurrent := -1;
-end;
-
-function TdormListEnumerator.DoGetCurrent: TObject;
-begin
-  if FCurrent > -1 then
-    Result := FList.GetItem(FCurrent);
-end;
-
-function TdormListEnumerator.DoMoveNext: boolean;
-begin
-  Result := FList.Count > FCurrent + 1;
-  if Result then
-    FCurrent := FCurrent + 1;
 end;
 
 { TdormInterfacedObject }
