@@ -22,30 +22,72 @@ uses
   TestFramework,
   TypInfo,
   dorm,
-  dorm.Commons;
+  dorm.Commons, BaseTestCase;
 
 type
-  TTestDORMSearchCriteria = class(TTestCase)
+  TTestDORMSearchCriteria = class(TBaseTestCase)
   published
     procedure TestSimpleRawCriteria;
+    procedure TestSearchByAttributes;
   end;
 
 implementation
 
 uses
-  Rtti, dorm.tests.bo;
+  Rtti, dorm.tests.bo, dorm.Collections;
 
 { TTestDORMSearchCriteria }
+
+procedure TTestDORMSearchCriteria.TestSearchByAttributes;
+var
+  Criteria: TdormCriteria;
+  People: TdormCollection;
+  p: TPerson;
+begin
+  Session.DeleteAll(TPerson);
+  p := TPerson.NewPerson;
+  p.LastName := 'Smith';
+  Session.SaveAndFree(p);
+  p := TPerson.NewPerson;
+  Session.SaveAndFree(p);
+
+  Criteria := TdormCriteria.
+    NewCriteria('FirstName', TdormCompareOperator.Equal, 'Daniele').
+    Add('LastName', TdormCompareOperator.Different, 'Smith');
+  People := Session.List<TPerson>(Criteria);
+  try
+    CheckEquals(1, People.Count);
+  finally
+    People.Free;
+  end;
+end;
 
 procedure TTestDORMSearchCriteria.TestSimpleRawCriteria;
 var
   intf: IdormSearchCriteria;
-const
-  SQL = 'SELECT * FROM PEOPLE';
+  People: TdormCollection;
+  SQL: string;
 begin
+  Session.DeleteAll(TPerson);
+
+  SQL := 'SELECT * FROM PEOPLE';
   intf := TdormSimpleSearchCriteria.Create(TypeInfo(TPerson), SQL);
-  CheckEquals(PTypeInfo(TypeInfo(TPerson))^.name, intf.GetItemClassInfo.name);
-  CheckEquals(SQL, intf.GetSQL);
+  People := Session.List(intf);
+  try
+    CheckEquals(0, People.Count);
+  finally
+    People.Free;
+  end;
+
+  Session.SaveAndFree(TPerson.NewPerson);
+  SQL := 'SELECT * FROM PEOPLE';
+  intf := TdormSimpleSearchCriteria.Create(TypeInfo(TPerson), SQL);
+  People := Session.List(intf);
+  try
+    CheckEquals(1, People.Count);
+  finally
+    People.Free;
+  end;
 end;
 
 initialization

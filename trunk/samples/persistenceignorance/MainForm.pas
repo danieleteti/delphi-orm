@@ -11,12 +11,7 @@ uses
 type
   TButton = class(Vcl.StdCtrls.TButton)
   public
-    constructor Create;
-  end;
-
-  TEdit = class(Vcl.StdCtrls.TEdit)
-  public
-    constructor Create;
+    constructor Create; // A parameterless constructor
   end;
 
   TForm11 = class(TForm)
@@ -71,13 +66,6 @@ end;
 constructor TButton.Create;
 begin
   inherited Create(Form11);
-end;
-
-{ TEdit }
-
-constructor TEdit.Create;
-begin
-  inherited Create(Form11)
 end;
 
 end.
