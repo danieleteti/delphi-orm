@@ -51,7 +51,8 @@ type
       AReader: TDBXReader; AFieldsMapping: TArray<TdormFieldMapping>): TObject;
     function LoadObjectFromDBXReader(ARttiType: TRttiType; AReader: TDBXReader;
       AFieldsMapping: TArray<TdormFieldMapping>; AObject: TObject): Boolean;
-    function GetSelectList(AMapping: TArray<TdormFieldMapping>): string;
+    function GetSelectList(AMapping: TArray<TdormFieldMapping>;
+      AWithPrimaryKey: Boolean): string;
     function GetLogger: IdormLogger;
     procedure SetDBXParameterValue(aFieldType: string;
       aParameter: TDBXParameter; aValue: TValue);
@@ -70,12 +71,6 @@ type
       AFieldsMapping: TArray<TdormFieldMapping>): TValue;
     function Load(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>; const Value: TValue)
-      : TObject; overload;
-    function Load(ARttiType: TRttiType; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>; const Value: string;
-      out AObject: TObject): Boolean; overload;
-    function Load(ARttiType: TRttiType; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>; const Value: Integer)
       : TObject; overload;
     function List(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>;
@@ -267,7 +262,6 @@ var
   pk_value: TValue;
   pk_attribute_name, pk_field_name, SQL: string;
   cmd: TDBXCommand;
-  // reader: TDBXReader;
 begin
   pk_idx := GetPKMappingIndex(AFieldsMapping);
   if pk_idx = -1 then
@@ -387,12 +381,22 @@ begin
 end;
 
 function TFirebirdPersistStrategy.GetSelectList
-  (AMapping: TArray<TdormFieldMapping>): string;
+  (AMapping: TArray<TdormFieldMapping>; AWithPrimaryKey: Boolean): string;
 var
   field: TdormFieldMapping;
 begin
-  for field in AMapping do
-    Result := Result + ',"' + field.field + '"';
+  Result := '';
+  if AWithPrimaryKey then
+    for field in AMapping do
+    begin
+      Result := Result + ',"' + field.field + '"';
+    end
+  else
+    for field in AMapping do
+    begin
+      if not field.pk then
+        Result := Result + ',"' + field.field + '"';
+    end;
   System.Delete(Result, 1, 1);
 end;
 
@@ -503,10 +507,8 @@ function TFirebirdPersistStrategy.Load(ARttiType: TRttiType; ATableName: string;
   AFieldsMapping: TArray<TdormFieldMapping>; const Value: TValue): TObject;
 var
   pk_idx: Integer;
-  // , pk_value: Integer;
   pk_attribute_name, pk_field_name, SQL: string;
   cmd: TDBXCommand;
-  // v: TValue;
   reader: TDBXReader;
 begin
   Result := nil;
@@ -515,7 +517,7 @@ begin
     raise Exception.Create('Invalid primary key for table ' + ATableName);
   pk_attribute_name := AFieldsMapping[pk_idx].name;
   pk_field_name := AFieldsMapping[pk_idx].field;
-  SQL := 'SELECT ' + GetSelectList(AFieldsMapping) + ' FROM ' + ATableName +
+  SQL := 'SELECT ' + GetSelectList(AFieldsMapping, true) + ' FROM ' + ATableName +
     ' WHERE ' + pk_field_name + ' = ?';
   GetLogger.Debug('PREPARING: ' + SQL);
   cmd := FB.Prepare(SQL);
@@ -528,47 +530,6 @@ begin
     try
       if reader.Next then
         Result := CreateObjectFromDBXReader(ARttiType, reader, AFieldsMapping);
-    finally
-      reader.Free;
-    end;
-  finally
-    cmd.Free;
-  end;
-end;
-
-function TFirebirdPersistStrategy.Load(ARttiType: TRttiType; ATableName: string;
-  AFieldsMapping: TArray<TdormFieldMapping>; const Value: Integer): TObject;
-begin
-  // do nothing
-end;
-
-function TFirebirdPersistStrategy.Load(ARttiType: TRttiType; ATableName: string;
-  AFieldsMapping: TArray<TdormFieldMapping>; const Value: string;
-  out AObject: TObject): Boolean;
-var
-  pk_idx: Integer;
-  // , pk_value: Integer;
-  pk_attribute_name, pk_field_name, SQL: string;
-  cmd: TDBXCommand;
-  reader: TDBXReader;
-begin
-  Result := False;
-  pk_idx := GetPKMappingIndex(AFieldsMapping);
-  if pk_idx = -1 then
-    raise Exception.Create('Invalid primary key for table ' + ATableName);
-  pk_attribute_name := AFieldsMapping[pk_idx].name;
-  pk_field_name := AFieldsMapping[pk_idx].field;
-  SQL := 'SELECT ' + GetSelectList(AFieldsMapping) + ' FROM ' + ATableName +
-    ' WHERE ' + pk_field_name + ' = ?';
-  GetLogger.Debug('PREPARING: ' + SQL);
-  cmd := FB.Prepare(SQL);
-  try
-    cmd.Parameters[0].Value.SetAnsiString(Value);
-    GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
-    reader := cmd.ExecuteQuery();
-    try
-      if reader.Next then
-        LoadObjectFromDBXReader(ARttiType, reader, AFieldsMapping, AObject);
     finally
       reader.Free;
     end;
