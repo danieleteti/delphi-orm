@@ -99,14 +99,8 @@ type
     function Update(rtty_type: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TValue;
     function Load(ARttiType: TRttiType; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>; const Value: Integer)
-      : TObject; overload;
-    function Load(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>; const Value: TValue)
       : TObject; overload;
-    function Load(ARttiType: TRttiType; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>; const Value: string;
-      out AObject: TObject): boolean; overload;
     function List(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>;
       AdormSearchCriteria: IdormSearchCriteria): TdormCollection;
