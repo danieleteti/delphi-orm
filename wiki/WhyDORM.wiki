@@ -1,0 +1,7 @@
+= You could have benefits from DORM if... =
+
+  * You don't want (or you cant) change your database to use an ORM
+  * You want persistence ignorance
+  * You want to access to the «metal»
+  * You want to persist PODOs (Plain Old Delphi Objects)
+  * You don't hate SQL, but you know that 90% of it is boilerplate and errors prone
