@@ -1,0 +1,6 @@
+= Who is behind DORM? =
+* DORM’s author is Daniele Teti (http://www.danieleteti.it/)
+
+* Contributors are welcome.
+
+* bitTime software (http://www.bittime.it/) is the main sponsor and offer support for DORM custom development, consultancy and so on.
