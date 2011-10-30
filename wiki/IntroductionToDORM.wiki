@@ -45,7 +45,7 @@ The following code, update and delete an object representation from the database
 var 
   person: TPerson; oid: Integer;
 begin
-  person := Session.Load<TPerson>(1);
+  person := Session.Load<TPerson>(1);  //"1" is the Object's identifier
   try
     person.FirstName := ‘Daniele’;
     person.LastName := ‘Teti’;
