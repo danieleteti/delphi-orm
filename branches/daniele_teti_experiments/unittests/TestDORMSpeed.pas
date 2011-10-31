@@ -72,6 +72,12 @@ begin
   persone := Session.ListAll<TPerson>;
   try
     CheckEquals(1000, persone.Count);
+    persone.Sort(TdormComparer.Create('FirstName'));
+    for I := 1 to 1000 do
+      CheckEquals('Daniele' + Format('%4d', [I]), TPerson(persone[I-1]).FirstName);
+    persone.ReverseSort(TdormComparer.Create('FirstName'));
+    for I := 1 to 1000 do
+      CheckEquals('Daniele' + Format('%4d', [I]), TPerson(persone[1000-I]).FirstName);
     Session.Commit;
   finally
     persone.Free;

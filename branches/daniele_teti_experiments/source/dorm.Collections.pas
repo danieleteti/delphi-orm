@@ -46,6 +46,8 @@ type
     FItems: TObjectList<TObject>;
     FChilds: TObjectList<TObject>;
   public
+    procedure Sort(AComparer: IComparer<TObject>);
+    procedure ReverseSort(AComparer: IComparer<TObject>);
     function GetEnumerator: TdormCollectionEnumerator;
     function Add(const Value: TObject): TdormCollection;
     function First: TObject;
@@ -67,10 +69,17 @@ type
     function AsObjectList<T: class>(): TObjectList<T>;
     procedure ForEach<T: class>(Proc: TProc<T>);
     function FindFirst<T: class>(Filter: TFunc<T, Boolean>): T;
-
     constructor Create; virtual;
     destructor Destroy; override;
     property Items[index: Integer]: TObject read GetItem write SetItem; default;
+  end;
+
+  TdormComparer = class(TComparer<TObject>)
+  protected
+    FAttributeName: String;
+  public
+    function Compare(const Left, Right: TObject): Integer; override;
+    constructor Create(const AttributeName: String);
   end;
 
 function NewList(AOwnObjects: Boolean = true): TdormCollection; overload;
@@ -80,7 +89,7 @@ function NewList(Objects: array of TObject; AOwnObjects: Boolean = true)
 implementation
 
 uses
-  dorm.Utils;
+  dorm.Utils, dorm.Commons;
 
 function NewList(AOwnObjects: Boolean): TdormCollection; overload;
 begin
@@ -238,6 +247,12 @@ begin
   Result := FItems.Remove(Value);
 end;
 
+procedure TdormCollection.ReverseSort(AComparer: IComparer<TObject>);
+begin
+  Sort(AComparer);
+  FItems.Reverse;
+end;
+
 procedure TdormCollection.SetItem(index: Integer; const Value: TObject);
 begin
   FItems.Items[index] := Value;
@@ -246,6 +261,11 @@ end;
 procedure TdormCollection.SetOwnsObjects(Value: Boolean);
 begin
   FItems.OwnsObjects := Value;
+end;
+
+procedure TdormCollection.Sort(AComparer: IComparer<TObject>);
+begin
+  FItems.Sort(AComparer);
 end;
 
 { TdormCollectionEnumerator }
@@ -272,6 +292,47 @@ begin
   end
   else
     Result := false;
+end;
+
+{ TdormComparer }
+
+function TdormComparer.Compare(const Left, Right: TObject): Integer;
+var
+  _VRight, _VLeft: TValue;
+begin
+  Result := 0;
+  _VLeft := TdormUtils.GetProperty(Left, FAttributeName);
+  _VRight := TdormUtils.GetProperty(Right, FAttributeName);
+  if _VLeft.IsType<String> then
+  begin
+    if _VLeft.AsString < _VRight.AsString then
+      Exit(-1);
+    if _VLeft.AsString > _VRight.AsString then
+      Exit(1);
+  end
+  else if _VLeft.IsType<Integer> then
+  begin
+    if _VLeft.AsInteger < _VRight.AsInteger then
+      Exit(-1);
+    if _VLeft.AsInteger > _VRight.AsInteger then
+      Exit(1);
+  end
+  else if (_VLeft.IsType<TDate>) or (_VLeft.IsType<TDateTime>) then
+  begin
+    if _VLeft.AsExtended < _VRight.AsExtended then
+      Exit(-1);
+    if _VLeft.AsExtended > _VRight.AsExtended then
+      Exit(1);
+  end
+  else
+    raise EdormException.Create('Unsupported sort type for attribute ' +
+      FAttributeName);
+end;
+
+constructor TdormComparer.Create(const AttributeName: String);
+begin
+  inherited Create;
+  FAttributeName := AttributeName;
 end;
 
 end.
