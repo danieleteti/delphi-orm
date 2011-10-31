@@ -29,12 +29,13 @@ type
   published
     procedure TestSimpleRawCriteria;
     procedure TestSearchByAttributes;
+    procedure TestSearchByAttributesAll;
   end;
 
 implementation
 
 uses
-  Rtti, dorm.tests.bo, dorm.Collections;
+  Rtti, dorm.tests.bo, dorm.Collections, SysUtils;
 
 { TTestDORMSearchCriteria }
 
@@ -51,15 +52,58 @@ begin
   p := TPerson.NewPerson;
   Session.SaveAndFree(p);
 
-  Criteria := TdormCriteria.
-    NewCriteria('FirstName', TdormCompareOperator.Equal, 'Daniele').
-    Add('LastName', TdormCompareOperator.Different, 'Smith');
+  Criteria := TdormCriteria.NewCriteria('FirstName', TdormCompareOperator.Equal,
+    'Daniele').Add('LastName', TdormCompareOperator.Different, 'Smith');
   People := Session.List<TPerson>(Criteria);
   try
     CheckEquals(1, People.Count);
   finally
     People.Free;
   end;
+end;
+
+procedure TTestDORMSearchCriteria.TestSearchByAttributesAll;
+var
+  p: TPerson;
+  crit: TdormCriteria;
+  List: TdormCollection;
+begin
+  p := TPerson.NewPerson;
+  try
+    p.BornDate := EncodeDate(2000, 10, 20);
+    p.BornTimeStamp := p.BornDate + EncodeTime(12, 10, 5, 0);
+    Session.Save(p);
+  finally
+    p.Free;
+  end;
+  crit := TdormCriteria.NewCriteria('BornDate', TdormCompareOperator.Equal,
+    EncodeDate(2000, 10, 20));
+  List := Session.List<TPerson>(crit);
+  try
+    CheckEquals(1, List.Count);
+  finally
+    List.Free;
+  end;
+
+  crit := TdormCriteria.NewCriteria('BornTimeStamp', TdormCompareOperator.Equal,
+    EncodeDate(2000, 10, 20) + EncodeTime(12, 10, 5, 0));
+  List := Session.List<TPerson>(crit);
+  try
+    CheckEquals(1, List.Count);
+  finally
+    List.Free;
+  end;
+
+  crit := TdormCriteria
+    .NewCriteria('BornTimeStamp', TdormCompareOperator.GreaterOrEqual, EncodeDate(2000, 10, 20) + EncodeTime(12, 10, 5, 0))
+    .AddAnd('BornDate', TdormCompareOperator.LowerOrEqual, EncodeDate(2000, 10, 20));
+  List := Session.List<TPerson>(crit);
+  try
+    CheckEquals(1, List.Count);
+  finally
+    List.Free;
+  end;
+
 end;
 
 procedure TTestDORMSearchCriteria.TestSimpleRawCriteria;

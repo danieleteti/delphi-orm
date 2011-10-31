@@ -46,13 +46,12 @@ type
     FKeysGenerator: IdormKeysGenerator;
     FKeyType: TdormKeyType;
     FNullKeyValue: TValue;
+    FLastInsertOID: TValue;
     function CreateDBXFactory(Conf: ISuperObject): TDBXFactory; virtual;
     function CreateObjectFromDBXReader(ARttiType: TRttiType;
       AReader: TDBXReader; AFieldsMapping: TArray<TdormFieldMapping>): TObject;
     function LoadObjectFromDBXReader(ARttiType: TRttiType; AReader: TDBXReader;
       AFieldsMapping: TArray<TdormFieldMapping>; AObject: TObject): Boolean;
-    function GetSelectList(AMapping: TArray<TdormFieldMapping>;
-      AWithPrimaryKey: Boolean): string;
     function GetLogger: IdormLogger;
     procedure SetDBXParameterValue(aFieldType: string;
       aParameter: TDBXParameter; aValue: TValue);
@@ -63,7 +62,10 @@ type
       const Entity: string): TValue; overload;
     function FillPrimaryKeyParam(PKParam: TDBXParameter;
       const Value: TValue): TValue;
-    function GetLastInsertID: Int64;
+    function EscapeString(const Value: String): String;
+    function EscapeDate(const Value: TDate): String;
+    function EscapeDateTime(const Value: TDate): String;
+    function GetLastInsertOID: TValue;
     function GetKeysGenerator: IdormKeysGenerator;
     function Insert(rtti_type: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TValue;
@@ -75,9 +77,9 @@ type
     function List(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>;
       AdormSearchCriteria: IdormSearchCriteria): TdormCollection; overload;
-    function CreateChildLoaderSearch(AChildClassTypeInfo: PTypeInfo;
-      AChildClassName, AChildTableName, AChildRelationField: string;
-      APKValue: TValue): IdormSearchCriteria;
+    // function CreateChildLoaderSearch(AChildClassTypeInfo: PTypeInfo;
+    // AChildClassName, AChildTableName, AChildRelationField: string;
+    // APKValue: TValue): IdormSearchCriteria;
     function Delete(ARttiType: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TObject;
     procedure DeleteAll(ATableName: string);
@@ -229,25 +231,25 @@ begin
   end;
 end;
 
-function TFirebirdPersistStrategy.CreateChildLoaderSearch(AChildClassTypeInfo
-  : PTypeInfo; AChildClassName, AChildTableName, AChildRelationField: string;
-  APKValue: TValue): IdormSearchCriteria;
-var
-  SQL: string;
-begin
-  SQL := 'SELECT * FROM ' + AChildTableName + ' WHERE ' +
-    AChildRelationField + ' = ';
-  case FKeyType of
-    ktInteger:
-      SQL := SQL + IntToStr(APKValue.AsInt64);
-    ktString:
-      SQL := SQL + '''' + StringReplace(APKValue.AsString, '''', '''''',
-        [rfReplaceAll]) + '''';
-  end;
-
-  GetLogger.Debug('CreateChildLoaderSearch: ' + SQL);
-  Result := TdormSimpleSearchCriteria.Create(nil, SQL);
-end;
+// function TFirebirdPersistStrategy.CreateChildLoaderSearch(AChildClassTypeInfo
+// : PTypeInfo; AChildClassName, AChildTableName, AChildRelationField: string;
+// APKValue: TValue): IdormSearchCriteria;
+// var
+// SQL: string;
+// begin
+// SQL := 'SELECT * FROM ' + AChildTableName + ' WHERE ' +
+// AChildRelationField + ' = ';
+// case FKeyType of
+// ktInteger:
+// SQL := SQL + IntToStr(APKValue.AsInt64);
+// ktString:
+// SQL := SQL + '''' + StringReplace(APKValue.AsString, '''', '''''',
+// [rfReplaceAll]) + '''';
+// end;
+//
+// GetLogger.Debug('CreateChildLoaderSearch: ' + SQL);
+// Result := TdormSimpleSearchCriteria.Create(nil, SQL);
+// end;
 
 function TFirebirdPersistStrategy.CreateDBXFactory(Conf: ISuperObject)
   : TDBXFactory;
@@ -297,6 +299,21 @@ begin
   inherited;
 end;
 
+function TFirebirdPersistStrategy.EscapeDate(const Value: TDate): String;
+begin
+  Result := FormatDateTime('YYYY-MM-DD', Value);
+end;
+
+function TFirebirdPersistStrategy.EscapeDateTime(const Value: TDate): String;
+begin
+  Result := FormatDateTime('YYYY-MM-DD HH:NN:SS', Value);
+end;
+
+function TFirebirdPersistStrategy.EscapeString(const Value: String): String;
+begin
+  Result := StringReplace(Value, '''', '''''', [rfReplaceAll]);
+end;
+
 function TFirebirdPersistStrategy.ExecuteAndGetFirst(SQL: string): Int64;
 var
   rdr: TDBXReader;
@@ -334,7 +351,7 @@ begin
         Result := PKParam.Value.AsInt64;
       end;
   end;
-
+  FLastInsertOID := Result;
 end;
 
 function TFirebirdPersistStrategy.FillPrimaryKeyParam(PKParam: TDBXParameter;
@@ -370,9 +387,9 @@ begin
   Result := FKeyType;
 end;
 
-function TFirebirdPersistStrategy.GetLastInsertID: Int64;
+function TFirebirdPersistStrategy.GetLastInsertOID: TValue;
 begin
-  // Result := FDB.GetLastInsertRowID;
+  Result := FLastInsertOID;
 end;
 
 function TFirebirdPersistStrategy.GetLogger: IdormLogger;
@@ -380,29 +397,9 @@ begin
   Result := FLogger;
 end;
 
-function TFirebirdPersistStrategy.GetSelectList
-  (AMapping: TArray<TdormFieldMapping>; AWithPrimaryKey: Boolean): string;
-var
-  field: TdormFieldMapping;
-begin
-  Result := '';
-  if AWithPrimaryKey then
-    for field in AMapping do
-    begin
-      Result := Result + ',"' + field.field + '"';
-    end
-  else
-    for field in AMapping do
-    begin
-      if not field.pk then
-        Result := Result + ',"' + field.field + '"';
-    end;
-  System.Delete(Result, 1, 1);
-end;
-
 procedure TFirebirdPersistStrategy.InitStrategy;
 begin
-
+  FLastInsertOID := TValue.Empty;
 end;
 
 function TFirebirdPersistStrategy.Insert(rtti_type: TRttiType; AObject: TObject;
@@ -517,14 +514,12 @@ begin
     raise Exception.Create('Invalid primary key for table ' + ATableName);
   pk_attribute_name := AFieldsMapping[pk_idx].name;
   pk_field_name := AFieldsMapping[pk_idx].field;
-  SQL := 'SELECT ' + GetSelectList(AFieldsMapping, true) + ' FROM ' + ATableName +
-    ' WHERE ' + pk_field_name + ' = ?';
+  SQL := 'SELECT ' + GetSelectFieldsList(AFieldsMapping, true) + ' FROM ' +
+    ATableName + ' WHERE ' + pk_field_name + ' = ?';
   GetLogger.Debug('PREPARING: ' + SQL);
   cmd := FB.Prepare(SQL);
   try
     FillPrimaryKeyParam(cmd.Parameters[pk_idx], Value);
-
-    // cmd.Parameters[0].Value.SetAnsiString(Value);
     GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
     reader := cmd.ExecuteQuery();
     try
