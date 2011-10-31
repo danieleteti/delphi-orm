@@ -114,8 +114,6 @@ type
       AClassName: string; AObject: TObject);
     procedure DeleteHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
       AClassName: string; AObject: TObject);
-    function CreateChildLoaderSearch(AChildClassName, AChildTableName,
-      AChildRelationField: string; AParentPKValue: TValue): IdormSearchCriteria;
     procedure LoadHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
       AClassName: string; AObject: TObject);
     procedure LoadHasManyRelationByPropertyName(APKValue: TValue;
@@ -283,15 +281,6 @@ begin
   EnvironmentNames[ord(deRelease)] := 'release';
 end;
 
-function TSession.CreateChildLoaderSearch(AChildClassName, AChildTableName,
-  AChildRelationField: string; AParentPKValue: TValue): IdormSearchCriteria;
-begin
-  Result := GetStrategy.CreateChildLoaderSearch
-    (FCTX.FindType(Qualified(AChildClassName)).AsInstance.Handle,
-    AChildClassName, GetTableName(AChildClassName), AChildRelationField,
-    AParentPKValue);
-end;
-
 class function TSession.CreateConfigured(TextReader: TTextReader;
   Environment: TdormEnvironment): TSession;
 begin
@@ -343,8 +332,6 @@ end;
 procedure TSession.DeleteAll(AClassType: TClass);
 var
   _table: string;
-  // _child_type, _type: TRttiType;
-  // fields: TArray<TdormFieldMapping>;
 begin
   _table := GetTableName(AClassType.ClassName);
   GetStrategy.DeleteAll(_table);
@@ -362,8 +349,6 @@ var
   _child_field_name, _child_class_name: string;
   _has_many: TSuperArray;
   v: TValue;
-  // , _pk_value: TValue;
-  // O: TObject;
   _child_type: TRttiType;
   i: Integer;
   Coll: TdormCollection;
@@ -399,8 +384,6 @@ destructor TSession.Destroy;
 begin
   if GetStrategy.InTransaction then
     GetStrategy.Rollback;
-  // FIdentityMap.Clear;
-  // FIdentityMap.Free;
   FUOWInsert.Free;
   FUOWUpdate.Free;
   FUOWDelete.Free;
@@ -743,13 +726,14 @@ ARttiType: TRttiType; AClassName: string; APropertyName: string;
 var AObject: TObject);
 var
   _has_many: TSuperArray;
-  _child_field_name, _child_class_name, _child_db_field_name: string;
+  _child_field_name, _child_class_name: string;
   v: TValue;
   List: TdormCollection;
   _child_type: TRttiType;
   SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
   _table_mapping: TArray<TdormFieldMapping>;
+  AttributeNameInTheParentObject: string;
 begin
   GetLogger.Debug('Loading HAS_MANY for ' + AClassName + '.' + APropertyName);
   _has_many := FMapping.O['mapping'].O[AObject.ClassName].A['has_many'];
@@ -759,22 +743,18 @@ begin
     i := GetRelationMappingIndexByPropertyName(_has_many, APropertyName);
     if i >= 0 then
     begin
-      v := TdormUtils.GetField(AObject, _has_many[i].AsObject.s['name']);
+      AttributeNameInTheParentObject := _has_many[i].AsObject.s['name'];
+      v := TdormUtils.GetField(AObject, AttributeNameInTheParentObject);
       _child_class_name := _has_many[i].AsObject.s['class_name'];
       _child_type := FCTX.FindType(Qualified(_child_class_name));
       if not assigned(_child_type) then
         raise Exception.Create('Unknown type ' + _child_class_name);
       _child_field_name := _has_many[i].AsObject.s['child_field_name'];
-      _child_db_field_name := GetFieldNameFromAttributeName
-        (GetTableMapping(_child_class_name), _child_class_name,
-        _child_field_name);
-      SearchChildCriteria := CreateChildLoaderSearch(_child_class_name,
-        GetTableName(_child_class_name), _child_db_field_name,
-        GetPKValue(ARttiType, _table_mapping, AObject));
-      List := GetStrategy.List(_child_type, GetTableName(_child_class_name),
-        GetTableMapping(_child_class_name), SearchChildCriteria);
+      List := Self.List(_child_type.Handle,
+        TdormCriteria.NewCriteria(_child_field_name, TdormCompareOperator.Equal,
+        GetPKValue(ARttiType, _table_mapping, AObject)), true);
       v := TValue.From<TdormCollection>(List);
-      TdormUtils.SetField(AObject, _has_many[i].AsObject.s['name'], v);
+      TdormUtils.SetField(AObject, AttributeNameInTheParentObject, v);
       LoadRelations(v.AsObject as TdormCollection);
     end
     else
@@ -860,7 +840,6 @@ begin
         v := FindOne(_child_type.Handle,
           TdormCriteria.NewCriteria(_child_field_name,
           TdormCompareOperator.Equal, APKValue), true);
-        // v := Load(FCTX.FindType(Qualified(_child_class_name)).Handle, APKValue);
         TdormUtils.SetField(AObject, _has_one[i].AsObject.s['name'], v);
       end;
     end
@@ -872,10 +851,10 @@ end;
 procedure TSession.LoadRelations(AList: TdormCollection;
 ARelationsSet: TdormRelations);
 var
-  i: Integer;
+  el: TObject;
 begin
-  for i := 0 to AList.Count - 1 do
-    LoadRelations(AList.GetItem(i), ARelationsSet);
+  for el in AList do
+    LoadRelations(el, ARelationsSet);
 end;
 
 function TSession.OIDIsSet(Obj: TObject): Boolean;
@@ -1074,11 +1053,11 @@ end;
 
 procedure TSession.InsertCollection(Collection: TdormCollection);
 var
-  // Obj: TObject;
   i: Integer;
+  el: TObject;
 begin
-  for i := 0 to Collection.Count - 1 do
-    Save(Collection.GetItem(i));
+  for el in Collection do
+    Save(el);
 end;
 
 procedure TSession.InsertHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
@@ -1100,12 +1079,7 @@ begin
     GetLogger.Debug('Saving has_many for ' + AClassName);
     for i := 0 to _has_many.Length - 1 do
     begin
-      // prop := ARttiType.GetProperty(_has_many[i].AsObject.s['name']);
-      // if not assigned(prop) then
-      // raise EdormException.Create('Cannot find ' + AClassName + '.' + _has_many[i].AsObject.s['name']);
-      // v := prop.GetValue(AObject);
       v := TdormUtils.GetField(AObject, _has_many[i].AsObject.s['name']);
-
       _child_class_name := _has_many[i].AsObject.s['class_name'];
       GetLogger.Debug('-- Inspecting for ' + _child_class_name);
       _child_type := FCTX.FindType(Qualified(_child_class_name));
@@ -1217,19 +1191,10 @@ end;
 
 procedure TSession.Update(AObject: TObject);
 var
-  // _child_type,
   _type: TRttiType;
   _table, _class_name: string;
-  // _child_field_name, _child_class_name,
-  // json, _map: ISuperObject;
-  // m: TdormFieldMapping;
   fields: TArray<TdormFieldMapping>;
-  // i: Integer;
-  // _has_many: TSuperArray;
-  // v,
   _pk_value: TValue;
-  // List: IList;
-  // O: TObject;
 begin
   GetLogger.EnterLevel(_class_name);
   DoUpdateValidation(AObject);
@@ -1244,8 +1209,6 @@ begin
   begin
     FLogger.Info('Updating ' + AObject.ClassName);
     GetStrategy.Update(_type, AObject, _table, fields);
-    // UpdateHasManyRelation(GetPKValue(_type, fields, AObject), _type,
-    // _class_name, AObject);
   end
   else
     raise EdormException.CreateFmt('Cannot update object without an ID [%s]',
@@ -1284,6 +1247,9 @@ var
   i: Integer;
   Mapping: TArray<TdormFieldMapping>;
   fm: TdormFieldMapping;
+  select_fields: string;
+  d: TDate;
+  dt: TDateTime;
   function GetFieldMappingByAttribute(AttributeName: string): TdormFieldMapping;
   var
     fm: TdormFieldMapping;
@@ -1297,11 +1263,12 @@ var
 
 begin
   _table := GetTableName(string(AItemClassInfo.name));
-  if Criteria.Count > 0 then
-    SQL := 'SELECT * FROM ' + _table + ' WHERE '
-  else
-    SQL := 'SELECT * FROM ' + _table + ' ';
   Mapping := GetTableMapping(string(AItemClassInfo.name));
+  select_fields := GetSelectFieldsList(Mapping, true);
+  if Criteria.Count > 0 then
+    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' WHERE '
+  else
+    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' ';
 
   for i := 0 to Criteria.Count - 1 do
   begin
@@ -1331,11 +1298,27 @@ begin
     end;
 
     if fm.field_type = 'string' then
-      SQL := SQL + '''' + CritItem.Value.AsString + '''';
-    if fm.field_type = 'integer' then
-      SQL := SQL + inttostr(CritItem.Value.AsInteger);
-    if fm.field_type = 'boolean' then
-      SQL := SQL + BoolToStr(CritItem.Value.AsBoolean);
+      SQL := SQL + '''' + GetStrategy.EscapeString
+        (CritItem.Value.AsString) + ''''
+    else if fm.field_type = 'integer' then
+      SQL := SQL + inttostr(CritItem.Value.AsInteger)
+    else if fm.field_type = 'boolean' then
+      SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
+    else if fm.field_type = 'boolean' then
+      SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
+    else if fm.field_type = 'date' then
+    begin
+      d := CritItem.Value.AsExtended;
+      SQL := SQL + '''' + GetStrategy.EscapeDate(d) + ''''
+    end
+    else if fm.field_type = 'datetime' then
+    begin
+      dt := CritItem.Value.AsExtended;
+      SQL := SQL + '''' + GetStrategy.EscapeDateTime(dt) + ''''
+    end
+    else
+      raise EdormException.CreateFmt('Unknown type %s in criteria',
+        [fm.field_type]);
 
   end;
   Result := List(TdormSimpleSearchCriteria.Create(AItemClassInfo, SQL));
@@ -1377,7 +1360,7 @@ begin
   Item.Value := Value;
   Item.LogicRelation := LogicRelation;
   FItems.Add(Item);
-  Result := self;
+  Result := Self;
 end;
 
 function TdormCriteria.AddOr(const Attribute: string;

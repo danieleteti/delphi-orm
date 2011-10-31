@@ -104,15 +104,12 @@ type
     function List(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>;
       AdormSearchCriteria: IdormSearchCriteria): TdormCollection;
-    function CreateChildLoaderSearch(AChildClassTypeInfo: PTypeInfo;
-      AChildClassName, AChildTableName, AChildRelationField: string;
-      APKValue: TValue): IdormSearchCriteria;
     function Delete(ARttiType: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TObject;
     function GetKeyType: TdormKeyType;
     procedure DeleteAll(ATableName: string);
     function Count(ATableName: string): Int64;
-    function GetLastInsertID: Int64;
+    function GetLastInsertOID: TValue;
     procedure ConfigureStrategy(ConfigurationInfo: ISuperObject);
     procedure InitStrategy;
     procedure StartTransaction;
@@ -124,6 +121,9 @@ type
     procedure SetLogger(ALogger: IdormLogger);
     function RawExecute(SQL: string): Int64;
     function ExecuteAndGetFirst(SQL: string): Int64;
+    function EscapeString(const Value: String): String;
+    function EscapeDate(const Value: TDate): String;
+    function EscapeDateTime(const Value: TDate): String;
   end;
 
   IdormKeysGenerator = interface
@@ -159,12 +159,34 @@ function GetPKValue(AType: TRttiType; const AMapping: TArray<TdormFieldMapping>;
   AObject: TObject): TValue;
 function GetRelationMappingIndexByPropertyName(AHasManyMapping: TSuperArray;
   APropertyName: string): Integer;
+function GetSelectFieldsList(AMapping: TArray<TdormFieldMapping>;
+  AWithPrimaryKey: boolean): string;
 
 implementation
 
 uses
   dorm,
   dorm.Utils;
+
+function GetSelectFieldsList(AMapping: TArray<TdormFieldMapping>;
+  AWithPrimaryKey: boolean): string;
+var
+  field: TdormFieldMapping;
+begin
+  Result := '';
+  if AWithPrimaryKey then
+    for field in AMapping do
+    begin
+      Result := Result + ',"' + field.field + '"';
+    end
+  else
+    for field in AMapping do
+    begin
+      if not field.pk then
+        Result := Result + ',"' + field.field + '"';
+    end;
+  System.Delete(Result, 1, 1);
+end;
 
 function GetRelationMappingIndexByPropertyName(AHasManyMapping: TSuperArray;
   APropertyName: string): Integer;

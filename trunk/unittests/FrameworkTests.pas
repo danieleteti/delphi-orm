@@ -28,7 +28,7 @@ uses
 type
   TFrameworkTests = class(TBaseTestCase)
   published
-    procedure TestFirebirdGeneratorID;
+    procedure TestGeneratorID;
     procedure TestLoadByAttribute;
     procedure TestLoadByAttributeWithRelationOperators;
     procedure TestClone;
@@ -38,6 +38,7 @@ type
     procedure TestTDateTime;
     procedure TestBlob;
     procedure TestEnumerableCollection;
+    procedure TestLastInsertedOID;
   end;
 
 implementation
@@ -48,7 +49,7 @@ uses
   DateUtils,
   dorm.Utils, dorm.tests.bo,
   IdHashMessageDigest,
-  idHash;
+  idHash, RTTI;
 
 // returns MD5 has for a file
 function MD5(const fileName: string): string;
@@ -255,19 +256,32 @@ begin
   end;
 end;
 
-procedure TFrameworkTests.TestFirebirdGeneratorID;
-// var
-// t: TTest01;
+procedure TFrameworkTests.TestGeneratorID;
+var
+  t: TPerson;
 begin
-  // t := TTest01.Create;
-  // try
-  // CheckTrue(t.ID = 0);
-  // t.RagioneSociale := 'Daniele Teti Corp';
-  // Session.Save(t);
-  // CheckFalse(t.ID = 0);
-  // finally
-  // t.Free;
-  // end;
+  t := TPerson.NewPerson;
+  try
+    CheckTrue(t.ID = 0);
+    Session.Save(t);
+    CheckFalse(t.ID = 0);
+  finally
+    t.Free;
+  end;
+end;
+
+procedure TFrameworkTests.TestLastInsertedOID;
+var
+  p: TPerson;
+begin
+  CheckTrue(Session.Strategy.GetLastInsertOID.IsEmpty);
+  p := TPerson.NewPerson;
+  try
+    Session.Save(p);
+    CheckTrue(p.ID = Session.Strategy.GetLastInsertOID.AsInt64);
+  finally
+    p.Free;
+  end;
 end;
 
 procedure TFrameworkTests.TestLoadByAttribute;
