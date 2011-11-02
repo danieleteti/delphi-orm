@@ -48,6 +48,13 @@ begin
 {$IFDEF FIREBIRD_STRATEGY}
   result := 'dorm_firebird.conf';
 {$ENDIF}
+{$IFNDEF INTERBASE_STRATEGY}
+  {$IFNDEF FIREBIRD_STRATEGY}
+    {$MESSAGE ERROR '************************************************'}
+    {$MESSAGE ERROR '**>>> There are not strategy conditionals defined'}
+    {$MESSAGE ERROR '************************************************'}
+  {$ENDIF}
+{$ENDIF}
 end;
 
 procedure TBaseTestCase.SetUp;

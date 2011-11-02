@@ -1,0 +1,142 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{83D7E00E-1949-446B-97EE-AF1D9F4C293C}</ProjectGuid>
+			<MainSource>DORM_UnitTests_XE.dpr</MainSource>
+			<Base>True</Base>
+			<Config Condition="'$(Config)'==''">FIREBIRD_STRATEGY</Config>
+			<Platform>Win32</Platform>
+			<AppType>Application</AppType>
+			<FrameworkType>VCL</FrameworkType>
+			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+			<ProjectVersion>12.2</ProjectVersion>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='BASE_STRATEGY' or '$(Cfg_3)'!=''">
+			<Cfg_3>true</Cfg_3>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='INTERBASE_STRATEGY' or '$(Cfg_4)'!=''">
+			<Cfg_4>true</Cfg_4>
+			<CfgParent>Cfg_3</CfgParent>
+			<Cfg_3>true</Cfg_3>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='FIREBIRD_STRATEGY' or '$(Cfg_5)'!=''">
+			<Cfg_5>true</Cfg_5>
+			<CfgParent>Cfg_3</CfgParent>
+			<Cfg_3>true</Cfg_3>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_E>false</DCC_E>
+			<DCC_ImageBase>00400000</DCC_ImageBase>
+			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;WinTypes=Windows;WinProcs=Windows;$(DCC_UnitAlias)</DCC_UnitAlias>
+			<DCC_F>false</DCC_F>
+			<DCC_S>false</DCC_S>
+			<DCC_N>false</DCC_N>
+			<DCC_K>false</DCC_K>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_3)'!=''">
+			<DCC_UnitSearchPath>..\lib\fastmm;..\lib\superobject;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_Optimize>false</DCC_Optimize>
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+			<DCC_DebugDCUs>true</DCC_DebugDCUs>
+			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_4)'!=''">
+			<DCC_Define>INTERBASE_STRATEGY;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_5)'!=''">
+			<DCC_Define>FIREBIRD_STRATEGY;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
+		<ItemGroup>
+			<DelphiCompile Include="DORM_UnitTests_XE.dpr">
+				<MainSource>MainSource</MainSource>
+			</DelphiCompile>
+			<DCCReference Include="TestDORM.pas"/>
+			<DCCReference Include="TestDORMSearchCriteria.pas"/>
+			<DCCReference Include="TestDORMSpeed.pas"/>
+			<DCCReference Include="TestDORMRelations.pas"/>
+			<DCCReference Include="..\source\dorm.Collections.pas"/>
+			<DCCReference Include="..\source\dorm.Commons.pas"/>
+			<DCCReference Include="..\source\dorm.Core.IdentityMap.pas"/>
+			<DCCReference Include="..\source\dorm.InterposedObject.pas"/>
+			<DCCReference Include="..\source\dorm.loggers.FileLog.pas"/>
+			<DCCReference Include="..\source\dorm.pas"/>
+			<DCCReference Include="..\source\dorm.UOW.pas"/>
+			<DCCReference Include="..\source\dorm.Utils.pas"/>
+			<DCCReference Include="..\source\dorm.utils.Sequences.pas"/>
+			<DCCReference Include="dorm.tests.bo.pas"/>
+			<DCCReference Include="BaseTestCase.pas"/>
+			<DCCReference Include="FindersTests.pas"/>
+			<DCCReference Include="FrameworkTests.pas"/>
+			<DCCReference Include="..\source\dorm.Finders.pas"/>
+			<DCCReference Include="..\source\dorm.loggers.CodeSite.pas"/>
+			<DCCReference Include="..\source\dorm.adapter.DBExpress.Factory.pas"/>
+			<DCCReference Include="..\source\dorm.adapter.Firebird.pas"/>
+			<DCCReference Include="..\source\dorm.adapter.Interbase.pas"/>
+			<BuildConfiguration Include="INTERBASE_STRATEGY">
+				<Key>Cfg_4</Key>
+				<CfgParent>Cfg_3</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="FIREBIRD_STRATEGY">
+				<Key>Cfg_5</Key>
+				<CfgParent>Cfg_3</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="BASE_STRATEGY">
+				<Key>Cfg_3</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\8.0\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\8.0\UserTools.proj"/>
+		<ProjectExtensions>
+			<Borland.Personality>Delphi.Personality.12</Borland.Personality>
+			<Borland.ProjectType>VCLApplication</Borland.ProjectType>
+			<BorlandProject>
+				<Delphi.Personality>
+					<Source>
+						<Source Name="MainSource">DORM_UnitTests_XE.dpr</Source>
+					</Source>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">1</VersionInfo>
+						<VersionInfo Name="MinorVer">0</VersionInfo>
+						<VersionInfo Name="Release">0</VersionInfo>
+						<VersionInfo Name="Build">0</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">1040</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName"/>
+						<VersionInfoKeys Name="FileDescription"/>
+						<VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName"/>
+						<VersionInfoKeys Name="LegalCopyright"/>
+						<VersionInfoKeys Name="LegalTrademarks"/>
+						<VersionInfoKeys Name="OriginalFilename"/>
+						<VersionInfoKeys Name="ProductName"/>
+						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments"/>
+					</VersionInfoKeys>
+				</Delphi.Personality>
+				<Platforms>
+					<Platform value="Win32">True</Platform>
+				</Platforms>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+	</Project>

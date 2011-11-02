@@ -37,7 +37,8 @@ uses
   windows,
   Classes,
   SysUtils,
-  dorm.Commons, dorm.Collections, dorm.tests.bo, System.DateUtils;
+  dorm.Commons, dorm.Collections, dorm.tests.bo,
+  {$IFDEF VER210}System.{$ENDIF}DateUtils;
 
 { TTestDORMSpeed }
 
