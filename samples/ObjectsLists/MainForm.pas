@@ -40,6 +40,12 @@ type
     Button5: TButton;
     StyleBook1: TStyleBook;
     ScaledLayout1: TScaledLayout;
+    BindScopeLaptops: TBindScope;
+    ListBox2: TListBox;
+    BindList2: TBindList;
+    Label5: TLabel;
+    Label6: TLabel;
+    Button6: TButton;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure Button1Click(Sender: TObject);
@@ -51,9 +57,11 @@ type
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
   private
     People: TdormCollection;
     Session: TSession;
+    procedure InitializeData;
   public
     { Public declarations }
   end;
@@ -77,20 +85,41 @@ procedure TForm11.FormCreate(Sender: TObject);
 begin
   Session := TSession.CreateConfigured(TStreamReader.Create('dorm.conf'),
     deDevelopment);
-  People := Session.ListAll<TPerson>;
 {$REGION 'Insert some data'}
-//  People := NewList;
-//  Session.DeleteAll(TPerson);
-//  People.Add(TPerson.Create('Daniele', 'Teti', 32));
-//  People.Add(TPerson.Create('Scott', 'Summers', 40));
-//  People.Add(TPerson.Create('Bruce', 'Banner', 50));
-//  People.Add(TPerson.Create('Sue', 'Storm', 35));
-//  People.Add(TPerson.Create('Peter', 'Parker', 17));
-//  Session.InsertCollection(People);
+//   InitializeData;
 {$ENDREGION}
+  People := Session.ListAll<TPerson>;
   BindScopePeople.DataObject := People;
   BindScopePeople.Active := True;
   BindList1.FillList;
+end;
+
+procedure TForm11.InitializeData;
+var
+  p: TPerson;
+begin
+  People := NewList;
+  Session.DeleteAll(TPerson);
+  p := TPerson.Create('Daniele', 'Teti', 32);
+  p.Laptops := NewList;
+  p.Laptops.Add(TLaptop.Create('DELL LATITUDE', 2048, 2));
+  p.Laptops.Add(TLaptop.Create('COMPAQ PRESARIO', 2048, 4));
+  People.Add(p);
+
+  p := TPerson.Create('Scott', 'Summers', 40);
+  p.Laptops := NewList;
+  p.Laptops.Add(TLaptop.Create('DELL A707', 4096, 8));
+  People.Add(p);
+
+  p := TPerson.Create('Bruce', 'Banner', 50);
+  p.Laptops := NewList;
+  p.Laptops.Add(TLaptop.Create('DELL A101', 1024, 1));
+  People.Add(p);
+
+  People.Add(TPerson.Create('Sue', 'Storm', 35));
+  People.Add(TPerson.Create('Peter', 'Parker', 17));
+  Session.InsertCollection(People);
+  People.Free;
 end;
 
 procedure TForm11.Button1Click(Sender: TObject);
@@ -128,6 +157,7 @@ begin
     People := Session.List<TPerson>(Criteria);
   end;
   BindScopePeople.DataObject := People;
+  BindScopePeople.Active := True;
   BindList1.FillList;
 end;
 
@@ -136,7 +166,24 @@ begin
   BindScopePerson.Active := False;
   Session.Delete(People.Extract(BindScopePerson.DataObject));
   BindScopePerson.DataObject := nil;
+  BindScopePerson.Active := True;
   BindList1.FillList;
+end;
+
+procedure TForm11.Button6Click(Sender: TObject);
+var
+  res: TArray<String>;
+  l: TLaptop;
+begin
+  SetLength(res, 3);
+  if InputQuery('New Laptop', ['Model', 'RAM [MB]', 'Cores'], res) then
+  begin
+    l := TLaptop.Create(res[0], strtoint(res[1]), strtoint(res[2]));
+    TPerson(People[ListBox1.ItemIndex]).Laptops.Add(l);
+    l.Owner := People[ListBox1.ItemIndex] as TPerson;
+    Session.Persist(l);
+    BindList2.FillList;
+  end;
 end;
 
 procedure TForm11.Edit1Exit(Sender: TObject);
@@ -154,7 +201,13 @@ begin
   if ListBox1.ItemIndex > -1 then
   begin
     BindScopePerson.Active := False;
+    BindScopeLaptops.Active := False;
+    Session.LoadRelations(People[ListBox1.ItemIndex]);
     BindScopePerson.DataObject := People[ListBox1.ItemIndex];
+    BindScopeLaptops.DataObject := TPerson(People[ListBox1.ItemIndex]).Laptops;
+    BindScopePerson.Active := True;
+    BindScopeLaptops.Active := True;
+    BindList2.FillList;
   end;
 end;
 

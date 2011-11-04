@@ -94,9 +94,9 @@ type
 
   IdormPersistStrategy = interface
     ['{04A7F5C2-9B9B-4259-90C2-F23894189717}']
-    function Insert(rtty_type: TRttiType; AObject: TObject; ATableName: string;
+    function Insert(ARttiType: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TValue;
-    function Update(rtty_type: TRttiType; AObject: TObject; ATableName: string;
+    function Update(ARttiType: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TValue;
     function Load(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>; const Value: TValue)

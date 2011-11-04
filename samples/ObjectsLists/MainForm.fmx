@@ -1,11 +1,9 @@
 object Form11: TForm11
   Left = 0
   Top = 0
-  BiDiMode = bdLeftToRight
   Caption = 'DORM With Livebindings'
-  ClientHeight = 396
-  ClientWidth = 598
-  Transparency = False
+  ClientHeight = 433
+  ClientWidth = 793
   Visible = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
@@ -525,17 +523,17 @@ object Form11: TForm11
       '    end'
       '  end'
       'end')
-    Left = 232
-    Top = 48
+    Left = 320
+    Top = 216
   end
   object ScaledLayout1: TScaledLayout
     Align = alClient
-    Width = 598.000000000000000000
-    Height = 396.000000000000000000
-    OriginalWidth = 598.000000000000000000
-    OriginalHeight = 396.000000000000000000
+    Width = 793.000000000000000000
+    Height = 433.000000000000000000
+    OriginalWidth = 793.000000000000000000
+    OriginalHeight = 519.000000000000000000
     object Rectangle1: TRectangle
-      Position.Point = '(280,48)'
+      Position.Point = '(472,80)'
       Width = 305.000000000000000000
       Height = 217.000000000000000000
       Fill.Kind = bkGradient
@@ -553,9 +551,7 @@ object Form11: TForm11
       Width = 89.000000000000000000
       Height = 25.000000000000000000
       OnClick = Button1Click
-      TabOrder = 0
-      StaysPressed = False
-      IsPressed = False
+      TabOrder = 1
       Text = 'Refresh List'
       WordWrap = True
     end
@@ -564,56 +560,47 @@ object Form11: TForm11
       Width = 97.000000000000000000
       Height = 25.000000000000000000
       OnClick = Button2Click
-      TabOrder = 1
-      StaysPressed = False
-      IsPressed = False
+      TabOrder = 2
       Text = 'New'
     end
     object Button3: TButton
-      Position.Point = '(496,232)'
+      Position.Point = '(680,256)'
       Width = 80.000000000000000000
       Height = 22.000000000000000000
       OnClick = Button3Click
-      TabOrder = 2
-      StaysPressed = False
-      IsPressed = False
+      TabOrder = 3
       Text = 'Save'
     end
     object Button4: TButton
-      Position.Point = '(144,352)'
+      Position.Point = '(144,392)'
       Width = 65.000000000000000000
       Height = 22.000000000000000000
       OnClick = Button4Click
-      TabOrder = 3
-      StaysPressed = False
-      IsPressed = False
+      TabOrder = 4
       Text = 'Search'
     end
     object Button5: TButton
-      Position.Point = '(408,232)'
+      Position.Point = '(592,256)'
       Width = 80.000000000000000000
       Height = 22.000000000000000000
       OnClick = Button5Click
-      TabOrder = 4
-      StaysPressed = False
-      IsPressed = False
+      TabOrder = 5
       Text = 'Delete'
     end
     object CheckBox1: TCheckBox
-      Position.Point = '(424,185)'
+      Position.Point = '(608,209)'
       Width = 120.000000000000000000
       Height = 19.000000000000000000
-      TabOrder = 5
-      IsChecked = False
+      TabOrder = 6
       Text = 'Adult'
     end
     object Edit1: TEdit
-      Position.Point = '(312,88)'
+      Position.Point = '(496,112)'
       Width = 217.000000000000000000
       Height = 22.000000000000000000
       OnExit = Edit1Exit
-      TabOrder = 6
-      ReadOnly = False
+      TabOrder = 7
+      KeyboardType = vktDefault
       Password = False
       object Label1: TLabel
         Position.Point = '(1,-17)'
@@ -624,12 +611,12 @@ object Form11: TForm11
       end
     end
     object Edit2: TEdit
-      Position.Point = '(312,136)'
+      Position.Point = '(496,160)'
       Width = 217.000000000000000000
       Height = 22.000000000000000000
       OnExit = Edit1Exit
-      TabOrder = 7
-      ReadOnly = False
+      TabOrder = 8
+      KeyboardType = vktDefault
       Password = False
       object Label2: TLabel
         Position.Point = '(0,-16)'
@@ -640,27 +627,28 @@ object Form11: TForm11
       end
     end
     object Edit3: TEdit
-      Position.Point = '(16,352)'
+      Position.Point = '(16,392)'
       Width = 121.000000000000000000
       Height = 22.000000000000000000
-      TabOrder = 8
-      ReadOnly = False
+      TabOrder = 9
+      KeyboardType = vktDefault
       Password = False
     end
     object Label4: TLabel
-      Position.Point = '(16,336)'
+      Position.Point = '(16,376)'
       Width = 120.000000000000000000
       Height = 15.000000000000000000
-      TabOrder = 9
+      TabOrder = 10
       Text = 'Search for First name'
     end
     object ListBox1: TListBox
-      Position.Point = '(16,48)'
+      Position.Point = '(24,80)'
       Width = 193.000000000000000000
-      Height = 273.000000000000000000
+      Height = 281.000000000000000000
+      CanClip = False
       OnClick = ListBox1Click
       StyleLookup = 'ListBox1Style1'
-      TabOrder = 10
+      TabOrder = 11
       object TListBoxItem
         Width = 191.000000000000000000
         Height = 57.000000000000000000
@@ -672,16 +660,15 @@ object Form11: TForm11
       end
     end
     object SpinBox1: TSpinBox
-      Position.Point = '(312,184)'
+      Position.Point = '(496,208)'
       Width = 100.000000000000000000
       Height = 22.000000000000000000
       TabOrder = 12
-      ReadOnly = False
+      KeyboardType = vktDefault
       OnChange = SpinBox1Change
       Min = 1.000000000000000000
       Max = 100.000000000000000000
       Increment = 1.000000000000000000
-      ValueType = vtInteger
       object Label3: TLabel
         Position.Point = '(0,-16)'
         Width = 120.000000000000000000
@@ -689,6 +676,34 @@ object Form11: TForm11
         TabOrder = 0
         Text = 'Age'
       end
+    end
+    object ListBox2: TListBox
+      Position.Point = '(240,80)'
+      Width = 201.000000000000000000
+      Height = 281.000000000000000000
+      TabOrder = 13
+    end
+    object Label5: TLabel
+      Position.Point = '(24,64)'
+      Width = 120.000000000000000000
+      Height = 15.000000000000000000
+      TabOrder = 14
+      Text = 'People'
+    end
+    object Label6: TLabel
+      Position.Point = '(240,64)'
+      Width = 120.000000000000000000
+      Height = 15.000000000000000000
+      TabOrder = 15
+      Text = 'Laptops'
+    end
+    object Button6: TButton
+      Position.Point = '(360,56)'
+      Width = 80.000000000000000000
+      Height = 22.000000000000000000
+      OnClick = Button6Click
+      TabOrder = 16
+      Text = 'New Laptop'
     end
   end
   object BindingsList1: TBindingsList
@@ -765,13 +780,34 @@ object Form11: TForm11
       NotifyOutputs = False
       Direction = dirSourceToControl
     end
+    object BindList2: TBindList
+      Category = 'Lists'
+      ControlComponent = ListBox2
+      SourceComponent = BindScopeLaptops
+      FormatExpressions = <
+        item
+          ControlExpression = 'Text'
+          SourceExpression = 
+            'Current.Model + " (" + ToStr(Current.RAM) + "MB " + ToStr(Curren' +
+            't.Cores) + " Cores)"'
+        end>
+      FormatControlExpressions = <>
+      ClearControlExpressions = <>
+      AutoActivate = False
+    end
   end
   object BindScopePeople: TBindScope
-    Left = 80
-    Top = 208
+    Left = 104
+    Top = 256
   end
   object BindScopePerson: TBindScope
-    Left = 440
-    Top = 296
+    AutoActivate = False
+    Left = 712
+    Top = 168
+  end
+  object BindScopeLaptops: TBindScope
+    AutoActivate = False
+    Left = 320
+    Top = 152
   end
 end

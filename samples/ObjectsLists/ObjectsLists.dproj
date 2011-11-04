@@ -63,6 +63,11 @@
 			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0</VerInfo_Keys>
+			<DCC_DebugDCUs>true</DCC_DebugDCUs>
+			<DCC_MapFile>3</DCC_MapFile>
+			<Manifest_File>None</Manifest_File>
+			<VerInfo_Locale>1040</VerInfo_Locale>
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 			<DCC_Optimize>false</DCC_Optimize>
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
@@ -87,7 +92,6 @@
 			</DelphiCompile>
 			<DCCReference Include="MainForm.pas">
 				<Form>Form11</Form>
-				<FormType>fmx</FormType>
 			</DCCReference>
 			<DCCReference Include="..\BusinessObjects.pas"/>
 			<BuildConfiguration Include="Release">

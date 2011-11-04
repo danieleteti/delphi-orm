@@ -754,7 +754,8 @@ begin
         TdormCriteria.NewCriteria(_child_field_name, TdormCompareOperator.Equal,
         GetPKValue(ARttiType, _table_mapping, AObject)), true);
       v := TValue.From<TdormCollection>(List);
-      TdormUtils.SetField(AObject, AttributeNameInTheParentObject, v);
+      //TdormUtils.SetField(AObject, AttributeNameInTheParentObject, v);
+      TdormUtils.SetProperty(AObject, AttributeNameInTheParentObject, v);
       LoadRelations(v.AsObject as TdormCollection);
     end
     else
