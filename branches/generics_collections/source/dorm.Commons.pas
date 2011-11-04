@@ -103,7 +103,10 @@ type
       : TObject; overload;
     function List(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>;
-      AdormSearchCriteria: IdormSearchCriteria): TdormCollection;
+      AdormSearchCriteria: IdormSearchCriteria): TdormCollection; overload;
+    procedure FillList(AList: TdormCollection; ARttiType: TRttiType;
+      ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>;
+      AdormSearchCriteria: IdormSearchCriteria); overload;
     function Delete(ARttiType: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TObject;
     function GetKeyType: TdormKeyType;

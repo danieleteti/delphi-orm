@@ -74,12 +74,14 @@ type
     function Load(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>; const Value: TValue)
       : TObject; overload;
+
     function List(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>;
-      AdormSearchCriteria: IdormSearchCriteria): TdormCollection; overload;
-    // function CreateChildLoaderSearch(AChildClassTypeInfo: PTypeInfo;
-    // AChildClassName, AChildTableName, AChildRelationField: string;
-    // APKValue: TValue): IdormSearchCriteria;
+      AdormSearchCriteria: IdormSearchCriteria): TdormCollection;
+    procedure FillList(AList: TdormCollection; ARttiType: TRttiType;
+      ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>;
+      AdormSearchCriteria: IdormSearchCriteria);
+
     function Delete(ARttiType: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TObject;
     procedure DeleteAll(ATableName: string);
@@ -476,6 +478,15 @@ end;
 function TFirebirdPersistStrategy.List(ARttiType: TRttiType; ATableName: string;
   AFieldsMapping: TArray<TdormFieldMapping>;
   AdormSearchCriteria: IdormSearchCriteria): TdormCollection;
+begin
+  Result :=NewList();
+  FillList(Result, ARttiType, ATableName, AFieldsMapping, AdormSearchCriteria);
+end;
+
+procedure TFirebirdPersistStrategy.FillList(AList: TdormCollection;
+  ARttiType: TRttiType; ATableName: string;
+  AFieldsMapping: TArray<TdormFieldMapping>;
+  AdormSearchCriteria: IdormSearchCriteria);
 var
   SQL: string;
   cmd: TDBXCommand;
@@ -488,9 +499,8 @@ begin
     GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
     reader := cmd.ExecuteQuery;
     try
-      Result := TdormCollection.Create;
       while reader.Next do
-        Result.Add(CreateObjectFromDBXReader(ARttiType, reader,
+        AList.Add(CreateObjectFromDBXReader(ARttiType, reader,
           AFieldsMapping));
     finally
       reader.Free;
