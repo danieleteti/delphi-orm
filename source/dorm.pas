@@ -172,8 +172,13 @@ type
       FreeCriteria: Boolean = true): TObject; overload;
     function List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
       FreeCriteria: Boolean = false): TdormCollection; overload;
+    procedure FillList(AdormCollection: TdormCollection;
+      AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
+      FreeCriteria: Boolean = false); overload;
     function List(AdormSearchCriteria: IdormSearchCriteria)
       : TdormCollection; overload;
+    procedure FillList(AdormCollection: TdormCollection;
+      AdormSearchCriteria: IdormSearchCriteria); overload;
     function ListAll<T: class>(): TdormCollection;
     function List<T: class>(Criteria: TdormCriteria;
       FreeCriteria: Boolean = true): TdormCollection; overload;
@@ -452,6 +457,115 @@ begin
   // FIdentityMap.Extract(AOID);
 end;
 
+procedure TSession.FillList(AdormCollection: TdormCollection;
+AItemClassInfo: PTypeInfo; Criteria: TdormCriteria; FreeCriteria: Boolean);
+var
+  _table: string;
+  SQL: string;
+  CritItem: TdormCriteriaItem;
+  i: Integer;
+  Mapping: TArray<TdormFieldMapping>;
+  fm: TdormFieldMapping;
+  select_fields: string;
+  d: TDate;
+  dt: TDateTime;
+  function GetFieldMappingByAttribute(AttributeName: string): TdormFieldMapping;
+  var
+    fm: TdormFieldMapping;
+  begin
+    for fm in Mapping do
+      if fm.name = AttributeName then
+        Exit(fm);
+    raise EdormException.CreateFmt('Unknown field attribute %s',
+      [AttributeName]);
+  end;
+
+begin
+  _table := GetTableName(string(AItemClassInfo.name));
+  Mapping := GetTableMapping(string(AItemClassInfo.name));
+  select_fields := GetSelectFieldsList(Mapping, true);
+  if Criteria.Count > 0 then
+    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' WHERE '
+  else
+    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' ';
+
+  for i := 0 to Criteria.Count - 1 do
+  begin
+    CritItem := Criteria.GetCriteria(i);
+    if i > 0 then
+      case CritItem.LogicRelation of
+        lrAnd:
+          SQL := SQL + ' AND ';
+        lrOr:
+          SQL := SQL + ' OR ';
+      end;
+    fm := GetFieldMappingByAttribute(CritItem.Attribute);
+    SQL := SQL + fm.field;
+    case CritItem.CompareOperator of
+      Equal:
+        SQL := SQL + ' = ';
+      GreaterThan:
+        SQL := SQL + ' > ';
+      LowerThan:
+        SQL := SQL + ' < ';
+      GreaterOrEqual:
+        SQL := SQL + ' >= ';
+      LowerOrEqual:
+        SQL := SQL + ' <= ';
+      Different:
+        SQL := SQL + ' != ';
+    end;
+
+    if fm.field_type = 'string' then
+      SQL := SQL + '''' + GetStrategy.EscapeString
+        (CritItem.Value.AsString) + ''''
+    else if fm.field_type = 'integer' then
+      SQL := SQL + inttostr(CritItem.Value.AsInteger)
+    else if fm.field_type = 'boolean' then
+      SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
+    else if fm.field_type = 'boolean' then
+      SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
+    else if fm.field_type = 'date' then
+    begin
+      d := CritItem.Value.AsExtended;
+      SQL := SQL + '''' + GetStrategy.EscapeDate(d) + ''''
+    end
+    else if fm.field_type = 'datetime' then
+    begin
+      dt := CritItem.Value.AsExtended;
+      SQL := SQL + '''' + GetStrategy.EscapeDateTime(dt) + ''''
+    end
+    else
+      raise EdormException.CreateFmt('Unknown type %s in criteria',
+        [fm.field_type]);
+
+  end;
+  FillList(AdormCollection, TdormSimpleSearchCriteria.Create
+    (AItemClassInfo, SQL));
+  if FreeCriteria then
+    FreeAndNil(Criteria);
+end;
+
+procedure TSession.FillList(AdormCollection: TdormCollection;
+AdormSearchCriteria: IdormSearchCriteria);
+var
+  rt: TRttiType;
+  _table: string;
+  _fields: TArray<TdormFieldMapping>;
+  _type_info: PTypeInfo;
+  searcher_classname: string;
+begin
+  _type_info := AdormSearchCriteria.GetItemClassInfo;
+  searcher_classname := TObject(AdormSearchCriteria).ClassName;
+  GetLogger.EnterLevel(searcher_classname);
+  rt := FCTX.GetType(_type_info);
+  _table := GetTableName(rt.ToString);
+  _fields := GetTableMapping(rt.ToString);
+  FPersistStrategy.FillList(AdormCollection, rt, _table, _fields,
+    AdormSearchCriteria);
+  GetLogger.ExitLevel(searcher_classname);
+end;
+
 function TSession.FindOne(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
 FreeCriteria: Boolean): TObject;
 var
@@ -633,22 +747,9 @@ end;
 
 function TSession.List(AdormSearchCriteria: IdormSearchCriteria)
   : TdormCollection;
-var
-  rt: TRttiType;
-  _table: string;
-  _fields: TArray<TdormFieldMapping>;
-  _type_info: PTypeInfo;
-  searcher_classname: string;
 begin
-  _type_info := AdormSearchCriteria.GetItemClassInfo;
-  searcher_classname := TObject(AdormSearchCriteria).ClassName;
-  GetLogger.EnterLevel(searcher_classname);
-  rt := FCTX.GetType(_type_info);
-  _table := GetTableName(rt.ToString);
-  _fields := GetTableMapping(rt.ToString);
-  Result := FPersistStrategy.List(rt, _table, _fields, AdormSearchCriteria);
-  Result.SetOwnsObjects(true);
-  GetLogger.ExitLevel(searcher_classname);
+  Result := NewList;
+  FillList(Result, AdormSearchCriteria);
 end;
 
 function TSession.List<T>(Criteria: TdormCriteria; FreeCriteria: Boolean)
@@ -744,18 +845,21 @@ begin
     if i >= 0 then
     begin
       AttributeNameInTheParentObject := _has_many[i].AsObject.s['name'];
-      v := TdormUtils.GetField(AObject, AttributeNameInTheParentObject);
+//      v := TdormUtils.GetField(AObject, AttributeNameInTheParentObject);
       _child_class_name := _has_many[i].AsObject.s['class_name'];
       _child_type := FCTX.FindType(Qualified(_child_class_name));
       if not assigned(_child_type) then
         raise Exception.Create('Unknown type ' + _child_class_name);
       _child_field_name := _has_many[i].AsObject.s['child_field_name'];
-      List := Self.List(_child_type.Handle,
+
+      v := TdormUtils.GetProperty(AObject, AttributeNameInTheParentObject);
+      List := v.AsObject as TdormCollection;
+      Self.FillList(List, _child_type.Handle,
         TdormCriteria.NewCriteria(_child_field_name, TdormCompareOperator.Equal,
         GetPKValue(ARttiType, _table_mapping, AObject)), true);
-      v := TValue.From<TdormCollection>(List);
-      //TdormUtils.SetField(AObject, AttributeNameInTheParentObject, v);
-      TdormUtils.SetProperty(AObject, AttributeNameInTheParentObject, v);
+      // v := TValue.From<TdormCollection>(List);
+      // TdormUtils.SetField(AObject, AttributeNameInTheParentObject, v);
+      // TdormUtils.SetProperty(AObject, AttributeNameInTheParentObject, v);
       LoadRelations(v.AsObject as TdormCollection);
     end
     else
@@ -837,7 +941,7 @@ begin
         if _child_field_name = EmptyStr then
           raise Exception.Create('Empty child_field_name for ' +
             _child_class_name);
-
+        {todo: FindOne deve accettare un oggetto da riempire, non crearne uno lui}
         v := FindOne(_child_type.Handle,
           TdormCriteria.NewCriteria(_child_field_name,
           TdormCompareOperator.Equal, APKValue), true);
@@ -1241,90 +1345,9 @@ end;
 
 function TSession.List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
 FreeCriteria: Boolean): TdormCollection;
-var
-  _table: string;
-  SQL: string;
-  CritItem: TdormCriteriaItem;
-  i: Integer;
-  Mapping: TArray<TdormFieldMapping>;
-  fm: TdormFieldMapping;
-  select_fields: string;
-  d: TDate;
-  dt: TDateTime;
-  function GetFieldMappingByAttribute(AttributeName: string): TdormFieldMapping;
-  var
-    fm: TdormFieldMapping;
-  begin
-    for fm in Mapping do
-      if fm.name = AttributeName then
-        Exit(fm);
-    raise EdormException.CreateFmt('Unknown field attribute %s',
-      [AttributeName]);
-  end;
-
 begin
-  _table := GetTableName(string(AItemClassInfo.name));
-  Mapping := GetTableMapping(string(AItemClassInfo.name));
-  select_fields := GetSelectFieldsList(Mapping, true);
-  if Criteria.Count > 0 then
-    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' WHERE '
-  else
-    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' ';
-
-  for i := 0 to Criteria.Count - 1 do
-  begin
-    CritItem := Criteria.GetCriteria(i);
-    if i > 0 then
-      case CritItem.LogicRelation of
-        lrAnd:
-          SQL := SQL + ' AND ';
-        lrOr:
-          SQL := SQL + ' OR ';
-      end;
-    fm := GetFieldMappingByAttribute(CritItem.Attribute);
-    SQL := SQL + fm.field;
-    case CritItem.CompareOperator of
-      Equal:
-        SQL := SQL + ' = ';
-      GreaterThan:
-        SQL := SQL + ' > ';
-      LowerThan:
-        SQL := SQL + ' < ';
-      GreaterOrEqual:
-        SQL := SQL + ' >= ';
-      LowerOrEqual:
-        SQL := SQL + ' <= ';
-      Different:
-        SQL := SQL + ' != ';
-    end;
-
-    if fm.field_type = 'string' then
-      SQL := SQL + '''' + GetStrategy.EscapeString
-        (CritItem.Value.AsString) + ''''
-    else if fm.field_type = 'integer' then
-      SQL := SQL + inttostr(CritItem.Value.AsInteger)
-    else if fm.field_type = 'boolean' then
-      SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
-    else if fm.field_type = 'boolean' then
-      SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
-    else if fm.field_type = 'date' then
-    begin
-      d := CritItem.Value.AsExtended;
-      SQL := SQL + '''' + GetStrategy.EscapeDate(d) + ''''
-    end
-    else if fm.field_type = 'datetime' then
-    begin
-      dt := CritItem.Value.AsExtended;
-      SQL := SQL + '''' + GetStrategy.EscapeDateTime(dt) + ''''
-    end
-    else
-      raise EdormException.CreateFmt('Unknown type %s in criteria',
-        [fm.field_type]);
-
-  end;
-  Result := List(TdormSimpleSearchCriteria.Create(AItemClassInfo, SQL));
-  if FreeCriteria then
-    FreeAndNil(Criteria);
+  Result := NewList;
+  FillList(Result, AItemClassInfo, Criteria, FreeCriteria);
 end;
 
 { TdormSimpleSearchCriteria }

@@ -169,8 +169,9 @@ end;
 constructor TPerson.Create;
 begin
   inherited;
-  FPhones := nil;
-  FCar := nil;
+  FPhones := NewList();
+  FCar := TCar.Create;
+  FEmail := nil; //TEmail.Create;
 end;
 
 destructor TPerson.Destroy;

@@ -27,6 +27,8 @@ type
   private
     class var ctx: TRttiContext;
   public
+    class function MethodCall(AObject: TObject; AMethodName: String;
+      AParameters: array of TValue): TValue; static;
     class procedure SetProperty(Obj: TObject; const PropertyName: string;
       const Value: TValue); static;
     class procedure ObjectToDataSet(Obj: TObject; Field: TField;
@@ -40,6 +42,7 @@ type
     class function Clone(Obj: TObject): TObject; static;
     class procedure CopyObject(SourceObj, TargetObj: TObject); static;
     class function CreateObject(ARttiType: TRttiType): TObject; static;
+
   end;
 
 function FieldFor(const PropertyName: string): string; inline;
@@ -49,6 +52,18 @@ implementation
 uses
   SysUtils,
   Classes, dorm.Collections;
+
+class function TdormUtils.MethodCall(AObject: TObject; AMethodName: String;
+  AParameters: array of TValue): TValue;
+var
+  m: TRttiMethod;
+begin
+  m := ctx.GetType(AObject.ClassInfo).GetMethod('Add');
+  if Assigned(m) then
+    Result := m.Invoke(AObject, AParameters)
+  else
+    raise EdormException.Create('Cannot find method "ADD" in the object');
+end;
 
 function FieldFor(const PropertyName: string): string; inline;
 begin
@@ -63,16 +78,16 @@ var
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
-  if not assigned(ARttiType) then
+  if not Assigned(ARttiType) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [ARttiType.ToString]);
   Field := ARttiType.GetField(FieldFor(PropertyName));
-  if assigned(Field) then
+  if Assigned(Field) then
     Result := Field.GetValue(Obj)
   else
   begin
     Prop := ARttiType.GetProperty(PropertyName);
-    if not assigned(Prop) then
+    if not Assigned(Prop) then
       raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
         [ARttiType.ToString, PropertyName]);
     Result := Prop.GetValue(Obj);
@@ -86,11 +101,11 @@ var
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
-  if not assigned(ARttiType) then
+  if not Assigned(ARttiType) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [ARttiType.ToString]);
   Prop := ARttiType.GetProperty(PropertyName);
-  if not assigned(Prop) then
+  if not Assigned(Prop) then
     raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
       [ARttiType.ToString, PropertyName]);
   if Prop.IsReadable then
@@ -108,16 +123,16 @@ var
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
-  if not assigned(ARttiType) then
+  if not Assigned(ARttiType) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [ARttiType.ToString]);
   Field := ARttiType.GetField(FieldFor(PropertyName));
-  if assigned(Field) then
+  if Assigned(Field) then
     Field.SetValue(Obj, Value)
   else
   begin
     Prop := ARttiType.GetProperty(PropertyName);
-    if assigned(Prop) then
+    if Assigned(Prop) then
       Prop.SetValue(Obj, Value)
     else
       raise Exception.CreateFmt('Cannot get RTTI for field or property [%s.%s]',
@@ -132,11 +147,11 @@ var
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
-  if not assigned(ARttiType) then
+  if not Assigned(ARttiType) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [ARttiType.ToString]);
   Prop := ARttiType.GetProperty(PropertyName);
-  if not assigned(Prop) then
+  if not Assigned(Prop) then
     raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
       [ARttiType.ToString, PropertyName]);
   if Prop.IsWritable then
@@ -165,7 +180,7 @@ begin
     if not SameText(Prop.Name, 'ID') then
     begin
       f := Dataset.FindField(Prop.Name);
-      if assigned(f) and not f.ReadOnly then
+      if Assigned(f) and not f.ReadOnly then
       begin
         if f is TIntegerField then
           SetProperty(Obj, Prop.Name, TIntegerField(f).Value)
@@ -190,7 +205,7 @@ var
   sourceObject: TObject;
   targetObject: TObject;
 begin
-  if not assigned(TargetObj) then
+  if not Assigned(TargetObj) then
     exit;
 
   _ARttiType := ctx.GetType(SourceObj.ClassType);
@@ -260,9 +275,9 @@ class function TdormUtils.CreateObject(ARttiType: TRttiType): TObject;
 // Constructors: TArray<TRttiMethod>;
 begin
   // Constructors := ARttiType.GetMethods('Create');
-  Result := ARttiType.AsInstance.MetaclassType.Create
-  // Result := TObject(ARttiType.GetMethod('Create')
-  // .Invoke(ARttiType.AsInstance.MetaclassType, []).AsObject);
+//  Result := ARttiType.AsInstance.MetaclassType.Create
+   Result := TObject(ARttiType.GetMethod('Create')
+   .Invoke(ARttiType.AsInstance.MetaclassType, []).AsObject);
 end;
 
 class function TdormUtils.Clone(Obj: TObject): TObject;
@@ -281,7 +296,7 @@ var
   targetObject: TObject;
 begin
   Result := nil;
-  if not assigned(Obj) then
+  if not Assigned(Obj) then
     exit;
 
   _ARttiType := ctx.GetType(Obj.ClassType);
