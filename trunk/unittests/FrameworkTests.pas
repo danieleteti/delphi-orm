@@ -23,7 +23,7 @@ uses
   BaseTestCase,
   dorm,
   dorm.Collections,
-  dorm.Commons;
+  dorm.Commons, Generics.Defaults;
 
 type
   TFrameworkTests = class(TBaseTestCase)
@@ -39,6 +39,11 @@ type
     procedure TestBlob;
     procedure TestEnumerableCollection;
     procedure TestLastInsertedOID;
+    procedure TestCollectionSorting;
+  end;
+
+  TPersonComparer = class(TComparer<TObject>)
+    function Compare(const Left, Right: TObject): Integer; override;
   end;
 
 implementation
@@ -185,6 +190,54 @@ begin
 
 end;
 
+procedure TFrameworkTests.TestCollectionSorting;
+var
+  Coll: TdormCollection;
+  p: TPerson;
+begin
+  Coll := NewList();
+  try
+    p := TPerson.NewPerson;
+    p.LastName := 'abc';
+    p.Age := 30;
+    p.BornDate := EncodeDate(2000, 1, 10);
+    Coll.Add(p);
+    p := TPerson.NewPerson;
+    p.LastName := 'bcd';
+    p.Age := 29;
+    p.BornDate := EncodeDate(2000, 2, 10);
+    Coll.Add(p);
+    p := TPerson.NewPerson;
+    p.LastName := 'cde';
+    p.Age := 28;
+    p.BornDate := EncodeDate(2000, 3, 10);
+    Coll.Add(p);
+    p := TPerson.NewPerson;
+    p.LastName := 'def';
+    p.Age := 27;
+    p.BornDate := EncodeDate(2000, 4, 10);
+    Coll.Add(p);
+
+    Coll.Sort(TdormComparer.Create('LastName'));
+    CheckEquals('abc', TPerson(Coll[0]).LastName);
+    Coll.ReverseSort(TdormComparer.Create('LastName'));
+    CheckEquals('def', TPerson(Coll[0]).LastName);
+
+    Coll.Sort(TdormComparer.Create('Age'));
+    CheckEquals(27, TPerson(Coll[0]).Age);
+    Coll.ReverseSort(TdormComparer.Create('Age'));
+    CheckEquals(30, TPerson(Coll[0]).Age);
+
+    Coll.Sort(TdormComparer.Create('BornDate'));
+    CheckEquals(EncodeDate(2000, 1, 10), TPerson(Coll[0]).BornDate);
+    Coll.ReverseSort(TdormComparer.Create('BornDate'));
+    CheckEquals(EncodeDate(2000, 4, 10), TPerson(Coll[0]).BornDate);
+
+  finally
+    Coll.Free;
+  end;
+end;
+
 procedure TFrameworkTests.TestCopyObjectWithStream;
 var
   p: TPerson;
@@ -286,7 +339,7 @@ end;
 
 procedure TFrameworkTests.TestLoadByAttribute;
 var
-  coll: TdormCollection;
+  Coll: TdormCollection;
   Criteria: TdormCriteria;
   m_id: Int64;
   p: TPerson;
@@ -314,28 +367,28 @@ begin
   try
     Criteria.Add('FirstName', Equal, 'Daniele').AddAnd('FirstName',
       Different, 'Jack');
-    coll := Session.List<TPerson>(Criteria, false);
+    Coll := Session.List<TPerson>(Criteria, false);
     try
-      CheckEquals(1, coll.Count);
-      m_id := TPerson(coll.GetItem(0)).ID;
+      CheckEquals(1, Coll.Count);
+      m_id := TPerson(Coll.GetItem(0)).ID;
     finally
-      coll.Free;
+      Coll.Free;
     end;
 
     Criteria.Add('ID', Equal, m_id);
-    coll := Session.List<TPerson>(Criteria, false);
+    Coll := Session.List<TPerson>(Criteria, false);
     try
-      CheckEquals(1, coll.Count);
+      CheckEquals(1, Coll.Count);
     finally
-      coll.Free;
+      Coll.Free;
     end;
 
     Criteria.Add('ID', GreaterThan, m_id);
-    coll := Session.List<TPerson>(Criteria, false);
+    Coll := Session.List<TPerson>(Criteria, false);
     try
-      CheckEquals(0, coll.Count);
+      CheckEquals(0, Coll.Count);
     finally
-      coll.Free;
+      Coll.Free;
     end;
   finally
     Criteria.Free;
@@ -344,7 +397,7 @@ end;
 
 procedure TFrameworkTests.TestLoadByAttributeWithRelationOperators;
 var
-  coll: TdormCollection;
+  Coll: TdormCollection;
   Criteria: TdormCriteria;
   p: TPerson;
 begin
@@ -368,19 +421,19 @@ begin
 
   Criteria := TdormCriteria.NewCriteria('FirstName', Equal, 'Daniele')
     .AddOr('LastName', Equal, 'Teti');
-  coll := Session.List<TPerson>(Criteria, true);
+  Coll := Session.List<TPerson>(Criteria, true);
   try
-    CheckEquals(2, coll.Count);
+    CheckEquals(2, Coll.Count);
   finally
-    coll.Free;
+    Coll.Free;
   end;
 
   Criteria := TdormCriteria.NewCriteria('Age', Equal, 32);
-  coll := Session.List<TPerson>(Criteria, true);
+  Coll := Session.List<TPerson>(Criteria, true);
   try
-    CheckEquals(1, coll.Count);
+    CheckEquals(1, Coll.Count);
   finally
-    coll.Free;
+    Coll.Free;
   end;
 end;
 
@@ -436,6 +489,22 @@ begin
     p.Free;
   end;
 
+end;
+
+{ TPersonComparer }
+
+function TPersonComparer.Compare(const Left, Right: TObject): Integer;
+var
+  L: TPerson;
+  R: TPerson;
+begin
+  L := TPerson(Left);
+  R := TPerson(Right);
+  if L.LastName > R.LastName then
+    Exit(1);
+  if L.LastName < R.LastName then
+    Exit(-1);
+  result := 0;
 end;
 
 initialization

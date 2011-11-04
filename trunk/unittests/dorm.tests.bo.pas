@@ -21,7 +21,8 @@ unit dorm.tests.bo;
 interface
 
 uses
-  dorm.Commons, dorm.Collections, dorm.InterposedObject, System.Classes;
+  dorm.Commons, dorm.Collections, dorm.InterposedObject,
+  {$IFDEF VER210}System.{$ENDIF}Classes;
 
 type
   TPerson = class;

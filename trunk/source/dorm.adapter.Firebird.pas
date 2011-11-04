@@ -67,9 +67,9 @@ type
     function EscapeDateTime(const Value: TDate): String;
     function GetLastInsertOID: TValue;
     function GetKeysGenerator: IdormKeysGenerator;
-    function Insert(rtti_type: TRttiType; AObject: TObject; ATableName: string;
+    function Insert(ARttiType: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TValue;
-    function Update(rtti_type: TRttiType; AObject: TObject; ATableName: string;
+    function Update(ARttiType: TRttiType; AObject: TObject; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>): TValue;
     function Load(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>; const Value: TValue)
@@ -116,7 +116,7 @@ implementation
 uses
   dorm.Utils;
 
-function TFirebirdPersistStrategy.Update(rtti_type: TRttiType; AObject: TObject;
+function TFirebirdPersistStrategy.Update(ARttiType: TRttiType; AObject: TObject;
   ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>): TValue;
 var
   field: TdormFieldMapping;
@@ -157,7 +157,7 @@ begin
     end;
     pk_idx := GetPKMappingIndex(AFieldsMapping);
 
-    v := rtti_type.GetProperty(AFieldsMapping[pk_idx].name).GetValue(AObject);
+    v := ARttiType.GetProperty(AFieldsMapping[pk_idx].name).GetValue(AObject);
     FillPrimaryKeyParam(Query.Parameters[I], v);
     GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
     FB.Execute(Query);
@@ -402,7 +402,7 @@ begin
   FLastInsertOID := TValue.Empty;
 end;
 
-function TFirebirdPersistStrategy.Insert(rtti_type: TRttiType; AObject: TObject;
+function TFirebirdPersistStrategy.Insert(ARttiType: TRttiType; AObject: TObject;
   ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>): TValue;
 var
   field: TdormFieldMapping;
