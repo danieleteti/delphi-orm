@@ -155,10 +155,7 @@ var
 begin
   p := TPerson.NewPerson;
   try
-    p.Car := TCar.NewCar;
-    p.Email := TEmail.NewEmail;
     p.Photo := TMemoryStream.Create;
-    p.Phones := NewList();
     p.Phones.Add(TPhone.Create);
     p.Phones.Add(TPhone.Create);
     p.Phones.Add(TPhone.Create);

@@ -101,18 +101,15 @@ begin
   People := NewList;
   Session.DeleteAll(TPerson);
   p := TPerson.Create('Daniele', 'Teti', 32);
-  p.Laptops := NewList;
   p.Laptops.Add(TLaptop.Create('DELL LATITUDE', 2048, 2));
   p.Laptops.Add(TLaptop.Create('COMPAQ PRESARIO', 2048, 4));
   People.Add(p);
 
   p := TPerson.Create('Scott', 'Summers', 40);
-  p.Laptops := NewList;
   p.Laptops.Add(TLaptop.Create('DELL A707', 4096, 8));
   People.Add(p);
 
   p := TPerson.Create('Bruce', 'Banner', 50);
-  p.Laptops := NewList;
   p.Laptops.Add(TLaptop.Create('DELL A101', 1024, 1));
   People.Add(p);
 

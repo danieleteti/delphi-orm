@@ -883,6 +883,7 @@ begin
 
       v := TdormUtils.GetProperty(AObject, AttributeNameInTheParentObject);
       List := v.AsObject as TdormCollection;
+      List.Clear;
       FillList(List, _child_type.Handle,
         TdormCriteria.NewCriteria(_child_field_name, TdormCompareOperator.Equal,
         GetPKValue(ARttiType, _table_mapping, AObject)), true);
@@ -974,6 +975,7 @@ begin
           DestObj := TdormUtils.GetField(AObject, _has_one[i].AsObject.s['name']).AsObject;
         end;
         TdormUtils.CopyObject(SrcObj, DestObj);
+
         FreeAndNil(SrcObj);
       end;
     end

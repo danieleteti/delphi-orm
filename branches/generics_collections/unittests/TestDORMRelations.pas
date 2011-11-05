@@ -143,7 +143,6 @@ var
 begin
   p := TPerson.NewPerson;
   try
-    p.Phones := NewList;
     t := TPhone.Create;
     t.Number := '555-7765123';
     t.Model := 'Casa';
@@ -152,7 +151,6 @@ begin
     t1.Number := '555-7765123';
     t1.Model := 'Casa';
     p.Phones.Add(t1);
-    p.Car := TCar.Create;
     p.Car.Brand := 'Ford';
     p.Car.Model := 'Focus 1.8 TDCi';
     Session.Save(p); // save Person and telefoni
