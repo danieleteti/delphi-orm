@@ -171,7 +171,8 @@ begin
   inherited;
   FPhones := NewList();
   FCar := TCar.Create;
-  FEmail := nil; //TEmail.Create;
+  FEmail := TEmail.Create;
+  FEmail.Value := 'd.teti@bittime.it';
 end;
 
 destructor TPerson.Destroy;

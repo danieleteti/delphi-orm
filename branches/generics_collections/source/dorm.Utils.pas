@@ -271,13 +271,28 @@ begin
 end;
 
 class function TdormUtils.CreateObject(ARttiType: TRttiType): TObject;
-// var
-// Constructors: TArray<TRttiMethod>;
+var
+  Method: TRttiMethod;
+  metaClass: TClass;
 begin
-  // Constructors := ARttiType.GetMethods('Create');
-//  Result := ARttiType.AsInstance.MetaclassType.Create
-   Result := TObject(ARttiType.GetMethod('Create')
-   .Invoke(ARttiType.AsInstance.MetaclassType, []).AsObject);
+  { First solution, clear and slow }
+  metaClass := nil;
+  for Method in ARttiType.GetMethods do
+    if Method.HasExtendedInfo and Method.IsConstructor then
+      if Length(Method.GetParameters) = 0 then
+      begin
+        metaClass := ARttiType.AsInstance.MetaclassType;
+        Break;
+      end;
+  if Assigned(metaClass) then
+    Result := Method.Invoke(metaClass, []).AsObject
+  else
+    raise EdormException.Create('Cannot find a propert constructor for ' +
+      ARttiType.ToString);
+
+  { Second solution, dirty and fast }
+  // Result := TObject(ARttiType.GetMethod('Create')
+  // .Invoke(ARttiType.AsInstance.MetaclassType, []).AsObject);
 end;
 
 class function TdormUtils.Clone(Obj: TObject): TObject;

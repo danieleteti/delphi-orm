@@ -114,6 +114,8 @@ type
       AClassName: string; AObject: TObject);
     procedure DeleteHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
       AClassName: string; AObject: TObject);
+    procedure DeleteHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
+      AClassName: string; AObject: TObject);
     procedure LoadHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
       AClassName: string; AObject: TObject);
     procedure LoadHasManyRelationByPropertyName(APKValue: TValue;
@@ -330,7 +332,9 @@ begin
   fields := GetTableMapping(_class_name);
   PKValue := GetPKValue(RttiType, GetTableMapping(AObject.ClassName), AObject);
   DeleteHasManyRelation(PKValue, RttiType, AObject.ClassName, AObject);
+  DeleteHasOneRelation(PKValue, RttiType, AObject.ClassName, AObject);
   GetStrategy.Delete(RttiType, AObject, _table, fields);
+  ClearOID(AObject);
   GetLogger.ExitLevel('Delete');
 end;
 
@@ -380,6 +384,38 @@ begin
           begin
             Delete(O);
           end);
+    end;
+  end;
+  GetLogger.ExitLevel('has_many ' + AClassName);
+end;
+
+procedure TSession.DeleteHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
+AClassName: string; AObject: TObject);
+var
+  _child_field_name, _child_class_name: string;
+  _has_one: TSuperArray;
+  v: TValue;
+  _child_type: TRttiType;
+  i: Integer;
+  Obj: TObject;
+begin
+  GetLogger.EnterLevel('has_many ' + AClassName);
+  _has_one := FMapping.O['mapping'].O[AClassName].A['has_one'];
+  if assigned(_has_one) then
+  begin
+    GetLogger.Debug('Deleting has_one for ' + AClassName);
+    for i := 0 to _has_one.Length - 1 do
+    begin
+      v := TdormUtils.GetField(AObject, _has_one[i].AsObject.s['name']);
+      _child_class_name := _has_one[i].AsObject.s['class_name'];
+      _child_type := FCTX.FindType(Qualified(_child_class_name));
+      if not assigned(_child_type) then
+        raise Exception.Create('Unknown type ' + _child_class_name);
+      _child_field_name := _has_one[i].AsObject.s['child_field_name'];
+      Obj := v.AsObject; // if the relation is LazyLoad...
+      { todo: has_one row should be deleted also if they are lazy_loaded }
+      if assigned(Obj) then
+        Delete(Obj);
     end;
   end;
   GetLogger.ExitLevel('has_many ' + AClassName);
@@ -734,8 +770,6 @@ procedure TSession.LazyLoadFor(const APropertyName: string; AObject: TObject);
 var
   PKValue: TValue;
   RttiType: TRttiType;
-  // _class_name: string;
-  // fields: TArray<TdormFieldMapping>;
 begin
   RttiType := FCTX.GetType(AObject.ClassInfo);
   PKValue := GetPKValue(RttiType, GetTableMapping(AObject.ClassName), AObject);
@@ -792,11 +826,6 @@ begin
   GetLogger.ExitLevel('Load ' + rt.ToString);
 end;
 
-// function TSession.Load<T>(const Value: string; AObject: T): Boolean;
-// begin
-// Result := Load(TypeInfo(T), Value, AObject);
-// end;
-
 function TSession.Load<T>(const Value: TValue): T;
 begin
   Result := T(Load(TypeInfo(T), Value));
@@ -845,7 +874,7 @@ begin
     if i >= 0 then
     begin
       AttributeNameInTheParentObject := _has_many[i].AsObject.s['name'];
-//      v := TdormUtils.GetField(AObject, AttributeNameInTheParentObject);
+      // v := TdormUtils.GetField(AObject, AttributeNameInTheParentObject);
       _child_class_name := _has_many[i].AsObject.s['class_name'];
       _child_type := FCTX.FindType(Qualified(_child_class_name));
       if not assigned(_child_type) then
@@ -854,12 +883,9 @@ begin
 
       v := TdormUtils.GetProperty(AObject, AttributeNameInTheParentObject);
       List := v.AsObject as TdormCollection;
-      Self.FillList(List, _child_type.Handle,
+      FillList(List, _child_type.Handle,
         TdormCriteria.NewCriteria(_child_field_name, TdormCompareOperator.Equal,
         GetPKValue(ARttiType, _table_mapping, AObject)), true);
-      // v := TValue.From<TdormCollection>(List);
-      // TdormUtils.SetField(AObject, AttributeNameInTheParentObject, v);
-      // TdormUtils.SetProperty(AObject, AttributeNameInTheParentObject, v);
       LoadRelations(v.AsObject as TdormCollection);
     end
     else
@@ -890,13 +916,7 @@ end;
 procedure TSession.LoadBelongsToRelation(APKValue: TValue; ARttiType: TRttiType;
 AClassName: string; AObject: TObject);
 var
-  // _child_field_name, _child_class_name: string;
   _belongs_to: TSuperArray;
-  // v, _pk_value: TValue;
-  // List: IList;
-  // O: TObject;
-  // _child_type: TRttiType;
-  // SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
 begin
   GetLogger.EnterLevel('belongs_to ' + AClassName);
@@ -923,6 +943,8 @@ var
   i: Integer;
   _parent_field_key_value: TValue;
   _child_field_name: string;
+  SrcObj: TObject;
+  DestObj: TObject;
 begin
   GetLogger.Debug('Loading HAS_ONE for ' + AClassName + '.' + APropertyName);
   _has_one := FMapping.O['mapping'].O[AObject.ClassName].A['has_one'];
@@ -941,11 +963,18 @@ begin
         if _child_field_name = EmptyStr then
           raise Exception.Create('Empty child_field_name for ' +
             _child_class_name);
-        {todo: FindOne deve accettare un oggetto da riempire, non crearne uno lui}
+
+        {todo: A faster way without copy?}
         v := FindOne(_child_type.Handle,
           TdormCriteria.NewCriteria(_child_field_name,
           TdormCompareOperator.Equal, APKValue), true);
-        TdormUtils.SetField(AObject, _has_one[i].AsObject.s['name'], v);
+        if not v.IsEmpty then
+        begin
+          SrcObj := v.AsObject;
+          DestObj := TdormUtils.GetField(AObject, _has_one[i].AsObject.s['name']).AsObject;
+        end;
+        TdormUtils.CopyObject(SrcObj, DestObj);
+        FreeAndNil(SrcObj);
       end;
     end
     else
@@ -1078,7 +1107,6 @@ begin
   _table := GetTableName(_class_name);
   fields := GetTableMapping(_class_name);
   _pk_value := GetPKValue(_type, fields, AObject);
-
   if GetStrategy.IsNullKey(_pk_value) then
   begin
     FLogger.Info('Inserting ' + AObject.ClassName);
@@ -1090,6 +1118,8 @@ begin
     InsertHasOneRelation(GetPKValue(_type, fields, AObject), _type,
       _class_name, AObject);
   end
+  // else
+  // GetLogger.Warning(_class_name + ' not inserted because OI is not null');
   else
     raise EdormException.CreateFmt('Cannot insert object with an ID [%s]',
       [_class_name]);
