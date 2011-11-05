@@ -45,7 +45,7 @@ type
     procedure SetFirstName(const Value: String);
     procedure SetLastName(const Value: String);
     function GetIsAdult: Boolean;
-    procedure SetLaptops(const Value: TdormCollection);
+    procedure Init;
   public
     constructor Create; overload;
     constructor Create(FirstName, LastName: String; Age: Integer); overload;
@@ -55,7 +55,7 @@ type
     property LastName: String read FLastName write SetLastName;
     property Age: Integer read FAge write SetAge;
     property IsAdult: Boolean read GetIsAdult;
-    property Laptops: TdormCollection read FLaptops write SetLaptops;
+    property Laptops: TdormCollection read FLaptops;
   end;
 
 implementation
@@ -68,6 +68,7 @@ uses
 constructor TPerson.Create;
 begin
   inherited;
+  Init;
   FirstName := 'Daniele';
   LastName := 'Teti';
   Age := 32;
@@ -76,6 +77,7 @@ end;
 constructor TPerson.Create(FirstName, LastName: String; Age: Integer);
 begin
   inherited Create;
+  Init;
   FFirstName := FirstName;
   FLastName := LastName;
   FAge := Age;
@@ -92,6 +94,11 @@ begin
   Result := FAge >= 18;
 end;
 
+procedure TPerson.Init;
+begin
+  FLaptops := NewList();
+end;
+
 procedure TPerson.SetAge(const Value: Integer);
 begin
   FAge := Value;
@@ -101,12 +108,6 @@ end;
 procedure TPerson.SetFirstName(const Value: String);
 begin
   FFirstName := Value;
-end;
-
-procedure TPerson.SetLaptops(const Value: TdormCollection);
-begin
-  FreeAndNil(FLaptops);
-  FLaptops := Value;
 end;
 
 procedure TPerson.SetLastName(const Value: String);

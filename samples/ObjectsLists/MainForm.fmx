@@ -531,7 +531,7 @@ object Form11: TForm11
     Width = 793.000000000000000000
     Height = 433.000000000000000000
     OriginalWidth = 793.000000000000000000
-    OriginalHeight = 519.000000000000000000
+    OriginalHeight = 433.000000000000000000
     object Rectangle1: TRectangle
       Position.Point = '(472,80)'
       Width = 305.000000000000000000
