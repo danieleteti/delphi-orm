@@ -262,8 +262,8 @@ begin
       CheckEquals(p.Age, cloned_p.Age);
       CheckEquals(p.BornDate, cloned_p.BornDate);
       CheckEquals(p.BornTimeStamp, cloned_p.BornTimeStamp);
-      CheckNull(cloned_p.Phones);
-      CheckNull(cloned_p.Car);
+      CheckEquals(0, cloned_p.Phones.Count);
+      CheckFalse(Session.OIDIsSet(cloned_p.Car));
       CheckEquals(p.Photo.Size, cloned_p.Photo.Size);
     finally
       cloned_p.Free;
@@ -330,6 +330,14 @@ begin
   CheckTrue(Session.Strategy.GetLastInsertOID.IsEmpty);
   p := TPerson.NewPerson;
   try
+    //If Person has Email and Car, the LastInsertedOID will be the Email or Car.
+    //But I need to test the LastInsertedOID using a Person. So I remove the
+    //related objects.
+
+    p.Email.free;
+    p.Email := nil;
+    p.Car.free;
+    p.Car := nil;
     Session.Save(p);
     CheckTrue(p.ID = Session.Strategy.GetLastInsertOID.AsInt64);
   finally
