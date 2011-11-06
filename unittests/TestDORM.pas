@@ -35,6 +35,7 @@ type
     procedure TestCRUDAndFree;
     procedure TestUOW;
     procedure TestDormObject;
+    procedure TestFindOne;
   end;
 
 implementation
@@ -71,38 +72,38 @@ begin
     p1.Free;
   end;
 
-//  Session.StartTransaction;
-//  p1 := Session.Load<TPerson>(id);
-//  try
-//    p1.FirstName := 'Scott';
-//    p1.LastName := 'Summer';
-//    p1.Age := 45;
-//    p1.BornDate := EncodeDate(1965, 1, 1);
-//    Session.Update(p1);
-//    p1asstring := p1.ToString;
-//    Session.Commit;
-//  finally
-//    p1.Free;
-//  end;
-//
-//  Session.StartTransaction;
-//  p1 := Session.Load<TPerson>(id);
-//  try
-//    CheckEquals(p1asstring, p1.ToString);
-//    Session.Delete(p1);
-//    Session.Commit;
-//  finally
-//    p1.Free;
-//  end;
-//
-//  Session.StartTransaction;
-//  p1 := Session.Load<TPerson>(id);
-//  try
-//    CheckNull(p1);
-//    Session.Commit;
-//  finally
-//    p1.Free;
-//  end;
+  // Session.StartTransaction;
+  // p1 := Session.Load<TPerson>(id);
+  // try
+  // p1.FirstName := 'Scott';
+  // p1.LastName := 'Summer';
+  // p1.Age := 45;
+  // p1.BornDate := EncodeDate(1965, 1, 1);
+  // Session.Update(p1);
+  // p1asstring := p1.ToString;
+  // Session.Commit;
+  // finally
+  // p1.Free;
+  // end;
+  //
+  // Session.StartTransaction;
+  // p1 := Session.Load<TPerson>(id);
+  // try
+  // CheckEquals(p1asstring, p1.ToString);
+  // Session.Delete(p1);
+  // Session.Commit;
+  // finally
+  // p1.Free;
+  // end;
+  //
+  // Session.StartTransaction;
+  // p1 := Session.Load<TPerson>(id);
+  // try
+  // CheckNull(p1);
+  // Session.Commit;
+  // finally
+  // p1.Free;
+  // end;
 end;
 
 procedure TTestDORM.TestCRUDAndFree;
@@ -154,6 +155,27 @@ begin
       begin
         CheckTrue(E.ClassName = 'EdormException');
       end;
+    end;
+  finally
+    p.Free;
+  end;
+end;
+
+procedure TTestDORM.TestFindOne;
+var
+  p: TPerson;
+  p1: TPerson;
+begin
+  p := TPerson.NewPerson;
+  try
+    Session.Persist(p);
+    p1 := Session.FindOne<TPerson>(TdormCriteria.NewCriteria('ID',
+      TdormCompareOperator.Equal, p.id));
+    try
+      CheckEquals(p.id, p1.id);  //same data
+      CheckFalse(p = p1);  //different objects
+    finally
+      p1.Free;
     end;
   finally
     p.Free;

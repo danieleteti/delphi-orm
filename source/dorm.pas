@@ -82,11 +82,9 @@ type
     FCTX: TRttiContext;
     FDictTables: TDictionary<string, string>;
     FDictMapping: TDictionary<string, TArray<TdormFieldMapping>>;
-    // FIdentityMap: TIdentityMap;
     FMapping: ISuperObject;
     FPersistStrategy: IdormPersistStrategy;
     FUOWInsert, FUOWUpdate, FUOWDelete: TObjectList<TObject>;
-    // FPackageName: string;
     FLogger: IdormLogger;
     FEnvironment: TdormEnvironment;
     EnvironmentNames: TArray<string>;
@@ -132,19 +130,34 @@ type
       ARttiType: TRttiType; AClassName, APropertyName: string;
       var AObject: TObject);
     function Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject; overload;
+    function FindOne(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
+      FreeCriteria: Boolean = true): TObject; overload;
+    function List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
+      FreeCriteria: Boolean = false): TdormCollection; overload;
   public
     constructor Create(Environment: TdormEnvironment); virtual;
     destructor Destroy; override;
     // Environments
     function GetEnv: string;
-    // Core
+    // Utils
     function Clone<T: class, constructor>(Obj: T): T;
     procedure CopyObject(SourceObject, TargetObject: TObject);
     function GetTableName(AClassName: string): string;
     function GetTableMapping(AClassName: string): TArray<TdormFieldMapping>;
     function GetMapping: ISuperObject;
     function GetLogger: IdormLogger;
+    function GetPKValueFromObject(Obj: TObject;
+      var pktype: TdormKeyType): TValue;
+    function GetPersistentClassesName(WithPackage: Boolean = false)
+      : TList<string>;
+    function Strategy: IdormPersistStrategy;
+    function OIDIsSet(Obj: TObject): Boolean;
+    procedure ClearOID(Obj: TObject);
+    // Configuration
     procedure Configure(TextReader: TTextReader);
+    class function CreateConfigured(TextReader: TTextReader;
+      Environment: TdormEnvironment): TSession;
+    // Persistence
     procedure Persist(AObject: TObject);
     function Save(AObject: TObject): TValue; overload;
     function SaveAndFree(AObject: TObject): TValue;
@@ -156,24 +169,15 @@ type
     procedure InsertCollection(Collection: TdormCollection);
     procedure UpdateCollection(Collection: TdormCollection);
     procedure DeleteCollection(Collection: TdormCollection);
-    procedure Extract(AOID: string);
-    function GetPKValueFromObject(Obj: TObject;
-      var pktype: TdormKeyType): TValue;
     procedure LoadRelations(AObject: TObject;
       ARelationsSet: TdormRelations = [BelongsTo, HasMany, HasOne]); overload;
     procedure LoadRelations(AList: TdormCollection;
       ARelationsSet: TdormRelations = [BelongsTo, HasMany, HasOne]); overload;
     function Load<T: class>(const Value: TValue): T; overload;
-    // function Load<T: class>(const Value: string; AObject: T): Boolean; overload;
-    procedure LazyLoadFor(const APropertyName: string; AObject: TObject);
     procedure SetLazyLoadFor(ATypeInfo: PTypeInfo; const APropertyName: string;
       const Value: Boolean);
     function FindOne<T: class>(Criteria: TdormCriteria;
       FreeCriteria: Boolean = true): T; overload;
-    function FindOne(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
-      FreeCriteria: Boolean = true): TObject; overload;
-    function List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
-      FreeCriteria: Boolean = false): TdormCollection; overload;
     procedure FillList(AdormCollection: TdormCollection;
       AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
       FreeCriteria: Boolean = false); overload;
@@ -186,16 +190,10 @@ type
       FreeCriteria: Boolean = true): TdormCollection; overload;
     function Count(AClassType: TClass): Int64;
     procedure DeleteAll(AClassType: TClass);
+    // transaction
     procedure StartTransaction;
     procedure Commit;
     procedure Rollback;
-    function GetPersistentClassesName(WithPackage: Boolean = false)
-      : TList<string>;
-    function Strategy: IdormPersistStrategy;
-    function OIDIsSet(Obj: TObject): Boolean;
-    procedure ClearOID(Obj: TObject);
-    class function CreateConfigured(TextReader: TTextReader;
-      Environment: TdormEnvironment): TSession;
   end;
 
 implementation
@@ -488,11 +486,6 @@ begin
   end;
 end;
 
-procedure TSession.Extract(AOID: string);
-begin
-  // FIdentityMap.Extract(AOID);
-end;
-
 procedure TSession.FillList(AdormCollection: TdormCollection;
 AItemClassInfo: PTypeInfo; Criteria: TdormCriteria; FreeCriteria: Boolean);
 var
@@ -616,27 +609,14 @@ begin
         [Coll.Count]);
     if Coll.Count = 1 then
       Result := Coll.Extract(0);
-    // Non posso usare "as" per un buig nel compilatore :-(
   finally
     Coll.Free;
   end;
 end;
 
 function TSession.FindOne<T>(Criteria: TdormCriteria; FreeCriteria: Boolean): T;
-var
-  Coll: TdormCollection;
 begin
-  Coll := List<T>(Criteria, FreeCriteria);
-  try
-    if Coll.Count <> 1 then
-      raise EdormException.CreateFmt
-        ('FindOne MUST return one, and only one, record. Returned %d instead',
-        [Coll.Count]);
-    Result := T(Coll.Extract(0));
-    // Non posso usare "as" per un buig nel compilatore :-(
-  finally
-    Coll.Free;
-  end;
+  Result := FindOne(TypeInfo(T), Criteria, FreeCriteria) as T;
 end;
 
 function TSession.GetLogger: IdormLogger;
@@ -764,19 +744,6 @@ begin
       Exit(f.field);
   raise EdormException.CreateFmt('Cannot find mapping %s.%s',
     [_child_class_name, _child_field_name]);
-end;
-
-procedure TSession.LazyLoadFor(const APropertyName: string; AObject: TObject);
-var
-  PKValue: TValue;
-  RttiType: TRttiType;
-begin
-  RttiType := FCTX.GetType(AObject.ClassInfo);
-  PKValue := GetPKValue(RttiType, GetTableMapping(AObject.ClassName), AObject);
-  LoadHasManyRelationByPropertyName(PKValue, RttiType, AObject.ClassName,
-    APropertyName, AObject);
-  LoadHasOneRelationByPropertyName(PKValue, RttiType, AObject.ClassName,
-    APropertyName, AObject);
 end;
 
 function TSession.List(AdormSearchCriteria: IdormSearchCriteria)
@@ -965,14 +932,15 @@ begin
           raise Exception.Create('Empty child_field_name for ' +
             _child_class_name);
 
-        {todo: A faster way without copy?}
+        { todo: A faster way without copy? }
         v := FindOne(_child_type.Handle,
           TdormCriteria.NewCriteria(_child_field_name,
           TdormCompareOperator.Equal, APKValue), true);
         if not v.IsEmpty then
         begin
           SrcObj := v.AsObject;
-          DestObj := TdormUtils.GetField(AObject, _has_one[i].AsObject.s['name']).AsObject;
+          DestObj := TdormUtils.GetField(AObject, _has_one[i].AsObject.s['name']
+            ).AsObject;
         end;
         TdormUtils.CopyObject(SrcObj, DestObj);
 
