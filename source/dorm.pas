@@ -134,6 +134,8 @@ type
       FreeCriteria: Boolean = true): TObject; overload;
     function List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
       FreeCriteria: Boolean = false): TdormCollection; overload;
+    procedure FillList(ACollection: TObject; AItemClassInfo: PTypeInfo;
+      Criteria: TdormCriteria; FreeCriteria: Boolean = false); overload;
   public
     constructor Create(Environment: TdormEnvironment); virtual;
     destructor Destroy; override;
@@ -176,20 +178,22 @@ type
     function Load<T: class>(const Value: TValue): T; overload;
     procedure SetLazyLoadFor(ATypeInfo: PTypeInfo; const APropertyName: string;
       const Value: Boolean);
+    function Count(AClassType: TClass): Int64;
+    procedure DeleteAll(AClassType: TClass);
+
+    // Find and List
     function FindOne<T: class>(Criteria: TdormCriteria;
       FreeCriteria: Boolean = true): T; overload;
-    procedure FillList(AdormCollection: TdormCollection;
-      AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
-      FreeCriteria: Boolean = false); overload;
+    procedure FillList<T: class>(AdormCollection: TdormCollection;
+      Criteria: TdormCriteria; FreeCriteria: Boolean = false); overload;
     function List(AdormSearchCriteria: IdormSearchCriteria)
       : TdormCollection; overload;
-    procedure FillList(AdormCollection: TdormCollection;
+    procedure FillList(ACollection: TObject;
       AdormSearchCriteria: IdormSearchCriteria); overload;
     function ListAll<T: class>(): TdormCollection;
     function List<T: class>(Criteria: TdormCriteria;
       FreeCriteria: Boolean = true): TdormCollection; overload;
-    function Count(AClassType: TClass): Int64;
-    procedure DeleteAll(AClassType: TClass);
+
     // transaction
     procedure StartTransaction;
     procedure Commit;
@@ -486,8 +490,8 @@ begin
   end;
 end;
 
-procedure TSession.FillList(AdormCollection: TdormCollection;
-AItemClassInfo: PTypeInfo; Criteria: TdormCriteria; FreeCriteria: Boolean);
+procedure TSession.FillList(ACollection: TObject; AItemClassInfo: PTypeInfo;
+Criteria: TdormCriteria; FreeCriteria: Boolean);
 var
   _table: string;
   SQL: string;
@@ -569,13 +573,12 @@ begin
         [fm.field_type]);
 
   end;
-  FillList(AdormCollection, TdormSimpleSearchCriteria.Create
-    (AItemClassInfo, SQL));
+  FillList(ACollection, TdormSimpleSearchCriteria.Create(AItemClassInfo, SQL));
   if FreeCriteria then
     FreeAndNil(Criteria);
 end;
 
-procedure TSession.FillList(AdormCollection: TdormCollection;
+procedure TSession.FillList(ACollection: TObject;
 AdormSearchCriteria: IdormSearchCriteria);
 var
   rt: TRttiType;
@@ -590,9 +593,15 @@ begin
   rt := FCTX.GetType(_type_info);
   _table := GetTableName(rt.ToString);
   _fields := GetTableMapping(rt.ToString);
-  FPersistStrategy.FillList(AdormCollection, rt, _table, _fields,
+  FPersistStrategy.FillList(ACollection, rt, _table, _fields,
     AdormSearchCriteria);
   GetLogger.ExitLevel(searcher_classname);
+end;
+
+procedure TSession.FillList<T>(AdormCollection: TdormCollection;
+Criteria: TdormCriteria; FreeCriteria: Boolean);
+begin
+  FillList(AdormCollection, TypeInfo(T), Criteria, FreeCriteria);
 end;
 
 function TSession.FindOne(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
@@ -756,17 +765,16 @@ end;
 function TSession.List<T>(Criteria: TdormCriteria; FreeCriteria: Boolean)
   : TdormCollection;
 begin
-  Result := List(TypeInfo(T), Criteria);
+  Result := NewList();
+  FillList(Result, TypeInfo(T), Criteria);
   if FreeCriteria then
     FreeAndNil(Criteria);
 end;
 
 function TSession.ListAll<T>: TdormCollection;
-var
-  _table: string;
 begin
-  _table := GetTableName(T.ClassName);
-  Result := List<T>(TdormCriteria.Create);
+  Result := NewList();
+  FillList(Result, TypeInfo(T), TdormCriteria.Create, true);
 end;
 
 function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject;
@@ -825,7 +833,7 @@ var
   _has_many: TSuperArray;
   _child_field_name, _child_class_name: string;
   v: TValue;
-  List: TdormCollection;
+  List: TObject;
   _child_type: TRttiType;
   SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
@@ -849,8 +857,8 @@ begin
       _child_field_name := _has_many[i].AsObject.s['child_field_name'];
 
       v := TdormUtils.GetProperty(AObject, AttributeNameInTheParentObject);
-      List := v.AsObject as TdormCollection;
-      List.Clear;
+      List := v.AsObject;
+      TdormUtils.MethodCall(List, 'Clear', []);
       FillList(List, _child_type.Handle,
         TdormCriteria.NewCriteria(_child_field_name, TdormCompareOperator.Equal,
         GetPKValue(ARttiType, _table_mapping, AObject)), true);
@@ -1171,7 +1179,7 @@ var
   _child_field_name, _child_class_name: string;
   _has_many: TSuperArray;
   v: TValue; // , _pk_value
-  List: TdormCollection;
+  List: TObject;
   // O: TObject;
   _child_type: TRttiType;
   i, j: Integer;
@@ -1192,14 +1200,17 @@ begin
         raise Exception.Create('Unknown type ' + _child_class_name);
       _child_field_name := _has_many[i].AsObject.s['child_field_name'];
 
-      List := TdormCollection(v.AsObject);
+      List := v.AsObject;
       if assigned(List) then
-        for j := 0 to List.Count - 1 do
+        for j := 0 to TdormUtils.GetProperty(List, 'Count').AsInteger - 1 do
         begin
           GetLogger.Debug('-- Saving ' + _child_type.QualifiedName);
           GetLogger.Debug('----> Setting property ' + _child_field_name);
-          TdormUtils.SetField(List[j], _child_field_name, APKValue);
-          Save(List[j]);
+
+
+
+          TdormUtils.SetField(TdormUtils.MethodCall(List, 'GetItem' ,[j]).AsObject, _child_field_name, APKValue);
+          Save(TdormUtils.MethodCall(List, 'GetItem' ,[j]).AsObject);
         end;
     end;
   end;

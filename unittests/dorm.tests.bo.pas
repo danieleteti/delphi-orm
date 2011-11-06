@@ -21,11 +21,12 @@ unit dorm.tests.bo;
 interface
 
 uses
-  dorm.Commons, dorm.Collections, dorm.InterposedObject,
-  {$IFDEF VER210}System.{$ENDIF}Classes;
+  dorm.Commons, dorm.InterposedObject,
+{$IFDEF VER210}System.{$ENDIF}Classes, Generics.Collections;
 
 type
   TPerson = class;
+  TPhone = class;
 
   TCar = class
   private
@@ -73,7 +74,7 @@ type
     FFirstName: string;
     FID: Integer;
     FBornDate: TDate;
-    FPhones: TdormCollection;
+    FPhones: TObjectList<TPhone>;
     FCar: TCar;
     FEmail: TEmail;
     FBornTimeStamp: TDateTime;
@@ -83,7 +84,6 @@ type
     procedure SetFirstName(const Value: string);
     procedure SetID(const Value: Integer);
     procedure SetBornDate(const Value: TDate);
-    procedure SetPhones(const Value: TdormCollection);
     procedure SetCar(const Value: TCar);
     procedure SetEmail(const Value: TEmail);
     procedure SetBornTimeStamp(const Value: TDateTime);
@@ -100,7 +100,7 @@ type
     property BornDate: TDate read FBornDate write SetBornDate;
     property BornTimeStamp: TDateTime read FBornTimeStamp
       write SetBornTimeStamp;
-    property Phones: TdormCollection read FPhones write SetPhones;
+    property Phones: TObjectList<TPhone> read FPhones;
     property Car: TCar read FCar write SetCar;
     property Email: TEmail read FEmail write SetEmail;
     property Photo: TStream read FPhoto write SetPhoto;
@@ -169,7 +169,7 @@ end;
 constructor TPerson.Create;
 begin
   inherited;
-  FPhones := NewList();
+  FPhones := TObjectList<TPhone>.Create(true);
   FCar := TCar.Create;
   FEmail := TEmail.Create;
   FEmail.Value := 'd.teti@bittime.it';
@@ -232,11 +232,6 @@ end;
 procedure TPerson.SetFirstName(const Value: string);
 begin
   FFirstName := Value;
-end;
-
-procedure TPerson.SetPhones(const Value: TdormCollection);
-begin
-  FPhones := Value;
 end;
 
 procedure TPerson.SetPhoto(const Value: TStream);

@@ -104,7 +104,7 @@ type
     function List(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>;
       AdormSearchCriteria: IdormSearchCriteria): TdormCollection; overload;
-    procedure FillList(AList: TdormCollection; ARttiType: TRttiType;
+    procedure FillList(AList: TObject; ARttiType: TRttiType;
       ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>;
       AdormSearchCriteria: IdormSearchCriteria); overload;
     function Delete(ARttiType: TRttiType; AObject: TObject; ATableName: string;
