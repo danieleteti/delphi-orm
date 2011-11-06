@@ -83,7 +83,7 @@ begin
   finally
     persone.Free;
   end;
-  CheckTrue(MilliSecondsBetween(now, start) < 15000,
+  CheckTrue(MilliSecondsBetween(now, start) < 25000,
     'Too slow: ' + inttostr(MilliSecondsBetween(now, start)));
 end;
 
@@ -103,7 +103,7 @@ begin
   end;
   Session.Commit;
   CheckEquals(1000, Session.Count(TPerson));
-  CheckTrue(MilliSecondsBetween(now, start) < 15000,
+  CheckTrue(MilliSecondsBetween(now, start) < 25000,
     'Too slow: ' + inttostr(MilliSecondsBetween(now, start)));
 end;
 
