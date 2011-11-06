@@ -19,13 +19,36 @@ unit dorm.Utils;
 interface
 
 uses
-  CodeSiteLogging, //remove!!
+  CodeSiteLogging, // remove!!
   RTTI,
   DB, dorm.Commons;
 
 type
+  IdormDuckTypedList = interface
+    ['{B60AF5A6-7C31-4EAA-8DFB-D8BD3E112EE7}']
+    function Count: Integer;
+    function GetItem(const Index: Integer): TObject;
+    procedure Add(const AObject: TObject);
+    procedure Clear;
+  end;
+
+  TDuckTypedList = class(TInterfacedObject, IdormDuckTypedList)
+  protected
+    FObjectAsDuck: TObject;
+    FAddMethod: TRttiMethod;
+    FClearMethod: TRttiMethod;
+    FCountProperty: TRttiProperty;
+    FGetItemMethod: TRttiMethod;
+    function Count: Integer;
+    function GetItem(const Index: Integer): TObject;
+    procedure Add(const AObject: TObject);
+    procedure Clear;
+  public
+    constructor Create(AObjectAsDuck: TObject);
+  end;
+
   TdormUtils = class sealed
-  private
+  protected
     class var ctx: TRttiContext;
   public
     class function MethodCall(AObject: TObject; AMethodName: String;
@@ -58,21 +81,13 @@ class function TdormUtils.MethodCall(AObject: TObject; AMethodName: String;
   AParameters: array of TValue): TValue;
 var
   m: TRttiMethod;
-//  methods: TArray<TRttiMethod>;
 begin
-//  methods := ctx.GetType(AObject.ClassInfo).GetMethods;
-//  ctx.GetType(AObject.ClassInfo).GetMethods;
-//  for m in methods do
-//  begin
-//    CodeSite.Send(m.Name);
-//  end;
-//
-//  {todo: cannot find method COUNT in an generic list}
   m := ctx.GetType(AObject.ClassInfo).GetMethod(AMethodName);
   if Assigned(m) then
     Result := m.Invoke(AObject, AParameters)
   else
-    raise EdormException.CreateFmt('Cannot find method "%s" in the object', [AMethodName]);
+    raise EdormException.CreateFmt('Cannot find method "%s" in the object',
+      [AMethodName]);
 end;
 
 function FieldFor(const PropertyName: string): string; inline;
@@ -387,6 +402,57 @@ begin
 
   end;
   Result := cloned;
+end;
+
+{ TListDuckTyping }
+
+procedure TDuckTypedList.Add(const AObject: TObject);
+begin
+  FAddMethod.Invoke(FObjectAsDuck, [AObject]);
+end;
+
+procedure TDuckTypedList.Clear;
+begin
+  FClearMethod.Invoke(FObjectAsDuck, []);
+end;
+
+function TDuckTypedList.Count: Integer;
+begin
+  Result := FCountProperty.GetValue(FObjectAsDuck).AsInteger;
+end;
+
+constructor TDuckTypedList.Create(AObjectAsDuck: TObject);
+begin
+  inherited Create;
+  FObjectAsDuck := AObjectAsDuck;
+
+  FAddMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetMethod('Add');
+  if not Assigned(FAddMethod) then
+    raise EdormException.Create('Cannot find method "Add" in the duck object');
+
+  FClearMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetMethod('Clear');
+  if not Assigned(FClearMethod) then
+    raise EdormException.Create
+      ('Cannot find method "Clear" in the duck object');
+
+  FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetMethod('GetItem');
+  if not Assigned(FGetItemMethod) then
+    raise EdormException.Create
+      ('Cannot find method "GetItem" in the duck object');
+
+  FCountProperty := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetProperty('Count');
+  if not Assigned(FCountProperty) then
+    raise EdormException.Create
+      ('Cannot find property "Count" in the duck object');
+end;
+
+function TDuckTypedList.GetItem(const Index: Integer): TObject;
+begin
+  Result := FGetItemMethod.Invoke(FObjectAsDuck, [Index]).AsObject;
 end;
 
 end.

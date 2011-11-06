@@ -173,7 +173,7 @@ type
     procedure DeleteCollection(Collection: TdormCollection);
     procedure LoadRelations(AObject: TObject;
       ARelationsSet: TdormRelations = [BelongsTo, HasMany, HasOne]); overload;
-    procedure LoadRelations(AList: TdormCollection;
+    procedure LoadRelationsForEachElement(AList: TObject;
       ARelationsSet: TdormRelations = [BelongsTo, HasMany, HasOne]); overload;
     function Load<T: class>(const Value: TValue): T; overload;
     procedure SetLazyLoadFor(ATypeInfo: PTypeInfo; const APropertyName: string;
@@ -361,8 +361,10 @@ var
   _has_many: TSuperArray;
   v: TValue;
   _child_type: TRttiType;
-  i: Integer;
-  Coll: TdormCollection;
+  i, x: Integer;
+  Coll: TObject;
+  O: TObject;
+  DuckObject: IdormDuckTypedList;
 begin
   GetLogger.EnterLevel('has_many ' + AClassName);
   _has_many := FMapping.O['mapping'].O[AClassName].A['has_many'];
@@ -377,22 +379,23 @@ begin
       if not assigned(_child_type) then
         raise Exception.Create('Unknown type ' + _child_class_name);
       _child_field_name := _has_many[i].AsObject.s['child_field_name'];
-      Coll := TdormCollection(v.AsObject); // if the relation is LazyLoad...
+      Coll := v.AsObject; // if the relation is LazyLoad...
       { todo: The has_many rows should be deleted also if they are lazy_loaded }
       { todo: optimize the delete? }
+
       if assigned(Coll) then
-        Coll.ForEach<TObject>(
-          procedure(O: TObject)
-          begin
-            Delete(O);
-          end);
+      begin
+        DuckObject := TDuckTypedList.Create(Coll);
+        for x := 0 to DuckObject.Count - 1 do
+          Delete(DuckObject.GetItem(x));
+      end;
     end;
   end;
   GetLogger.ExitLevel('has_many ' + AClassName);
 end;
 
 procedure TSession.DeleteHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _child_field_name, _child_class_name: string;
   _has_one: TSuperArray;
@@ -491,7 +494,7 @@ begin
 end;
 
 procedure TSession.FillList(ACollection: TObject; AItemClassInfo: PTypeInfo;
-Criteria: TdormCriteria; FreeCriteria: Boolean);
+  Criteria: TdormCriteria; FreeCriteria: Boolean);
 var
   _table: string;
   SQL: string;
@@ -579,7 +582,7 @@ begin
 end;
 
 procedure TSession.FillList(ACollection: TObject;
-AdormSearchCriteria: IdormSearchCriteria);
+  AdormSearchCriteria: IdormSearchCriteria);
 var
   rt: TRttiType;
   _table: string;
@@ -599,13 +602,13 @@ begin
 end;
 
 procedure TSession.FillList<T>(AdormCollection: TdormCollection;
-Criteria: TdormCriteria; FreeCriteria: Boolean);
+  Criteria: TdormCriteria; FreeCriteria: Boolean);
 begin
   FillList(AdormCollection, TypeInfo(T), Criteria, FreeCriteria);
 end;
 
 function TSession.FindOne(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
-FreeCriteria: Boolean): TObject;
+  FreeCriteria: Boolean): TObject;
 var
   Coll: TdormCollection;
 begin
@@ -727,7 +730,7 @@ begin
 end;
 
 function TSession.GetPKValueFromObject(Obj: TObject;
-var pktype: TdormKeyType): TValue;
+  var pktype: TdormKeyType): TValue;
 var
   rt: TRttiType;
   pk_value: TValue;
@@ -807,7 +810,7 @@ begin
 end;
 
 procedure TSession.LoadHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _has_many: TSuperArray;
   i: Integer;
@@ -827,8 +830,8 @@ begin
 end;
 
 procedure TSession.LoadHasManyRelationByPropertyName(APKValue: TValue;
-ARttiType: TRttiType; AClassName: string; APropertyName: string;
-var AObject: TObject);
+  ARttiType: TRttiType; AClassName: string; APropertyName: string;
+  var AObject: TObject);
 var
   _has_many: TSuperArray;
   _child_field_name, _child_class_name: string;
@@ -862,7 +865,7 @@ begin
       FillList(List, _child_type.Handle,
         TdormCriteria.NewCriteria(_child_field_name, TdormCompareOperator.Equal,
         GetPKValue(ARttiType, _table_mapping, AObject)), true);
-      LoadRelations(v.AsObject as TdormCollection);
+      LoadRelationsForEachElement(v.AsObject);
     end
     else
       raise Exception.Create('Unknown property name ' + APropertyName);
@@ -870,7 +873,7 @@ begin
 end;
 
 procedure TSession.LoadHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _has_one: TSuperArray;
   i: Integer;
@@ -890,7 +893,7 @@ begin
 end;
 
 procedure TSession.LoadBelongsToRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _belongs_to: TSuperArray;
   i: Integer;
@@ -910,7 +913,8 @@ begin
 end;
 
 procedure TSession.LoadHasOneRelationByPropertyName(APKValue: TValue;
-ARttiType: TRttiType; AClassName, APropertyName: string; var AObject: TObject);
+  ARttiType: TRttiType; AClassName, APropertyName: string;
+  var AObject: TObject);
 var
   _has_one: TSuperArray;
   _child_class_name: string;
@@ -960,13 +964,19 @@ begin
   end;
 end;
 
-procedure TSession.LoadRelations(AList: TdormCollection;
-ARelationsSet: TdormRelations);
+procedure TSession.LoadRelationsForEachElement(AList: TObject;
+  ARelationsSet: TdormRelations);
 var
   el: TObject;
+  i: Integer;
+  DuckList: IdormDuckTypedList;
 begin
-  for el in AList do
+  DuckList := TDuckTypedList.Create(AList);
+  for i := 0 to DuckList.Count - 1 do
+  begin
+    el := DuckList.GetItem(i);
     LoadRelations(el, ARelationsSet);
+  end;
 end;
 
 function TSession.OIDIsSet(Obj: TObject): Boolean;
@@ -1003,7 +1013,7 @@ begin
 end;
 
 procedure TSession.LoadRelations(AObject: TObject;
-ARelationsSet: TdormRelations);
+  ARelationsSet: TdormRelations);
 var
   rt: TRttiType;
   _table: string;
@@ -1027,7 +1037,8 @@ begin
 end;
 
 procedure TSession.LoadBelongsToRelationByPropertyName(APKValue: TValue;
-ARttiType: TRttiType; AClassName, APropertyName: string; var AObject: TObject);
+  ARttiType: TRttiType; AClassName, APropertyName: string;
+  var AObject: TObject);
 var
   _belongs_to: TSuperArray;
   _belong_class_name: string;
@@ -1123,7 +1134,7 @@ begin
 end;
 
 procedure TSession.SetLazyLoadFor(ATypeInfo: PTypeInfo;
-const APropertyName: string; const Value: Boolean);
+  const APropertyName: string; const Value: Boolean);
 var
   i: Integer;
   RttiType: TRttiType;
@@ -1174,16 +1185,15 @@ begin
 end;
 
 procedure TSession.InsertHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _child_field_name, _child_class_name: string;
   _has_many: TSuperArray;
   v: TValue; // , _pk_value
   List: TObject;
-  // O: TObject;
   _child_type: TRttiType;
   i, j: Integer;
-  // prop: TRttiProperty;
+  DuckList: IdormDuckTypedList;
 begin
   GetLogger.EnterLevel('has_many ' + AClassName);
   _has_many := FMapping.O['mapping'].O[AClassName].A['has_many'];
@@ -1202,23 +1212,26 @@ begin
 
       List := v.AsObject;
       if assigned(List) then
-        for j := 0 to TdormUtils.GetProperty(List, 'Count').AsInteger - 1 do
+      begin
+        DuckList := TDuckTypedList.Create(List);
+        for j := 0 to DuckList.Count - 1 do
         begin
           GetLogger.Debug('-- Saving ' + _child_type.QualifiedName);
           GetLogger.Debug('----> Setting property ' + _child_field_name);
-
-
-
-          TdormUtils.SetField(TdormUtils.MethodCall(List, 'GetItem' ,[j]).AsObject, _child_field_name, APKValue);
-          Save(TdormUtils.MethodCall(List, 'GetItem' ,[j]).AsObject);
+          TdormUtils.SetField(
+            // TdormUtils.MethodCall(List, 'GetItem', [j]).AsObject,
+            DuckList.GetItem(j), _child_field_name, APKValue);
+          Save(DuckList.GetItem(j));
+          // Save(TdormUtils.MethodCall(List, 'GetItem', [j]).AsObject);
         end;
+      end;
     end;
   end;
   GetLogger.ExitLevel('has_many ' + AClassName);
 end;
 
 procedure TSession.InsertHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _child_field_name, _child_class_name: string;
   _has_one: TSuperArray;
@@ -1257,7 +1270,7 @@ begin
 end;
 
 procedure TSession.FixBelongsToRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _parent_id_attribute_name, _parent_class_name: string;
   _belongs_to: TSuperArray;
@@ -1355,7 +1368,7 @@ begin
 end;
 
 function TSession.List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
-FreeCriteria: Boolean): TdormCollection;
+  FreeCriteria: Boolean): TdormCollection;
 begin
   Result := NewList;
   FillList(Result, AItemClassInfo, Criteria, FreeCriteria);
@@ -1364,7 +1377,7 @@ end;
 { TdormSimpleSearchCriteria }
 
 constructor TdormSimpleSearchCriteria.Create(AItemClassInfo: PTypeInfo;
-ASQL: string);
+  ASQL: string);
 begin
   inherited Create;
   FSQL := ASQL;
@@ -1384,8 +1397,8 @@ end;
 { TdormCriteria }
 
 function TdormCriteria.Add(const Attribute: string;
-CompareOperator: TdormCompareOperator; Value: TValue;
-LogicRelation: TdormLogicRelation): TdormCriteria;
+  CompareOperator: TdormCompareOperator; Value: TValue;
+  LogicRelation: TdormLogicRelation): TdormCriteria;
 var
   Item: TdormCriteriaItem;
 begin
@@ -1399,13 +1412,13 @@ begin
 end;
 
 function TdormCriteria.AddOr(const Attribute: string;
-CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
+  CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
 begin
   Result := Add(Attribute, CompareOperator, Value, lrOr);
 end;
 
 function TdormCriteria.AddAnd(const Attribute: string;
-CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
+  CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
 begin
   Result := Add(Attribute, CompareOperator, Value, lrAnd);
 end;
@@ -1438,7 +1451,7 @@ begin
 end;
 
 class function TdormCriteria.NewCriteria(const Attribute: string;
-CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
+  CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
 begin
   Result := TdormCriteria.Create;
   Result.Add(Attribute, CompareOperator, Value);

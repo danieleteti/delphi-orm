@@ -40,7 +40,7 @@ type
     FAge: Integer;
     FLastName: String;
     FFirstName: String;
-    FLaptops: TdormCollection;
+    FLaptops: TObjectList<TLaptop>;
     procedure SetAge(const Value: Integer);
     procedure SetFirstName(const Value: String);
     procedure SetLastName(const Value: String);
@@ -55,7 +55,7 @@ type
     property LastName: String read FLastName write SetLastName;
     property Age: Integer read FAge write SetAge;
     property IsAdult: Boolean read GetIsAdult;
-    property Laptops: TdormCollection read FLaptops;
+    property Laptops: TObjectList<TLaptop> read FLaptops;
   end;
 
 implementation
@@ -96,7 +96,7 @@ end;
 
 procedure TPerson.Init;
 begin
-  FLaptops := NewList();
+  FLaptops := TObjectList<TLaptop>.Create(true);
 end;
 
 procedure TPerson.SetAge(const Value: Integer);
