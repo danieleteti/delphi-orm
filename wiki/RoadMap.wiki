@@ -1,0 +1,19 @@
+  * Many to many relations
+  * Support for strongly typed collections 
+{{{
+TPerson = class(Tobject)
+  ...
+  Phones: TObjectList<TPhone>;
+  ...
+end;
+}}}
+  * Per-Object custom mappers
+  * More databases support
+  * MySQL, Oracle, SQLite, MSSQLServer, ??
+  * File based (not SQL) supports
+  * JSON, CSV, XML, ??
+  * More tools
+  * Create config file from existing databases
+  * Create objects from config file
+  * Demos, demos, demos
+  * Build a strong community
