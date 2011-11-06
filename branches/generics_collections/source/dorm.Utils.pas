@@ -19,6 +19,7 @@ unit dorm.Utils;
 interface
 
 uses
+  CodeSiteLogging, //remove!!
   RTTI,
   DB, dorm.Commons;
 
@@ -57,12 +58,21 @@ class function TdormUtils.MethodCall(AObject: TObject; AMethodName: String;
   AParameters: array of TValue): TValue;
 var
   m: TRttiMethod;
+//  methods: TArray<TRttiMethod>;
 begin
-  m := ctx.GetType(AObject.ClassInfo).GetMethod('Add');
+//  methods := ctx.GetType(AObject.ClassInfo).GetMethods;
+//  ctx.GetType(AObject.ClassInfo).GetMethods;
+//  for m in methods do
+//  begin
+//    CodeSite.Send(m.Name);
+//  end;
+//
+//  {todo: cannot find method COUNT in an generic list}
+  m := ctx.GetType(AObject.ClassInfo).GetMethod(AMethodName);
   if Assigned(m) then
     Result := m.Invoke(AObject, AParameters)
   else
-    raise EdormException.Create('Cannot find method "ADD" in the object');
+    raise EdormException.CreateFmt('Cannot find method "%s" in the object', [AMethodName]);
 end;
 
 function FieldFor(const PropertyName: string): string; inline;

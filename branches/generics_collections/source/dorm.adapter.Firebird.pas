@@ -78,7 +78,7 @@ type
     function List(ARttiType: TRttiType; ATableName: string;
       AFieldsMapping: TArray<TdormFieldMapping>;
       AdormSearchCriteria: IdormSearchCriteria): TdormCollection;
-    procedure FillList(AList: TdormCollection; ARttiType: TRttiType;
+    procedure FillList(AList: TObject; ARttiType: TRttiType;
       ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>;
       AdormSearchCriteria: IdormSearchCriteria);
 
@@ -483,7 +483,7 @@ begin
   FillList(Result, ARttiType, ATableName, AFieldsMapping, AdormSearchCriteria);
 end;
 
-procedure TFirebirdPersistStrategy.FillList(AList: TdormCollection;
+procedure TFirebirdPersistStrategy.FillList(AList: TObject;
   ARttiType: TRttiType; ATableName: string;
   AFieldsMapping: TArray<TdormFieldMapping>;
   AdormSearchCriteria: IdormSearchCriteria);
@@ -500,8 +500,10 @@ begin
     reader := cmd.ExecuteQuery;
     try
       while reader.Next do
-        AList.Add(CreateObjectFromDBXReader(ARttiType, reader,
-          AFieldsMapping));
+        TdormUtils.MethodCall(AList, 'Add', [CreateObjectFromDBXReader(ARttiType, reader,
+          AFieldsMapping)]);
+//        AList.Add(CreateObjectFromDBXReader(ARttiType, reader,
+//          AFieldsMapping));
     finally
       reader.Free;
     end;
