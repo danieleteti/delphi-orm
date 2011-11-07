@@ -135,7 +135,7 @@ type
     function List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
       FreeCriteria: Boolean = false): TdormCollection; overload;
     procedure FillList(ACollection: TObject; AItemClassInfo: PTypeInfo;
-      Criteria: TdormCriteria; FreeCriteria: Boolean = false); overload;
+      Criteria: TdormCriteria = nil; FreeCriteria: Boolean = false); overload;
   public
     constructor Create(Environment: TdormEnvironment); virtual;
     destructor Destroy; override;
@@ -168,9 +168,9 @@ type
     procedure Save(dormUOW: TdormUOW); overload;
     procedure Delete(AObject: TObject);
     procedure DeleteAndFree(AObject: TObject);
-    procedure InsertCollection(Collection: TdormCollection);
-    procedure UpdateCollection(Collection: TdormCollection);
-    procedure DeleteCollection(Collection: TdormCollection);
+    procedure InsertCollection(Collection: TObject);
+    procedure UpdateCollection(Collection: TObject);
+    procedure DeleteCollection(Collection: TObject);
     procedure LoadRelations(AObject: TObject;
       ARelationsSet: TdormRelations = [BelongsTo, HasMany, HasOne]); overload;
     procedure LoadRelationsForEachElement(AList: TObject;
@@ -184,8 +184,8 @@ type
     // Find and List
     function FindOne<T: class>(Criteria: TdormCriteria;
       FreeCriteria: Boolean = true): T; overload;
-    procedure FillList<T: class>(AdormCollection: TdormCollection;
-      Criteria: TdormCriteria; FreeCriteria: Boolean = false); overload;
+    procedure FillList<T: class>(Collection: TObject;
+      Criteria: TdormCriteria = nil; FreeCriteria: Boolean = true); overload;
     function List(AdormSearchCriteria: IdormSearchCriteria)
       : TdormCollection; overload;
     procedure FillList(ACollection: TObject;
@@ -404,7 +404,7 @@ var
   i: Integer;
   Obj: TObject;
 begin
-  GetLogger.EnterLevel('has_many ' + AClassName);
+  GetLogger.EnterLevel('has_one ' + AClassName);
   _has_one := FMapping.O['mapping'].O[AClassName].A['has_one'];
   if assigned(_has_one) then
   begin
@@ -423,7 +423,7 @@ begin
         Delete(Obj);
     end;
   end;
-  GetLogger.ExitLevel('has_many ' + AClassName);
+  GetLogger.ExitLevel('has_one ' + AClassName);
 end;
 
 destructor TSession.Destroy;
@@ -520,62 +520,63 @@ begin
   _table := GetTableName(string(AItemClassInfo.name));
   Mapping := GetTableMapping(string(AItemClassInfo.name));
   select_fields := GetSelectFieldsList(Mapping, true);
-  if Criteria.Count > 0 then
-    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' WHERE '
-  else
+  if assigned(Criteria) and (Criteria.Count > 0) then
+  begin
+    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' WHERE ';
+    for i := 0 to Criteria.Count - 1 do
+    begin
+      CritItem := Criteria.GetCriteria(i);
+      if i > 0 then
+        case CritItem.LogicRelation of
+          lrAnd:
+            SQL := SQL + ' AND ';
+          lrOr:
+            SQL := SQL + ' OR ';
+        end;
+      fm := GetFieldMappingByAttribute(CritItem.Attribute);
+      SQL := SQL + fm.field;
+      case CritItem.CompareOperator of
+        Equal:
+          SQL := SQL + ' = ';
+        GreaterThan:
+          SQL := SQL + ' > ';
+        LowerThan:
+          SQL := SQL + ' < ';
+        GreaterOrEqual:
+          SQL := SQL + ' >= ';
+        LowerOrEqual:
+          SQL := SQL + ' <= ';
+        Different:
+          SQL := SQL + ' != ';
+      end;
+
+      if fm.field_type = 'string' then
+        SQL := SQL + '''' + GetStrategy.EscapeString
+          (CritItem.Value.AsString) + ''''
+      else if fm.field_type = 'integer' then
+        SQL := SQL + inttostr(CritItem.Value.AsInteger)
+      else if fm.field_type = 'boolean' then
+        SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
+      else if fm.field_type = 'boolean' then
+        SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
+      else if fm.field_type = 'date' then
+      begin
+        d := CritItem.Value.AsExtended;
+        SQL := SQL + '''' + GetStrategy.EscapeDate(d) + ''''
+      end
+      else if fm.field_type = 'datetime' then
+      begin
+        dt := CritItem.Value.AsExtended;
+        SQL := SQL + '''' + GetStrategy.EscapeDateTime(dt) + ''''
+      end
+      else
+        raise EdormException.CreateFmt('Unknown type %s in criteria',
+          [fm.field_type]);
+    end;
+  end
+  else // Criteria is nil or is empty
     SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' ';
 
-  for i := 0 to Criteria.Count - 1 do
-  begin
-    CritItem := Criteria.GetCriteria(i);
-    if i > 0 then
-      case CritItem.LogicRelation of
-        lrAnd:
-          SQL := SQL + ' AND ';
-        lrOr:
-          SQL := SQL + ' OR ';
-      end;
-    fm := GetFieldMappingByAttribute(CritItem.Attribute);
-    SQL := SQL + fm.field;
-    case CritItem.CompareOperator of
-      Equal:
-        SQL := SQL + ' = ';
-      GreaterThan:
-        SQL := SQL + ' > ';
-      LowerThan:
-        SQL := SQL + ' < ';
-      GreaterOrEqual:
-        SQL := SQL + ' >= ';
-      LowerOrEqual:
-        SQL := SQL + ' <= ';
-      Different:
-        SQL := SQL + ' != ';
-    end;
-
-    if fm.field_type = 'string' then
-      SQL := SQL + '''' + GetStrategy.EscapeString
-        (CritItem.Value.AsString) + ''''
-    else if fm.field_type = 'integer' then
-      SQL := SQL + inttostr(CritItem.Value.AsInteger)
-    else if fm.field_type = 'boolean' then
-      SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
-    else if fm.field_type = 'boolean' then
-      SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
-    else if fm.field_type = 'date' then
-    begin
-      d := CritItem.Value.AsExtended;
-      SQL := SQL + '''' + GetStrategy.EscapeDate(d) + ''''
-    end
-    else if fm.field_type = 'datetime' then
-    begin
-      dt := CritItem.Value.AsExtended;
-      SQL := SQL + '''' + GetStrategy.EscapeDateTime(dt) + ''''
-    end
-    else
-      raise EdormException.CreateFmt('Unknown type %s in criteria',
-        [fm.field_type]);
-
-  end;
   FillList(ACollection, TdormSimpleSearchCriteria.Create(AItemClassInfo, SQL));
   if FreeCriteria then
     FreeAndNil(Criteria);
@@ -601,10 +602,10 @@ begin
   GetLogger.ExitLevel(searcher_classname);
 end;
 
-procedure TSession.FillList<T>(AdormCollection: TdormCollection;
-  Criteria: TdormCriteria; FreeCriteria: Boolean);
+procedure TSession.FillList<T>(Collection: TObject; Criteria: TdormCriteria;
+  FreeCriteria: Boolean);
 begin
-  FillList(AdormCollection, TypeInfo(T), Criteria, FreeCriteria);
+  FillList(Collection, TypeInfo(T), Criteria, FreeCriteria);
 end;
 
 function TSession.FindOne(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
@@ -1175,13 +1176,14 @@ begin
     end;
 end;
 
-procedure TSession.InsertCollection(Collection: TdormCollection);
+procedure TSession.InsertCollection(Collection: TObject);
 var
   i: Integer;
-  el: TObject;
+  List: IdormDuckTypedList;
 begin
-  for el in Collection do
-    Save(el);
+  List := TDuckTypedList.Create(Collection);
+  for i := 0 to List.Count - 1 do
+    Save(List.GetItem(i));
 end;
 
 procedure TSession.InsertHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
@@ -1305,6 +1307,7 @@ begin
       end;
     end;
   end;
+  GetLogger.ExitLevel('belongs_to ' + AClassName);
 end;
 
 procedure TSession.StartTransaction;
@@ -1351,20 +1354,24 @@ begin
   FreeAndNil(AObject);
 end;
 
-procedure TSession.UpdateCollection(Collection: TdormCollection);
+procedure TSession.UpdateCollection(Collection: TObject);
 var
   i: Integer;
+  List: IdormDuckTypedList;
 begin
-  for i := 0 to Collection.Count - 1 do
-    Update(Collection.GetItem(i));
+  List := TDuckTypedList.Create(Collection);
+  for i := 0 to List.Count - 1 do
+    Update(List.GetItem(i));
 end;
 
-procedure TSession.DeleteCollection(Collection: TdormCollection);
+procedure TSession.DeleteCollection(Collection: TObject);
 var
   i: Integer;
+  List: IdormDuckTypedList;
 begin
-  for i := 0 to Collection.Count - 1 do
-    Delete(Collection.GetItem(i));
+  List := TDuckTypedList.Create(Collection);
+  for i := 0 to List.Count - 1 do
+    Delete(List.GetItem(i));
 end;
 
 function TSession.List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
