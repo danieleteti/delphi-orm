@@ -36,6 +36,7 @@ type
     procedure TestUOW;
     procedure TestDormObject;
     procedure TestFindOne;
+    procedure TestBulkCollectionOperations;
   end;
 
 implementation
@@ -43,9 +44,38 @@ implementation
 uses
   Classes,
   SysUtils,
-  dorm.Commons, dorm.tests.bo, dorm.UOW;
+  dorm.Commons, dorm.tests.bo, dorm.UOW, System.Generics.Collections;
 
 { TTestDORM }
+
+procedure TTestDORM.TestBulkCollectionOperations;
+var
+  People: TObjectList<TPerson>;
+begin
+  People := CreateRandomPeople;
+  try
+    Session.InsertCollection(People);
+  finally
+    People.Free
+  end;
+
+  People := TObjectList<TPerson>.Create;
+  try
+    Session.FillList<TPerson>(People, TdormCriteria.Create);
+    Session.UpdateCollection(People);
+  finally
+    People.Free;
+  end;
+
+  People := TObjectList<TPerson>.Create;
+  try
+    Session.FillList<TPerson>(People);
+    Session.DeleteCollection(People);
+  finally
+    People.Free;
+  end;
+  Session.Commit;
+end;
 
 procedure TTestDORM.TestCRUD;
 var
@@ -172,8 +202,8 @@ begin
     p1 := Session.FindOne<TPerson>(TdormCriteria.NewCriteria('ID',
       TdormCompareOperator.Equal, p.id));
     try
-      CheckEquals(p.id, p1.id);  //same data
-      CheckFalse(p = p1);  //different objects
+      CheckEquals(p.id, p1.id); // same data
+      CheckFalse(p = p1); // different objects
     finally
       p1.Free;
     end;
