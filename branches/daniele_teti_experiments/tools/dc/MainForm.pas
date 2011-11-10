@@ -16,7 +16,7 @@ uses
   dorm,
 
   dorm.Commons,
-  dorm.DBCreator, Vcl.ActnList;
+  dorm.DBCreator, {$IFDEF VER120 } Vcl. {$ENDIF}ActnList;
 
 type
   TfrmMain = class(TForm)

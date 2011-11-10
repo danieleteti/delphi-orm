@@ -18,7 +18,7 @@ type
 implementation
 
 uses
-  SysUtils, Generics.Collections, System.Classes;
+  SysUtils, Generics.Collections, {$IFDEF VER120 } System.{$ENDIF}Classes;
 
 { TdormInterbaseDBCreator }
 procedure TdormInterbaseDBCreator.Execute;
