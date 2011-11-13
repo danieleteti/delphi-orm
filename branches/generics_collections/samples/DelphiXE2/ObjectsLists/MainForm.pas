@@ -84,7 +84,7 @@ begin
   Session := TSession.CreateConfigured(TStreamReader.Create('dorm.conf'),
     deDevelopment);
 {$REGION 'Insert some data'}
-  // InitializeData;
+  InitializeData;
 {$ENDREGION}
   People := TObjectList<TPerson>.Create;
   Session.FillList<TPerson>(People);

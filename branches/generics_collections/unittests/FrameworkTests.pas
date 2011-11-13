@@ -21,11 +21,20 @@ interface
 uses
   TestFramework,
   BaseTestCase,
+  Generics.Collections,
+  dorm.tests.bo,
   dorm,
   dorm.Collections,
-  dorm.Commons, Generics.Defaults;
+  dorm.Commons,
+  Generics.Defaults;
 
 type
+{$RTTI EXPLICIT FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished]) METHODS([vcPrivate, vcProtected, vcPublic, vcPublished]) PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
+  TPeople = class(TObjectList<TPerson>)
+  protected
+    function GetElement(const index: Integer): TPerson;
+  end;
+
   TFrameworkTests = class(TBaseTestCase)
   published
     procedure TestGeneratorID;
@@ -40,6 +49,7 @@ type
     procedure TestEnumerableCollection;
     procedure TestLastInsertedOID;
     procedure TestCollectionSorting;
+    procedure TestListDuckTyping;
   end;
 
   TPersonComparer = class(TComparer<TObject>)
@@ -52,9 +62,10 @@ uses
   Classes,
   SysUtils,
   DateUtils,
-  dorm.Utils, dorm.tests.bo,
+  dorm.Utils,
   IdHashMessageDigest,
-  idHash, RTTI;
+  idHash,
+  RTTI;
 
 // returns MD5 has for a file
 function MD5(const fileName: string): string;
@@ -64,7 +75,7 @@ var
 begin
   idmd5 := TIdHashMessageDigest5.Create;
   try
-    fs := TFileStream.Create(fileName, fmOpenRead OR fmShareDenyWrite);
+    fs := TFileStream.Create(fileName, fmOpenRead or fmShareDenyWrite);
     try
       result := idmd5.HashStreamAsHex(fs);
     finally
@@ -308,15 +319,15 @@ end;
 
 procedure TFrameworkTests.TestGeneratorID;
 var
-  t: TPerson;
+  T: TPerson;
 begin
-  t := TPerson.NewPerson;
+  T := TPerson.NewPerson;
   try
-    CheckTrue(t.ID = 0);
-    Session.Save(t);
-    CheckFalse(t.ID = 0);
+    CheckTrue(T.ID = 0);
+    Session.Save(T);
+    CheckFalse(T.ID = 0);
   finally
-    t.Free;
+    T.Free;
   end;
 end;
 
@@ -327,18 +338,40 @@ begin
   CheckTrue(Session.Strategy.GetLastInsertOID.IsEmpty);
   p := TPerson.NewPerson;
   try
-    //If Person has Email and Car, the LastInsertedOID will be the Email or Car.
-    //But I need to test the LastInsertedOID using a Person. So I remove the
-    //related objects.
+    // If Person has Email and Car, the LastInsertedOID will be the Email or Car.
+    // But I need to test the LastInsertedOID using a Person. So I remove the
+    // related objects.
 
-    p.Email.free;
+    p.Email.Free;
     p.Email := nil;
-    p.Car.free;
+    p.Car.Free;
     p.Car := nil;
     Session.Save(p);
     CheckTrue(p.ID = Session.Strategy.GetLastInsertOID.AsInt64);
   finally
     p.Free;
+  end;
+end;
+
+procedure TFrameworkTests.TestListDuckTyping;
+var
+{$IF CompilerVersion = 22}
+  ObjectList: TPeople;
+{$ELSE}
+  ObjectList: TObjectList<TPerson>;
+{$IFEND}
+  List: IdormDuckTypedList;
+begin
+  ObjectList :=
+{$IF CompilerVersion = 22}
+    TPeople.Create;
+{$ELSE}
+    TObjectList<TPerson>.Create;
+{$IFEND}
+  try
+    List := TDuckTypedlist.Create(ObjectList);
+  finally
+    ObjectList.Free;
   end;
 end;
 
@@ -510,6 +543,13 @@ begin
   if L.LastName < R.LastName then
     Exit(-1);
   result := 0;
+end;
+
+{ TPeople }
+
+function TPeople.GetElement(const index: Integer): TPerson;
+begin
+  result := Items[index];
 end;
 
 initialization

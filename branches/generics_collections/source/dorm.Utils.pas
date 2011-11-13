@@ -21,17 +21,11 @@ interface
 uses
   CodeSiteLogging, // remove!!
   RTTI,
-  DB, dorm.Commons;
+  DB,
+  dorm.Commons,
+  dorm.InterposedObject;
 
 type
-  IdormDuckTypedList = interface
-    ['{B60AF5A6-7C31-4EAA-8DFB-D8BD3E112EE7}']
-    function Count: Integer;
-    function GetItem(const Index: Integer): TObject;
-    procedure Add(const AObject: TObject);
-    procedure Clear;
-  end;
-
   TDuckTypedList = class(TInterfacedObject, IdormDuckTypedList)
   protected
     FObjectAsDuck: TObject;
@@ -40,7 +34,7 @@ type
     FCountProperty: TRttiProperty;
     FGetItemMethod: TRttiMethod;
     function Count: Integer;
-    function GetItem(const Index: Integer): TObject;
+    function GetItem(const index: Integer): TObject;
     procedure Add(const AObject: TObject);
     procedure Clear;
   public
@@ -51,7 +45,7 @@ type
   protected
     class var ctx: TRttiContext;
   public
-    class function MethodCall(AObject: TObject; AMethodName: String;
+    class function MethodCall(AObject: TObject; AMethodName: string;
       AParameters: array of TValue): TValue; static;
     class procedure SetProperty(Obj: TObject; const PropertyName: string;
       const Value: TValue); static;
@@ -75,9 +69,10 @@ implementation
 
 uses
   SysUtils,
-  Classes, dorm.Collections;
+  Classes,
+  dorm.Collections;
 
-class function TdormUtils.MethodCall(AObject: TObject; AMethodName: String;
+class function TdormUtils.MethodCall(AObject: TObject; AMethodName: string;
   AParameters: array of TValue): TValue;
 var
   m: TRttiMethod;
@@ -437,11 +432,21 @@ begin
     raise EdormException.Create
       ('Cannot find method "Clear" in the duck object');
 
+  FGetItemMethod := nil;
+{$IF CompilerVersion >= 23}
   FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-    .GetMethod('GetItem');
+    .GetIndexedProperty('Items').ReadMethod;
+{$IFEND}
+  if not Assigned(FGetItemMethod) then
+    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+      .GetMethod('GetItem');
+  if not Assigned(FGetItemMethod) then
+    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+      .GetMethod('GetElement');
+
   if not Assigned(FGetItemMethod) then
     raise EdormException.Create
-      ('Cannot find method "GetItem" in the duck object');
+      ('Cannot find method Indexed property "Items" or method "GetItem" or method "GetElement" in the duck object');
 
   FCountProperty := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
     .GetProperty('Count');
@@ -450,9 +455,9 @@ begin
       ('Cannot find property "Count" in the duck object');
 end;
 
-function TDuckTypedList.GetItem(const Index: Integer): TObject;
+function TDuckTypedList.GetItem(const index: Integer): TObject;
 begin
-  Result := FGetItemMethod.Invoke(FObjectAsDuck, [Index]).AsObject;
+  Result := FGetItemMethod.Invoke(FObjectAsDuck, [index]).AsObject;
 end;
 
 end.

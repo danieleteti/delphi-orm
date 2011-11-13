@@ -27,7 +27,8 @@ uses
   TypInfo,
   Rtti,
   dorm.Collections,
-  dorm.UOW;
+  dorm.UOW,
+  dorm.InterposedObject;
 
 type
   TdormParam = class
@@ -206,8 +207,7 @@ uses
   dorm.loggers.CodeSite,
   dorm.adapter.Firebird,
   SysUtils,
-  dorm.Utils,
-  dorm.InterposedObject;
+  dorm.Utils;
 
 { TSession }
 
@@ -590,6 +590,7 @@ var
   _fields: TArray<TdormFieldMapping>;
   _type_info: PTypeInfo;
   searcher_classname: string;
+  List: IdormDuckTypedList;
 begin
   _type_info := AdormSearchCriteria.GetItemClassInfo;
   searcher_classname := TObject(AdormSearchCriteria).ClassName;
@@ -597,6 +598,8 @@ begin
   rt := FCTX.GetType(_type_info);
   _table := GetTableName(rt.ToString);
   _fields := GetTableMapping(rt.ToString);
+  List := TDuckTypedList.Create(ACollection);
+  List.Clear;
   FPersistStrategy.FillList(ACollection, rt, _table, _fields,
     AdormSearchCriteria);
   GetLogger.ExitLevel(searcher_classname);
@@ -629,7 +632,12 @@ end;
 
 function TSession.FindOne<T>(Criteria: TdormCriteria; FreeCriteria: Boolean): T;
 begin
+{$IF CompilerVersion >= 23}
   Result := FindOne(TypeInfo(T), Criteria, FreeCriteria) as T;
+{$ELSE}
+  // There is a bug with generics type and "as" in Delphi XE
+  Result := T(FindOne(TypeInfo(T), Criteria, FreeCriteria));
+{$IFEND}
 end;
 
 function TSession.GetLogger: IdormLogger;
