@@ -1,3 +1,4 @@
+  * New PersistentStrategy to allow use Firebird with Delphi Professional
   * Many to many relations
   * Support for strongly typed collections 
 {{{
