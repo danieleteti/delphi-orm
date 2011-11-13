@@ -1,7 +1,7 @@
 program PersistenceIgnorance;
 
 uses
-  Vcl.Forms,
+  Forms,
   MainForm in 'MainForm.pas' {Form11};
 
 {$R *.res}
