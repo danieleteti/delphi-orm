@@ -3,7 +3,7 @@ unit MainForm;
 interface
 
 uses
-  dorm, dorm.Collections, dorm.Commons,
+  dorm, dorm.Collections, dorm.Commons, Generics.Collections,
   System.SysUtils, System.Types, System.UITypes, System.Classes,
   System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.Layouts, FMX.ListBox,
@@ -59,7 +59,7 @@ type
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
   private
-    People: TdormCollection;
+    People: TObjectList<TPerson>;
     Session: TSession;
     procedure InitializeData;
   public
@@ -71,10 +71,8 @@ var
 
 implementation
 
-uses
-  Generics.Collections;
-
 {$R *.fmx}
+
 
 procedure TForm11.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
@@ -86,9 +84,10 @@ begin
   Session := TSession.CreateConfigured(TStreamReader.Create('dorm.conf'),
     deDevelopment);
 {$REGION 'Insert some data'}
-//   InitializeData;
+  // InitializeData;
 {$ENDREGION}
-  People := Session.ListAll<TPerson>;
+  People := TObjectList<TPerson>.Create;
+  Session.FillList<TPerson>(People);
   BindScopePeople.DataObject := People;
   BindScopePeople.Active := True;
   BindList1.FillList;
@@ -98,8 +97,9 @@ procedure TForm11.InitializeData;
 var
   p: TPerson;
 begin
-  People := NewList;
+  People := TObjectList<TPerson>.Create;
   Session.DeleteAll(TPerson);
+  Session.DeleteAll(TLaptop);
   p := TPerson.Create('Daniele', 'Teti', 32);
   p.Laptops.Add(TLaptop.Create('DELL LATITUDE', 2048, 2));
   p.Laptops.Add(TLaptop.Create('COMPAQ PRESARIO', 2048, 4));
@@ -144,14 +144,15 @@ var
   Criteria: TdormCriteria;
 begin
   BindScopePeople.Active := False;
-  FreeAndNil(People);
   if Edit3.Text = EmptyStr then
-    People := Session.ListAll<TPerson>
+  begin
+    Session.FillList<TPerson>(People);
+  end
   else
   begin
     Criteria := TdormCriteria.NewCriteria('FirstName',
       TdormCompareOperator.Equal, Edit3.Text);
-    People := Session.List<TPerson>(Criteria);
+    Session.FillList<TPerson>(People, Criteria);
   end;
   BindScopePeople.DataObject := People;
   BindScopePeople.Active := True;
@@ -159,9 +160,12 @@ begin
 end;
 
 procedure TForm11.Button5Click(Sender: TObject);
+var
+  p: TPerson;
 begin
   BindScopePerson.Active := False;
-  Session.Delete(People.Extract(BindScopePerson.DataObject));
+  p := BindScopePerson.DataObject as TPerson;
+  Session.Delete(People.Extract(p));
   BindScopePerson.DataObject := nil;
   BindScopePerson.Active := True;
   BindList1.FillList;

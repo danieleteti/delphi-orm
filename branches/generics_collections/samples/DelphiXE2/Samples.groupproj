@@ -9,6 +9,12 @@
 			<Projects Include="persistenceignorance\PersistenceIgnorance.dproj">
 				<Dependencies/>
 			</Projects>
+			<Projects Include="datasnap\server\dsserver.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="datasnap\client\dsclient.dproj">
+				<Dependencies/>
+			</Projects>
 		</ItemGroup>
 		<ProjectExtensions>
 			<Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -35,14 +41,32 @@
 		<Target Name="PersistenceIgnorance:Make">
 			<MSBuild Projects="persistenceignorance\PersistenceIgnorance.dproj" Targets="Make"/>
 		</Target>
+		<Target Name="dsserver">
+			<MSBuild Projects="datasnap\server\dsserver.dproj"/>
+		</Target>
+		<Target Name="dsserver:Clean">
+			<MSBuild Projects="datasnap\server\dsserver.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dsserver:Make">
+			<MSBuild Projects="datasnap\server\dsserver.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dsclient">
+			<MSBuild Projects="datasnap\client\dsclient.dproj"/>
+		</Target>
+		<Target Name="dsclient:Clean">
+			<MSBuild Projects="datasnap\client\dsclient.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dsclient:Make">
+			<MSBuild Projects="datasnap\client\dsclient.dproj" Targets="Make"/>
+		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="ObjectsLists;PersistenceIgnorance"/>
+			<CallTarget Targets="ObjectsLists;PersistenceIgnorance;dsserver;dsclient"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="ObjectsLists:Clean;PersistenceIgnorance:Clean"/>
+			<CallTarget Targets="ObjectsLists:Clean;PersistenceIgnorance:Clean;dsserver:Clean;dsclient:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="ObjectsLists:Make;PersistenceIgnorance:Make"/>
+			<CallTarget Targets="ObjectsLists:Make;PersistenceIgnorance:Make;dsserver:Make;dsclient:Make"/>
 		</Target>
 		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
 	</Project>
