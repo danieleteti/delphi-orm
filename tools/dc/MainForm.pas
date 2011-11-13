@@ -88,6 +88,7 @@ begin
     dbc.GetSQLScript.SaveToFile(outputfilename);
     ShowMessage('Generation completed' + sLineBreak +
       'Output file is located to: ' + outputfilename);
+    dbc.CreateDatabase(CurrentEnv);
   finally
     dbc.Free;
   end;

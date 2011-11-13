@@ -17,11 +17,13 @@ type
     FSQL: TStringList;
     function GetDatabaseFieldDeclaration(const dormFieldMapping
       : TdormFieldMapping): string; virtual; abstract;
+    function EnvDesc(ACurrentEnv: TdormEnvironment): String;
   public
     constructor Create(Session: dorm.TSession);
     procedure Execute; virtual; abstract;
     function GetSQLScript: TStringList;
     destructor Destroy; override;
+    procedure CreateDataBase(CurrentEnv: TdormEnvironment); virtual;
   end;
 
   TdormDBCreatorClass = class of TdormDBCreator;
@@ -51,10 +53,25 @@ begin
   FSQL := TStringList.Create;
 end;
 
+procedure TdormDBCreator.CreateDataBase(CurrentEnv: TdormEnvironment);
+begin
+
+end;
+
 destructor TdormDBCreator.Destroy;
 begin
   FSession.Free;
   inherited;
+end;
+
+function TdormDBCreator.EnvDesc(ACurrentEnv: TdormEnvironment): String;
+begin
+  if ACurrentEnv = TdormEnvironment.deDevelopment then
+    Exit('development');
+  if ACurrentEnv = TdormEnvironment.deTest then
+    Exit('test');
+  if ACurrentEnv = TdormEnvironment.deRelease then
+    Exit('release');
 end;
 
 function TdormDBCreator.GetSQLScript: TStringList;
