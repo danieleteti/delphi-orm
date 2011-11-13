@@ -79,17 +79,9 @@ type
   IList = interface
     ['{2A1BCB3C-17A2-4F8D-B6FB-32B2A1BFE840}']
     function Add(const Value: TObject): Integer;
-    function First: TObject;
-    function Last: TObject;
     procedure Clear;
     function Count: Integer;
-    function Remove(const Value: TObject): Integer;
-    procedure Delete(index: Integer);
-    procedure DeleteRange(AIndex, ACount: Integer);
-    function contains(const Value: TObject): boolean;
-    function IndexOf(const Value: TObject): Integer;
     function GetItem(index: Integer): TObject;
-    procedure SetItem(index: Integer; const Value: TObject);
   end;
 
   IdormPersistStrategy = interface
@@ -124,9 +116,9 @@ type
     procedure SetLogger(ALogger: IdormLogger);
     function RawExecute(SQL: string): Int64;
     function ExecuteAndGetFirst(SQL: string): Int64;
-    function EscapeString(const Value: String): String;
-    function EscapeDate(const Value: TDate): String;
-    function EscapeDateTime(const Value: TDate): String;
+    function EscapeString(const Value: string): string;
+    function EscapeDate(const Value: TDate): string;
+    function EscapeDateTime(const Value: TDate): string;
   end;
 
   IdormKeysGenerator = interface
@@ -154,6 +146,14 @@ type
     property Value: TValue read FValue write SetValue;
     property LogicRelation: TdormLogicRelation read FLogicRelation
       write SetLogicRelation;
+  end;
+
+  IdormDuckTypedList = interface
+    ['{B60AF5A6-7C31-4EAA-8DFB-D8BD3E112EE7}']
+    function Count: Integer;
+    function GetItem(const index: Integer): TObject;
+    procedure Add(const AObject: TObject);
+    procedure Clear;
   end;
 
 function GetPKMappingIndex(const AMapping: TArray<TdormFieldMapping>): Integer;

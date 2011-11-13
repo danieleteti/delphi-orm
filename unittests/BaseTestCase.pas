@@ -80,9 +80,10 @@ begin
 {$ENDIF}
 {$IFNDEF INTERBASE_STRATEGY}
 {$IFNDEF FIREBIRD_STRATEGY}
-{$MESSAGE ERROR '************************************************'}
-{$MESSAGE ERROR '**>>> There are not strategy conditionals defined'}
-{$MESSAGE ERROR '************************************************'}
+{$MESSAGE ERROR '**************************************************'}
+{$MESSAGE ERROR '**>>> There are not strategy conditionals defined '}
+{$MESSAGE ERROR '**>>> You should select a REAL BUILD configuration'}
+{$MESSAGE ERROR '**************************************************'}
 {$ENDIF}
 {$ENDIF}
 end;
