@@ -2,8 +2,14 @@ unit ServerMethodsUnit;
 
 interface
 
-uses System.SysUtils, System.Classes, Datasnap.DSServer, Datasnap.DSAuth, dorm,
-  BusinessObjects, Generics.Collections;
+uses
+  SysUtils,
+  Classes,
+  DSServer,
+  DSAuth,
+  dorm,
+  BusinessObjects,
+  Generics.Collections;
 
 type
 {$METHODINFO ON}
@@ -16,12 +22,12 @@ type
     { Public declarations }
     function EchoString(Value: string): string;
     function ReverseString(Value: string): string;
-    function GetPeople: TObjectList<TPerson>;
+    function GetPeople: TPeople;
     procedure LoadRelations(var APerson: TPerson);
     function LoadPersonByOID(OID: Integer): TPerson;
     function Persist(AObject: TObject): Integer;
     procedure Delete(AObject: TObject);
-    function SearchByName(const AName: String): TObjectList<TPerson>;
+    function SearchByName(const AName: string): TObjectList<TPerson>;
   end;
 {$METHODINFO OFF}
 
@@ -30,7 +36,11 @@ implementation
 {$R *.dfm}
 
 
-uses System.StrUtils, dorm.Commons, dorm.Collections, dorm.Utils;
+uses
+  StrUtils,
+  dorm.Commons,
+  dorm.Collections,
+  dorm.Utils;
 
 procedure TdormServerSample.DataModuleCreate(Sender: TObject);
 begin
@@ -53,9 +63,9 @@ begin
   Result := Value;
 end;
 
-function TdormServerSample.GetPeople: TObjectList<TPerson>;
+function TdormServerSample.GetPeople: TPeople;
 begin
-  Result := TObjectList<TPerson>.Create;
+  Result := TPeople.Create;
   Session.FillList<TPerson>(Result);
 end;
 
@@ -77,10 +87,10 @@ end;
 
 function TdormServerSample.ReverseString(Value: string): string;
 begin
-  Result := System.StrUtils.ReverseString(Value);
+  Result := StrUtils.ReverseString(Value);
 end;
 
-function TdormServerSample.SearchByName(const AName: String)
+function TdormServerSample.SearchByName(const AName: string)
   : TObjectList<TPerson>;
 var
   Criteria: TdormCriteria;

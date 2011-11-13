@@ -3,13 +3,21 @@ unit MainForm;
 interface
 
 uses
-  dorm, dorm.Commons,
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+  dorm,
+  dorm.Commons,
+  Windows,
+  Messages,
+  SysUtils,
+  Variants,
+  Classes,
+  Graphics,
+  Controls,
+  Forms,
+  Dialogs,
+  StdCtrls;
 
 type
-  TButton = class(Vcl.StdCtrls.TButton)
+  TButton = class(StdCtrls.TButton)
   public
     constructor Create; // A parameterless constructor
   end;
@@ -34,6 +42,7 @@ var
 implementation
 
 {$R *.dfm}
+
 
 procedure TForm11.Button1Click(Sender: TObject);
 begin

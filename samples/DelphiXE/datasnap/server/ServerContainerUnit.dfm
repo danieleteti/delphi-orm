@@ -11,10 +11,10 @@ object ServerContainer: TServerContainer
     Top = 11
   end
   object DSTCPServerTransport1: TDSTCPServerTransport
+    PoolSize = 0
     Server = DSServer1
     BufferKBSize = 32
     Filters = <>
-    KeepAliveEnablement = kaDefault
     Left = 96
     Top = 73
   end

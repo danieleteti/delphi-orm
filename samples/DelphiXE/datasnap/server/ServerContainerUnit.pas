@@ -2,11 +2,18 @@ unit ServerContainerUnit;
 
 interface
 
-uses System.SysUtils, System.Classes,
-  Datasnap.DSTCPServerTransport,
-  Datasnap.DSHTTPCommon, Datasnap.DSHTTP,
-  Datasnap.DSServer, Datasnap.DSCommonServer,
-  Datasnap.DSAuth, IndyPeerImpl, BusinessObjects, Generics.Collections, dorm;
+uses
+  SysUtils,
+  Classes,
+  DSTCPServerTransport,
+  DSHTTPCommon,
+  DSHTTP,
+  DSServer,
+  DSCommonServer,
+  DSAuth,
+  BusinessObjects,
+  Generics.Collections,
+  dorm;
 
 type
   TServerContainer = class(TDataModule)
@@ -29,7 +36,10 @@ var
 
 implementation
 
-uses Winapi.Windows, ServerMethodsUnit, dorm.Commons;
+uses
+  Windows,
+  ServerMethodsUnit,
+  dorm.Commons;
 
 {$R *.dfm}
 
@@ -49,10 +59,10 @@ end;
 procedure TServerContainer.InitializeData(Session: TSession);
 var
   p: TPerson;
-  People: TObjectList<TPerson>;
+  People: TPeople;
 begin
   Session.DeleteAll(TPerson);
-  People := TObjectList<TPerson>.Create;
+  People := TPeople.Create;
   try
     p := TPerson.Create('Daniele', 'Teti', 32);
     p.Laptops.Add(TLaptop.Create('DELL LATITUDE', 2048, 2));

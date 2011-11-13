@@ -3,10 +3,10 @@
 			<ProjectGuid>{7401AF9A-7165-4F84-9C05-467E9EEDA1FE}</ProjectGuid>
 		</PropertyGroup>
 		<ItemGroup>
-			<Projects Include="ObjectsLists\ObjectsLists.dproj">
+			<Projects Include="persistenceignorance\PersistenceIgnorance.dproj">
 				<Dependencies/>
 			</Projects>
-			<Projects Include="persistenceignorance\PersistenceIgnorance.dproj">
+			<Projects Include="datasnap\server\datasnapserver.dproj">
 				<Dependencies/>
 			</Projects>
 		</ItemGroup>
@@ -17,15 +17,6 @@
 				<Default.Personality/>
 			</BorlandProject>
 		</ProjectExtensions>
-		<Target Name="ObjectsLists">
-			<MSBuild Projects="ObjectsLists\ObjectsLists.dproj"/>
-		</Target>
-		<Target Name="ObjectsLists:Clean">
-			<MSBuild Projects="ObjectsLists\ObjectsLists.dproj" Targets="Clean"/>
-		</Target>
-		<Target Name="ObjectsLists:Make">
-			<MSBuild Projects="ObjectsLists\ObjectsLists.dproj" Targets="Make"/>
-		</Target>
 		<Target Name="PersistenceIgnorance">
 			<MSBuild Projects="persistenceignorance\PersistenceIgnorance.dproj"/>
 		</Target>
@@ -35,14 +26,23 @@
 		<Target Name="PersistenceIgnorance:Make">
 			<MSBuild Projects="persistenceignorance\PersistenceIgnorance.dproj" Targets="Make"/>
 		</Target>
+		<Target Name="datasnapserver">
+			<MSBuild Projects="datasnap\server\datasnapserver.dproj"/>
+		</Target>
+		<Target Name="datasnapserver:Clean">
+			<MSBuild Projects="datasnap\server\datasnapserver.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="datasnapserver:Make">
+			<MSBuild Projects="datasnap\server\datasnapserver.dproj" Targets="Make"/>
+		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="ObjectsLists;PersistenceIgnorance"/>
+			<CallTarget Targets="PersistenceIgnorance;datasnapserver"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="ObjectsLists:Clean;PersistenceIgnorance:Clean"/>
+			<CallTarget Targets="PersistenceIgnorance:Clean;datasnapserver:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="ObjectsLists:Make;PersistenceIgnorance:Make"/>
+			<CallTarget Targets="PersistenceIgnorance:Make;datasnapserver:Make"/>
 		</Target>
 		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
 	</Project>
