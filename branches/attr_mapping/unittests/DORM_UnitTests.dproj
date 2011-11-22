@@ -81,7 +81,7 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_3_Win32)'!=''">
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-			<DCC_Define>DEBUG;FIREBIRD_STRATEGY;$(DCC_Define)</DCC_Define>
+			<DCC_Define>DEBUG;FIREBIRD_STRATEGY;madExcept;$(DCC_Define)</DCC_Define>
 			<VerInfo_Locale>1033</VerInfo_Locale>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
@@ -117,6 +117,8 @@
 			<DCCReference Include="..\source\dorm.adapter.DBExpress.Factory.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Firebird.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Interbase.pas"/>
+			<DCCReference Include="..\source\dorm.Mappings.pas"/>
+			<DCCReference Include="TestMappings.pas"/>
 			<BuildConfiguration Include="FIREBIRD_STRATEGY">
 				<Key>Cfg_3</Key>
 				<CfgParent>Base</CfgParent>
