@@ -462,7 +462,7 @@ begin
   try
     if Coll.Count > 1 then
       raise EdormException.CreateFmt
-        ('FindOne MUST return one, and only one, record. Returned %d instead',
+        ('FindOne MUST return zero or one record. Returned %d instead',
         [Coll.Count]);
     if Coll.Count = 1 then
       Result := Coll.Extract(0);
@@ -473,20 +473,8 @@ begin
 end;
 
 function TSession.FindOne<T>(Criteria: TdormCriteria; FreeCriteria: Boolean): T;
-var
-  Coll: TdormCollection;
 begin
-  Coll := List<T>(Criteria, FreeCriteria);
-  try
-    if Coll.Count <> 1 then
-      raise EdormException.CreateFmt
-        ('FindOne MUST return one, and only one, record. Returned %d instead',
-        [Coll.Count]);
-    Result := T(Coll.Extract(0));
-    // Non posso usare "as" per un buig nel compilatore :-(
-  finally
-    Coll.Free;
-  end;
+  Result := T(FindOne(TypeInfo(T), Criteria, FreeCriteria));
 end;
 
 function TSession.GetLogger: IdormLogger;
