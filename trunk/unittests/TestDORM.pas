@@ -35,6 +35,9 @@ type
     procedure TestCRUDAndFree;
     procedure TestUOW;
     procedure TestDormObject;
+    procedure TestFindOne;
+    procedure TestFindOneNoObject;
+    procedure TestFindOneManyObjects;
   end;
 
 implementation
@@ -42,7 +45,14 @@ implementation
 uses
   Classes,
   SysUtils,
+  Rtti,
   dorm.Commons, dorm.tests.bo, dorm.UOW;
+
+function FirstNameIs(const FirstName: String): TdormCriteria;
+begin
+  Result := TdormCriteria.Create;
+  Result.Add('FirstName', Equal, TValue.From(FirstName));
+end;
 
 { TTestDORM }
 
@@ -156,6 +166,95 @@ begin
         CheckTrue(E.ClassName = 'EdormException');
       end;
     end;
+  finally
+    p.Free;
+  end;
+end;
+
+procedure TTestDORM.TestFindOne;
+var
+  p: TPerson;
+begin
+  p := TPerson.NewPerson;
+  try
+    Session.Save(p);
+    Session.Commit;
+  finally
+    p.Free;
+  end;
+
+  p := Session.FindOne(TypeInfo(TPerson), FirstNameIs('Daniele')) as TPerson;
+  try
+    CheckNotNull(p, 'Didn''t find the object');
+  finally
+    p.Free;
+  end;
+
+  p := Session.FindOne<TPerson>(FirstNameIs('Daniele'));
+  try
+    CheckNotNull(p, 'Didn''t find the object');
+  finally
+    p.Free;
+  end;
+end;
+
+procedure TTestDORM.TestFindOneManyObjects;
+var
+  p: TPerson;
+begin
+  p := TPerson.NewPerson;
+  try
+    Session.Save(p);
+  finally
+    p.Free;
+  end;
+
+  p := TPerson.NewPerson;
+  try
+    Session.Save(p);
+  finally
+    p.Free;
+  end;
+
+  Session.Commit;
+
+  try
+    Session.FindOne(TypeInfo(TPerson), FirstNameIs('Daniele'));
+    Fail('TSession.FindOne must raise an EdormException when more than one object is found');
+  except
+    on EdormException do CheckTrue(True);
+  end;
+
+  try
+    Session.FindOne<TPerson>(FirstNameIs('Daniele'));
+    Fail('TSession.FindOne must raise an EdormException when more than one object is found');
+  except
+    on EdormException do CheckTrue(True);
+  end;
+end;
+
+procedure TTestDORM.TestFindOneNoObject;
+var
+  p: TPerson;
+begin
+  p := TPerson.NewPerson;
+  try
+    Session.Save(p);
+    Session.Commit;
+  finally
+    p.Free;
+  end;
+
+  p := Session.FindOne(TypeInfo(TPerson), FirstNameIs('SomeOneThatDoesntExist')) as TPerson;
+  try
+    CheckNull(p, 'TSession.FindOne should return nil then no object is found');
+  finally
+    p.Free;
+  end;
+
+  p := Session.FindOne<TPerson>(FirstNameIs('SomeOneThatDoesntExist'));
+  try
+    CheckNull(p, 'TSession.FindOne should return nil then no object is found');
   finally
     p.Free;
   end;
