@@ -6,6 +6,11 @@ program DORM_UnitTests;
 
 uses
   FastMM4,
+  madExcept,
+  madLinkDisAsm,
+  madListHardware,
+  madListProcesses,
+  madListModules,
   Forms,
   TestFramework,
   GUITestRunner,
@@ -31,7 +36,9 @@ uses
   dorm.loggers.CodeSite in '..\source\dorm.loggers.CodeSite.pas',
   dorm.adapter.DBExpress.Factory in '..\source\dorm.adapter.DBExpress.Factory.pas',
   dorm.adapter.Firebird in '..\source\dorm.adapter.Firebird.pas',
-  dorm.adapter.Interbase in '..\source\dorm.adapter.Interbase.pas';
+  dorm.adapter.Interbase in '..\source\dorm.adapter.Interbase.pas',
+  dorm.Mappings in '..\source\dorm.Mappings.pas',
+  TestMappings in 'TestMappings.pas';
 
 {$R *.RES}
 
