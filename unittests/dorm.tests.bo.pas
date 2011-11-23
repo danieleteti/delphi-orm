@@ -67,7 +67,7 @@ type
     property Value: String read FValue write SetValue;
   end;
 
-  [Entity('PERSON')]
+  [Entity('TABLE_PERSON')]
   TPerson = class
   private
     FLastName: string;
@@ -95,8 +95,9 @@ type
     destructor Destroy; override;
     function ToString: string; override;
     class function NewPerson: TPerson;
+    [PrimaryKey]
     property ID: Integer read FID write SetID;
-    [Column('FIRSTNAME')]
+    [Column('COLUMN_FIRSTNAME')]
     property FirstName: string read FFirstName write SetFirstName;
     property LastName: string read FLastName write SetLastName;
     property Age: Int32 read FAge write SetAge;

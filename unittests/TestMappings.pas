@@ -67,6 +67,19 @@ type
   published
     procedure TestTableName;
     procedure TestFieldName;
+    procedure TestPKPropertyName;
+  end;
+
+  TCoCMappingStrategyTests = class(TMappingStrategyBaseTestCase)
+  private
+    FMapping: IMappingStrategy;
+  protected
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    procedure TestTableName;
+    procedure TestFieldName;
+    procedure TestPKPropertyName;
   end;
 
 implementation
@@ -234,10 +247,44 @@ end;
 
 procedure TAttributesMappingStrategyTests.TestFieldName;
 begin
-  CheckEquals('FIRSTNAME', FMapping.FieldName(FFirstNameProperty));
+  CheckEquals('COLUMN_FIRSTNAME', FMapping.FieldName(FFirstNameProperty));
+end;
+
+procedure TAttributesMappingStrategyTests.TestPKPropertyName;
+begin
+  CheckEquals('ID', FMapping.PKPropertyName(FPersonType));
 end;
 
 procedure TAttributesMappingStrategyTests.TestTableName;
+begin
+  CheckEquals('TABLE_PERSON', FMapping.TableName(FPersonType));
+end;
+
+{ TCoCMappingStrategyTests }
+
+procedure TCoCMappingStrategyTests.SetUp;
+begin
+  inherited;
+  FMapping := TCoCMappingStrategy.Create;
+end;
+
+procedure TCoCMappingStrategyTests.TearDown;
+begin
+  inherited;
+  FMapping := Nil;
+end;
+
+procedure TCoCMappingStrategyTests.TestFieldName;
+begin
+  CheckEquals('FIRSTNAME', FMapping.FieldName(FFirstNameProperty));
+end;
+
+procedure TCoCMappingStrategyTests.TestPKPropertyName;
+begin
+  CheckEquals('', FMapping.PKPropertyName(FPersonType));
+end;
+
+procedure TCoCMappingStrategyTests.TestTableName;
 begin
   CheckEquals('PERSON', FMapping.TableName(FPersonType));
 end;
@@ -245,5 +292,6 @@ end;
 initialization
 RegisterTest(TDelegateMappingStrategyTests.Suite);
 RegisterTest(TAttributesMappingStrategyTests.Suite);
+RegisterTest(TCoCMappingStrategyTests.Suite);
 
 end.
