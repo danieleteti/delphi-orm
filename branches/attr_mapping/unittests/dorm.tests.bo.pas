@@ -22,7 +22,8 @@ interface
 
 uses
   dorm.Commons, dorm.Collections, dorm.InterposedObject,
-  {$IFDEF VER210}System.{$ENDIF}Classes;
+  {$IFDEF VER210}System.{$ENDIF}Classes,
+  dorm.Mappings;
 
 type
   TPerson = class;
@@ -66,6 +67,7 @@ type
     property Value: String read FValue write SetValue;
   end;
 
+  [Entity('PERSON')]
   TPerson = class
   private
     FLastName: string;
@@ -94,6 +96,7 @@ type
     function ToString: string; override;
     class function NewPerson: TPerson;
     property ID: Integer read FID write SetID;
+    [Column('FIRSTNAME')]
     property FirstName: string read FFirstName write SetFirstName;
     property LastName: string read FLastName write SetLastName;
     property Age: Int32 read FAge write SetAge;

@@ -35,13 +35,20 @@ type
     procedure SetTableNameDelegate(const Value: TTableNameDelegate);
   end;
 
-  TDelegateMappingStrategyTests = class(TTestCase)
-  private
-    FDelegate: IMappingStrategy;
-    FMapping1, FMapping2: IFakeMappingStrategy;
+  TMappingStrategyBaseTestCase = class(TTestCase)
+  protected
     FContext: TRttiContext;
     FPersonType: TRttiType;
     FFirstNameProperty: TRttiProperty;
+  protected
+    procedure SetUp; override;
+    procedure TearDown; override;
+  end;
+
+  TDelegateMappingStrategyTests = class(TMappingStrategyBaseTestCase)
+  private
+    FDelegate: IMappingStrategy;
+    FMapping1, FMapping2: IFakeMappingStrategy;
   protected
     procedure TearDown; override;
     procedure SetUp; override;
@@ -49,6 +56,17 @@ type
     procedure TestTableName;
     procedure TestFieldName;
     procedure TestPKPropertyName;
+  end;
+
+  TAttributesMappingStrategyTests = class(TMappingStrategyBaseTestCase)
+  private
+    FMapping: IMappingStrategy;
+  protected
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    procedure TestTableName;
+    procedure TestFieldName;
   end;
 
 implementation
@@ -99,15 +117,11 @@ begin
   FMapping1 := TFakeMappingStrategy.Create;
   FMapping2 := TFakeMappingStrategy.Create;
   FDelegate := TDelegateMappingStrategy.Create([FMapping1, FMapping2]);
-  FContext := TRttiContext.Create;
-  FPersonType := FContext.GetType(TPerson);
-  FFirstNameProperty := FPersonType.GetProperty('FirstName');
 end;
 
 procedure TDelegateMappingStrategyTests.TearDown;
 begin
   inherited;
-  FContext.Free;
   FDelegate := Nil;
   FMapping2 := Nil;
   FMapping1 := Nil;
@@ -188,7 +202,48 @@ begin
   CheckEquals('B', FDelegate.TableName(FPersonType));
 end;
 
+{ TMappingStrategyBaseTestCase }
+
+procedure TMappingStrategyBaseTestCase.SetUp;
+begin
+  inherited;
+  FContext := TRttiContext.Create;
+  FPersonType := FContext.GetType(TPerson);
+  FFirstNameProperty := FPersonType.GetProperty('FirstName');
+end;
+
+procedure TMappingStrategyBaseTestCase.TearDown;
+begin
+  inherited;
+  FContext.Free;
+end;
+
+{ TAttributesMappingStrategyTests }
+
+procedure TAttributesMappingStrategyTests.SetUp;
+begin
+  inherited;
+  FMapping := TAttributesMappingStrategy.Create;
+end;
+
+procedure TAttributesMappingStrategyTests.TearDown;
+begin
+  inherited;
+  FMapping := Nil;
+end;
+
+procedure TAttributesMappingStrategyTests.TestFieldName;
+begin
+  CheckEquals('FIRSTNAME', FMapping.FieldName(FFirstNameProperty));
+end;
+
+procedure TAttributesMappingStrategyTests.TestTableName;
+begin
+  CheckEquals('PERSON', FMapping.TableName(FPersonType));
+end;
+
 initialization
 RegisterTest(TDelegateMappingStrategyTests.Suite);
+RegisterTest(TAttributesMappingStrategyTests.Suite);
 
 end.
