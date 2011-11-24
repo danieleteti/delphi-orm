@@ -1,6 +1,6 @@
   * New PersistentStrategy to allow use Firebird with Delphi Professional
   * Many to many relations
-  * Support for strongly typed collections 
+  * Support for strongly typed collections - *Branch/Testing*
 {{{
 TPerson = class(Tobject)
   ...
@@ -8,7 +8,7 @@ TPerson = class(Tobject)
   ...
 end;
 }}}
-  * Differents Mapping Strategies (File, Atributtes, Convencion) *Branch/Testing*
+  * Differents Mapping Strategies (File, Atributtes, Convencion) - *Branch/Testing*
   * Per-Object custom mappers
   * More databases support
   * MySQL, Oracle, SQLite, MSSQLServer, ??
