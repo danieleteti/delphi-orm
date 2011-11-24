@@ -63,7 +63,7 @@
 			<DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
 			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 			<DCC_DebugDCUs>true</DCC_DebugDCUs>
-			<DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\lib\fastmm;..\lib\superobject;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\lib\fastmm;..\lib\superobject;..\lib\sqlitewrap\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_DependencyCheckOutputName>DORM_UnitTests.exe</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_Optimize>false</DCC_Optimize>
@@ -102,9 +102,12 @@
 			<VerInfo_Locale>1033</VerInfo_Locale>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_Define>SQLITE3_STRATEGY;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-			<DCC_Define>DEBUG;SQLITE3_STRATEGY;$(DCC_Define)</DCC_Define>
+			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 			<VerInfo_Locale>1033</VerInfo_Locale>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
@@ -134,6 +137,7 @@
 			<DCCReference Include="..\source\dorm.adapter.DBExpress.Factory.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Firebird.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Interbase.pas"/>
+			<DCCReference Include="..\source\dorm.adapter.Sqlite3.pas"/>
 			<BuildConfiguration Include="INTERBASE_STRATEGY">
 				<Key>Cfg_4</Key>
 				<CfgParent>Base</CfgParent>

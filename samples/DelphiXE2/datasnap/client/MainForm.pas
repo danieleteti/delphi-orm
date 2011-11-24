@@ -106,7 +106,6 @@ procedure TfrmClientMain.Button3Click(Sender: TObject);
 begin
   People[ListBox1.ItemIndex].ID :=
     ClientProxy.dormServerSampleClient.Persist(BindScopePerson.DataObject);
-  ShowMessage(inttostr(People[ListBox1.ItemIndex].ID));
   BindList1.FillList;
 end;
 
@@ -174,11 +173,8 @@ begin
     PersonOID := People[ListBox1.ItemIndex].ID;
     BindScopePerson.Active := False;
     BindScopeLaptops.Active := False;
-    // if Assigned(BindScopePerson.DataObject) then
-    // BindScopePerson.DataObject.Free;
     FreeAndNil(Person);
     Person := ClientProxy.dormServerSampleClient.LoadPersonByOID(PersonOID);
-    Caption := inttostr(People[ListBox1.ItemIndex].ID);
     BindScopePerson.DataObject := Person; // People[ListBox1.ItemIndex];
     BindScopeLaptops.DataObject := Person.Laptops;
     BindScopePerson.Active := True;
