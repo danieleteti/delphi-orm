@@ -12,7 +12,7 @@ end;
   * Per-Object custom mappers
   * More databases support
     * MySQL
-    * Oracle, ??
+    * Oracle
     * SQLite - *Branch/Testing*
     * MSSQLServer - *Branch/Testing*
   * File based (not SQL) supports
