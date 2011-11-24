@@ -1,5 +1,6 @@
   * New PersistentStrategy to allow use Firebird with Delphi Professional
   * Many to many relations
+  * Automatic optimistic locking through object versioning
   * Support for strongly typed collections - *Branch/Testing*
 {{{
 TPerson = class(Tobject)
