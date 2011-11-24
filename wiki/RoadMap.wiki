@@ -8,6 +8,7 @@ TPerson = class(Tobject)
   ...
 end;
 }}}
+  * Differents Mapping Strategies (File, Atributtes, Convencion) *Branch/Testing*
   * Per-Object custom mappers
   * More databases support
   * MySQL, Oracle, SQLite, MSSQLServer, ??
