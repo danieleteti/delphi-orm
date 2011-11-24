@@ -78,15 +78,17 @@ begin
 {$IFDEF FIREBIRD_STRATEGY}
   Result := 'dorm_firebird.conf';
 {$ENDIF}
-{$IFDEF FIREBIRD_STRATEGY}
+{$IFDEF SQLITE3_STRATEGY}
   Result := 'dorm_sqlite3.conf';
 {$ENDIF}
 {$IFNDEF INTERBASE_STRATEGY}
 {$IFNDEF FIREBIRD_STRATEGY}
+{$IFNDEF SQLITE3_STRATEGY}
 {$MESSAGE ERROR '**************************************************'}
 {$MESSAGE ERROR '**>>> There are not strategy conditionals defined '}
 {$MESSAGE ERROR '**>>> You should select a REAL BUILD configuration'}
 {$MESSAGE ERROR '**************************************************'}
+{$ENDIF}
 {$ENDIF}
 {$ENDIF}
 end;
