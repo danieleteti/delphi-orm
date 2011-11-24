@@ -8,14 +8,19 @@ TPerson = class(Tobject)
   ...
 end;
 }}}
-  * Differents Mapping Strategies (File, Atributtes, Convencion) - *Branch/Testing*
+  * Differents Mapping Strategies (File, Attributes, Convention) - *Branch/Testing*
   * Per-Object custom mappers
   * More databases support
-  * MySQL, Oracle, SQLite, MSSQLServer, ??
+    * MySQL
+    * Oracle, ??
+    * SQLite - *Branch/Testing*
+    * MSSQLServer - *Branch/Testing*
   * File based (not SQL) supports
-  * JSON, CSV, XML, ??
+    * JSON
+    * CSV
+    * XML
   * More tools
-  * Create config file from existing databases
-  * Create objects from config file
+    * Create config file from existing databases
+    * Create classes from config file
   * Demos, demos, demos
   * Build a strong community
