@@ -1,0 +1,375 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+<meta name="GENERATOR" content="PasDoc 0.9.0">
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<title>SQLiteWrap: Class TSQLiteDatabase</title>
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000ff" vlink="#800080" alink="#FF0000">
+<a name="TSQLiteDatabase"></a><h1 class="cio">Class TSQLiteDatabase</h1>
+<table class="sections">
+<tr>
+<td><a class="section"  href="#@Description">Description</a></td><td><a class="section"  href="#@Hierarchy">Hierarchy</a></td><td>Fields</td><td><a class="section"  href="#@Methods">Methods</a></td><td><a class="section"  href="#@Properties">Properties</a></td></tr></table>
+<a name="@Description"></a><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a   href="SQLiteWrap.html">SQLiteWrap</a></p>
+<h2 class="declaration">Declaration</h2>
+<p class="declaration">
+<code>type TSQLiteDatabase = class(TObject)</code></p>
+<h2 class="description">Description</h2>
+<p>
+Class for handling SQLite database</p>
+<a name="@Hierarchy"></a><h2 class="hierarchy">Hierarchy</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="thisitem">TSQLiteDatabase</li></ul><h2 class="overview">Overview</h2>
+<a name="@Methods"></a><h3 class="summary">Methods</h3>
+<table class="summary">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>constructor <b><a   href="SQLiteWrap.TSQLiteDatabase.html#Create">Create</a></b>(const FileName: String);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>destructor <b><a   href="SQLiteWrap.TSQLiteDatabase.html#Destroy">Destroy</a></b>; override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#ExecSQL">ExecSQL</a></b>(const SQL : String);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteDatabase.html#GetTable">GetTable</a></b>(const SQL: String; PrepareOnly: Boolean = false): <a   href="SQLiteWrap.TSQLiteTable.html">TSQLiteTable</a>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteDatabase.html#GetTableValue">GetTableValue</a></b>(const SQL: String): int64;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteDatabase.html#GetTableString">GetTableString</a></b>(const SQL: String): String;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#GetTableStrings">GetTableStrings</a></b>(const SQL: String; const Value: TStrings);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteDatabase.html#InTransaction">InTransaction</a></b>: Boolean;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#Start">Start</a></b>(const name:String; const param: String = '');</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#Commit">Commit</a></b>(const name:String);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#Rollback">Rollback</a></b>(const name:String);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteDatabase.html#LastInsertRowID">LastInsertRowID</a></b>: int64;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteDatabase.html#LastChangedRows">LastChangedRows</a></b>: int64;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteDatabase.html#TotalChanges">TotalChanges</a></b>: int64;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#SetTimeout">SetTimeout</a></b>(Value: integer);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteDatabase.html#Version">Version</a></b>: String;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#AddCustomCollate">AddCustomCollate</a></b>(name: String; xCompare: TCollateXCompare);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>Procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#AddSystemCollate">AddSystemCollate</a></b>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#ParamsClear">ParamsClear</a></b>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#AddParamInt">AddParamInt</a></b>(const name: String; value: int64);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#AddParamFloat">AddParamFloat</a></b>(const name: String; value: double);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#AddParamText">AddParamText</a></b>(const name: String; const value: String);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#AddParamNull">AddParamNull</a></b>(const name: String);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#AddParamBlobPtr">AddParamBlobPtr</a></b>(const name: String; buffer: pointer; len: integer);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#AddParamBlobText">AddParamBlobText</a></b>(const name: String; const value: AnsiString);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteDatabase.html#AddParamBlob">AddParamBlob</a></b>(const name: String; const value: TStream; len: integer);</code></td>
+</tr>
+</table>
+<a name="@Properties"></a><h3 class="summary">Properties</h3>
+<table class="summary">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a   href="SQLiteWrap.TSQLiteDatabase.html#DB">DB</a></b>: TSQLiteDB read fDB;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a   href="SQLiteWrap.TSQLiteDatabase.html#OnQuery">OnQuery</a></b>: <a   href="SQLiteWrap.html#THookQuery">THookQuery</a> read FOnQuery write FOnQuery;</code></td>
+</tr>
+</table>
+<h2 class="description">Description</h2>
+<h3 class="detail">Methods</h3>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Create"></a><code>constructor <b>Create</b>(const FileName: String);</code></td>
+</tr>
+</table>
+<p>
+Class constructor. Pass filename of database. If databas not exists, then new one is created. If you pass empty string as filename, then temporary database is created. If you pass ':memory:' as filename, then temporary database in memory is created.
+
+<p>Warning: Pass FileName as AnsiString (if you are not using Unicode Delphi version) or as UnicodeString (on Delphi 2009 and higher)!</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Destroy"></a><code>destructor <b>Destroy</b>; override;</code></td>
+</tr>
+</table>
+<p>
+Class descructor. Call Free instead.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="ExecSQL"></a><code>procedure <b>ExecSQL</b>(const SQL : String);</code></td>
+</tr>
+</table>
+<p>
+Run SQL command without result. You can call before functions AddParam* for set query parameters.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="GetTable"></a><code>function <b>GetTable</b>(const SQL: String; PrepareOnly: Boolean = false): <a   href="SQLiteWrap.TSQLiteTable.html">TSQLiteTable</a>;</code></td>
+</tr>
+</table>
+<p>
+Run SQL command with result. You can call before functions AddParam* for set query parameters. If you set PerpareOnly, then query is just prepared but first row is not fetched!</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="GetTableValue"></a><code>function <b>GetTableValue</b>(const SQL: String): int64;</code></td>
+</tr>
+</table>
+<p>
+Run SQL command and number from first field in first row is returned. You can call before functions AddParam* for set query parameters.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="GetTableString"></a><code>function <b>GetTableString</b>(const SQL: String): String;</code></td>
+</tr>
+</table>
+<p>
+Run SQL command and value from first field in first row is returned. You can call before functions AddParam* for set query parameters.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="GetTableStrings"></a><code>procedure <b>GetTableStrings</b>(const SQL: String; const Value: TStrings);</code></td>
+</tr>
+</table>
+<p>
+Run SQL command and values from first field in each row is filled to stringlist. You can call before functions AddParam* for set query parameters.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="InTransaction"></a><code>function <b>InTransaction</b>: Boolean;</code></td>
+</tr>
+</table>
+<p>
+Return <code>True</code> if database is in transaction state.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Start"></a><code>procedure <b>Start</b>(const name:String; const param: String = '');</code></td>
+</tr>
+</table>
+<p>
+Start transaction. You can modify transaction type by Param parameter. If you use non-empty Name parameter, then savepoint is used. Savepoint is named and can be nested.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Commit"></a><code>procedure <b>Commit</b>(const name:String);</code></td>
+</tr>
+</table>
+<p>
+Commit transaction. If you use non-empty Name parameter, then savepoint is used. Savepoint is named and can be nested.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Rollback"></a><code>procedure <b>Rollback</b>(const name:String);</code></td>
+</tr>
+</table>
+<p>
+Rollback transaction. If you use non-empty Name parameter, then savepoint is used. Savepoint is named and can be nested.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="LastInsertRowID"></a><code>function <b>LastInsertRowID</b>: int64;</code></td>
+</tr>
+</table>
+<p>
+Get ROWID of last inserted row.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="LastChangedRows"></a><code>function <b>LastChangedRows</b>: int64;</code></td>
+</tr>
+</table>
+<p>
+Return number of modified rows by last query.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="TotalChanges"></a><code>function <b>TotalChanges</b>: int64;</code></td>
+</tr>
+</table>
+<p>
+Return number of modified rows starting by opened database connection.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="SetTimeout"></a><code>procedure <b>SetTimeout</b>(Value: integer);</code></td>
+</tr>
+</table>
+<p>
+Set wait timeout. if database is locked, then it wait this timeout. If database is not released within this timeout, then error is returned.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Version"></a><code>function <b>Version</b>: String;</code></td>
+</tr>
+</table>
+<p>
+Return SQLite engine version.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddCustomCollate"></a><code>procedure <b>AddCustomCollate</b>(name: String; xCompare: TCollateXCompare);</code></td>
+</tr>
+</table>
+<p>
+Add custom sorting procedure as new Collate.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddSystemCollate"></a><code>Procedure <b>AddSystemCollate</b>;</code></td>
+</tr>
+</table>
+<p>
+Add collate named SYSTEM for correct data sorting by user's locale</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="ParamsClear"></a><code>procedure <b>ParamsClear</b>;</code></td>
+</tr>
+</table>
+<p>
+Clear all query parameters.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamInt"></a><code>procedure <b>AddParamInt</b>(const name: String; value: int64);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of integer type.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamFloat"></a><code>procedure <b>AddParamFloat</b>(const name: String; value: double);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of floating-point type.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamText"></a><code>procedure <b>AddParamText</b>(const name: String; const value: String);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of string or binary type.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamNull"></a><code>procedure <b>AddParamNull</b>(const name: String);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter with null value.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamBlobPtr"></a><code>procedure <b>AddParamBlobPtr</b>(const name: String; buffer: pointer; len: integer);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of BLOB type from the memory buffer.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamBlobText"></a><code>procedure <b>AddParamBlobText</b>(const name: String; const value: AnsiString);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of BLOB type from the binary string.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamBlob"></a><code>procedure <b>AddParamBlob</b>(const name: String; const value: TStream; len: integer);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of BLOB type from the stream.</p>
+<h3 class="detail">Properties</h3>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="DB"></a><code>property <b>DB</b>: TSQLiteDB read fDB;</code></td>
+</tr>
+</table>
+<p>
+SQLite database handler.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="OnQuery"></a><code>property <b>OnQuery</b>: <a   href="SQLiteWrap.html#THookQuery">THookQuery</a> read FOnQuery write FOnQuery;</code></td>
+</tr>
+</table>
+<p>
+Debug hook for log all called queries.</p>
+<hr noshade size="1"><span class="appinfo"><em>Generated by <a  target="_parent" href="http://pasdoc.sourceforge.net/">PasDoc 0.9.0</a> on 2011-02-22 18:17:15</em>
+</span>
+</body></html>
