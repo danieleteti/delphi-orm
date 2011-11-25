@@ -91,6 +91,8 @@ type
     FLogger: IdormLogger;
     FEnvironment: TdormEnvironment;
     EnvironmentNames: TArray<string>;
+    // TODO: Rename to FMapping after the ISuperObject FMapping is removed
+    FMappingStrategy: IMappingStrategy;
     procedure DoOnAfterLoad(AObject: TObject);
     procedure DoOnBeforeDelete(AObject: TObject);
     procedure DoOnBeforeUpdate(AObject: TObject);
@@ -228,12 +230,28 @@ procedure TSession.Configure(TextReader: TTextReader; const CustomMapping: IMapp
 var
   s: string;
   Mappings: TArray<IMappingStrategy>;
+  CustomMappingCount: Integer;
 begin
   try
     s := TextReader.ReadToEnd;
   finally
     TextReader.Free;
   end;
+
+  if Assigned(CustomMapping) then
+    CustomMappingCount := 1
+  else
+    CustomMappingCount := 0;
+
+  SetLength(Mappings, CustomMappingCount + 2);
+  if Assigned(CustomMapping) then
+    Mappings[0] := CustomMapping;
+  Mappings[CustomMappingCount] := TAttributesMappingStrategy.Create;
+  Mappings[CustomMappingCount + 1] := TCoCMappingStrategy.Create;
+
+  FMappingStrategy := TDelegateMappingStrategy(Mappings);
+
+
   try
     FMapping := TSuperObject.ParseString(pwidechar(s), true);
     if not assigned(FMapping) then
