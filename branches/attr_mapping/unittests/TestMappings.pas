@@ -39,6 +39,7 @@ type
   protected
     FContext: TRttiContext;
     FPersonType: TRttiType;
+    FCarType: TRttiType;
     FFirstNameProperty: TRttiProperty;
   protected
     procedure SetUp; override;
@@ -236,6 +237,8 @@ begin
   FContext := TRttiContext.Create;
   FPersonType := FContext.GetType(TPerson);
   FFirstNameProperty := FPersonType.GetProperty('FirstName');
+
+  FCarType := FContext.GetType(TCar);
 end;
 
 procedure TMappingStrategyBaseTestCase.TearDown;
@@ -271,6 +274,8 @@ end;
 procedure TAttributesMappingStrategyTests.TestTableName;
 begin
   CheckEquals('TABLE_PERSON', FMapping.TableName(FPersonType));
+
+  CheckEquals('', FMapping.TableName(FCarType), 'If the class don''t have the [Entity] attribute, table name should be empty');
 end;
 
 { TCoCMappingStrategyTests }
