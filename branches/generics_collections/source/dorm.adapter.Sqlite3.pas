@@ -37,28 +37,25 @@ uses
 type
   TSqlite3PersistStrategy = class(TdormInterfacedObject, IdormPersistStrategy)
   strict protected
+    FFormatSettings: TFormatSettings;
     DB: TSQLiteDatabase;
     FLogger: IdormLogger;
-    FKeysGeneratorClassName: string;
-    FKeysGenerator: IdormKeysGenerator;
+    // FKeysGeneratorClassName: string;  //not supported
+    // FKeysGenerator: IdormKeysGenerator; //not supported
     FKeyType: TdormKeyType;
     FNullKeyValue: TValue;
     FLastInsertOID: TValue;
-    // function CreateDBXFactory(Conf: ISuperObject): TDBXFactory; virtual;
+    procedure InitFormatSettings;
     function CreateObjectFromSqliteTable(ARttiType: TRttiType;
       AReader: TSqliteTable; AFieldsMapping: TArray<TdormFieldMapping>)
       : TObject;
-    // function LoadObjectFromDBXReader(ARttiType: TRttiType; AReader: TDBXReader;
-    // AFieldsMapping: TArray<TdormFieldMapping>; AObject: TObject): Boolean;
     function GetLogger: IdormLogger;
     procedure SetSqlite3ParameterValue(ADB: TSQLiteDatabase;
       aFieldType: string;
       aParameterName: String; aValue: TValue);
   public
-    // function GenerateAndFillPrimaryKeyParam(PKParam: TDBXParameter;
-    // const Entity: string): TValue; overload;
-    function FillPrimaryKeyParam(ATable: TSqliteTable;
-      AParamName: String; const Value: TValue): TValue;
+    function FillPrimaryKeyParam(ADB: TSQLiteDatabase;
+      AParamName: String; const Value: TValue): TValue; overload;
     function EscapeString(const Value: String): String;
     function EscapeDate(const Value: TDate): String;
     function EscapeDateTime(const Value: TDate): String;
@@ -118,52 +115,37 @@ uses
 function TSqlite3PersistStrategy.Update(ARttiType: TRttiType;
   AObject: TObject;
   ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>): TValue;
-// var
-// field: TdormFieldMapping;
-// SQL: string;
-// Query: TDBXCommand;
-// I, pk_idx: Integer;
-// v: TValue;
-// sql_fields_names: string;
-// pk_field: string;
+var
+  field: TdormFieldMapping;
+  SQL: string;
+  I, pk_idx: Integer;
+  v: TValue;
+  sql_fields_names: string;
+  pk_field: string;
 begin
-  // sql_fields_names := '';
-  // for field in AFieldsMapping do
-  // if not field.pk then
-  // sql_fields_names := sql_fields_names + ',"' + field.field + '" = ?';
-  // System.Delete(sql_fields_names, 1, 1);
-  //
-  // pk_field := AFieldsMapping[GetPKMappingIndex(AFieldsMapping)].field;
-  // SQL := Format('UPDATE %S SET %S WHERE %S = ?', [ATableName, sql_fields_names,
-  // pk_field]);
-  //
-  // GetLogger.Debug(AFieldsMapping[GetPKMappingIndex(AFieldsMapping)].field);
-  //
-  // GetLogger.Debug('PREPARING: ' + SQL);
-  // Query := FB.Prepare(SQL);
-  // try
-  // I := 0;
-  // for field in AFieldsMapping do
-  // begin
-  // v := TdormUtils.GetField(AObject, field.name);
-  //
-  // if field.pk then
-  // Continue
-  // else
-  // begin
-  // SetDBXParameterValue(field.field_type, Query.Parameters[I], v);
-  // end;
-  // inc(I);
-  // end;
-  // pk_idx := GetPKMappingIndex(AFieldsMapping);
-  //
-  // v := ARttiType.GetProperty(AFieldsMapping[pk_idx].name).GetValue(AObject);
-  // FillPrimaryKeyParam(Query.Parameters[I], v);
-  // GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
-  // FB.Execute(Query);
-  // finally
-  // Query.Free;
-  // end;
+  sql_fields_names := '';
+  for field in AFieldsMapping do
+    if not field.pk then
+      sql_fields_names := sql_fields_names + ',"' + field.field + '" = :' +
+        field.field;
+  System.Delete(sql_fields_names, 1, 1);
+
+  pk_field := AFieldsMapping[GetPKMappingIndex(AFieldsMapping)].field;
+  SQL := Format('UPDATE %S SET %S WHERE "%S" = :%S',
+    [ATableName, sql_fields_names,
+    pk_field, pk_field]);
+
+  GetLogger.Debug(AFieldsMapping[GetPKMappingIndex(AFieldsMapping)].field);
+  DB.ParamsClear;
+  GetLogger.Debug('PREPARING: ' + SQL);
+  for field in AFieldsMapping do
+  begin
+    v := TdormUtils.GetField(AObject, field.name);
+    SetSqlite3ParameterValue(DB, field.field_type, ':' + field.field, v);
+  end;
+  GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
+  DB.ExecSQL(SQL);
+  DB.ParamsClear;
 end;
 
 procedure TSqlite3PersistStrategy.Commit;
@@ -180,23 +162,26 @@ var
   t: TRttiType;
   obj: TObject;
   database_connection_string: string;
-  password: string;
+  // password: string; //Not supported
 begin
+  InitFormatSettings;
   database_connection_string := ConfigurationInfo.S
     ['database_connection_string'];
-  password := ConfigurationInfo.S['password'];
+  // Do not support password. The configuration about "password" is ingored
+  // password := ConfigurationInfo.S['password'];
   DB := TSQLiteDatabase.Create(database_connection_string);
-  FKeysGeneratorClassName := ConfigurationInfo.S['keys_generator'];
-  t := ctx.FindType(FKeysGeneratorClassName);
-  if t = nil then
-    raise EdormException.Create('Unknown key generator ' +
-      FKeysGeneratorClassName);
-  obj := t.AsInstance.MetaclassType.Create;
-  if not Supports(obj, IdormKeysGenerator, FKeysGenerator) then
-    raise EdormException.Create('Keys generator ' + FKeysGeneratorClassName +
-      ' doesn''t implements ''IdormKeysGenerator''');
-  FKeysGenerator.SetPersistStrategy(self);
-  self._Release;
+  // Do not support String Keys Generator. The configuration about "keys_generator" is ingored
+  // FKeysGeneratorClassName := ConfigurationInfo.S['keys_generator'];
+  // t := ctx.FindType(FKeysGeneratorClassName);
+  // if t = nil then
+  // raise EdormException.Create('Unknown key generator ' +
+  // FKeysGeneratorClassName);
+  // obj := t.AsInstance.MetaclassType.Create;
+  // if not Supports(obj, IdormKeysGenerator, FKeysGenerator) then
+  // raise EdormException.Create('Keys generator ' + FKeysGeneratorClassName +
+  // ' doesn''t implements ''IdormKeysGenerator''');
+  // FKeysGenerator.SetPersistStrategy(self);
+  // self._Release;
 
   if (SameText(ConfigurationInfo.S['key_type'], 'integer')) then
   begin
@@ -229,65 +214,36 @@ begin
   end;
 end;
 
-// function TSqlite3PersistStrategy.CreateChildLoaderSearch(AChildClassTypeInfo
-// : PTypeInfo; AChildClassName, AChildTableName, AChildRelationField: string;
-// APKValue: TValue): IdormSearchCriteria;
-// var
-// SQL: string;
-// begin
-// SQL := 'SELECT * FROM ' + AChildTableName + ' WHERE ' +
-// AChildRelationField + ' = ';
-// case FKeyType of
-// ktInteger:
-// SQL := SQL + IntToStr(APKValue.AsInt64);
-// ktString:
-// SQL := SQL + '''' + StringReplace(APKValue.AsString, '''', '''''',
-// [rfReplaceAll]) + '''';
-// end;
-//
-// GetLogger.Debug('CreateChildLoaderSearch: ' + SQL);
-// Result := TdormSimpleSearchCriteria.Create(nil, SQL);
-// end;
-
-// function TSqlite3PersistStrategy.CreateDBXFactory(Conf: ISuperObject)
-// : TDBXFactory;
-// begin
-// Result := TDBXFactory.Create('dbxfb.dll', 'Sqlite3', Conf);
-// end;
-
 function TSqlite3PersistStrategy.Delete(ARttiType: TRttiType;
   AObject: TObject;
   ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>): TObject;
-// var
-// pk_idx: Integer;
-// pk_value: TValue;
-// pk_attribute_name, pk_field_name, SQL: string;
-// cmd: TDBXCommand;
+var
+  pk_idx: Integer;
+  pk_value: TValue;
+  pk_attribute_name, pk_field_name, SQL: string;
 begin
-  // pk_idx := GetPKMappingIndex(AFieldsMapping);
-  // if pk_idx = -1 then
-  // raise Exception.Create('Invalid primary key for table ' + ATableName);
-  // pk_attribute_name := AFieldsMapping[pk_idx].name;
-  // pk_field_name := AFieldsMapping[pk_idx].field;
-  // pk_value := ARttiType.GetProperty(pk_attribute_name).GetValue(AObject);
-  // SQL := 'DELETE FROM ' + ATableName + ' WHERE ' + pk_field_name + ' = ?';
-  // GetLogger.Debug('PREPARING: ' + SQL);
-  // cmd := FB.Prepare(SQL);
-  // try
-  // FillPrimaryKeyParam(cmd.Parameters[pk_idx], pk_value);
-  // GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
-  // cmd.ExecuteUpdate;
-  // finally
-  // cmd.Free;
-  // end;
-  //
+  pk_idx := GetPKMappingIndex(AFieldsMapping);
+  if pk_idx = -1 then
+    raise Exception.Create('Invalid primary key for table ' + ATableName);
+  pk_attribute_name := AFieldsMapping[pk_idx].name;
+  pk_field_name := AFieldsMapping[pk_idx].field;
+  pk_value := ARttiType.GetProperty(pk_attribute_name).GetValue(AObject);
+  SQL := 'DELETE FROM ' + AnsiQuotedStr(ATableName, '"') + ' WHERE ' +
+    AnsiQuotedStr(pk_field_name, '"') + ' = :' +
+    pk_field_name;
+  GetLogger.Debug('PREPARING: ' + SQL);
+  DB.ParamsClear;
+  FillPrimaryKeyParam(DB, ':' + pk_field_name, pk_value);
+  GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
+  DB.ExecSQL(SQL);
+  DB.ParamsClear;
 end;
 
 procedure TSqlite3PersistStrategy.DeleteAll(ATableName: string);
 var
   SQL: string;
 begin
-  SQL := 'DELETE FROM ' + ATableName;
+  SQL := 'DELETE FROM ' + AnsiQuotedStr(ATableName, '"');
   GetLogger.Debug('EXECUTING :' + SQL);
   DB.ExecSQL(SQL);
 end;
@@ -315,25 +271,8 @@ begin
 end;
 
 function TSqlite3PersistStrategy.ExecuteAndGetFirst(SQL: string): Int64;
-// var
-// rdr: TDBXReader;
-// cmd: TDBXCommand;
 begin
-  // cmd := FB.Prepare(SQL);
-  // try
-  // rdr := cmd.ExecuteQuery;
-  // try
-  // if rdr.Next then
-  // Result := rdr.Value[0].AsInt64
-  // else
-  // raise EdormException.Create('ExecuteAndGetFirst returns o rows');
-  // rdr.Close;
-  // finally
-  // rdr.Free;
-  // end;
-  // finally
-  // cmd.Free;
-  // end;
+  Result := DB.GetTableValue(SQL);
 end;
 
 // function TSqlite3PersistStrategy.GenerateAndFillPrimaryKeyParam
@@ -354,33 +293,37 @@ end;
 // FLastInsertOID := Result;
 // end;
 
-function TSqlite3PersistStrategy.FillPrimaryKeyParam(ATable: TSqliteTable;
-  AParamName: String;
-  const Value: TValue): TValue;
-begin
-  try
-    case FKeyType of
-      ktString:
-        begin
-          ATable.AddParamText(AParamName, Value.AsString);
-          Result := Value.AsString;
-        end;
-      ktInteger:
-        begin
-          ATable.AddParamInt(AParamName, Value.AsInteger);
-          Result := Value.AsInteger;
-        end;
-    end;
-  except
-    on E: Exception do
-      raise EdormException.Create('Error during fill primary key for query. ' +
-        E.Message);
-  end;
-end;
+// function TSqlite3PersistStrategy.FillPrimaryKeyParam(ATable: TSqliteTable;
+// AParamName: String;
+// const Value: TValue): TValue;
+// begin
+// try
+// case FKeyType of
+// ktString:
+// begin
+// { todo: implement string primary keys for sqlite3 }
+// raise EdormException.Create
+// (ClassName + ' do not support string primary keys');
+// // ATable.AddParamText(AParamName, Value.AsString);
+// // Result := Value.AsString;
+// end;
+// ktInteger:
+// begin
+// ATable.AddParamInt(AParamName, Value.AsInteger);
+// Result := Value.AsInteger;
+// end;
+// end;
+// except
+// on E: Exception do
+// raise EdormException.Create('Error during fill primary key for query. ' +
+// E.Message);
+// end;
+// end;
 
 function TSqlite3PersistStrategy.GetKeysGenerator: IdormKeysGenerator;
 begin
-  Result := FKeysGenerator;
+  // Result := FKeysGenerator;
+  raise EdormException.Create('Not supported on ' + ClassName);
 end;
 
 function TSqlite3PersistStrategy.GetKeyType: TdormKeyType;
@@ -396,6 +339,16 @@ end;
 function TSqlite3PersistStrategy.GetLogger: IdormLogger;
 begin
   Result := FLogger;
+end;
+
+procedure TSqlite3PersistStrategy.InitFormatSettings;
+begin
+  FFormatSettings.LongDateFormat := 'YYYY-MM-DD';
+  FFormatSettings.ShortDateFormat := 'YYYY-MM-DD';
+  FFormatSettings.LongTimeFormat := 'HH:NN:SS';
+  FFormatSettings.ShortTimeFormat := 'HH:NN:SS';
+  FFormatSettings.DateSeparator := '-';
+  FFormatSettings.TimeSeparator := ':';
 end;
 
 procedure TSqlite3PersistStrategy.InitStrategy;
@@ -416,21 +369,14 @@ begin
   sql_fields_names := '';
   for field in AFieldsMapping do
     if not field.pk then
-      if field.field_type <> 'blob' then
-        sql_fields_names := sql_fields_names + ',' + field.field + '';
+      sql_fields_names := sql_fields_names + ',' + field.field + '';
 
   System.Delete(sql_fields_names, 1, 1);
   Param := 0;
   sql_fields_values := '';
   for field in AFieldsMapping do
     if not field.pk then
-    begin
-      if field.field_type <> 'blob' then
-      begin
-        sql_fields_values := sql_fields_values + ', :' + field.field;
-        inc(Param);
-      end;
-    end;
+      sql_fields_values := sql_fields_values + ', :' + field.field;
   System.Delete(sql_fields_values, 1, 1);
 
   SQL := Format('INSERT INTO %s (%S) VALUES (%S)',
@@ -442,19 +388,8 @@ begin
   for field in AFieldsMapping do
   begin
     v := TdormUtils.GetField(AObject, field.name);
-    if field.pk then
-    begin
-      // pk_value := GenerateAndFillPrimaryKeyParam(Query.Parameters[I],
-      // ATableName)
-    end
-    else
-    begin
-      if field.field_type <> 'blob' then
-      begin
-        SetSqlite3ParameterValue(DB, field.field_type, ':' + field.field, v);
-        inc(I);
-      end;
-    end;
+    if not field.pk then
+      SetSqlite3ParameterValue(DB, field.field_type, ':' + field.field, v);
   end;
   GetLogger.Debug('EXECUTING PREPARED :' + SQL);
   DB.ExecSQL(SQL);
@@ -462,11 +397,12 @@ begin
   pk_idx := GetPKMappingIndex(AFieldsMapping);
   TdormUtils.SetProperty(AObject, AFieldsMapping[pk_idx].name, pk_value);
   Result := pk_value;
+  FLastInsertOID := Result;
 end;
 
 function TSqlite3PersistStrategy.InTransaction: Boolean;
 begin
-  // Result := assigned(FCurTransaction);
+  Result := DB.InTransaction;
 end;
 
 function TSqlite3PersistStrategy.IsNullKey(const Value: TValue): Boolean;
@@ -500,30 +436,50 @@ procedure TSqlite3PersistStrategy.FillList(AList: TObject;
   ARttiType: TRttiType; ATableName: string;
   AFieldsMapping: TArray<TdormFieldMapping>;
   AdormSearchCriteria: IdormSearchCriteria);
-// var
-// SQL: string;
-// cmd: TDBXCommand;
-// reader: TDBXReader;
+var
+  SQL: string;
+  reader: TSqliteTable;
 begin
-  // SQL := AdormSearchCriteria.GetSQL;
-  // GetLogger.Debug('PREPARING: ' + SQL);
-  // cmd := FB.Prepare(SQL);
-  // try
-  // GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
-  // reader := cmd.ExecuteQuery;
-  // try
-  // while reader.Next do
-  // TdormUtils.MethodCall(AList, 'Add',
-  // [CreateObjectFromDBXReader(ARttiType, reader,
-  // AFieldsMapping)]);
-  // // AList.Add(CreateObjectFromDBXReader(ARttiType, reader,
-  // // AFieldsMapping));
-  // finally
-  // reader.Free;
-  // end;
-  // finally
-  // cmd.Free;
-  // end;
+  SQL := AdormSearchCriteria.GetSQL;
+  GetLogger.Debug('EXECUTING: ' + SQL);
+  reader := DB.GetTable(SQL, false);
+  try
+    while not reader.EOF do
+    begin
+      TdormUtils.MethodCall(AList, 'Add',
+        [CreateObjectFromSqliteTable(ARttiType, reader,
+        AFieldsMapping)]);
+      reader.Next;
+    end;
+  finally
+    reader.Free;
+  end;
+end;
+
+function TSqlite3PersistStrategy.FillPrimaryKeyParam(ADB: TSQLiteDatabase;
+  AParamName: String; const Value: TValue): TValue;
+begin
+  try
+    case FKeyType of
+      ktString:
+        begin
+          { todo: implement string primary keys for sqlite3 }
+          raise EdormException.Create
+            (ClassName + ' do not support string primary keys');
+          // ADB.AddParamText(AParamName, Value.AsString);
+          // Result := Value.AsString;
+        end;
+      ktInteger:
+        begin
+          ADB.AddParamInt(AParamName, Value.AsInteger);
+          Result := Value.AsInteger;
+        end;
+    end;
+  except
+    on E: Exception do
+      raise EdormException.Create('Error during fill primary key for query. ' +
+        E.Message);
+  end;
 end;
 
 function TSqlite3PersistStrategy.Load(ARttiType: TRttiType;
@@ -541,14 +497,14 @@ begin
   pk_attribute_name := AFieldsMapping[pk_idx].name;
   pk_field_name := AFieldsMapping[pk_idx].field;
   SQL := 'SELECT ' + GetSelectFieldsList(AFieldsMapping, true) + ' FROM ' +
-    ATableName + ' WHERE ' + pk_field_name + ' = :id';
+    ATableName + ' WHERE ' + pk_field_name + ' = :' + pk_field_name;
   GetLogger.Debug('PREPARING: ' + SQL);
   DB.ParamsClear;
-  reader := DB.GetTable(SQL, true);
+  FillPrimaryKeyParam(DB, ':' + pk_field_name, Value);
+  GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
+  reader := DB.GetTable(SQL);
   try
-    FillPrimaryKeyParam(reader, ':id', Value);
-    GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
-    if reader.Next then
+    if not reader.EOF then
       Result := CreateObjectFromSqliteTable(ARttiType, reader, AFieldsMapping);
   finally
     reader.Free;
@@ -597,12 +553,9 @@ var
   obj: TObject;
   field: TdormFieldMapping;
   v: TValue;
-  t: TTimeStamp;
   S: string;
   sourceStream: TStream;
   targetStream: TMemoryStream;
-  v1: TValue;
-  fs: TFormatSettings;
 begin
   Result := nil;
   try
@@ -622,29 +575,23 @@ begin
       else if CompareText(field.field_type, 'date') = 0 then
       begin
         v := AReader.FieldAsString(AReader.FieldIndex[field.field]);
-        fs.ShortDateFormat := 'yyyy-mm-dd';
-        fs.LongDateFormat := 'yyyy-mm-dd';
-        fs.DateSeparator := '-';
-        v := StrToDate(v.AsString, fs);
-        // t.Date := AReader.Value[AReader.GetOrdinal(field.field)].AsDate;
-        // t.Time := 0;
-        // v := TimeStampToDateTime(t);
+        v := StrToDate(v.AsString, FFormatSettings);
         S := field.field + ' as date';
       end
       else if CompareText(field.field_type, 'blob') = 0 then
       begin
         targetStream := nil;
-        sourceStream := AReader.FieldAsBlob(AReader.FieldIndex[field.field]);
+        sourceStream := nil;
+        if not AReader.FieldIsNull(AReader.FieldIndex[field.field]) then
+          sourceStream := AReader.FieldAsBlob(AReader.FieldIndex[field.field]);
         S := field.field + ' as blob';
         if assigned(sourceStream) then
         begin
-          v := sourceStream;
           sourceStream.Position := 0;
-          targetStream := TMemoryStream.Create;
-          targetStream.CopyFrom(sourceStream, sourceStream.Size);
-          targetStream.Position := 0;
-        end;
-        v := targetStream;
+          v := sourceStream;
+        end
+        else
+          v := nil;
       end
       else if CompareText(field.field_type, 'decimal') = 0 then
       begin
@@ -660,13 +607,7 @@ begin
       else if CompareText(field.field_type, 'datetime') = 0 then
       begin
         v := AReader.FieldAsString(AReader.FieldIndex[field.field]);
-        fs.ShortDateFormat := 'YYYY-MM-DD';
-        fs.ShortTimeFormat := 'HH:NN:SS';
-        fs.LongDateFormat := 'yyyy-mm-dd';
-        fs.LongTimeFormat := 'HH:NN:SS';
-        fs.DateSeparator := '-';
-        fs.TimeSeparator := ':';
-        v := StrToDateTime(v.AsString, fs);
+        v := StrToDateTime(v.AsString, FFormatSettings);
         S := field.field + ' as datetime';
       end
       else
@@ -708,7 +649,7 @@ procedure TSqlite3PersistStrategy.SetSqlite3ParameterValue
   aValue: TValue);
 var
   sourceStream: TStream;
-  str: TBytesStream;
+  str: TMemoryStream;
 begin
   if CompareText(aFieldType, 'string') = 0 then
   begin
@@ -754,26 +695,26 @@ begin
   end
   else if CompareText(aFieldType, 'blob') = 0 then
   begin
-    {
-      sourceStream := TStream(aValue.AsObject);
-      if sourceStream = nil then
-      begin
-      // AQuery.SetParamBlob(aParameterIndex, nil)
-      end
-      else
-      begin
-      str := TBytesStream.Create;
+    sourceStream := TStream(aValue.AsObject);
+    if sourceStream = nil then
+    begin
+      ADB.AddParamNull(aParameterName);
+      GetLogger.Debug(aParameterName + ' = NULL');
+    end
+    else
+    begin
+      str := TMemoryStream.Create;
       try
-      sourceStream.Position := 0;
-      str.CopyFrom(sourceStream, sourceStream.Size);
-      str.Position := 0;
-      AQuery.SetParamBlob(aParameterIndex, str);
-      except
-      str.Free;
-      raise;
+        sourceStream.Position := 0;
+        str.CopyFrom(sourceStream, sourceStream.Size);
+        str.Position := 0;
+        ADB.AddParamBlobPtr(aParameterName, str.Memory, str.Size);
+        GetLogger.Debug(aParameterName + ' = <' + IntToStr(str.Size) +
+          ' bytes>');
+      finally
+        str.Free;
       end;
-      end;
-    }
+    end;
   end;
 end;
 

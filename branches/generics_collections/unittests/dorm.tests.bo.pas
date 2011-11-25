@@ -197,6 +197,7 @@ end;
 constructor TPerson.Create;
 begin
   inherited;
+  FPhoto := nil;
   FPhones := TPhones.Create(true);
   FCar := TCar.Create;
   FEmail := TEmail.Create;

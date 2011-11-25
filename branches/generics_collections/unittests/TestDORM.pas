@@ -106,8 +106,7 @@ begin
   finally
     p1.Free;
   end;
-  //
-  // lasciare commentato ?
+
   Session.StartTransaction;
   p1 := Session.Load<TPerson>(id);
   try
@@ -227,6 +226,9 @@ procedure TTestDORM.SetUp;
 begin
   inherited;
   Session.DeleteAll(TPerson);
+  Session.DeleteAll(TCar);
+  Session.DeleteAll(TEmail);
+  Session.DeleteAll(TPhone);
 end;
 
 procedure TTestDORM.TestSave;
