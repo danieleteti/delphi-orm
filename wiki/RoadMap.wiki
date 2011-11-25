@@ -1,7 +1,7 @@
   * New PersistentStrategy to allow use Firebird with Delphi Professional
   * Many to many relations
   * Automatic optimistic locking through object versioning
-  * Support for strongly typed collections - *Branch/Testing*
+  * Support for strongly typed collections - *DONE*
 {{{
 TPerson = class(Tobject)
   ...
@@ -14,7 +14,7 @@ end;
   * More databases support
     * MySQL
     * Oracle
-    * SQLite - *Branch/Testing*
+    * SQLite - *DONE*
     * MSSQLServer - *Branch/Testing*
   * File based (not SQL) supports
     * JSON
