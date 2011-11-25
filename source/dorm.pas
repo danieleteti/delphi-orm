@@ -27,7 +27,8 @@ uses
   TypInfo,
   Rtti,
   dorm.Collections,
-  dorm.UOW;
+  dorm.UOW,
+  dorm.Mappings;
 
 type
   TdormParam = class
@@ -142,7 +143,7 @@ type
     function GetTableMapping(AClassName: string): TArray<TdormFieldMapping>;
     function GetMapping: ISuperObject;
     function GetLogger: IdormLogger;
-    procedure Configure(TextReader: TTextReader);
+    procedure Configure(TextReader: TTextReader; const CustomMapping: IMappingStrategy);
     procedure Persist(AObject: TObject);
     function Save(AObject: TObject): TValue; overload;
     function SaveAndFree(AObject: TObject): TValue;
@@ -188,7 +189,7 @@ type
     function OIDIsSet(Obj: TObject): Boolean;
     procedure ClearOID(Obj: TObject);
     class function CreateConfigured(TextReader: TTextReader;
-      Environment: TdormEnvironment): TSession;
+      Environment: TdormEnvironment; const CustomMapping: IMappingStrategy): TSession;
   end;
 
 implementation
@@ -223,9 +224,10 @@ begin
   GetLogger.ExitLevel('TSession.Commit');
 end;
 
-procedure TSession.Configure(TextReader: TTextReader);
+procedure TSession.Configure(TextReader: TTextReader; const CustomMapping: IMappingStrategy);
 var
   s: string;
+  Mappings: TArray<IMappingStrategy>;
 begin
   try
     s := TextReader.ReadToEnd;
@@ -282,11 +284,11 @@ begin
 end;
 
 class function TSession.CreateConfigured(TextReader: TTextReader;
-  Environment: TdormEnvironment): TSession;
+  Environment: TdormEnvironment; const CustomMapping: IMappingStrategy): TSession;
 begin
   Result := TSession.Create(Environment);
   try
-    Result.Configure(TextReader);
+    Result.Configure(TextReader, CustomMapping);
   except
     FreeAndNil(Result);
     raise;

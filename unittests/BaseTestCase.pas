@@ -61,7 +61,7 @@ procedure TBaseTestCase.SetUp;
 begin
   inherited;
   Session := TSession.Create(deTest);
-  Session.Configure(TStreamReader.Create(GetDORMConfigFileName));
+  Session.Configure(TStreamReader.Create(GetDORMConfigFileName), Nil);
   Session.StartTransaction;
 end;
 
