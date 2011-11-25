@@ -21,11 +21,39 @@ unit dorm.tests.bo;
 interface
 
 uses
-  dorm.Commons, dorm.Collections, dorm.InterposedObject,
-  {$IFDEF VER210}System.{$ENDIF}Classes;
+  dorm.Commons,
+{$IFDEF VER210}System.{$ENDIF}Classes,
+  Generics.Collections,
+  dorm.InterposedObject;
 
 type
   TPerson = class;
+  TPhone = class;
+
+{$IF CompilerVersion = 22}
+  // In DelphiXE you cannot use directly TObjectList<T> because
+  // GetItem method is private. SO you have to use a specific typed list
+  // as this sample show. However, you can avoid default delphi collections
+  // and use whatever list you want. The only requirements are the following methods:
+  // - function Add(Object: TObject)
+  // - procedure Clear
+  // - property Count: Integer
+  // - function GetItem(Index: Integer): TObject
+
+  TdormObjectList<T: class> = class(TObjectList<T>)
+  protected
+    function GetElement(index: Integer): T;
+  end;
+{$IFEND}
+
+  TPhones = class(
+{$IF CompilerVersion = 22}
+    TdormObjectList<TPhone>
+{$ELSE}
+    TObjectList<TPhone>
+{$IFEND}
+    )
+  end;
 
   TCar = class
   private
@@ -51,10 +79,10 @@ type
 
   TEmail = class(TdormObject)
   private
-    FValue: String;
+    FValue: string;
     FPersonID: Integer;
     FID: Integer;
-    procedure SetValue(const Value: String);
+    procedure SetValue(const Value: string);
     procedure SetPersonID(const Value: Integer);
     procedure SetID(const Value: Integer);
     // Private!!!
@@ -63,7 +91,7 @@ type
     class function NewEmail: TEmail;
     function Validate: Boolean; override;
     property ID: Integer read FID write SetID;
-    property Value: String read FValue write SetValue;
+    property Value: string read FValue write SetValue;
   end;
 
   TPerson = class
@@ -73,7 +101,7 @@ type
     FFirstName: string;
     FID: Integer;
     FBornDate: TDate;
-    FPhones: TdormCollection;
+    FPhones: TPhones;
     FCar: TCar;
     FEmail: TEmail;
     FBornTimeStamp: TDateTime;
@@ -83,7 +111,6 @@ type
     procedure SetFirstName(const Value: string);
     procedure SetID(const Value: Integer);
     procedure SetBornDate(const Value: TDate);
-    procedure SetPhones(const Value: TdormCollection);
     procedure SetCar(const Value: TCar);
     procedure SetEmail(const Value: TEmail);
     procedure SetBornTimeStamp(const Value: TDateTime);
@@ -100,7 +127,7 @@ type
     property BornDate: TDate read FBornDate write SetBornDate;
     property BornTimeStamp: TDateTime read FBornTimeStamp
       write SetBornTimeStamp;
-    property Phones: TdormCollection read FPhones write SetPhones;
+    property Phones: TPhones read FPhones;
     property Car: TCar read FCar write SetCar;
     property Email: TEmail read FEmail write SetEmail;
     property Photo: TStream read FPhoto write SetPhoto;
@@ -120,7 +147,7 @@ type
     property PersonID: Integer read FPersonID write SetPersonID;
   public
     class constructor Create;
-    class procedure Register;
+    class procedure register;
     constructor Create;
   published
     property Number: string read FNumber write SetNumber;
@@ -131,7 +158,8 @@ type
 implementation
 
 uses
-  SysUtils, DateUtils;
+  SysUtils,
+  DateUtils;
 
 function IsValidEmail(const Value: string): Boolean;
 
@@ -169,8 +197,11 @@ end;
 constructor TPerson.Create;
 begin
   inherited;
-  FPhones := nil;
-  FCar := nil;
+  FPhoto := nil;
+  FPhones := TPhones.Create(true);
+  FCar := TCar.Create;
+  FEmail := TEmail.Create;
+  FEmail.Value := 'd.teti@bittime.it';
 end;
 
 destructor TPerson.Destroy;
@@ -232,11 +263,6 @@ begin
   FFirstName := Value;
 end;
 
-procedure TPerson.SetPhones(const Value: TdormCollection);
-begin
-  FPhones := Value;
-end;
-
 procedure TPerson.SetPhoto(const Value: TStream);
 begin
   FPhoto := Value;
@@ -262,7 +288,7 @@ begin
   inherited;
 end;
 
-class procedure TPhone.Register;
+class procedure TPhone.register;
 begin
 
 end;
@@ -339,7 +365,7 @@ begin
   FPersonID := Value;
 end;
 
-procedure TEmail.SetValue(const Value: String);
+procedure TEmail.SetValue(const Value: string);
 begin
   FValue := Value;
 end;
@@ -350,5 +376,15 @@ begin
   if not Result then
     AddError('Invalid email');
 end;
+
+{$IF CompilerVersion = 22}
+
+
+{ TdormObjectList<T> }
+function TdormObjectList<T>.GetElement(index: Integer): T;
+begin
+  Result := Items[index];
+end;
+{$IFEND}
 
 end.

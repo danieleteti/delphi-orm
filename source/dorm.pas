@@ -27,7 +27,8 @@ uses
   TypInfo,
   Rtti,
   dorm.Collections,
-  dorm.UOW;
+  dorm.UOW,
+  dorm.InterposedObject;
 
 type
   TdormParam = class
@@ -82,11 +83,9 @@ type
     FCTX: TRttiContext;
     FDictTables: TDictionary<string, string>;
     FDictMapping: TDictionary<string, TArray<TdormFieldMapping>>;
-    // FIdentityMap: TIdentityMap;
     FMapping: ISuperObject;
     FPersistStrategy: IdormPersistStrategy;
     FUOWInsert, FUOWUpdate, FUOWDelete: TObjectList<TObject>;
-    // FPackageName: string;
     FLogger: IdormLogger;
     FEnvironment: TdormEnvironment;
     EnvironmentNames: TArray<string>;
@@ -114,6 +113,8 @@ type
       AClassName: string; AObject: TObject);
     procedure DeleteHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
       AClassName: string; AObject: TObject);
+    procedure DeleteHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
+      AClassName: string; AObject: TObject);
     procedure LoadHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
       AClassName: string; AObject: TObject);
     procedure LoadHasManyRelationByPropertyName(APKValue: TValue;
@@ -130,19 +131,36 @@ type
       ARttiType: TRttiType; AClassName, APropertyName: string;
       var AObject: TObject);
     function Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject; overload;
+    function FindOne(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
+      FreeCriteria: Boolean = true): TObject; overload;
+    function List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
+      FreeCriteria: Boolean = false): TdormCollection; overload;
+    procedure FillList(ACollection: TObject; AItemClassInfo: PTypeInfo;
+      Criteria: TdormCriteria = nil; FreeCriteria: Boolean = false); overload;
   public
     constructor Create(Environment: TdormEnvironment); virtual;
     destructor Destroy; override;
     // Environments
     function GetEnv: string;
-    // Core
+    // Utils
     function Clone<T: class, constructor>(Obj: T): T;
     procedure CopyObject(SourceObject, TargetObject: TObject);
     function GetTableName(AClassName: string): string;
     function GetTableMapping(AClassName: string): TArray<TdormFieldMapping>;
     function GetMapping: ISuperObject;
     function GetLogger: IdormLogger;
+    function GetPKValueFromObject(Obj: TObject;
+      var pktype: TdormKeyType): TValue;
+    function GetPersistentClassesName(WithPackage: Boolean = false)
+      : TList<string>;
+    function Strategy: IdormPersistStrategy;
+    function OIDIsSet(Obj: TObject): Boolean;
+    procedure ClearOID(Obj: TObject);
+    // Configuration
     procedure Configure(TextReader: TTextReader);
+    class function CreateConfigured(TextReader: TTextReader;
+      Environment: TdormEnvironment): TSession;
+    // Persistence
     procedure Persist(AObject: TObject);
     function Save(AObject: TObject): TValue; overload;
     function SaveAndFree(AObject: TObject): TValue;
@@ -151,44 +169,36 @@ type
     procedure Save(dormUOW: TdormUOW); overload;
     procedure Delete(AObject: TObject);
     procedure DeleteAndFree(AObject: TObject);
-    procedure InsertCollection(Collection: TdormCollection);
-    procedure UpdateCollection(Collection: TdormCollection);
-    procedure DeleteCollection(Collection: TdormCollection);
-    procedure Extract(AOID: string);
-    function GetPKValueFromObject(Obj: TObject;
-      var pktype: TdormKeyType): TValue;
+    procedure InsertCollection(Collection: TObject);
+    procedure UpdateCollection(Collection: TObject);
+    procedure DeleteCollection(Collection: TObject);
     procedure LoadRelations(AObject: TObject;
       ARelationsSet: TdormRelations = [BelongsTo, HasMany, HasOne]); overload;
-    procedure LoadRelations(AList: TdormCollection;
+    procedure LoadRelationsForEachElement(AList: TObject;
       ARelationsSet: TdormRelations = [BelongsTo, HasMany, HasOne]); overload;
     function Load<T: class>(const Value: TValue): T; overload;
-    // function Load<T: class>(const Value: string; AObject: T): Boolean; overload;
-    procedure LazyLoadFor(const APropertyName: string; AObject: TObject);
     procedure SetLazyLoadFor(ATypeInfo: PTypeInfo; const APropertyName: string;
       const Value: Boolean);
+    function Count(AClassType: TClass): Int64;
+    procedure DeleteAll(AClassType: TClass);
+
+    // Find and List
     function FindOne<T: class>(Criteria: TdormCriteria;
       FreeCriteria: Boolean = true): T; overload;
-    function FindOne(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
-      FreeCriteria: Boolean = true): TObject; overload;
-    function List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
-      FreeCriteria: Boolean = false): TdormCollection; overload;
+    procedure FillList<T: class>(Collection: TObject;
+      Criteria: TdormCriteria = nil; FreeCriteria: Boolean = true); overload;
     function List(AdormSearchCriteria: IdormSearchCriteria)
       : TdormCollection; overload;
+    procedure FillList(ACollection: TObject;
+      AdormSearchCriteria: IdormSearchCriteria); overload;
     function ListAll<T: class>(): TdormCollection;
     function List<T: class>(Criteria: TdormCriteria;
       FreeCriteria: Boolean = true): TdormCollection; overload;
-    function Count(AClassType: TClass): Int64;
-    procedure DeleteAll(AClassType: TClass);
+
+    // transaction
     procedure StartTransaction;
     procedure Commit;
     procedure Rollback;
-    function GetPersistentClassesName(WithPackage: Boolean = false)
-      : TList<string>;
-    function Strategy: IdormPersistStrategy;
-    function OIDIsSet(Obj: TObject): Boolean;
-    procedure ClearOID(Obj: TObject);
-    class function CreateConfigured(TextReader: TTextReader;
-      Environment: TdormEnvironment): TSession;
   end;
 
 implementation
@@ -197,8 +207,7 @@ uses
   dorm.loggers.CodeSite,
   dorm.adapter.Firebird,
   SysUtils,
-  dorm.Utils,
-  dorm.InterposedObject;
+  dorm.Utils;
 
 { TSession }
 
@@ -325,7 +334,9 @@ begin
   fields := GetTableMapping(_class_name);
   PKValue := GetPKValue(RttiType, GetTableMapping(AObject.ClassName), AObject);
   DeleteHasManyRelation(PKValue, RttiType, AObject.ClassName, AObject);
+  DeleteHasOneRelation(PKValue, RttiType, AObject.ClassName, AObject);
   GetStrategy.Delete(RttiType, AObject, _table, fields);
+  ClearOID(AObject);
   GetLogger.ExitLevel('Delete');
 end;
 
@@ -350,8 +361,10 @@ var
   _has_many: TSuperArray;
   v: TValue;
   _child_type: TRttiType;
-  i: Integer;
-  Coll: TdormCollection;
+  i, x: Integer;
+  Coll: TObject;
+  O: TObject;
+  DuckObject: IdormDuckTypedList;
 begin
   GetLogger.EnterLevel('has_many ' + AClassName);
   _has_many := FMapping.O['mapping'].O[AClassName].A['has_many'];
@@ -366,18 +379,51 @@ begin
       if not assigned(_child_type) then
         raise Exception.Create('Unknown type ' + _child_class_name);
       _child_field_name := _has_many[i].AsObject.s['child_field_name'];
-      Coll := TdormCollection(v.AsObject); // if the relation is LazyLoad...
+      Coll := v.AsObject; // if the relation is LazyLoad...
       { todo: The has_many rows should be deleted also if they are lazy_loaded }
       { todo: optimize the delete? }
+
       if assigned(Coll) then
-        Coll.ForEach<TObject>(
-          procedure(O: TObject)
           begin
-            Delete(O);
-          end);
+        DuckObject := TDuckTypedList.Create(Coll);
+        for x := 0 to DuckObject.Count - 1 do
+          Delete(DuckObject.GetItem(x));
     end;
   end;
+  end;
   GetLogger.ExitLevel('has_many ' + AClassName);
+end;
+
+procedure TSession.DeleteHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
+  AClassName: string; AObject: TObject);
+var
+  _child_field_name, _child_class_name: string;
+  _has_one: TSuperArray;
+  v: TValue;
+  _child_type: TRttiType;
+  i: Integer;
+  Obj: TObject;
+begin
+  GetLogger.EnterLevel('has_one ' + AClassName);
+  _has_one := FMapping.O['mapping'].O[AClassName].A['has_one'];
+  if assigned(_has_one) then
+  begin
+    GetLogger.Debug('Deleting has_one for ' + AClassName);
+    for i := 0 to _has_one.Length - 1 do
+    begin
+      v := TdormUtils.GetField(AObject, _has_one[i].AsObject.s['name']);
+      _child_class_name := _has_one[i].AsObject.s['class_name'];
+      _child_type := FCTX.FindType(Qualified(_child_class_name));
+      if not assigned(_child_type) then
+        raise Exception.Create('Unknown type ' + _child_class_name);
+      _child_field_name := _has_one[i].AsObject.s['child_field_name'];
+      Obj := v.AsObject; // if the relation is LazyLoad...
+      { todo: has_one row should be deleted also if they are lazy_loaded }
+      if assigned(Obj) then
+        Delete(Obj);
+    end;
+  end;
+  GetLogger.ExitLevel('has_one ' + AClassName);
 end;
 
 destructor TSession.Destroy;
@@ -447,13 +493,126 @@ begin
   end;
 end;
 
-procedure TSession.Extract(AOID: string);
+procedure TSession.FillList(ACollection: TObject; AItemClassInfo: PTypeInfo;
+  Criteria: TdormCriteria; FreeCriteria: Boolean);
+var
+  _table: string;
+  SQL: string;
+  CritItem: TdormCriteriaItem;
+  i: Integer;
+  Mapping: TArray<TdormFieldMapping>;
+  fm: TdormFieldMapping;
+  select_fields: string;
+  d: TDate;
+  dt: TDateTime;
+  function GetFieldMappingByAttribute(AttributeName: string): TdormFieldMapping;
+  var
+    fm: TdormFieldMapping;
+  begin
+    for fm in Mapping do
+      if fm.name = AttributeName then
+        Exit(fm);
+    raise EdormException.CreateFmt('Unknown field attribute %s',
+      [AttributeName]);
+  end;
+
 begin
-  // FIdentityMap.Extract(AOID);
+  _table := GetTableName(string(AItemClassInfo.name));
+  Mapping := GetTableMapping(string(AItemClassInfo.name));
+  select_fields := GetSelectFieldsList(Mapping, true);
+  if assigned(Criteria) and (Criteria.Count > 0) then
+  begin
+    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' WHERE ';
+    for i := 0 to Criteria.Count - 1 do
+    begin
+      CritItem := Criteria.GetCriteria(i);
+      if i > 0 then
+        case CritItem.LogicRelation of
+          lrAnd:
+            SQL := SQL + ' AND ';
+          lrOr:
+            SQL := SQL + ' OR ';
+        end;
+      fm := GetFieldMappingByAttribute(CritItem.Attribute);
+      SQL := SQL + fm.field;
+      case CritItem.CompareOperator of
+        Equal:
+          SQL := SQL + ' = ';
+        GreaterThan:
+          SQL := SQL + ' > ';
+        LowerThan:
+          SQL := SQL + ' < ';
+        GreaterOrEqual:
+          SQL := SQL + ' >= ';
+        LowerOrEqual:
+          SQL := SQL + ' <= ';
+        Different:
+          SQL := SQL + ' != ';
+      end;
+
+      if fm.field_type = 'string' then
+        SQL := SQL + '''' + GetStrategy.EscapeString
+          (CritItem.Value.AsString) + ''''
+      else if fm.field_type = 'integer' then
+        SQL := SQL + inttostr(CritItem.Value.AsInteger)
+      else if fm.field_type = 'boolean' then
+        SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
+      else if fm.field_type = 'boolean' then
+        SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
+      else if fm.field_type = 'date' then
+      begin
+        d := CritItem.Value.AsExtended;
+        SQL := SQL + '''' + GetStrategy.EscapeDate(d) + ''''
+      end
+      else if fm.field_type = 'datetime' then
+      begin
+        dt := CritItem.Value.AsExtended;
+        SQL := SQL + '''' + GetStrategy.EscapeDateTime(dt) + ''''
+      end
+      else
+        raise EdormException.CreateFmt('Unknown type %s in criteria',
+          [fm.field_type]);
+    end;
+  end
+  else // Criteria is nil or is empty
+    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' ';
+
+  FillList(ACollection, TdormSimpleSearchCriteria.Create(AItemClassInfo, SQL));
+  if FreeCriteria then
+    FreeAndNil(Criteria);
+end;
+
+procedure TSession.FillList(ACollection: TObject;
+  AdormSearchCriteria: IdormSearchCriteria);
+var
+  rt: TRttiType;
+  _table: string;
+  _fields: TArray<TdormFieldMapping>;
+  _type_info: PTypeInfo;
+  searcher_classname: string;
+  List: IdormDuckTypedList;
+begin
+  _type_info := AdormSearchCriteria.GetItemClassInfo;
+  searcher_classname := TObject(AdormSearchCriteria).ClassName;
+  GetLogger.EnterLevel(searcher_classname);
+  rt := FCTX.GetType(_type_info);
+  _table := GetTableName(rt.ToString);
+  _fields := GetTableMapping(rt.ToString);
+  List := TDuckTypedList.Create(ACollection);
+  List.Clear;
+  FPersistStrategy.FillList(ACollection, rt, _table, _fields,
+    AdormSearchCriteria);
+  GetLogger.ExitLevel(searcher_classname);
+end;
+
+procedure TSession.FillList<T>(Collection: TObject; Criteria: TdormCriteria;
+  FreeCriteria: Boolean);
+begin
+  FillList(Collection, TypeInfo(T), Criteria, FreeCriteria);
 end;
 
 function TSession.FindOne(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
-FreeCriteria: Boolean): TObject;
+  FreeCriteria: Boolean): TObject;
 var
   Coll: TdormCollection;
 begin
@@ -466,7 +625,6 @@ begin
         [Coll.Count]);
     if Coll.Count = 1 then
       Result := Coll.Extract(0);
-    // Non posso usare "as" per un buig nel compilatore :-(
   finally
     Coll.Free;
   end;
@@ -474,7 +632,12 @@ end;
 
 function TSession.FindOne<T>(Criteria: TdormCriteria; FreeCriteria: Boolean): T;
 begin
+{$IF CompilerVersion >= 23}
+  Result := FindOne(TypeInfo(T), Criteria, FreeCriteria) as T;
+{$ELSE}
+  // There is a bug with generics type and "as" in Delphi XE
   Result := T(FindOne(TypeInfo(T), Criteria, FreeCriteria));
+{$IFEND}
 end;
 
 function TSession.GetLogger: IdormLogger;
@@ -576,7 +739,7 @@ begin
 end;
 
 function TSession.GetPKValueFromObject(Obj: TObject;
-var pktype: TdormKeyType): TValue;
+  var pktype: TdormKeyType): TValue;
 var
   rt: TRttiType;
   pk_value: TValue;
@@ -604,55 +767,26 @@ begin
     [_child_class_name, _child_field_name]);
 end;
 
-procedure TSession.LazyLoadFor(const APropertyName: string; AObject: TObject);
-var
-  PKValue: TValue;
-  RttiType: TRttiType;
-  // _class_name: string;
-  // fields: TArray<TdormFieldMapping>;
-begin
-  RttiType := FCTX.GetType(AObject.ClassInfo);
-  PKValue := GetPKValue(RttiType, GetTableMapping(AObject.ClassName), AObject);
-  LoadHasManyRelationByPropertyName(PKValue, RttiType, AObject.ClassName,
-    APropertyName, AObject);
-  LoadHasOneRelationByPropertyName(PKValue, RttiType, AObject.ClassName,
-    APropertyName, AObject);
-end;
-
 function TSession.List(AdormSearchCriteria: IdormSearchCriteria)
   : TdormCollection;
-var
-  rt: TRttiType;
-  _table: string;
-  _fields: TArray<TdormFieldMapping>;
-  _type_info: PTypeInfo;
-  searcher_classname: string;
 begin
-  _type_info := AdormSearchCriteria.GetItemClassInfo;
-  searcher_classname := TObject(AdormSearchCriteria).ClassName;
-  GetLogger.EnterLevel(searcher_classname);
-  rt := FCTX.GetType(_type_info);
-  _table := GetTableName(rt.ToString);
-  _fields := GetTableMapping(rt.ToString);
-  Result := FPersistStrategy.List(rt, _table, _fields, AdormSearchCriteria);
-  Result.SetOwnsObjects(true);
-  GetLogger.ExitLevel(searcher_classname);
+  Result := NewList;
+  FillList(Result, AdormSearchCriteria);
 end;
 
 function TSession.List<T>(Criteria: TdormCriteria; FreeCriteria: Boolean)
   : TdormCollection;
 begin
-  Result := List(TypeInfo(T), Criteria);
+  Result := NewList();
+  FillList(Result, TypeInfo(T), Criteria);
   if FreeCriteria then
     FreeAndNil(Criteria);
 end;
 
 function TSession.ListAll<T>: TdormCollection;
-var
-  _table: string;
 begin
-  _table := GetTableName(T.ClassName);
-  Result := List<T>(TdormCriteria.Create);
+  Result := NewList();
+  FillList(Result, TypeInfo(T), TdormCriteria.Create, true);
 end;
 
 function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject;
@@ -679,18 +813,13 @@ begin
   GetLogger.ExitLevel('Load ' + rt.ToString);
 end;
 
-// function TSession.Load<T>(const Value: string; AObject: T): Boolean;
-// begin
-// Result := Load(TypeInfo(T), Value, AObject);
-// end;
-
 function TSession.Load<T>(const Value: TValue): T;
 begin
   Result := T(Load(TypeInfo(T), Value));
 end;
 
 procedure TSession.LoadHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _has_many: TSuperArray;
   i: Integer;
@@ -710,13 +839,13 @@ begin
 end;
 
 procedure TSession.LoadHasManyRelationByPropertyName(APKValue: TValue;
-ARttiType: TRttiType; AClassName: string; APropertyName: string;
-var AObject: TObject);
+  ARttiType: TRttiType; AClassName: string; APropertyName: string;
+  var AObject: TObject);
 var
   _has_many: TSuperArray;
   _child_field_name, _child_class_name: string;
   v: TValue;
-  List: TdormCollection;
+  List: TObject;
   _child_type: TRttiType;
   SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
@@ -732,19 +861,20 @@ begin
     if i >= 0 then
     begin
       AttributeNameInTheParentObject := _has_many[i].AsObject.s['name'];
-      v := TdormUtils.GetField(AObject, AttributeNameInTheParentObject);
+      // v := TdormUtils.GetField(AObject, AttributeNameInTheParentObject);
       _child_class_name := _has_many[i].AsObject.s['class_name'];
       _child_type := FCTX.FindType(Qualified(_child_class_name));
       if not assigned(_child_type) then
         raise Exception.Create('Unknown type ' + _child_class_name);
       _child_field_name := _has_many[i].AsObject.s['child_field_name'];
-      List := Self.List(_child_type.Handle,
+
+      v := TdormUtils.GetProperty(AObject, AttributeNameInTheParentObject);
+      List := v.AsObject;
+      TdormUtils.MethodCall(List, 'Clear', []);
+      FillList(List, _child_type.Handle,
         TdormCriteria.NewCriteria(_child_field_name, TdormCompareOperator.Equal,
         GetPKValue(ARttiType, _table_mapping, AObject)), true);
-      v := TValue.From<TdormCollection>(List);
-      //TdormUtils.SetField(AObject, AttributeNameInTheParentObject, v);
-      TdormUtils.SetProperty(AObject, AttributeNameInTheParentObject, v);
-      LoadRelations(v.AsObject as TdormCollection);
+      LoadRelationsForEachElement(v.AsObject);
     end
     else
       raise Exception.Create('Unknown property name ' + APropertyName);
@@ -752,7 +882,7 @@ begin
 end;
 
 procedure TSession.LoadHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _has_one: TSuperArray;
   i: Integer;
@@ -772,15 +902,9 @@ begin
 end;
 
 procedure TSession.LoadBelongsToRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
-  // _child_field_name, _child_class_name: string;
   _belongs_to: TSuperArray;
-  // v, _pk_value: TValue;
-  // List: IList;
-  // O: TObject;
-  // _child_type: TRttiType;
-  // SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
 begin
   GetLogger.EnterLevel('belongs_to ' + AClassName);
@@ -798,7 +922,8 @@ begin
 end;
 
 procedure TSession.LoadHasOneRelationByPropertyName(APKValue: TValue;
-ARttiType: TRttiType; AClassName, APropertyName: string; var AObject: TObject);
+  ARttiType: TRttiType; AClassName, APropertyName: string;
+  var AObject: TObject);
 var
   _has_one: TSuperArray;
   _child_class_name: string;
@@ -807,6 +932,8 @@ var
   i: Integer;
   _parent_field_key_value: TValue;
   _child_field_name: string;
+  SrcObj: TObject;
+  DestObj: TObject;
 begin
   GetLogger.Debug('Loading HAS_ONE for ' + AClassName + '.' + APropertyName);
   _has_one := FMapping.O['mapping'].O[AObject.ClassName].A['has_one'];
@@ -826,10 +953,19 @@ begin
           raise Exception.Create('Empty child_field_name for ' +
             _child_class_name);
 
+        { todo: A faster way without copy? }
         v := FindOne(_child_type.Handle,
           TdormCriteria.NewCriteria(_child_field_name,
           TdormCompareOperator.Equal, APKValue), true);
-        TdormUtils.SetField(AObject, _has_one[i].AsObject.s['name'], v);
+        if not v.IsEmpty then
+        begin
+          SrcObj := v.AsObject;
+          DestObj := TdormUtils.GetField(AObject, _has_one[i].AsObject.s['name']
+            ).AsObject;
+      end;
+        TdormUtils.CopyObject(SrcObj, DestObj);
+
+        FreeAndNil(SrcObj);
       end;
     end
     else
@@ -837,13 +973,19 @@ begin
   end;
 end;
 
-procedure TSession.LoadRelations(AList: TdormCollection;
-ARelationsSet: TdormRelations);
+procedure TSession.LoadRelationsForEachElement(AList: TObject;
+  ARelationsSet: TdormRelations);
 var
   el: TObject;
+  i: Integer;
+  DuckList: IdormDuckTypedList;
 begin
-  for el in AList do
+  DuckList := TDuckTypedList.Create(AList);
+  for i := 0 to DuckList.Count - 1 do
+  begin
+    el := DuckList.GetItem(i);
     LoadRelations(el, ARelationsSet);
+  end;
 end;
 
 function TSession.OIDIsSet(Obj: TObject): Boolean;
@@ -880,7 +1022,7 @@ begin
 end;
 
 procedure TSession.LoadRelations(AObject: TObject;
-ARelationsSet: TdormRelations);
+  ARelationsSet: TdormRelations);
 var
   rt: TRttiType;
   _table: string;
@@ -904,7 +1046,8 @@ begin
 end;
 
 procedure TSession.LoadBelongsToRelationByPropertyName(APKValue: TValue;
-ARttiType: TRttiType; AClassName, APropertyName: string; var AObject: TObject);
+  ARttiType: TRttiType; AClassName, APropertyName: string;
+  var AObject: TObject);
 var
   _belongs_to: TSuperArray;
   _belong_class_name: string;
@@ -962,7 +1105,6 @@ begin
   _table := GetTableName(_class_name);
   fields := GetTableMapping(_class_name);
   _pk_value := GetPKValue(_type, fields, AObject);
-
   if GetStrategy.IsNullKey(_pk_value) then
   begin
     FLogger.Info('Inserting ' + AObject.ClassName);
@@ -974,6 +1116,8 @@ begin
     InsertHasOneRelation(GetPKValue(_type, fields, AObject), _type,
       _class_name, AObject);
   end
+  // else
+  // GetLogger.Warning(_class_name + ' not inserted because OI is not null');
   else
     raise EdormException.CreateFmt('Cannot insert object with an ID [%s]',
       [_class_name]);
@@ -999,7 +1143,7 @@ begin
 end;
 
 procedure TSession.SetLazyLoadFor(ATypeInfo: PTypeInfo;
-const APropertyName: string; const Value: Boolean);
+  const APropertyName: string; const Value: Boolean);
 var
   i: Integer;
   RttiType: TRttiType;
@@ -1040,26 +1184,26 @@ begin
     end;
 end;
 
-procedure TSession.InsertCollection(Collection: TdormCollection);
+procedure TSession.InsertCollection(Collection: TObject);
 var
   i: Integer;
-  el: TObject;
+  List: IdormDuckTypedList;
 begin
-  for el in Collection do
-    Save(el);
+  List := TDuckTypedList.Create(Collection);
+  for i := 0 to List.Count - 1 do
+    Save(List.GetItem(i));
 end;
 
 procedure TSession.InsertHasManyRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _child_field_name, _child_class_name: string;
   _has_many: TSuperArray;
   v: TValue; // , _pk_value
-  List: TdormCollection;
-  // O: TObject;
+  List: TObject;
   _child_type: TRttiType;
   i, j: Integer;
-  // prop: TRttiProperty;
+  DuckList: IdormDuckTypedList;
 begin
   GetLogger.EnterLevel('has_many ' + AClassName);
   _has_many := FMapping.O['mapping'].O[AClassName].A['has_many'];
@@ -1076,22 +1220,28 @@ begin
         raise Exception.Create('Unknown type ' + _child_class_name);
       _child_field_name := _has_many[i].AsObject.s['child_field_name'];
 
-      List := TdormCollection(v.AsObject);
+      List := v.AsObject;
       if assigned(List) then
-        for j := 0 to List.Count - 1 do
+        begin
+        DuckList := TDuckTypedList.Create(List);
+        for j := 0 to DuckList.Count - 1 do
         begin
           GetLogger.Debug('-- Saving ' + _child_type.QualifiedName);
           GetLogger.Debug('----> Setting property ' + _child_field_name);
-          TdormUtils.SetField(List[j], _child_field_name, APKValue);
-          Save(List[j]);
+          TdormUtils.SetField(
+            // TdormUtils.MethodCall(List, 'GetItem', [j]).AsObject,
+            DuckList.GetItem(j), _child_field_name, APKValue);
+          Save(DuckList.GetItem(j));
+          // Save(TdormUtils.MethodCall(List, 'GetItem', [j]).AsObject);
         end;
     end;
+  end;
   end;
   GetLogger.ExitLevel('has_many ' + AClassName);
 end;
 
 procedure TSession.InsertHasOneRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _child_field_name, _child_class_name: string;
   _has_one: TSuperArray;
@@ -1130,7 +1280,7 @@ begin
 end;
 
 procedure TSession.FixBelongsToRelation(APKValue: TValue; ARttiType: TRttiType;
-AClassName: string; AObject: TObject);
+  AClassName: string; AObject: TObject);
 var
   _parent_id_attribute_name, _parent_class_name: string;
   _belongs_to: TSuperArray;
@@ -1165,6 +1315,7 @@ begin
       end;
     end;
   end;
+  GetLogger.ExitLevel('belongs_to ' + AClassName);
 end;
 
 procedure TSession.StartTransaction;
@@ -1211,114 +1362,37 @@ begin
   FreeAndNil(AObject);
 end;
 
-procedure TSession.UpdateCollection(Collection: TdormCollection);
+procedure TSession.UpdateCollection(Collection: TObject);
 var
   i: Integer;
+  List: IdormDuckTypedList;
 begin
-  for i := 0 to Collection.Count - 1 do
-    Update(Collection.GetItem(i));
+  List := TDuckTypedList.Create(Collection);
+  for i := 0 to List.Count - 1 do
+    Update(List.GetItem(i));
 end;
 
-procedure TSession.DeleteCollection(Collection: TdormCollection);
+procedure TSession.DeleteCollection(Collection: TObject);
 var
   i: Integer;
+  List: IdormDuckTypedList;
 begin
-  for i := 0 to Collection.Count - 1 do
-    Delete(Collection.GetItem(i));
+  List := TDuckTypedList.Create(Collection);
+  for i := 0 to List.Count - 1 do
+    Delete(List.GetItem(i));
 end;
 
 function TSession.List(AItemClassInfo: PTypeInfo; Criteria: TdormCriteria;
-FreeCriteria: Boolean): TdormCollection;
-var
-  _table: string;
-  SQL: string;
-  CritItem: TdormCriteriaItem;
-  i: Integer;
-  Mapping: TArray<TdormFieldMapping>;
-  fm: TdormFieldMapping;
-  select_fields: string;
-  d: TDate;
-  dt: TDateTime;
-  function GetFieldMappingByAttribute(AttributeName: string): TdormFieldMapping;
-  var
-    fm: TdormFieldMapping;
-  begin
-    for fm in Mapping do
-      if fm.name = AttributeName then
-        Exit(fm);
-    raise EdormException.CreateFmt('Unknown field attribute %s',
-      [AttributeName]);
-  end;
-
+  FreeCriteria: Boolean): TdormCollection;
 begin
-  _table := GetTableName(string(AItemClassInfo.name));
-  Mapping := GetTableMapping(string(AItemClassInfo.name));
-  select_fields := GetSelectFieldsList(Mapping, true);
-  if Criteria.Count > 0 then
-    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' WHERE '
-  else
-    SQL := 'SELECT ' + select_fields + ' FROM ' + _table + ' ';
-
-  for i := 0 to Criteria.Count - 1 do
-  begin
-    CritItem := Criteria.GetCriteria(i);
-    if i > 0 then
-      case CritItem.LogicRelation of
-        lrAnd:
-          SQL := SQL + ' AND ';
-        lrOr:
-          SQL := SQL + ' OR ';
-      end;
-    fm := GetFieldMappingByAttribute(CritItem.Attribute);
-    SQL := SQL + fm.field;
-    case CritItem.CompareOperator of
-      Equal:
-        SQL := SQL + ' = ';
-      GreaterThan:
-        SQL := SQL + ' > ';
-      LowerThan:
-        SQL := SQL + ' < ';
-      GreaterOrEqual:
-        SQL := SQL + ' >= ';
-      LowerOrEqual:
-        SQL := SQL + ' <= ';
-      Different:
-        SQL := SQL + ' != ';
-    end;
-
-    if fm.field_type = 'string' then
-      SQL := SQL + '''' + GetStrategy.EscapeString
-        (CritItem.Value.AsString) + ''''
-    else if fm.field_type = 'integer' then
-      SQL := SQL + inttostr(CritItem.Value.AsInteger)
-    else if fm.field_type = 'boolean' then
-      SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
-    else if fm.field_type = 'boolean' then
-      SQL := SQL + BoolToStr(CritItem.Value.AsBoolean)
-    else if fm.field_type = 'date' then
-    begin
-      d := CritItem.Value.AsExtended;
-      SQL := SQL + '''' + GetStrategy.EscapeDate(d) + ''''
-    end
-    else if fm.field_type = 'datetime' then
-    begin
-      dt := CritItem.Value.AsExtended;
-      SQL := SQL + '''' + GetStrategy.EscapeDateTime(dt) + ''''
-    end
-    else
-      raise EdormException.CreateFmt('Unknown type %s in criteria',
-        [fm.field_type]);
-
-  end;
-  Result := List(TdormSimpleSearchCriteria.Create(AItemClassInfo, SQL));
-  if FreeCriteria then
-    FreeAndNil(Criteria);
+  Result := NewList;
+  FillList(Result, AItemClassInfo, Criteria, FreeCriteria);
 end;
 
 { TdormSimpleSearchCriteria }
 
 constructor TdormSimpleSearchCriteria.Create(AItemClassInfo: PTypeInfo;
-ASQL: string);
+  ASQL: string);
 begin
   inherited Create;
   FSQL := ASQL;
@@ -1338,8 +1412,8 @@ end;
 { TdormCriteria }
 
 function TdormCriteria.Add(const Attribute: string;
-CompareOperator: TdormCompareOperator; Value: TValue;
-LogicRelation: TdormLogicRelation): TdormCriteria;
+  CompareOperator: TdormCompareOperator; Value: TValue;
+  LogicRelation: TdormLogicRelation): TdormCriteria;
 var
   Item: TdormCriteriaItem;
 begin
@@ -1353,13 +1427,13 @@ begin
 end;
 
 function TdormCriteria.AddOr(const Attribute: string;
-CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
+  CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
 begin
   Result := Add(Attribute, CompareOperator, Value, lrOr);
 end;
 
 function TdormCriteria.AddAnd(const Attribute: string;
-CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
+  CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
 begin
   Result := Add(Attribute, CompareOperator, Value, lrAnd);
 end;
@@ -1392,7 +1466,7 @@ begin
 end;
 
 class function TdormCriteria.NewCriteria(const Attribute: string;
-CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
+  CompareOperator: TdormCompareOperator; Value: TValue): TdormCriteria;
 begin
   Result := TdormCriteria.Create;
   Result.Add(Attribute, CompareOperator, Value);

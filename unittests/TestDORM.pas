@@ -20,10 +20,13 @@ interface
 
 uses
   TestFramework,
-  dorm, BaseTestCase;
+  dorm,
+  Generics.Collections,
+  BaseTestCase;
 
 type
   TTestDORM = class(TBaseTestCase)
+  private
   protected
     procedure SetUp; override;
   public
@@ -38,6 +41,7 @@ type
     procedure TestFindOne;
     procedure TestFindOneNoObject;
     procedure TestFindOneManyObjects;
+    procedure TestBulkCollectionOperations;
   end;
 
 implementation
@@ -46,7 +50,10 @@ uses
   Classes,
   SysUtils,
   Rtti,
-  dorm.Commons, dorm.tests.bo, dorm.UOW;
+  dorm.Commons,
+  dorm.tests.bo,
+  dorm.UOW,
+  dorm.InterposedObject;
 
 function FirstNameIs(const FirstName: String): TdormCriteria;
 begin
@@ -55,6 +62,35 @@ begin
 end;
 
 { TTestDORM }
+
+procedure TTestDORM.TestBulkCollectionOperations;
+var
+  People: TObjectList<TPerson>;
+begin
+  // People := CreateRandomPeople;
+  // try
+  // Session.InsertCollection(People);
+  // finally
+  // People.Free
+  // end;
+  //
+  // People := TObjectList<TPerson>.Create;
+  // try
+  // Session.FillList<TPerson>(People, TdormCriteria.Create);
+  // Session.UpdateCollection(People);
+  // finally
+  // People.Free;
+  // end;
+  //
+  // People := TObjectList<TPerson>.Create;
+  // try
+  // Session.FillList<TPerson>(People);
+  // Session.DeleteCollection(People);
+  // finally
+  // People.Free;
+  // end;
+  // Session.Commit;
+end;
 
 procedure TTestDORM.TestCRUD;
 var
@@ -155,7 +191,6 @@ var
 begin
   p := TPerson.NewPerson;
   try
-    p.Email := TEmail.Create;
     p.Email.Value := 'not_a_real_email';
     try
       Session.Save(p);
@@ -166,33 +201,6 @@ begin
         CheckTrue(E.ClassName = 'EdormException');
       end;
     end;
-  finally
-    p.Free;
-  end;
-end;
-
-procedure TTestDORM.TestFindOne;
-var
-  p: TPerson;
-begin
-  p := TPerson.NewPerson;
-  try
-    Session.Save(p);
-    Session.Commit;
-  finally
-    p.Free;
-  end;
-
-  p := Session.FindOne(TypeInfo(TPerson), FirstNameIs('Daniele')) as TPerson;
-  try
-    CheckNotNull(p, 'Didn''t find the object');
-  finally
-    p.Free;
-  end;
-
-  p := Session.FindOne<TPerson>(FirstNameIs('Daniele'));
-  try
-    CheckNotNull(p, 'Didn''t find the object');
   finally
     p.Free;
   end;
@@ -219,17 +227,19 @@ begin
   Session.Commit;
 
   try
-    Session.FindOne(TypeInfo(TPerson), FirstNameIs('Daniele'));
+    Session.FindOne<TPerson>(FirstNameIs('Daniele'));
     Fail('TSession.FindOne must raise an EdormException when more than one object is found');
   except
-    on EdormException do CheckTrue(True);
+    on EdormException do
+      CheckTrue(True);
   end;
 
   try
     Session.FindOne<TPerson>(FirstNameIs('Daniele'));
     Fail('TSession.FindOne must raise an EdormException when more than one object is found');
   except
-    on EdormException do CheckTrue(True);
+    on EdormException do
+      CheckTrue(True);
   end;
 end;
 
@@ -245,7 +255,7 @@ begin
     p.Free;
   end;
 
-  p := Session.FindOne(TypeInfo(TPerson), FirstNameIs('SomeOneThatDoesntExist')) as TPerson;
+  p := Session.FindOne<TPerson>(FirstNameIs('SomeOneThatDoesntExist'));
   try
     CheckNull(p, 'TSession.FindOne should return nil then no object is found');
   finally
@@ -260,15 +270,39 @@ begin
   end;
 end;
 
+procedure TTestDORM.TestFindOne;
+var
+  p: TPerson;
+  p1: TPerson;
+begin
+  p := TPerson.NewPerson;
+  try
+    Session.Persist(p);
+    p1 := Session.FindOne<TPerson>(TdormCriteria.NewCriteria('ID',
+      TdormCompareOperator.Equal, p.id));
+    try
+      CheckEquals(p.id, p1.id); // same data
+      CheckFalse(p = p1); // different objects
+    finally
+      p1.Free;
+    end;
+  finally
+    p.Free;
+  end;
+end;
+
 procedure TTestDORM.LoadPersonaPassingNilAsReturnObject;
 begin
-  Session.Load<TPerson>(nil);
+  // Session.Load<TPerson>(nil);
 end;
 
 procedure TTestDORM.SetUp;
 begin
   inherited;
   Session.DeleteAll(TPerson);
+  Session.DeleteAll(TCar);
+  Session.DeleteAll(TEmail);
+  Session.DeleteAll(TPhone);
 end;
 
 procedure TTestDORM.TestSave;

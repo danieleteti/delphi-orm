@@ -16,7 +16,7 @@ uses
   dorm,
 
   dorm.Commons,
-  dorm.DBCreator, Vcl.ActnList;
+  dorm.DBCreator, Vcl.ActnList, Vcl.Buttons;
 
 type
   TfrmMain = class(TForm)
@@ -28,19 +28,24 @@ type
     Edit1: TEdit;
     Label2: TLabel;
     ListBox1: TListBox;
+    SpeedButton1: TSpeedButton;
+    FileOpenDialog1: TFileOpenDialog;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure SpeedButton1Click(Sender: TObject);
   private
-    outputfilename: string;
+    OutputFilename: string;
     CurrentEnv: TdormEnvironment;
-    function ConfigFileName: String;
+    function GetConfigFileName: String;
     procedure Generate;
+    procedure SetConfigFileName(const Value: String);
   public
-    { Public declarations }
+    property ConfigFileName: String read GetConfigFileName
+      write SetConfigFileName;
   end;
 
 var
@@ -54,6 +59,7 @@ uses
   inifiles, dorm.DBCreator.Interbase;
 
 {$R *.dfm}
+
 
 procedure TfrmMain.Generate;
 var
@@ -72,7 +78,7 @@ begin
     CurrentEnv));
   try
     dbc.Execute;
-    outputfilename := '';
+    OutputFilename := '';
     case CurrentEnv of
       deDevelopment:
         pref := 'development';
@@ -81,15 +87,32 @@ begin
       deRelease:
         pref := 'release';
     end;
-    outputfilename := IncludeTrailingPathDelimiter
+    OutputFilename := IncludeTrailingPathDelimiter
       (ExtractFilePath(ConfigFileName)) + pref + '_' +
       ChangeFileExt(ExtractFileName(ConfigFileName), '.sql');
 
-    dbc.GetSQLScript.SaveToFile(outputfilename);
+    dbc.GetSQLScript.SaveToFile(OutputFilename);
     ShowMessage('Generation completed' + sLineBreak +
-      'Output file is located to: ' + outputfilename);
+      'Output file is located to: ' + OutputFilename);
+    dbc.CreateDatabase(CurrentEnv);
   finally
     dbc.Free;
+  end;
+end;
+
+procedure TfrmMain.SetConfigFileName(const Value: String);
+begin
+  Edit1.Text := Value;
+end;
+
+procedure TfrmMain.SpeedButton1Click(Sender: TObject);
+begin
+  if FileExists(ConfigFileName) then
+    FileOpenDialog1.DefaultFolder := ExtractFilePath(ConfigFileName);
+  if FileOpenDialog1.Execute then
+  begin
+    if FileExists(FileOpenDialog1.FileName) then
+      ConfigFileName := FileOpenDialog1.FileName
   end;
 end;
 
@@ -107,7 +130,7 @@ end;
 
 procedure TfrmMain.Button3Click(Sender: TObject);
 begin
-  ShellExecute(0, nil, PWideChar(outputfilename), nil, nil, SW_NORMAL);
+  ShellExecute(0, nil, PWideChar(OutputFilename), nil, nil, SW_NORMAL);
 end;
 
 procedure TfrmMain.Button4Click(Sender: TObject);
@@ -116,7 +139,7 @@ begin
   Generate;
 end;
 
-function TfrmMain.ConfigFileName: String;
+function TfrmMain.GetConfigFileName: String;
 begin
   Result := Edit1.Text;
 end;
@@ -128,7 +151,7 @@ begin
   try
     ini := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
     try
-      ini.WriteString('LASTRUN', 'CONFIG_FILE_FULL_PATH', Edit1.Text);
+      ini.WriteString('LASTRUN', 'CONFIG_FILE_FULL_PATH', ConfigFileName);
     finally
       ini.Free;
     end;
@@ -144,16 +167,14 @@ var
 begin
   ini := TIniFile.Create(ChangeFileExt(Application.ExeName, '.ini'));
   try
-    Edit1.Text := ini.ReadString('LASTRUN', 'CONFIG_FILE_FULL_PATH', '');
+    ConfigFileName := ini.ReadString('LASTRUN', 'CONFIG_FILE_FULL_PATH', '');
   finally
     ini.Free;
   end;
 
   ListBox1.Clear;
   for c in TdormDBCreatorsRegister.GetDBCreators.Keys do
-  begin
     ListBox1.Items.Add(c);
-  end;
 end;
 
 end.

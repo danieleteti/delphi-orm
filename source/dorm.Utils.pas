@@ -19,14 +19,34 @@ unit dorm.Utils;
 interface
 
 uses
+  CodeSiteLogging, // remove!!
   RTTI,
-  DB, dorm.Commons;
+  DB,
+  dorm.Commons,
+  dorm.InterposedObject;
 
 type
+  TDuckTypedList = class(TInterfacedObject, IdormDuckTypedList)
+  protected
+    FObjectAsDuck: TObject;
+    FAddMethod: TRttiMethod;
+    FClearMethod: TRttiMethod;
+    FCountProperty: TRttiProperty;
+    FGetItemMethod: TRttiMethod;
+    function Count: Integer;
+    function GetItem(const index: Integer): TObject;
+    procedure Add(const AObject: TObject);
+    procedure Clear;
+  public
+    constructor Create(AObjectAsDuck: TObject);
+  end;
+
   TdormUtils = class sealed
-  private
+  protected
     class var ctx: TRttiContext;
   public
+    class function MethodCall(AObject: TObject; AMethodName: string;
+      AParameters: array of TValue): TValue; static;
     class procedure SetProperty(Obj: TObject; const PropertyName: string;
       const Value: TValue); static;
     class procedure ObjectToDataSet(Obj: TObject; Field: TField;
@@ -40,6 +60,7 @@ type
     class function Clone(Obj: TObject): TObject; static;
     class procedure CopyObject(SourceObj, TargetObj: TObject); static;
     class function CreateObject(ARttiType: TRttiType): TObject; static;
+
   end;
 
 function FieldFor(const PropertyName: string): string; inline;
@@ -48,7 +69,21 @@ implementation
 
 uses
   SysUtils,
-  Classes, dorm.Collections;
+  Classes,
+  dorm.Collections;
+
+class function TdormUtils.MethodCall(AObject: TObject; AMethodName: string;
+  AParameters: array of TValue): TValue;
+var
+  m: TRttiMethod;
+begin
+  m := ctx.GetType(AObject.ClassInfo).GetMethod(AMethodName);
+  if Assigned(m) then
+    Result := m.Invoke(AObject, AParameters)
+  else
+    raise EdormException.CreateFmt('Cannot find method "%s" in the object',
+      [AMethodName]);
+end;
 
 function FieldFor(const PropertyName: string): string; inline;
 begin
@@ -63,16 +98,16 @@ var
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
-  if not assigned(ARttiType) then
+  if not Assigned(ARttiType) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [ARttiType.ToString]);
   Field := ARttiType.GetField(FieldFor(PropertyName));
-  if assigned(Field) then
+  if Assigned(Field) then
     Result := Field.GetValue(Obj)
   else
   begin
     Prop := ARttiType.GetProperty(PropertyName);
-    if not assigned(Prop) then
+    if not Assigned(Prop) then
       raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
         [ARttiType.ToString, PropertyName]);
     Result := Prop.GetValue(Obj);
@@ -86,11 +121,11 @@ var
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
-  if not assigned(ARttiType) then
+  if not Assigned(ARttiType) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [ARttiType.ToString]);
   Prop := ARttiType.GetProperty(PropertyName);
-  if not assigned(Prop) then
+  if not Assigned(Prop) then
     raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
       [ARttiType.ToString, PropertyName]);
   if Prop.IsReadable then
@@ -108,16 +143,16 @@ var
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
-  if not assigned(ARttiType) then
+  if not Assigned(ARttiType) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [ARttiType.ToString]);
   Field := ARttiType.GetField(FieldFor(PropertyName));
-  if assigned(Field) then
+  if Assigned(Field) then
     Field.SetValue(Obj, Value)
   else
   begin
     Prop := ARttiType.GetProperty(PropertyName);
-    if assigned(Prop) then
+    if Assigned(Prop) then
       Prop.SetValue(Obj, Value)
     else
       raise Exception.CreateFmt('Cannot get RTTI for field or property [%s.%s]',
@@ -132,11 +167,11 @@ var
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
-  if not assigned(ARttiType) then
+  if not Assigned(ARttiType) then
     raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
       [ARttiType.ToString]);
   Prop := ARttiType.GetProperty(PropertyName);
-  if not assigned(Prop) then
+  if not Assigned(Prop) then
     raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
       [ARttiType.ToString, PropertyName]);
   if Prop.IsWritable then
@@ -165,7 +200,7 @@ begin
     if not SameText(Prop.Name, 'ID') then
     begin
       f := Dataset.FindField(Prop.Name);
-      if assigned(f) and not f.ReadOnly then
+      if Assigned(f) and not f.ReadOnly then
       begin
         if f is TIntegerField then
           SetProperty(Obj, Prop.Name, TIntegerField(f).Value)
@@ -190,7 +225,7 @@ var
   sourceObject: TObject;
   targetObject: TObject;
 begin
-  if not assigned(TargetObj) then
+  if not Assigned(TargetObj) then
     exit;
 
   _ARttiType := ctx.GetType(SourceObj.ClassType);
@@ -256,11 +291,26 @@ begin
 end;
 
 class function TdormUtils.CreateObject(ARttiType: TRttiType): TObject;
-// var
-// Constructors: TArray<TRttiMethod>;
+var
+  Method: TRttiMethod;
+  metaClass: TClass;
 begin
-  // Constructors := ARttiType.GetMethods('Create');
-  Result := ARttiType.AsInstance.MetaclassType.Create
+  { First solution, clear and slow }
+  metaClass := nil;
+  for Method in ARttiType.GetMethods do
+    if Method.HasExtendedInfo and Method.IsConstructor then
+      if Length(Method.GetParameters) = 0 then
+      begin
+        metaClass := ARttiType.AsInstance.MetaclassType;
+        Break;
+      end;
+  if Assigned(metaClass) then
+    Result := Method.Invoke(metaClass, []).AsObject
+  else
+    raise EdormException.Create('Cannot find a propert constructor for ' +
+      ARttiType.ToString);
+
+  { Second solution, dirty and fast }
   // Result := TObject(ARttiType.GetMethod('Create')
   // .Invoke(ARttiType.AsInstance.MetaclassType, []).AsObject);
 end;
@@ -281,7 +331,7 @@ var
   targetObject: TObject;
 begin
   Result := nil;
-  if not assigned(Obj) then
+  if not Assigned(Obj) then
     exit;
 
   _ARttiType := ctx.GetType(Obj.ClassType);
@@ -347,6 +397,67 @@ begin
 
   end;
   Result := cloned;
+end;
+
+{ TListDuckTyping }
+
+procedure TDuckTypedList.Add(const AObject: TObject);
+begin
+  FAddMethod.Invoke(FObjectAsDuck, [AObject]);
+end;
+
+procedure TDuckTypedList.Clear;
+begin
+  FClearMethod.Invoke(FObjectAsDuck, []);
+end;
+
+function TDuckTypedList.Count: Integer;
+begin
+  Result := FCountProperty.GetValue(FObjectAsDuck).AsInteger;
+end;
+
+constructor TDuckTypedList.Create(AObjectAsDuck: TObject);
+begin
+  inherited Create;
+  FObjectAsDuck := AObjectAsDuck;
+
+  FAddMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetMethod('Add');
+  if not Assigned(FAddMethod) then
+    raise EdormException.Create('Cannot find method "Add" in the duck object');
+
+  FClearMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetMethod('Clear');
+  if not Assigned(FClearMethod) then
+    raise EdormException.Create
+      ('Cannot find method "Clear" in the duck object');
+
+  FGetItemMethod := nil;
+{$IF CompilerVersion >= 23}
+  FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetIndexedProperty('Items').ReadMethod;
+{$IFEND}
+  if not Assigned(FGetItemMethod) then
+    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+      .GetMethod('GetItem');
+  if not Assigned(FGetItemMethod) then
+    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+      .GetMethod('GetElement');
+
+  if not Assigned(FGetItemMethod) then
+    raise EdormException.Create
+      ('Cannot find method Indexed property "Items" or method "GetItem" or method "GetElement" in the duck object');
+
+  FCountProperty := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetProperty('Count');
+  if not Assigned(FCountProperty) then
+    raise EdormException.Create
+      ('Cannot find property "Count" in the duck object');
+end;
+
+function TDuckTypedList.GetItem(const index: Integer): TObject;
+begin
+  Result := FGetItemMethod.Invoke(FObjectAsDuck, [index]).AsObject;
 end;
 
 end.
