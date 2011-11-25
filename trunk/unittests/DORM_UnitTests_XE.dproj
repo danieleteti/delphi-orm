@@ -3,7 +3,7 @@
 			<ProjectGuid>{83D7E00E-1949-446B-97EE-AF1D9F4C293C}</ProjectGuid>
 			<MainSource>DORM_UnitTests_XE.dpr</MainSource>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">FIREBIRD_STRATEGY</Config>
+			<Config Condition="'$(Config)'==''">SQLITE3_STRATEGY</Config>
 			<Platform>Win32</Platform>
 			<AppType>Application</AppType>
 			<FrameworkType>VCL</FrameworkType>
@@ -30,7 +30,14 @@
 			<Cfg_3>true</Cfg_3>
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='SQLITE3_STRATEGY' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Cfg_3</CfgParent>
+			<Cfg_3>true</Cfg_3>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_UnitSearchPath>..\lib\sqlitewrap\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_E>false</DCC_E>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;WinTypes=Windows;WinProcs=Windows;$(DCC_UnitAlias)</DCC_UnitAlias>
@@ -52,6 +59,9 @@
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_5)'!=''">
 			<DCC_Define>FIREBIRD_STRATEGY;$(DCC_Define)</DCC_Define>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<DCC_Define>SQLITE3_STRATEGY;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<ItemGroup>
 			<DelphiCompile Include="DORM_UnitTests_XE.dpr">
@@ -79,6 +89,7 @@
 			<DCCReference Include="..\source\dorm.adapter.DBExpress.Factory.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Firebird.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Interbase.pas"/>
+			<DCCReference Include="..\source\dorm.adapter.Sqlite3.pas"/>
 			<BuildConfiguration Include="INTERBASE_STRATEGY">
 				<Key>Cfg_4</Key>
 				<CfgParent>Cfg_3</CfgParent>
@@ -93,6 +104,10 @@
 			</BuildConfiguration>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="SQLITE3_STRATEGY">
+				<Key>Cfg_1</Key>
+				<CfgParent>Cfg_3</CfgParent>
 			</BuildConfiguration>
 		</ItemGroup>
 		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
