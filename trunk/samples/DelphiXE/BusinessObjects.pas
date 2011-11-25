@@ -3,79 +3,90 @@ unit BusinessObjects;
 interface
 
 uses
-  Generics.Collections, dorm.Collections;
+  Generics.Collections,
+  dorm.Collections,
+  SysUtils;
 
 type
   TPerson = class;
+
+  TPeople = class(TObjectList<TPerson>)
+  public
+    function GetElement(const index: Integer): TPerson;
+  end;
 
   TLaptop = class
   private
     FRAM: Integer;
     FCores: Integer;
-    FModel: String;
+    FModel: string;
     FPersonID: Integer;
     FID: Integer;
     FOwner: TPerson;
     procedure SetCores(const Value: Integer);
-    procedure SetModel(const Value: String);
+    procedure SetModel(const Value: string);
     procedure SetRAM(const Value: Integer);
     procedure SetID(const Value: Integer);
     procedure SetOwner(const Value: TPerson);
     property PersonID: Integer read FPersonID write FPersonID;
   protected
-    class procedure Register;
+    class procedure register;
   public
-    constructor Create(AModel: String; ARAM: Integer; ACores: Integer);
+    constructor Create(AModel: string; ARAM: Integer; ACores: Integer);
       overload;
     property Owner: TPerson read FOwner write SetOwner;
     property ID: Integer read FID write SetID;
-    property Model: String read FModel write SetModel;
+    property Model: string read FModel write SetModel;
     property RAM: Integer read FRAM write SetRAM;
     property Cores: Integer read FCores write SetCores;
+  end;
+
+  TLaptops = class(TObjectList<TLaptop>)
+  public
+    function GetElement(const index: Integer): TLaptop;
   end;
 
   TPerson = class
   private
     FID: Integer;
     FAge: Integer;
-    FLastName: String;
-    FFirstName: String;
-    FLaptops: TdormCollection;
+    FLastName: string;
+    FFirstName: string;
+    FLaptops: TLaptops;
     procedure SetAge(const Value: Integer);
-    procedure SetFirstName(const Value: String);
-    procedure SetLastName(const Value: String);
+    procedure SetFirstName(const Value: string);
+    procedure SetLastName(const Value: string);
     function GetIsAdult: Boolean;
-    procedure SetLaptops(const Value: TdormCollection);
+    procedure Init;
   public
     constructor Create; overload;
-    constructor Create(FirstName, LastName: String; Age: Integer); overload;
+    constructor Create(FirstName, LastName: string; Age: Integer); overload;
     destructor Destroy; override;
     property ID: Integer read FID write FID;
-    property FirstName: String read FFirstName write SetFirstName;
-    property LastName: String read FLastName write SetLastName;
+    property FirstName: string read FFirstName write SetFirstName;
+    property LastName: string read FLastName write SetLastName;
     property Age: Integer read FAge write SetAge;
     property IsAdult: Boolean read GetIsAdult;
-    property Laptops: TdormCollection read FLaptops write SetLaptops;
+    property Laptops: TLaptops read FLaptops;
   end;
 
 implementation
-
-uses
-  System.Bindings.Helper, System.SysUtils;
 
 { TPerson }
 
 constructor TPerson.Create;
 begin
   inherited;
+  Init;
   FirstName := 'Daniele';
   LastName := 'Teti';
   Age := 32;
 end;
 
-constructor TPerson.Create(FirstName, LastName: String; Age: Integer);
+constructor TPerson.Create(FirstName, LastName: string; Age: Integer);
 begin
   inherited Create;
+  Init;
   FFirstName := FirstName;
   FLastName := LastName;
   FAge := Age;
@@ -92,31 +103,29 @@ begin
   Result := FAge >= 18;
 end;
 
+procedure TPerson.Init;
+begin
+  FLaptops := TLaptops.Create;
+end;
+
 procedure TPerson.SetAge(const Value: Integer);
 begin
   FAge := Value;
-  TBindings.Notify(self, '');
 end;
 
-procedure TPerson.SetFirstName(const Value: String);
+procedure TPerson.SetFirstName(const Value: string);
 begin
   FFirstName := Value;
 end;
 
-procedure TPerson.SetLaptops(const Value: TdormCollection);
-begin
-  FreeAndNil(FLaptops);
-  FLaptops := Value;
-end;
-
-procedure TPerson.SetLastName(const Value: String);
+procedure TPerson.SetLastName(const Value: string);
 begin
   FLastName := Value;
 end;
 
 { TLaptop }
 
-constructor TLaptop.Create(AModel: String; ARAM, ACores: Integer);
+constructor TLaptop.Create(AModel: string; ARAM, ACores: Integer);
 begin
   inherited Create;
   FModel := AModel;
@@ -139,7 +148,7 @@ begin
   FID := Value;
 end;
 
-procedure TLaptop.SetModel(const Value: String);
+procedure TLaptop.SetModel(const Value: string);
 begin
   FModel := Value;
 end;
@@ -156,6 +165,20 @@ end;
 procedure TLaptop.SetRAM(const Value: Integer);
 begin
   FRAM := Value;
+end;
+
+{ TPeople }
+
+function TPeople.GetElement(const index: Integer): TPerson;
+begin
+  Result := Self.Items[index];
+end;
+
+{ TLaptops }
+
+function TLaptops.GetElement(const index: Integer): TLaptop;
+begin
+  Result := Self.Items[index];
 end;
 
 initialization
