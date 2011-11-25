@@ -141,7 +141,6 @@ type
     // Core
     function Clone<T: class, constructor>(Obj: T): T;
     procedure CopyObject(SourceObject, TargetObject: TObject);
-    function GetTableName(AClassName: string): string;
     function GetTableMapping(AClassName: string): TArray<TdormFieldMapping>;
     function GetMapping: ISuperObject;
     function GetLogger: IdormLogger;
@@ -281,7 +280,7 @@ function TSession.Count(AClassType: TClass): Int64;
 var
   _table: string;
 begin
-  _table := GetTableName(AClassType.ClassName);
+  _table := FMappingStrategy.TableName(FCTX.GetType(AClassType));
   Result := GetStrategy.Count(_table);
 end;
 
@@ -341,7 +340,7 @@ begin
   DoOnBeforeDelete(AObject);
   RttiType := FCTX.GetType(AObject.ClassInfo);
   _class_name := RttiType.ToString;
-  _table := GetTableName(_class_name);
+  _table := FMappingStrategy.TableName(RttiType);
   fields := GetTableMapping(_class_name);
   PKValue := GetPKValue(RttiType, GetTableMapping(AObject.ClassName), AObject);
   DeleteHasManyRelation(PKValue, RttiType, AObject.ClassName, AObject);
@@ -353,7 +352,7 @@ procedure TSession.DeleteAll(AClassType: TClass);
 var
   _table: string;
 begin
-  _table := GetTableName(AClassType.ClassName);
+  _table := FMappingStrategy.TableName(FCTX.GetType(AClassType));
   GetStrategy.DeleteAll(_table);
 end;
 
@@ -567,18 +566,6 @@ begin
   end;
 end;
 
-function TSession.GetTableName(AClassName: string): string;
-var
-  q: string;
-begin
-  q := AClassName;
-  if not FDictTables.TryGetValue(q, Result) then
-  begin
-    Result := FMapping.O['mapping'].O[q].s['table'];
-    FDictTables.Add(q, Result);
-  end;
-end;
-
 function TSession.GetPersistentClassesName(WithPackage: Boolean): TList<string>;
 var
   A: TSuperArray;
@@ -652,7 +639,7 @@ begin
   searcher_classname := TObject(AdormSearchCriteria).ClassName;
   GetLogger.EnterLevel(searcher_classname);
   rt := FCTX.GetType(_type_info);
-  _table := GetTableName(rt.ToString);
+  _table := FMappingStrategy.TableName(rt);
   _fields := GetTableMapping(rt.ToString);
   Result := FPersistStrategy.List(rt, _table, _fields, AdormSearchCriteria);
   Result.SetOwnsObjects(true);
@@ -668,10 +655,7 @@ begin
 end;
 
 function TSession.ListAll<T>: TdormCollection;
-var
-  _table: string;
 begin
-  _table := GetTableName(T.ClassName);
   Result := List<T>(TdormCriteria.Create);
 end;
 
@@ -683,7 +667,7 @@ var
 begin
   rt := FCTX.GetType(ATypeInfo);
   GetLogger.EnterLevel('Load ' + rt.ToString);
-  _table := GetTableName(rt.ToString);
+  _table := FMappingStrategy.TableName(rt);
   _fields := GetTableMapping(rt.ToString);
   Result := FPersistStrategy.Load(rt, _table, _fields, Value);
   if assigned(Result) then
@@ -909,7 +893,7 @@ begin
   if assigned(AObject) then
   begin
     rt := FCTX.GetType(AObject.ClassType);
-    _table := GetTableName(rt.ToString);
+    _table := FMappingStrategy.TableName(rt);
     _fields := GetTableMapping(rt.ToString);
     if BelongsTo in ARelationsSet then
       LoadBelongsToRelation(GetPKValue(rt, _fields, AObject), rt,
@@ -979,7 +963,7 @@ begin
   DoOnBeforeInsert(AObject);
   _type := FCTX.GetType(AObject.ClassInfo);
   _class_name := _type.ToString;
-  _table := GetTableName(_class_name);
+  _table := FMappingStrategy.TableName(_type);
   fields := GetTableMapping(_class_name);
   _pk_value := GetPKValue(_type, fields, AObject);
 
@@ -1210,7 +1194,7 @@ begin
   DoOnBeforeUpdate(AObject);
   _type := FCTX.GetType(AObject.ClassInfo);
   _class_name := _type.ToString;
-  _table := GetTableName(_class_name);
+  _table := FMappingStrategy.TableName(_type);
   fields := GetTableMapping(_class_name);
   _pk_value := GetPKValue(_type, fields, AObject);
 
@@ -1271,7 +1255,7 @@ var
   end;
 
 begin
-  _table := GetTableName(string(AItemClassInfo.name));
+  _table := FMappingStrategy.TableName(FCTX.GetType(AItemClassInfo));
   Mapping := GetTableMapping(string(AItemClassInfo.name));
   select_fields := GetSelectFieldsList(Mapping, true);
   if Criteria.Count > 0 then
