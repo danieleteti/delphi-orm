@@ -237,24 +237,25 @@ begin
     TextReader.Free;
   end;
 
-  if Assigned(CustomMapping) then
-    CustomMappingCount := 1
-  else
-    CustomMappingCount := 0;
-
-  SetLength(Mappings, CustomMappingCount + 2);
-  if Assigned(CustomMapping) then
-    Mappings[0] := CustomMapping;
-  Mappings[CustomMappingCount] := TAttributesMappingStrategy.Create;
-  Mappings[CustomMappingCount + 1] := TCoCMappingStrategy.Create;
-
-  FMappingStrategy := TDelegateMappingStrategy(Mappings);
-
-
   try
     FMapping := TSuperObject.ParseString(pwidechar(s), true);
     if not assigned(FMapping) then
       raise Exception.Create('Cannot parse configuration');
+
+    if Assigned(CustomMapping) then
+      CustomMappingCount := 1
+    else
+      CustomMappingCount := 0;
+
+    SetLength(Mappings, CustomMappingCount + 3);
+    if Assigned(CustomMapping) then
+      Mappings[0] := CustomMapping;
+    Mappings[CustomMappingCount] := TFileMappingStrategy.Create(FMapping.O['mapping']);
+    Mappings[CustomMappingCount + 1] := TAttributesMappingStrategy.Create;
+    Mappings[CustomMappingCount + 2] := TCoCMappingStrategy.Create;
+
+    FMappingStrategy := TDelegateMappingStrategy.Create(Mappings);
+
     FLogger := CreateLogger;
     FPersistStrategy := GetStrategy;
     FPersistStrategy.ConfigureStrategy(FMapping.O['persistence'].O[GetEnv]);

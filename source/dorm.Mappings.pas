@@ -172,7 +172,10 @@ var
   Attr: Entity;
 begin
   Attr := GetAttribute<Entity>(AType);
-  Result := Attr.TableName;
+  if Assigned(Attr) then
+    Result := Attr.TableName
+  else
+    Result := '';
 end;
 
 { Column }
