@@ -46,9 +46,10 @@
 			<DCC_ExeOutput>..\..\bin</DCC_ExeOutput>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win32)'!=''">
+			<DCC_UnitSearchPath>..\..\lib\sqlitewrap\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<DCC_Namespace>System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 			<VerInfo_Locale>1033</VerInfo_Locale>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
@@ -87,12 +88,13 @@
 			<DCCReference Include="..\..\source\dorm.UOW.pas"/>
 			<DCCReference Include="..\..\source\dorm.Utils.pas"/>
 			<DCCReference Include="..\..\source\dorm.utils.Sequences.pas"/>
-			<DCCReference Include="..\..\lib\superobject\superobject.pas"/>
 			<DCCReference Include="lib\dorm.DBCreator.Firebird.pas"/>
 			<DCCReference Include="lib\dorm.DBCreator.pas"/>
 			<DCCReference Include="..\..\source\dorm.adapter.DBExpress.Factory.pas"/>
 			<DCCReference Include="lib\dorm.DBCreator.Interbase.pas"/>
 			<DCCReference Include="..\..\source\dorm.adapter.Interbase.pas"/>
+			<DCCReference Include="lib\dorm.DBCreator.Sqlite3.pas"/>
+			<DCCReference Include="..\..\source\dorm.adapter.Sqlite3.pas"/>
 			<None Include="ModelSupport_dormDCGUI\default.txaPackage"/>
 			<None Include="ModelSupport_dormDCGUI\default.txvpck"/>
 			<None Include="ModelSupport_dormDCGUI\dorm\default.txvpck"/>

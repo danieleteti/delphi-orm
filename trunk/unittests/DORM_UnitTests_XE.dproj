@@ -40,7 +40,7 @@
 			<DCC_K>false</DCC_K>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_3)'!=''">
-			<DCC_UnitSearchPath>..\lib\fastmm;..\lib\superobject;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\lib\fastmm;..\lib\superobject;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_Optimize>false</DCC_Optimize>
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 			<DCC_DebugDCUs>true</DCC_DebugDCUs>
@@ -136,6 +136,9 @@
 				<Platforms>
 					<Platform value="Win32">True</Platform>
 				</Platforms>
+				<UnitTesting>
+					<TestProjectName>C:\ProgettiMiei\dorm_generics_collections\unittests\Test\DORM_UnitTests_XETests.dproj</TestProjectName>
+				</UnitTesting>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
 		</ProjectExtensions>

@@ -20,14 +20,16 @@ interface
 
 uses
   TestFramework,
+  Generics.Collections,
   dorm,
-  dorm.Collections;
+  dorm.Collections, dorm.tests.bo;
 
 type
   TBaseTestCase = class(TTestCase)
   protected
     Session: dorm.TSession;
     function GetDORMConfigFileName: String;
+    function CreateRandomPeople: TObjectList<TPerson>;
   public
     procedure SetUp; override;
     procedure TearDown; override;
@@ -40,20 +42,54 @@ uses
   classes,
   dorm.Commons;
 
+function TBaseTestCase.CreateRandomPeople: TObjectList<TPerson>;
+var
+  p: TPerson;
+begin
+  Result := TObjectList<TPerson>.Create;
+  Result.Add(TPerson.NewPerson);
+  p := TPerson.Create;
+  p.FirstName := 'Scott';
+  p.LastName := 'Summers';
+  p.Age := 30;
+  Result.Add(p);
+  p := TPerson.Create;
+  p.FirstName := 'Sue';
+  p.LastName := 'Storm';
+  p.Age := 28;
+  Result.Add(p);
+  p := TPerson.Create;
+  p.FirstName := 'Bruce';
+  p.LastName := 'Banner';
+  p.Age := 50;
+  Result.Add(p);
+  p := TPerson.Create;
+  p.FirstName := 'Reed';
+  p.LastName := 'Richards';
+  p.Age := 35;
+  Result.Add(p);
+end;
+
 function TBaseTestCase.GetDORMConfigFileName: String;
 begin
 {$IFDEF INTERBASE_STRATEGY}
-  result := 'dorm_interbase.conf';
+  Result := 'dorm_interbase.conf';
 {$ENDIF}
 {$IFDEF FIREBIRD_STRATEGY}
-  result := 'dorm_firebird.conf';
+  Result := 'dorm_firebird.conf';
+{$ENDIF}
+{$IFDEF SQLITE3_STRATEGY}
+  Result := 'dorm_sqlite3.conf';
 {$ENDIF}
 {$IFNDEF INTERBASE_STRATEGY}
-  {$IFNDEF FIREBIRD_STRATEGY}
-    {$MESSAGE ERROR '************************************************'}
-    {$MESSAGE ERROR '**>>> There are not strategy conditionals defined'}
-    {$MESSAGE ERROR '************************************************'}
-  {$ENDIF}
+{$IFNDEF FIREBIRD_STRATEGY}
+{$IFNDEF SQLITE3_STRATEGY}
+{$MESSAGE ERROR '**************************************************'}
+{$MESSAGE ERROR '**>>> There are not strategy conditionals defined '}
+{$MESSAGE ERROR '**>>> You should select a REAL BUILD configuration'}
+{$MESSAGE ERROR '**************************************************'}
+{$ENDIF}
+{$ENDIF}
 {$ENDIF}
 end;
 

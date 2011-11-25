@@ -14,12 +14,13 @@ uses
   dorm.UOW in '..\..\source\dorm.UOW.pas',
   dorm.Utils in '..\..\source\dorm.Utils.pas',
   dorm.utils.Sequences in '..\..\source\dorm.utils.Sequences.pas',
-  superobject in '..\..\lib\superobject\superobject.pas',
   dorm.DBCreator.Firebird in 'lib\dorm.DBCreator.Firebird.pas',
   dorm.DBCreator in 'lib\dorm.DBCreator.pas',
   dorm.adapter.DBExpress.Factory in '..\..\source\dorm.adapter.DBExpress.Factory.pas',
   dorm.DBCreator.Interbase in 'lib\dorm.DBCreator.Interbase.pas',
-  dorm.adapter.Interbase in '..\..\source\dorm.adapter.Interbase.pas';
+  dorm.adapter.Interbase in '..\..\source\dorm.adapter.Interbase.pas',
+  dorm.DBCreator.Sqlite3 in 'lib\dorm.DBCreator.Sqlite3.pas',
+  dorm.adapter.Sqlite3 in '..\..\source\dorm.adapter.Sqlite3.pas';
 
 {$R *.res}
 

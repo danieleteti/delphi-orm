@@ -55,7 +55,7 @@ type
     procedure Clear;
     function Append(Collection: TdormCollection;
       FreeAfterAppend: Boolean = false): TdormCollection;
-    function Count: Integer;
+    function GetCount: Integer;
     function Remove(const Value: TObject): Integer;
     function Extract(index: Integer): TObject; overload;
     function Extract(Obj: TObject): TObject; overload;
@@ -72,6 +72,7 @@ type
     constructor Create; virtual;
     destructor Destroy; override;
     property Items[index: Integer]: TObject read GetItem write SetItem; default;
+    property Count: Integer read GetCount;
   end;
 
   TdormComparer = class(TComparer<TObject>)
@@ -157,7 +158,7 @@ begin
   Result := FItems.contains(Value);
 end;
 
-function TdormCollection.Count: Integer;
+function TdormCollection.GetCount: Integer;
 begin
   Result := FItems.Count;
 end;

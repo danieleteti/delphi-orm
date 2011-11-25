@@ -47,6 +47,14 @@ object frmMain: TfrmMain
     Height = 13
     Caption = 'Configuration file full path'
   end
+  object SpeedButton1: TSpeedButton
+    Left = 279
+    Top = 223
+    Width = 35
+    Height = 22
+    Caption = '...'
+    OnClick = SpeedButton1Click
+  end
   object Button1: TButton
     Left = 8
     Top = 251
@@ -86,7 +94,7 @@ object frmMain: TfrmMain
   object Edit1: TEdit
     Left = 8
     Top = 224
-    Width = 306
+    Width = 265
     Height = 21
     TabOrder = 4
   end
@@ -97,5 +105,22 @@ object frmMain: TfrmMain
     Height = 97
     ItemHeight = 13
     TabOrder = 5
+  end
+  object FileOpenDialog1: TFileOpenDialog
+    DefaultExtension = '*.conf'
+    FavoriteLinks = <>
+    FileTypes = <
+      item
+        DisplayName = 'dorm config file (*.conf)'
+        FileMask = '*.conf'
+      end
+      item
+        DisplayName = 'All files'
+        FileMask = '*.*'
+      end>
+    FileTypeIndex = 0
+    Options = [fdoFileMustExist]
+    Left = 152
+    Top = 160
   end
 end

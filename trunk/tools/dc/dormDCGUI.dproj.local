@@ -1,2 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<BorlandProject/>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2011/11/13 23.00.00.000.265,C:\ProgettiMiei\dorm_generics_collections\tools\dc\Unit1.pas=C:\ProgettiMiei\dorm_generics_collections\tools\dc\lib\dorm.DBCreator.Sqlite3.pas</Transaction>
+    <Transaction>2011/11/13 23.00.00.000.732,=C:\ProgettiMiei\dorm_generics_collections\lib\sqlite3\Source\SQLiteTable3.pas</Transaction>
+    <Transaction>2011/11/13 23.00.00.000.711,=C:\ProgettiMiei\dorm_generics_collections\tools\dc\Unit1.pas</Transaction>
+    <Transaction>2011/11/13 23.00.00.000.666,=C:\ProgettiMiei\dorm_generics_collections\lib\sqlite3\Source\SQLite3.pas</Transaction>
+    <Transaction>2011/11/13 23.00.00.000.685,=C:\ProgettiMiei\dorm_generics_collections\lib\sqlite3\Source\SQLite3Dataset.pas</Transaction>
+    <Transaction>2011/11/14 00.00.00.000.305,C:\ProgettiMiei\dorm_generics_collections\tools\dc\Unit1.pas=C:\ProgettiMiei\dorm_generics_collections\source\dorm.adapter.Sqlite3.pas</Transaction>
+    <Transaction>2011/11/14 00.00.00.000.878,=C:\ProgettiMiei\dorm_generics_collections\tools\dc\Unit1.pas</Transaction>
+    <Transaction>2011/11/25 16.34.11.841,C:\ProgettiMiei\dorm\lib\superobject\superobject.pas=</Transaction>
+  </Transactions>
+</BorlandProject>
