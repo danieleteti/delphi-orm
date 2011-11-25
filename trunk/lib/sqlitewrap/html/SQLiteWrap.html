@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+<meta name="GENERATOR" content="PasDoc 0.9.0">
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<title>SQLiteWrap</title>
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000ff" vlink="#800080" alink="#FF0000">
+<h1 class="unit">Unit SQLiteWrap</h1>
+<table class="sections">
+<tr>
+<td><a class="section"  href="#@Description">Description</a></td><td>uses</td><td><a class="section"  href="#@Classes">Classes, Interfaces, Objects and Records</a></td><td>Functions and Procedures</td><td><a class="section"  href="#@Types">Types</a></td><td>Constants</td><td>Variables</td></tr></table>
+<a name="@Description"></a><h2 class="description">Description</h2>
+<p>
+SQLite 3.x object based wrapper</p>
+<p>
+
+
+<p>Can be used for object based access to SQLite3 databases.
+
+<p>Note: Requires Sqlite 3.6.8 and higher!
+
+<p>Designed for Delphi 6+ and Freepascal, Unicode support for Delphi 2009+
+
+<p>V2.1.0 Added BLOB parameters and improved BLOB handling. Added TotalChanges property. Some bugfixes.
+
+<p>V2.0.0 29 June 2010 Ported to D2009 Unicode by Roger Lascelles (support@veecad.com)
+
+<p>V1.0.0 by Lukáš Gebauer at <a  target="_parent" href="http://www.ararat.cz/doku.php/en:sqlitewrap">http://www.ararat.cz/doku.php/en:sqlitewrap</a>. based on work by Tim Anderson (tim@itwriting.com)
+
+<p>UNICODE HANDLING: Delphi 2009+ Pass data as native UnicodeString. Datas are converted to SQLite native UTF-8 internally.
+
+<p>pre-Delphi 2009 Pass data as UTF8String (it is AnsiString contains UTF8 datas) and you must convert data to UTF-8 explicitly! Pasing data by UTF8String typed variable made your source forward compatible with Delphi 2009+.
+
+<p>Sample usage: </p>
+
+<pre class="longcode">
+<span class="pascal_keyword">procedure</span> sample;
+<span class="pascal_keyword">var</span>
+  database: TSqliteDatabase;
+  tab: TSqliteTable;
+  s: utf8string;
+<span class="pascal_keyword">begin</span>
+  database := TSqliteDatabase.Create(<span class="pascal_string">'somedatabase.db3'</span>);
+  <span class="pascal_keyword">try</span>
+    database.AddParamInt(<span class="pascal_string">':key'</span>, <span class="pascal_numeric">123456</span>);
+    tab := database.GetTable(<span class="pascal_string">'SELECT * FROM some_table WHERE ROWID=:key'</span>);
+    <span class="pascal_keyword">try</span>
+      <span class="pascal_keyword">while</span> <span class="pascal_keyword">not</span> tab.EOF <span class="pascal_keyword">do</span>
+      <span class="pascal_keyword">begin</span>
+        s := tab.FieldAsString(tab.FieldIndex[<span class="pascal_string">'ROWID'</span>]);
+        <span class="pascal_comment">//do something with 'S' variable...</span>
+        <span class="pascal_comment">//...</span>
+        <span class="pascal_comment">//...then go to nexr row.</span>
+        tab.next;
+      <span class="pascal_keyword">end</span>;
+    <span class="pascal_keyword">finally</span>
+      tab.free;
+    <span class="pascal_keyword">end</span>;
+  <span class="pascal_keyword">finally</span>
+    database.free;
+  <span class="pascal_keyword">end</span>;
+<span class="pascal_keyword">end</span>;</pre>
+
+<p></p>
+<a name="@Uses"></a><h2 class="overview">Overview</h2>
+<a name="@Classes"></a><h3 class="cio">Classes, Interfaces, Objects and Records</h3>
+<table class="classestable">
+<tr class="listheader">
+<th class="itemname">Name</th>
+<th class="itemdesc">Description</th>
+</tr>
+<tr class="list">
+<td class="itemname">Class&nbsp;<a class="bold"  href="SQLiteWrap.ESQLiteException.html"><code>ESQLiteException</code></a></td>
+<td class="itemdesc">Exception Class for SQLite based errors</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Class&nbsp;<a class="bold"  href="SQLiteWrap.TSQliteParam.html"><code>TSQliteParam</code></a></td>
+<td class="itemdesc">Class for storing deferred parameters</td>
+</tr>
+<tr class="list">
+<td class="itemname">Class&nbsp;<a class="bold"  href="SQLiteWrap.TSQLiteDatabase.html"><code>TSQLiteDatabase</code></a></td>
+<td class="itemdesc">Class for handling SQLite database</td>
+</tr>
+<tr class="list2">
+<td class="itemname">Class&nbsp;<a class="bold"  href="SQLiteWrap.TSQLiteTable.html"><code>TSQLiteTable</code></a></td>
+<td class="itemdesc">Class for handling SQLite query result</td>
+</tr>
+</table>
+<a name="@Types"></a><h3 class="summary">Types</h3>
+<table class="summary">
+<tr class="list">
+<td class="itemcode"><code><b><a   href="SQLiteWrap.html#THookQuery">THookQuery</a></b> = procedure(Sender: TObject; const SQL: String) of object;</code></td>
+</tr>
+</table>
+<h2 class="description">Description</h2>
+<h3 class="detail">Types</h3>
+<table class="detail">
+<tr class="list">
+<td class="itemcode"><a name="THookQuery"></a><code><b>THookQuery</b> = procedure(Sender: TObject; const SQL: String) of object;</code></td>
+</tr>
+</table>
+<p>
+procedural prototype for <code>OnQuery</code> hook.</p>
+<hr noshade size="1"><span class="appinfo"><em>Generated by <a  target="_parent" href="http://pasdoc.sourceforge.net/">PasDoc 0.9.0</a> on 2011-02-22 18:17:15</em>
+</span>
+</body></html>

@@ -1,0 +1,349 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+<html>
+<head>
+<meta name="GENERATOR" content="PasDoc 0.9.0">
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+<title>SQLiteWrap: Class TSQLiteTable</title>
+<link rel="StyleSheet" type="text/css" href="pasdoc.css">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#0000ff" vlink="#800080" alink="#FF0000">
+<a name="TSQLiteTable"></a><h1 class="cio">Class TSQLiteTable</h1>
+<table class="sections">
+<tr>
+<td><a class="section"  href="#@Description">Description</a></td><td><a class="section"  href="#@Hierarchy">Hierarchy</a></td><td>Fields</td><td><a class="section"  href="#@Methods">Methods</a></td><td><a class="section"  href="#@Properties">Properties</a></td></tr></table>
+<a name="@Description"></a><h2 class="unit">Unit</h2>
+<p class="unitlink">
+<a   href="SQLiteWrap.html">SQLiteWrap</a></p>
+<h2 class="declaration">Declaration</h2>
+<p class="declaration">
+<code>type TSQLiteTable = class(TObject)</code></p>
+<h2 class="description">Description</h2>
+<p>
+Class for handling SQLite query result</p>
+<a name="@Hierarchy"></a><h2 class="hierarchy">Hierarchy</h2>
+<ul class="hierarchy"><li class="ancestor">TObject</li>
+<li class="thisitem">TSQLiteTable</li></ul><h2 class="overview">Overview</h2>
+<a name="@Methods"></a><h3 class="summary">Methods</h3>
+<table class="summary">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>constructor <b><a   href="SQLiteWrap.TSQLiteTable.html#Create">Create</a></b>(const DB: <a   href="SQLiteWrap.TSQLiteDatabase.html">TSQLiteDatabase</a>; const SQL: String; PrepareOnly: Boolean = false);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>destructor <b><a   href="SQLiteWrap.TSQLiteTable.html#Destroy">Destroy</a></b>; override;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteTable.html#FieldAsInteger">FieldAsInteger</a></b>(I: cardinal): int64;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteTable.html#FieldAsBlob">FieldAsBlob</a></b>(I: cardinal): TMemoryStream;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteTable.html#FieldAsBlobPtr">FieldAsBlobPtr</a></b>(I: cardinal; out iNumBytes: integer): Pointer;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteTable.html#FieldAsBlobText">FieldAsBlobText</a></b>(I: cardinal): AnsiString;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteTable.html#FieldIsNull">FieldIsNull</a></b>(I: cardinal): boolean;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteTable.html#FieldAsString">FieldAsString</a></b>(I: cardinal): String;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteTable.html#FieldAsDouble">FieldAsDouble</a></b>(I: cardinal): double;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>function <b><a   href="SQLiteWrap.TSQLiteTable.html#Next">Next</a></b>: boolean;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteTable.html#ParamsClear">ParamsClear</a></b>;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteTable.html#Reset">Reset</a></b>;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteTable.html#AddParamInt">AddParamInt</a></b>(const name: String; value: int64);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteTable.html#AddParamFloat">AddParamFloat</a></b>(const name: String; value: double);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteTable.html#AddParamText">AddParamText</a></b>(const name: String; const value: String);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteTable.html#AddParamNull">AddParamNull</a></b>(const name: String);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteTable.html#AddParamBlobPtr">AddParamBlobPtr</a></b>(const name: String; buffer: pointer; len: integer);</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteTable.html#AddParamBlobText">AddParamBlobText</a></b>(const name: String; const value: AnsiString);</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>procedure <b><a   href="SQLiteWrap.TSQLiteTable.html#AddParamBlob">AddParamBlob</a></b>(const name: String; const value: TStream; len: integer);</code></td>
+</tr>
+</table>
+<a name="@Properties"></a><h3 class="summary">Properties</h3>
+<table class="summary">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a   href="SQLiteWrap.TSQLiteTable.html#Fields">Fields</a></b>[I: cardinal]: String read GetFields;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a   href="SQLiteWrap.TSQLiteTable.html#FieldByName">FieldByName</a></b>[FieldName: String]: String read GetFieldByName;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a   href="SQLiteWrap.TSQLiteTable.html#FieldIndex">FieldIndex</a></b>[FieldName: String]: integer read GetFieldIndex;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a   href="SQLiteWrap.TSQLiteTable.html#Columns">Columns</a></b>[I: integer]: String read GetColumns;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a   href="SQLiteWrap.TSQLiteTable.html#EOF">EOF</a></b>: boolean read FEOF;</code></td>
+</tr>
+<tr class="list2">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a   href="SQLiteWrap.TSQLiteTable.html#ColCount">ColCount</a></b>: cardinal read fColCount;</code></td>
+</tr>
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><code>property <b><a   href="SQLiteWrap.TSQLiteTable.html#Row">Row</a></b>: cardinal read fRow;</code></td>
+</tr>
+</table>
+<h2 class="description">Description</h2>
+<h3 class="detail">Methods</h3>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Create"></a><code>constructor <b>Create</b>(const DB: <a   href="SQLiteWrap.TSQLiteDatabase.html">TSQLiteDatabase</a>; const SQL: String; PrepareOnly: Boolean = false);</code></td>
+</tr>
+</table>
+<p>
+Class constructor. Called internally by <a class="normal" href="SQLiteWrap.TSQLiteDatabase.html">TSQLiteDatabase</a></p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Destroy"></a><code>destructor <b>Destroy</b>; override;</code></td>
+</tr>
+</table>
+<p>
+Class descructor. Call Free instead.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="FieldAsInteger"></a><code>function <b>FieldAsInteger</b>(I: cardinal): int64;</code></td>
+</tr>
+</table>
+<p>
+Read field from current row as integer.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="FieldAsBlob"></a><code>function <b>FieldAsBlob</b>(I: cardinal): TMemoryStream;</code></td>
+</tr>
+</table>
+<p>
+Read field from current row as blob to memory stream.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="FieldAsBlobPtr"></a><code>function <b>FieldAsBlobPtr</b>(I: cardinal; out iNumBytes: integer): Pointer;</code></td>
+</tr>
+</table>
+<p>
+Read field from current row as pointer to memory.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="FieldAsBlobText"></a><code>function <b>FieldAsBlobText</b>(I: cardinal): AnsiString;</code></td>
+</tr>
+</table>
+<p>
+Read field from current row as blob to AnsiString.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="FieldIsNull"></a><code>function <b>FieldIsNull</b>(I: cardinal): boolean;</code></td>
+</tr>
+</table>
+<p>
+Test if field from current row contains null value.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="FieldAsString"></a><code>function <b>FieldAsString</b>(I: cardinal): String;</code></td>
+</tr>
+</table>
+<p>
+Read field from current row as string.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="FieldAsDouble"></a><code>function <b>FieldAsDouble</b>(I: cardinal): double;</code></td>
+</tr>
+</table>
+<p>
+Read field from current row as floating-point.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Next"></a><code>function <b>Next</b>: boolean;</code></td>
+</tr>
+</table>
+<p>
+Go to next row.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="ParamsClear"></a><code>procedure <b>ParamsClear</b>;</code></td>
+</tr>
+</table>
+<p>
+Reset all query params.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Reset"></a><code>procedure <b>Reset</b>;</code></td>
+</tr>
+</table>
+<p>
+Reset current result set. After this you can set new query parameters values and call prepared query again by <a class="normal" href="SQLiteWrap.TSQLiteTable.html#Next">Next</a></p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamInt"></a><code>procedure <b>AddParamInt</b>(const name: String; value: int64);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of integer type.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamFloat"></a><code>procedure <b>AddParamFloat</b>(const name: String; value: double);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of floating-point type.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamText"></a><code>procedure <b>AddParamText</b>(const name: String; const value: String);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of string or binary type.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamNull"></a><code>procedure <b>AddParamNull</b>(const name: String);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter with null value.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamBlobPtr"></a><code>procedure <b>AddParamBlobPtr</b>(const name: String; buffer: pointer; len: integer);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of BLOB type from memory buffer.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamBlobText"></a><code>procedure <b>AddParamBlobText</b>(const name: String; const value: AnsiString);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of BLOB type from binary string.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="AddParamBlob"></a><code>procedure <b>AddParamBlob</b>(const name: String; const value: TStream; len: integer);</code></td>
+</tr>
+</table>
+<p>
+Add named query parameter of BLOB type from stream.</p>
+<h3 class="detail">Properties</h3>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Fields"></a><code>property <b>Fields</b>[I: cardinal]: String read GetFields;</code></td>
+</tr>
+</table>
+<p>
+Return value of some field in current row.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="FieldByName"></a><code>property <b>FieldByName</b>[FieldName: String]: String read GetFieldByName;</code></td>
+</tr>
+</table>
+<p>
+Return value of named field in current row.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="FieldIndex"></a><code>property <b>FieldIndex</b>[FieldName: String]: integer read GetFieldIndex;</code></td>
+</tr>
+</table>
+<p>
+Return index of some named field.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Columns"></a><code>property <b>Columns</b>[I: integer]: String read GetColumns;</code></td>
+</tr>
+</table>
+<p>
+Return field type of some field.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="EOF"></a><code>property <b>EOF</b>: boolean read FEOF;</code></td>
+</tr>
+</table>
+<p>
+Indicate last row in result set.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="ColCount"></a><code>property <b>ColCount</b>: cardinal read fColCount;</code></td>
+</tr>
+</table>
+<p>
+Return number of fields in row.</p>
+<table class="detail">
+<tr class="list">
+<td class="visibility"><a   href="legend.html"><img  src="public.gif" alt="Public" title="Public"></a></td>
+<td class="itemcode"><a name="Row"></a><code>property <b>Row</b>: cardinal read fRow;</code></td>
+</tr>
+</table>
+<p>
+Number of current row.</p>
+<hr noshade size="1"><span class="appinfo"><em>Generated by <a  target="_parent" href="http://pasdoc.sourceforge.net/">PasDoc 0.9.0</a> on 2011-02-22 18:17:15</em>
+</span>
+</body></html>
