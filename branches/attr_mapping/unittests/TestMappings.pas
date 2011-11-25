@@ -3,7 +3,7 @@ unit TestMappings;
 interface
 
 uses
-  BaseTestCase, dorm.Mappings, Rtti, TestFramework;
+  BaseTestCase, dorm.Mappings, Rtti, TestFramework, superobject;
 
 type
   TTableNameDelegate = reference to function(AType: TRttiType): String;
@@ -82,10 +82,21 @@ type
     procedure TestPKPropertyName;
   end;
 
+  TFileMappingStrategyTests = class(TMappingStrategyBaseTestCase)
+  private
+    FJson: ISuperObject;
+    FMapping: IMappingStrategy;
+  protected
+    procedure SetUp; override;
+    procedure TearDown; override;
+  published
+    procedure TestTableName;
+  end;
+
 implementation
 
 uses
-  dorm.tests.bo;
+  dorm.tests.bo, Classes;
 
 { TFakeMappingStrategy }
 
@@ -289,9 +300,41 @@ begin
   CheckEquals('PERSON', FMapping.TableName(FPersonType));
 end;
 
+{ TFileMappingStrategyTests }
+
+procedure TFileMappingStrategyTests.SetUp;
+var
+  Reader: TStreamReader;
+  Content: String;
+begin
+  inherited;
+  Reader := TStreamReader.Create('dorm_mapping_tests.conf');
+  try
+    Content := Reader.ReadToEnd;
+
+    FJson := TSuperObject.Create(Content);
+  finally
+    Reader.Free;
+  end;
+
+  FMapping := TFileMappingStrategy.Create(FJson.O['mapping']);
+end;
+
+procedure TFileMappingStrategyTests.TearDown;
+begin
+  inherited;
+
+end;
+
+procedure TFileMappingStrategyTests.TestTableName;
+begin
+  CheckEquals('PEOPLE', FMapping.TableName(FPersonType));
+end;
+
 initialization
 RegisterTest(TDelegateMappingStrategyTests.Suite);
 RegisterTest(TAttributesMappingStrategyTests.Suite);
 RegisterTest(TCoCMappingStrategyTests.Suite);
+RegisterTest(TFileMappingStrategyTests.Suite);
 
 end.

@@ -3,7 +3,7 @@ unit dorm.Mappings;
 interface
 
 uses
-  Rtti;
+  Rtti, superobject;
 
 type
   Entity = class(TCustomAttribute)
@@ -56,6 +56,16 @@ type
     function FieldName(const AProperty: TRttiProperty): string;
     function PKPropertyName(const AType: TRttiType): string;
     function TableName(const AType: TRttiType): string;
+  end;
+
+  TFileMappingStrategy = class(TInterfacedObject, IMappingStrategy)
+  private
+    FMapping: ISuperObject;
+    function FieldName(const AProperty: TRttiProperty): string;
+    function PKPropertyName(const AType: TRttiType): string;
+    function TableName(const AType: TRttiType): string;
+  public
+    constructor Create(const Mapping: ISuperObject);
   end;
 
 implementation
@@ -191,6 +201,34 @@ begin
     Result := AnsiUpperCase(Copy(AType.Name, 2))
   else
     Result := AnsiUpperCase(AType.Name);
+end;
+
+{ TFileMappingStrategy }
+
+constructor TFileMappingStrategy.Create(const Mapping: ISuperObject);
+begin
+  FMapping := Mapping;
+end;
+
+function TFileMappingStrategy.FieldName(const AProperty: TRttiProperty): string;
+begin
+
+end;
+
+function TFileMappingStrategy.PKPropertyName(const AType: TRttiType): string;
+begin
+
+end;
+
+function TFileMappingStrategy.TableName(const AType: TRttiType): string;
+var
+  Table: ISuperObject;
+begin
+  Table := FMapping.O[AType.Name + '.table'];
+  if Assigned(Table) then
+    Result := Table.AsString
+  else
+    Result := '';
 end;
 
 end.
