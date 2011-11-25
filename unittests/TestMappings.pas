@@ -91,6 +91,8 @@ type
     procedure TearDown; override;
   published
     procedure TestTableName;
+    procedure TestFieldName;
+    procedure TestPKPropertyName;
   end;
 
 implementation
@@ -312,7 +314,7 @@ begin
   try
     Content := Reader.ReadToEnd;
 
-    FJson := TSuperObject.Create(Content);
+    FJson := TSuperObject.ParseString(PChar(Content), True);
   finally
     Reader.Free;
   end;
@@ -323,7 +325,18 @@ end;
 procedure TFileMappingStrategyTests.TearDown;
 begin
   inherited;
+  FJson := Nil;
+  FMapping := Nil;
+end;
 
+procedure TFileMappingStrategyTests.TestFieldName;
+begin
+  CheckEquals('FIRST_NAME', FMapping.FieldName(FFirstNameProperty));
+end;
+
+procedure TFileMappingStrategyTests.TestPKPropertyName;
+begin
+  CheckEquals('ID', FMapping.PKPropertyName(FPersonType));
 end;
 
 procedure TFileMappingStrategyTests.TestTableName;

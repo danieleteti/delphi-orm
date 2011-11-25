@@ -65,13 +65,13 @@ type
     function PKPropertyName(const AType: TRttiType): string;
     function TableName(const AType: TRttiType): string;
   public
-    constructor Create(const Mapping: ISuperObject);
+    constructor Create(Mapping: ISuperObject);
   end;
 
 implementation
 
 uses
-  SysUtils;
+  SysUtils, StrUtils;
 
 { TDelegateMappingStrategy }
 
@@ -205,26 +205,37 @@ end;
 
 { TFileMappingStrategy }
 
-constructor TFileMappingStrategy.Create(const Mapping: ISuperObject);
+constructor TFileMappingStrategy.Create(Mapping: ISuperObject);
 begin
   FMapping := Mapping;
 end;
 
 function TFileMappingStrategy.FieldName(const AProperty: TRttiProperty): string;
+var
+  Fields: TSuperArray;
+  Item: ISuperObject;
+  i: Integer;
 begin
-
+  Result := '';
+  Fields := FMapping.O[AProperty.Parent.Name].O['fields'].AsArray;
+  for i := 0 to Fields.Length - 1 do
+  begin
+    Item := Fields.O[i];
+    if SameText(AProperty.Name, Item.O['name'].AsString) then
+      Exit(Item.O['field'].AsString);
+  end;
 end;
 
 function TFileMappingStrategy.PKPropertyName(const AType: TRttiType): string;
 begin
-
+  Result := FMapping.O[AType.Name].O['id'].O['name'].AsString;
 end;
 
 function TFileMappingStrategy.TableName(const AType: TRttiType): string;
 var
   Table: ISuperObject;
 begin
-  Table := FMapping.O[AType.Name + '.table'];
+  Table := FMapping.O[AType.Name].O['table'];
   if Assigned(Table) then
     Result := Table.AsString
   else
