@@ -20,6 +20,7 @@ end;
     * JSON
     * CSV
     * XML
+  * Split mapping config and persistence config in 2 separate files
   * More tools
     * Create config file from existing databases
     * Create classes from config file
