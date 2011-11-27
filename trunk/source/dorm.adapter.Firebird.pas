@@ -283,7 +283,7 @@ begin
   finally
     cmd.Free;
   end;
-
+  Result := nil;
 end;
 
 procedure TFirebirdPersistStrategy.DeleteAll(ATableName: string);
@@ -321,6 +321,7 @@ var
   rdr: TDBXReader;
   cmd: TDBXCommand;
 begin
+  Result := 0;
   cmd := FB.Prepare(SQL);
   try
     rdr := cmd.ExecuteQuery;
@@ -336,6 +337,7 @@ begin
   finally
     cmd.Free;
   end;
+
 end;
 
 function TFirebirdPersistStrategy.GenerateAndFillPrimaryKeyParam
@@ -415,7 +417,7 @@ var
 begin
   sql_fields_names := '';
   for field in AFieldsMapping do
-    sql_fields_names := sql_fields_names + ',"' + field.field + '"';
+    sql_fields_names := sql_fields_names + ',"' + AnsiString(field.field) + '"';
 
   System.Delete(sql_fields_names, 1, 1);
 
@@ -424,10 +426,10 @@ begin
     sql_fields_values := sql_fields_values + ',?';
   System.Delete(sql_fields_values, 1, 1);
 
-  SQL := Format('INSERT INTO %s (%S) VALUES (%S)',
-    [ATableName, sql_fields_names, sql_fields_values]);
-  GetLogger.Debug('PREPARING :' + SQL);
-  Query := FB.Prepare(SQL);
+  SQL := AnsiString(Format('INSERT INTO %s (%S) VALUES (%S)',
+    [ATableName, sql_fields_names, sql_fields_values]));
+  GetLogger.Debug('PREPARING :' + String(SQL));
+  Query := FB.Prepare(string(SQL));
   try
     I := 0;
     for field in AFieldsMapping do
@@ -443,7 +445,7 @@ begin
       end;
       inc(I);
     end;
-    GetLogger.Debug('EXECUTING PREPARED :' + SQL);
+    GetLogger.Debug('EXECUTING PREPARED :' + string(SQL));
     FB.Execute(Query);
   finally
     Query.Free;
@@ -553,7 +555,7 @@ var
   field: TdormFieldMapping;
   v: TValue;
 begin
-  Result := False;
+//  Result := False;
   obj := AObject;
   for field in AFieldsMapping do
   begin
@@ -591,9 +593,9 @@ var
   S: string;
   sourceStream: TStream;
   targetStream: TMemoryStream;
-  v1: TValue;
+//  v1: TValue;
 begin
-  Result := nil;
+//  Result := nil;
   try
     obj := TdormUtils.CreateObject(ARttiType);
     for field in AFieldsMapping do
