@@ -72,8 +72,8 @@ begin
 end;
 
 function TdormUOW.AddInsert(Obj: TObject): TdormUOW;
-var
-  v: TValue;
+//var
+//  v: TValue;
 begin
   Result := Self;
   if (FUOWInsert.IndexOf(Obj) > -1) then
@@ -114,8 +114,8 @@ begin
 end;
 
 function TdormUOW.AddUpdate(Obj: TObject): TdormUOW;
-var
-  v: TValue;
+//var
+//  v: TValue;
 begin
   Result := Self;
   if (FUOWUpdate.IndexOf(Obj) > -1) then

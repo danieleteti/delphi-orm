@@ -30,7 +30,7 @@ type
 
   TdormCollectionEnumerator = class
   private
-    FCurrent: TObject;
+//    FCurrent: TObject;
     FCollection: TdormCollection;
   protected
     FCurrentIndex: Int64;
@@ -281,7 +281,9 @@ end;
 function TdormCollectionEnumerator.GetCurrent: TObject;
 begin
   if FCurrentIndex > -1 then
-    Result := FCollection[FCurrentIndex];
+    Result := FCollection[FCurrentIndex]
+  else
+    Result := nil;
 end;
 
 function TdormCollectionEnumerator.MoveNext: Boolean;

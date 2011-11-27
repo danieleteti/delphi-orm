@@ -26,7 +26,7 @@ uses
   Sqlite3,
   Sqlite3udf,
   SQLiteWrap,
-  dorm.adapter.DBExpress.Factory,
+  //dorm.adapter.DBExpress.Factory,
   Rtti,
   dorm,
   superobject,
@@ -118,7 +118,7 @@ function TSqlite3PersistStrategy.Update(ARttiType: TRttiType;
 var
   field: TdormFieldMapping;
   SQL: string;
-  I, pk_idx: Integer;
+  //I, pk_idx: Integer;
   v: TValue;
   sql_fields_names: string;
   pk_field: string;
@@ -158,9 +158,9 @@ end;
 procedure TSqlite3PersistStrategy.ConfigureStrategy(ConfigurationInfo
   : ISuperObject);
 var
-  ctx: TRttiContext;
-  t: TRttiType;
-  obj: TObject;
+//  ctx: TRttiContext;
+//  t: TRttiType;
+//  obj: TObject;
   database_connection_string: string;
   // password: string; //Not supported
 begin
@@ -203,7 +203,7 @@ var
   SQL: string;
   Table: TSqliteTable;
 begin
-  Result := -1;
+//  Result := -1;
   SQL := 'SELECT COUNT(*) FROM ' + ATableName;
   GetLogger.Debug('PREPARING: ' + SQL);
   Table := DB.GetTable(SQL);
@@ -237,6 +237,7 @@ begin
   GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
   DB.ExecSQL(SQL);
   DB.ParamsClear;
+  Result := nil;
 end;
 
 procedure TSqlite3PersistStrategy.DeleteAll(ATableName: string);
@@ -362,37 +363,37 @@ function TSqlite3PersistStrategy.Insert(ARttiType: TRttiType;
 var
   field: TdormFieldMapping;
   sql_fields_names, sql_fields_values, SQL: ansistring;
-  Param, I, pk_idx: Integer;
+  {Param, I,} pk_idx: Integer;
   v, pk_value: TValue;
-  Query: TSqliteTable;
+//  Query: TSqliteTable;
 begin
   sql_fields_names := '';
   for field in AFieldsMapping do
     if not field.pk then
-      sql_fields_names := sql_fields_names + ',' + field.field + '';
+      sql_fields_names := sql_fields_names + ',' + AnsiString(field.field) + '';
 
   System.Delete(sql_fields_names, 1, 1);
-  Param := 0;
+//  Param := 0;
   sql_fields_values := '';
   for field in AFieldsMapping do
     if not field.pk then
-      sql_fields_values := sql_fields_values + ', :' + field.field;
+      sql_fields_values := sql_fields_values + ', :' + AnsiString(field.field);
   System.Delete(sql_fields_values, 1, 1);
 
-  SQL := Format('INSERT INTO %s (%S) VALUES (%S)',
-    [ATableName, sql_fields_names, sql_fields_values]);
-  GetLogger.Debug('PREPARING :' + SQL);
+  SQL := AnsiString(Format('INSERT INTO %s (%S) VALUES (%S)',
+    [ATableName, sql_fields_names, sql_fields_values]));
+  GetLogger.Debug('PREPARING :' + string(SQL));
 
   DB.ParamsClear;
-  I := 1;
+//  I := 1;
   for field in AFieldsMapping do
   begin
     v := TdormUtils.GetField(AObject, field.name);
     if not field.pk then
       SetSqlite3ParameterValue(DB, field.field_type, ':' + field.field, v);
   end;
-  GetLogger.Debug('EXECUTING PREPARED :' + SQL);
-  DB.ExecSQL(SQL);
+  GetLogger.Debug('EXECUTING PREPARED :' + string(SQL));
+  DB.ExecSQL(string(SQL));
   pk_value := DB.LastInsertRowID;
   pk_idx := GetPKMappingIndex(AFieldsMapping);
   TdormUtils.SetProperty(AObject, AFieldsMapping[pk_idx].name, pk_value);
@@ -542,7 +543,7 @@ end;
 function TSqlite3PersistStrategy.RawExecute(SQL: string): Int64;
 begin
   GetLogger.Warning('RAW EXECUTE: ' + SQL);
-  // Result :=
+  Result := 0;
   DB.ExecSQL(SQL); // sqlite3 do not return affected rows?
 end;
 
@@ -555,9 +556,9 @@ var
   v: TValue;
   S: string;
   sourceStream: TStream;
-  targetStream: TMemoryStream;
+//  targetStream: TMemoryStream;
 begin
-  Result := nil;
+//  Result := nil;
   try
     obj := TdormUtils.CreateObject(ARttiType);
     for field in AFieldsMapping do
@@ -580,7 +581,7 @@ begin
       end
       else if CompareText(field.field_type, 'blob') = 0 then
       begin
-        targetStream := nil;
+//        targetStream := nil;
         sourceStream := nil;
         if not AReader.FieldIsNull(AReader.FieldIndex[field.field]) then
           sourceStream := AReader.FieldAsBlob(AReader.FieldIndex[field.field]);

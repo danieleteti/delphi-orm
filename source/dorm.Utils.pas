@@ -297,6 +297,7 @@ var
 begin
   { First solution, clear and slow }
   metaClass := nil;
+  Method := nil;
   for Method in ARttiType.GetMethods do
     if Method.HasExtendedInfo and Method.IsConstructor then
       if Length(Method.GetParameters) = 0 then

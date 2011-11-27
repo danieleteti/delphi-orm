@@ -4,6 +4,7 @@ program DORM_UnitTests;
 {$APPTYPE CONSOLE}
 {$ENDIF}
 
+
 uses
   FastMM4,
   Forms,
@@ -22,19 +23,21 @@ uses
   dorm in '..\source\dorm.pas',
   dorm.UOW in '..\source\dorm.UOW.pas',
   dorm.Utils in '..\source\dorm.Utils.pas',
-  dorm.utils.Sequences in '..\source\dorm.utils.Sequences.pas',
+  dorm.Utils.Sequences in '..\source\dorm.utils.Sequences.pas',
   dorm.tests.bo in 'dorm.tests.bo.pas',
   BaseTestCase in 'BaseTestCase.pas',
   FindersTests in 'FindersTests.pas',
   FrameworkTests in 'FrameworkTests.pas',
   dorm.Finders in '..\source\dorm.Finders.pas',
   dorm.loggers.CodeSite in '..\source\dorm.loggers.CodeSite.pas',
-  dorm.adapter.DBExpress.Factory in '..\source\dorm.adapter.DBExpress.Factory.pas',
+  dorm.adapter.DBExpress.Factory
+    in '..\source\dorm.adapter.DBExpress.Factory.pas',
   dorm.adapter.Firebird in '..\source\dorm.adapter.Firebird.pas',
   dorm.adapter.Interbase in '..\source\dorm.adapter.Interbase.pas',
   dorm.adapter.Sqlite3 in '..\source\dorm.adapter.Sqlite3.pas';
 
 {$R *.RES}
+
 
 begin
   ReportMemoryLeaksOnShutdown := True;
@@ -44,5 +47,5 @@ begin
       Free
   else
     GUITestRunner.RunRegisteredTests;
-end.
 
+end.
