@@ -81,8 +81,6 @@ type
   TSession = class(TdormInterfacedObject)
   private
     FCTX: TRttiContext;
-    FDictTables: TDictionary<string, string>;
-    FDictMapping: TDictionary<string, TArray<TdormFieldMapping>>;
     // FIdentityMap: TIdentityMap;
     FMapping: ISuperObject;
     FPersistStrategy: IdormPersistStrategy;
@@ -93,6 +91,7 @@ type
     EnvironmentNames: TArray<string>;
     // TODO: Rename to FMapping after the ISuperObject FMapping is removed
     FMappingStrategy: IMappingStrategy;
+    FDictMapping: TDictionary<string, TArray <TDormFieldMapping>>;
     procedure DoOnAfterLoad(AObject: TObject);
     procedure DoOnBeforeDelete(AObject: TObject);
     procedure DoOnBeforeUpdate(AObject: TObject);
@@ -144,7 +143,7 @@ type
     function GetTableMapping(AClassName: string): TArray<TdormFieldMapping>;
     function GetMapping: ISuperObject;
     function GetLogger: IdormLogger;
-    procedure Configure(TextReader: TTextReader; const CustomMapping: IMappingStrategy);
+    procedure Configure(TextReader: TTextReader; const CustomMapping: IMappingStrategy = nil);
     procedure Persist(AObject: TObject);
     function Save(AObject: TObject): TValue; overload;
     function SaveAndFree(AObject: TObject): TValue;
@@ -225,11 +224,9 @@ begin
   GetLogger.ExitLevel('TSession.Commit');
 end;
 
-procedure TSession.Configure(TextReader: TTextReader; const CustomMapping: IMappingStrategy);
+procedure TSession.Configure(TextReader: TTextReader; const CustomMapping: IMappingStrategy = nil);
 var
   s: string;
-  Mappings: TArray<IMappingStrategy>;
-  CustomMappingCount: Integer;
 begin
   try
     s := TextReader.ReadToEnd;
@@ -242,19 +239,8 @@ begin
     if not assigned(FMapping) then
       raise Exception.Create('Cannot parse configuration');
 
-    if Assigned(CustomMapping) then
-      CustomMappingCount := 1
-    else
-      CustomMappingCount := 0;
-
-    SetLength(Mappings, CustomMappingCount + 3);
-    if Assigned(CustomMapping) then
-      Mappings[0] := CustomMapping;
-    Mappings[CustomMappingCount] := TFileMappingStrategy.Create(FMapping.O['mapping']);
-    Mappings[CustomMappingCount + 1] := TAttributesMappingStrategy.Create;
-    Mappings[CustomMappingCount + 2] := TCoCMappingStrategy.Create;
-
-    FMappingStrategy := TDelegateMappingStrategy.Create(Mappings);
+    FMappingStrategy := TCacheMappingStrategy.Create(
+      FMapping.O['mapping'], CustomMapping);
 
     FLogger := CreateLogger;
     FPersistStrategy := GetStrategy;
@@ -289,12 +275,10 @@ constructor TSession.Create(Environment: TdormEnvironment);
 begin
   inherited Create;
   FEnvironment := Environment;
-  FDictTables := TDictionary<string, string>.Create(128);
-  FDictMapping := TDictionary < string, TArray < TdormFieldMapping >>
-    .Create(128);
   FUOWInsert := TObjectList<TObject>.Create(true);
   FUOWUpdate := TObjectList<TObject>.Create(true);
   FUOWDelete := TObjectList<TObject>.Create(true);
+  FDictMapping := TDictionary<string, TArray <TDormFieldMapping>>.Create(128);
   SetLength(EnvironmentNames, 3);
   EnvironmentNames[ord(deDevelopment)] := 'development';
   EnvironmentNames[ord(deTest)] := 'test';
@@ -407,9 +391,8 @@ begin
   FUOWInsert.Free;
   FUOWUpdate.Free;
   FUOWDelete.Free;
-  FDictTables.Free;
-  FDictMapping.Free;
   FPersistStrategy := nil;
+  FDictMapping.Free;
   inherited;
 end;
 

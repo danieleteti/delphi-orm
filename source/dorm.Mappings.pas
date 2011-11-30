@@ -3,7 +3,10 @@ unit dorm.Mappings;
 interface
 
 uses
-  Rtti, superobject;
+  Rtti, 
+  Generics.Collections,
+  dorm.Commons,
+  superobject;
 
 type
   Entity = class(TCustomAttribute)
@@ -22,15 +25,27 @@ type
     property ColumnName: String read FColumnName;
   end;
 
-  PrimaryKey = class(TCustomAttribute)
-
-  end;
+  PrimaryKey = class(TCustomAttribute);
 
   IMappingStrategy = interface
     ['{C580ADCC-B58C-4BDC-AB19-D0E6A0B539D5}']
     function TableName(const AType: TRttiType): String;
     function FieldName(const AProperty: TRttiProperty): String;
     function PKPropertyName(const AType: TRttiType): String;
+  end;
+
+  TCacheMappingStrategy = class(TInterfacedObject, IMappingStrategy)
+  private
+    FDelegateMapping: IMappingStrategy;
+    FTableNamesCache: TDictionary<TRttiType, String>;
+    FDictMappingCache: TDictionary<string, TArray <TDormFieldMapping>>;
+  public
+    constructor Create(const aFileMapping: ISuperObject;
+      const aCustomMappingStrategy: IMappingStrategy);
+    destructor Destroy; override;
+    function FieldName(const AProperty: TRttiProperty): String;
+    function PKPropertyName(const AType: TRttiType): String;
+    function TableName(const AType: TRttiType): String;
   end;
 
   TDelegateMappingStrategy = class(TInterfacedObject, IMappingStrategy)
@@ -40,7 +55,18 @@ type
     function PKPropertyName(const AType: TRttiType): String;
     function TableName(const AType: TRttiType): String;
   public
-    constructor Create(const Strategies: array of IMappingStrategy);
+    constructor Create(const aFileMapping: ISuperObject;
+      const aCustomMappingStrategy: IMappingStrategy);
+  end;
+
+  TFileMappingStrategy = class(TInterfacedObject, IMappingStrategy)
+  private
+    FMapping: ISuperObject;
+    function FieldName(const AProperty: TRttiProperty): string;
+    function PKPropertyName(const AType: TRttiType): string;
+    function TableName(const AType: TRttiType): string;
+  public
+    constructor Create(Mapping: ISuperObject);
   end;
 
   TAttributesMappingStrategy = class(TInterfacedObject, IMappingStrategy)
@@ -58,31 +84,84 @@ type
     function TableName(const AType: TRttiType): string;
   end;
 
-  TFileMappingStrategy = class(TInterfacedObject, IMappingStrategy)
-  private
-    FMapping: ISuperObject;
-    function FieldName(const AProperty: TRttiProperty): string;
-    function PKPropertyName(const AType: TRttiType): string;
-    function TableName(const AType: TRttiType): string;
-  public
-    constructor Create(Mapping: ISuperObject);
-  end;
-
 implementation
 
 uses
   SysUtils, StrUtils;
 
+{ Entity }
+
+constructor Entity.Create(const TableName: String);
+begin
+  FTableName := TableName;
+end;
+
+{ Column }
+
+constructor Column.Create(const ColumnName: String);
+begin
+  FColumnName := ColumnName;
+end;
+
+{ TCacheMappingStrategy }
+
+constructor TCacheMappingStrategy.Create(const aFileMapping: ISuperObject;
+  const aCustomMappingStrategy: IMappingStrategy);
+begin
+  inherited Create;
+  FTableNamesCache := TDictionary<TRttiType, String>.Create(128);
+  FDictMappingCache := TDictionary<string, TArray <TDormFieldMapping>>.Create(128);
+  FDelegateMapping := TDelegateMappingStrategy.Create(
+    aFileMapping, aCustomMappingStrategy);
+end;
+
+destructor TCacheMappingStrategy.Destroy;
+begin
+  FDictMappingCache.Free;
+  FTableNamesCache.Free;
+  inherited;
+end;
+
+function TCacheMappingStrategy.FieldName(
+  const AProperty: TRttiProperty): String;
+begin
+
+end;
+
+function TCacheMappingStrategy.PKPropertyName(const AType: TRttiType): String;
+begin
+
+end;
+
+function TCacheMappingStrategy.TableName(const AType: TRttiType): String;
+begin
+  if not FTableNamesCache.TryGetValue(AType, Result) then
+  begin
+    Result := FDelegateMapping.TableName(AType);
+    FTablenamesCache.Add(AType, Result);
+  end;
+end;
+
 { TDelegateMappingStrategy }
 
-constructor TDelegateMappingStrategy.Create(
-  const Strategies: array of IMappingStrategy);
-var
-  i: Integer;
+constructor TDelegateMappingStrategy.Create(const aFileMapping: ISuperObject;
+  const aCustomMappingStrategy: IMappingStrategy);
 begin
-  SetLength(FStrategies, Length(Strategies));
-  for i := 0 to High(Strategies) do
-    FStrategies[i] := Strategies[i];
+  inherited Create;
+  // *** tem que ver aqui se vai ficar memory leaks quando esta classe for destruida
+  if Assigned(aCustomMappingStrategy) then
+  begin
+    SetLength(FStrategies, 4);
+    FStrategies[0] := aCustomMappingStrategy;
+    FStrategies[1] := TFileMappingStrategy.Create(aFileMapping);
+    FStrategies[2] := TAttributesMappingStrategy.Create;
+    FStrategies[3] := TCoCMappingStrategy.Create;
+  end else begin
+    SetLength(FStrategies, 3);
+    FStrategies[0] := TFileMappingStrategy.Create(aFileMapping);
+    FStrategies[1] := TAttributesMappingStrategy.Create;
+    FStrategies[2] := TCoCMappingStrategy.Create;
+  end;
 end;
 
 function TDelegateMappingStrategy.FieldName(
@@ -123,11 +202,43 @@ begin
   end;
 end;
 
-{ Entity }
+{ TFileMappingStrategy }
 
-constructor Entity.Create(const TableName: String);
+constructor TFileMappingStrategy.Create(Mapping: ISuperObject);
 begin
-  FTableName := TableName;
+  FMapping := Mapping;
+end;
+
+function TFileMappingStrategy.FieldName(const AProperty: TRttiProperty): string;
+var
+  Fields: TSuperArray;
+  Item: ISuperObject;
+  i: Integer;
+begin
+  Result := '';
+  Fields := FMapping.O[AProperty.Parent.Name].O['fields'].AsArray;
+  for i := 0 to Fields.Length - 1 do
+  begin
+    Item := Fields.O[i];
+    if SameText(AProperty.Name, Item.O['name'].AsString) then
+      Exit(Item.O['field'].AsString);
+  end;
+end;
+
+function TFileMappingStrategy.PKPropertyName(const AType: TRttiType): string;
+begin
+  Result := FMapping.O[AType.Name].O['id'].O['name'].AsString;
+end;
+
+function TFileMappingStrategy.TableName(const AType: TRttiType): string;
+var
+  Table: ISuperObject;
+begin
+  Table := FMapping.O[AType.Name].O['table'];
+  if Assigned(Table) then
+    Result := Table.AsString
+  else
+    Result := '';
 end;
 
 { TAttributesMappingStrategy }
@@ -178,13 +289,6 @@ begin
     Result := '';
 end;
 
-{ Column }
-
-constructor Column.Create(const ColumnName: String);
-begin
-  FColumnName := ColumnName;
-end;
-
 { TCoCMappingStrategy }
 
 function TCoCMappingStrategy.FieldName(const AProperty: TRttiProperty): string;
@@ -204,45 +308,6 @@ begin
     Result := AnsiUpperCase(Copy(AType.Name, 2))
   else
     Result := AnsiUpperCase(AType.Name);
-end;
-
-{ TFileMappingStrategy }
-
-constructor TFileMappingStrategy.Create(Mapping: ISuperObject);
-begin
-  FMapping := Mapping;
-end;
-
-function TFileMappingStrategy.FieldName(const AProperty: TRttiProperty): string;
-var
-  Fields: TSuperArray;
-  Item: ISuperObject;
-  i: Integer;
-begin
-  Result := '';
-  Fields := FMapping.O[AProperty.Parent.Name].O['fields'].AsArray;
-  for i := 0 to Fields.Length - 1 do
-  begin
-    Item := Fields.O[i];
-    if SameText(AProperty.Name, Item.O['name'].AsString) then
-      Exit(Item.O['field'].AsString);
-  end;
-end;
-
-function TFileMappingStrategy.PKPropertyName(const AType: TRttiType): string;
-begin
-  Result := FMapping.O[AType.Name].O['id'].O['name'].AsString;
-end;
-
-function TFileMappingStrategy.TableName(const AType: TRttiType): string;
-var
-  Table: ISuperObject;
-begin
-  Table := FMapping.O[AType.Name].O['table'];
-  if Assigned(Table) then
-    Result := Table.AsString
-  else
-    Result := '';
 end;
 
 end.
