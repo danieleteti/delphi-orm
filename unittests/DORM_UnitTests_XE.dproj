@@ -58,7 +58,7 @@
 		<PropertyGroup Condition="'$(Base_Win32)'!=''">
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<Icon_MainIcon>DORM_UnitTests_XE_Icon.ico</Icon_MainIcon>
-			<DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+			<DCC_Namespace>System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
 			<VerInfo_Locale>1033</VerInfo_Locale>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
@@ -103,6 +103,7 @@
 			<DCCReference Include="..\source\dorm.adapter.DBExpress.Factory.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Firebird.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Interbase.pas"/>
+			<DCCReference Include="..\source\dorm.Mappings.Strategies.pas"/>
 			<DCCReference Include="..\source\dorm.Mappings.pas"/>
 			<BuildConfiguration Include="INTERBASE_STRATEGY">
 				<Key>Cfg_4</Key>

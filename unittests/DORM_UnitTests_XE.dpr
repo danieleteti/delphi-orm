@@ -32,6 +32,7 @@ uses
   dorm.adapter.DBExpress.Factory in '..\source\dorm.adapter.DBExpress.Factory.pas',
   dorm.adapter.Firebird in '..\source\dorm.adapter.Firebird.pas',
   dorm.adapter.Interbase in '..\source\dorm.adapter.Interbase.pas',
+  dorm.Mappings.Strategies in '..\source\dorm.Mappings.Strategies.pas',
   dorm.Mappings in '..\source\dorm.Mappings.pas';
 
 {$R *.RES}
