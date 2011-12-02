@@ -1,59 +1,49 @@
-unit dorm.Mappings;
+unit dorm.Mappings.Strategies;
 
 interface
 
 uses
-  Rtti, 
+  Rtti,
   Generics.Collections,
+  superobject,
   dorm.Commons,
-  superobject;
+  dorm.Mappings;
 
 type
-  Entity = class(TCustomAttribute)
-  private
-    FTableName: String;
-  public
-    constructor Create(const TableName: String = '');
-    property TableName: String read FTableName;
-  end;
-
-  Column = class(TCustomAttribute)
-  private
-    FColumnName: String;
-  public
-    constructor Create(const ColumnName: String);
-    property ColumnName: String read FColumnName;
-  end;
-
-  PrimaryKey = class(TCustomAttribute);
-
   IMappingStrategy = interface
     ['{C580ADCC-B58C-4BDC-AB19-D0E6A0B539D5}']
-    function TableName(const AType: TRttiType): String;
+    function GetTableName(const AType: TRttiType): String;
     function FieldName(const AProperty: TRttiProperty): String;
     function PKPropertyName(const AType: TRttiType): String;
   end;
 
-  TCacheMappingStrategy = class(TInterfacedObject, IMappingStrategy)
+  IMappingStrategyGetter = interface(IMappingStrategy)
+    ['{B8C136E4-7C71-4D09-9016-61D2B2271EFE}']
+    function GetMapping(const AType: TRttiType): TMappingTable;
+  end;
+
+  TCacheMappingStrategy = class(TInterfacedObject, IMappingStrategy, IMappingStrategyGetter)
   private
-    FDelegateMapping: IMappingStrategy;
-    FTableNamesCache: TDictionary<TRttiType, String>;
-    FDictMappingCache: TDictionary<string, TArray <TDormFieldMapping>>;
+    FDelegateMapping: IMappingStrategyGetter;
+    FMapping: TDictionary<TRttiType, TMappingTable>;
+    //FDictMappingCache: TDictionary<string, TArray <TDormFieldMapping>>;
+    function GetMapping(const AType: TRttiType): TMappingTable;
+    function FieldName(const AProperty: TRttiProperty): String;
+    function PKPropertyName(const AType: TRttiType): String;
+    function GetTableName(const AType: TRttiType): String;
   public
     constructor Create(const aFileMapping: ISuperObject;
       const aCustomMappingStrategy: IMappingStrategy);
     destructor Destroy; override;
-    function FieldName(const AProperty: TRttiProperty): String;
-    function PKPropertyName(const AType: TRttiType): String;
-    function TableName(const AType: TRttiType): String;
   end;
 
-  TDelegateMappingStrategy = class(TInterfacedObject, IMappingStrategy)
+  TDelegateMappingStrategy = class(TInterfacedObject, IMappingStrategy, IMappingStrategyGetter)
   private
     FStrategies: array of IMappingStrategy;
+    function GetMapping(const AType: TRttiType): TMappingTable;
+    function GetTableName(const AType: TRttiType): string;
     function FieldName(const AProperty: TRttiProperty): String;
     function PKPropertyName(const AType: TRttiType): String;
-    function TableName(const AType: TRttiType): String;
   public
     constructor Create(const aFileMapping: ISuperObject;
       const aCustomMappingStrategy: IMappingStrategy);
@@ -64,7 +54,7 @@ type
     FMapping: ISuperObject;
     function FieldName(const AProperty: TRttiProperty): string;
     function PKPropertyName(const AType: TRttiType): string;
-    function TableName(const AType: TRttiType): string;
+    function GetTableName(const AType: TRttiType): string;
   public
     constructor Create(Mapping: ISuperObject);
   end;
@@ -74,14 +64,14 @@ type
     function GetAttribute<T:TCustomAttribute>(const Obj: TRttiObject): T;
     function FieldName(const AProperty: TRttiProperty): String;
     function PKPropertyName(const AType: TRttiType): String;
-    function TableName(const AType: TRttiType): String;
+    function GetTableName(const AType: TRttiType): String;
   end;
 
   TCoCMappingStrategy = class(TInterfacedObject, IMappingStrategy)
   private
     function FieldName(const AProperty: TRttiProperty): string;
     function PKPropertyName(const AType: TRttiType): string;
-    function TableName(const AType: TRttiType): string;
+    function GetTableName(const AType: TRttiType): string;
   end;
 
 implementation
@@ -89,43 +79,41 @@ implementation
 uses
   SysUtils, StrUtils;
 
-{ Entity }
-
-constructor Entity.Create(const TableName: String);
-begin
-  FTableName := TableName;
-end;
-
-{ Column }
-
-constructor Column.Create(const ColumnName: String);
-begin
-  FColumnName := ColumnName;
-end;
-
 { TCacheMappingStrategy }
 
 constructor TCacheMappingStrategy.Create(const aFileMapping: ISuperObject;
   const aCustomMappingStrategy: IMappingStrategy);
 begin
   inherited Create;
-  FTableNamesCache := TDictionary<TRttiType, String>.Create(128);
-  FDictMappingCache := TDictionary<string, TArray <TDormFieldMapping>>.Create(128);
-  FDelegateMapping := TDelegateMappingStrategy.Create(
-    aFileMapping, aCustomMappingStrategy);
+  FMapping := TDictionary<TRttiType, TMappingTable>.Create(128);
+  //FDictMappingCache := TDictionary<string, TArray <TDormFieldMapping>>.Create(128);
+  FDelegateMapping := TDelegateMappingStrategy.Create(aFileMapping,
+    aCustomMappingStrategy);
 end;
 
 destructor TCacheMappingStrategy.Destroy;
+var
+  maptable: TMappingTable;
 begin
-  FDictMappingCache.Free;
-  FTableNamesCache.Free;
+  for maptable in FMapping.Values do
+    maptable.Free;
+  //FDictMappingCache.Free;
+  FMapping.Free;
   inherited;
 end;
 
-function TCacheMappingStrategy.FieldName(
-  const AProperty: TRttiProperty): String;
+function TCacheMappingStrategy.GetMapping(const AType: TRttiType): TMappingTable;
 begin
+  if not FMapping.TryGetValue(AType, Result) then
+  begin
+    Result := FDelegateMapping.GetMapping(AType);
+    FMapping.Add(AType, Result);
+  end;
+end;
 
+function TCacheMappingStrategy.GetTableName(const AType: TRttiType): string;
+begin
+  Result := GetMapping(AType).TableName;
 end;
 
 function TCacheMappingStrategy.PKPropertyName(const AType: TRttiType): String;
@@ -133,13 +121,10 @@ begin
 
 end;
 
-function TCacheMappingStrategy.TableName(const AType: TRttiType): String;
+function TCacheMappingStrategy.FieldName(
+  const AProperty: TRttiProperty): String;
 begin
-  if not FTableNamesCache.TryGetValue(AType, Result) then
-  begin
-    Result := FDelegateMapping.TableName(AType);
-    FTablenamesCache.Add(AType, Result);
-  end;
+
 end;
 
 { TDelegateMappingStrategy }
@@ -162,6 +147,26 @@ begin
     FStrategies[1] := TAttributesMappingStrategy.Create;
     FStrategies[2] := TCoCMappingStrategy.Create;
   end;
+end;
+
+function TDelegateMappingStrategy.GetMapping(const AType: TRttiType): TMappingTable;
+begin
+  Result := TMappingTable.Create;
+  Result.TableName := GetTableName(AType);
+//  Result.Id := GetId(Result, AType);
+end;
+
+function TDelegateMappingStrategy.GetTableName(const AType: TRttiType): string;
+var
+  Strategy: IMappingStrategy;
+begin
+  for Strategy in FStrategies do
+  begin
+    Result := Strategy.GetTableName(AType);
+    if Result <> '' then
+      Exit;
+  end;
+  // *** generate exception here?????
 end;
 
 function TDelegateMappingStrategy.FieldName(
@@ -190,22 +195,11 @@ begin
   end;
 end;
 
-function TDelegateMappingStrategy.TableName(const AType: TRttiType): String;
-var
-  Strategy: IMappingStrategy;
-begin
-  for Strategy in FStrategies do
-  begin
-    Result := Strategy.TableName(AType);
-    if Result <> '' then
-      Exit;
-  end;
-end;
-
 { TFileMappingStrategy }
 
 constructor TFileMappingStrategy.Create(Mapping: ISuperObject);
 begin
+  inherited Create;
   FMapping := Mapping;
 end;
 
@@ -230,7 +224,7 @@ begin
   Result := FMapping.O[AType.Name].O['id'].O['name'].AsString;
 end;
 
-function TFileMappingStrategy.TableName(const AType: TRttiType): string;
+function TFileMappingStrategy.GetTableName(const AType: TRttiType): string;
 var
   Table: ISuperObject;
 begin
@@ -278,7 +272,7 @@ begin
   end;
 end;
 
-function TAttributesMappingStrategy.TableName(const AType: TRttiType): String;
+function TAttributesMappingStrategy.GetTableName(const AType: TRttiType): String;
 var
   Attr: Entity;
 begin
@@ -302,7 +296,7 @@ begin
   Result := '';
 end;
 
-function TCoCMappingStrategy.TableName(const AType: TRttiType): string;
+function TCoCMappingStrategy.GetTableName(const AType: TRttiType): string;
 begin
   if AType.Name[1] = 'T' then
     Result := AnsiUpperCase(Copy(AType.Name, 2))
