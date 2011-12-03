@@ -9,7 +9,7 @@ TPerson = class(Tobject)
   ...
 end;
 }}}
-  * Differents Mapping Strategies (File, Attributes, Convention) - *Branch/Testing*
+  * Differents Mapping Strategies (Custom, File, Attributes, Convention) - *Branch/Testing*
   * Per-Object custom mappers
   * More databases support
     * MySQL
