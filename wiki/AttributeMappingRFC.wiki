@@ -1,7 +1,6 @@
 = Attributes Mapping Examples =
 
-==Case 1==
-There isn't ANY kind of file mapping. I want to use the default mapping behaviour for my TPerson class:
+Let's say that there isn't ANY kind of file mapping. I want to use the default mapping behaviour for my TPerson class:
 
 {{{
 [dorm]
@@ -65,4 +64,26 @@ This class i intended to be mapped to the following table:
 ||FIELD2||ADDRESS(VARCHAR with default size)||
 ||FIELD3||AGE (NUMBER)||
 
+Now I want to define a new "IsAdult" transient property (not stored):
+{{{
+[dorm]
+[dorm_table('PEOPLE')]
+TPerson = class
+public
+  property id: integer;
+  [dorm_field('FULL_NAME', 60)]
+  property Name: String...
+  property Address: String...
+  property Age: Integer...
+  [dorm_transient_field]
+  property IsAdult read GetIsAdult;
+end;
+}}}
+
+The "IsAdult" field is not stored, so this class is intended to be mapped to the same table as before:
+||TABLE NAME||PEOPLE||
+||PKFIELD||ID (INTEGER)||
+||FIELD1||FULL_NAME(VARCHAR(60))||
+||FIELD2||ADDRESS(VARCHAR with default size)||
+||FIELD3||AGE (NUMBER)||
 
