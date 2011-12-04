@@ -87,3 +87,87 @@ The "IsAdult" field is not stored, so this class is intended to be mapped to the
 ||FIELD2||ADDRESS(VARCHAR with default size)||
 ||FIELD3||AGE (NUMBER)||
 
+Now I want to define a new has_many relation with class "TPhone":
+{{{
+[dorm]
+[dorm_table('PEOPLE')]
+TPerson = class
+public
+  property id: integer;
+  [dorm_field('FULL_NAME', 60)]
+  property Name: String...
+  property Address: String...
+  property Age: Integer...
+  [dorm_transient_field]
+  property IsAdult read GetIsAdult;
+  [dorm_has_many(TPhone)]
+  property Phones: TObjectList<TPhone>...
+end;
+
+[dorm]
+[dorm_table('PHONES')]
+TPhone = class
+protected
+  property PersonOID: integer...
+public
+  property id: integer...
+  property Number: String...
+end;
+}}}
+
+All the relations table fields in this example are defined "by convention":
+||TABLE NAME||PEOPLE||
+||PKFIELD||ID (INTEGER)||
+||FIELD1||FULL_NAME(VARCHAR(60))||
+||FIELD2||ADDRESS(VARCHAR with default size)||
+||FIELD3||AGE (NUMBER)||
+
+||TABLE NAME||PHONES||
+||PKFIELD||ID (INTEGER)||
+||FIELD1||NUMBER(VARCHAR with default size)||
+||FIELD2||PERSON_OID(INTEGER)||
+
+Now I want to define a SPECIFIC fields for the has_many relation with class "TPhone":
+{{{
+[dorm]
+[dorm_table('PEOPLE')]
+TPerson = class
+public
+  property id: integer;
+  [dorm_field('FULL_NAME', 60)]
+  property Name: String...
+  property Address: String...
+  property Age: Integer...
+  [dorm_transient_field]
+  property IsAdult read GetIsAdult;
+  [dorm_has_many(TPhone, 'OwnerID')]
+  property Phones: TObjectList<TPhone>...
+end;
+
+[dorm]
+[dorm_table('PHONES')]
+TPhone = class
+protected
+  [dorm_field('PARENT_PERSON_ID')]
+  property OwnerID: integer...
+public
+  property id: integer...
+  property Number: String...
+end;
+}}}
+
+All the relations table fields in this example are defined "by convention":
+||TABLE NAME||PEOPLE||
+||PKFIELD||ID (INTEGER)||
+||FIELD1||FULL_NAME(VARCHAR(60))||
+||FIELD2||ADDRESS(VARCHAR with default size)||
+||FIELD3||AGE (NUMBER)||
+
+||TABLE NAME||PHONES||
+||PKFIELD||ID (INTEGER)||
+||FIELD1||NUMBER(VARCHAR with default size)||
+||FIELD2||PARENT_PERSON_ID(INTEGER)||
+
+
+
+Please, add other mapping examples here... we've to share the ideas about the attributes mapping.
