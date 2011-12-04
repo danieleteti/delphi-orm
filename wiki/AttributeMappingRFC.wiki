@@ -1,3 +1,4 @@
+#labels Phase-Requirements,Phase-Design
 = Attributes Mapping Examples =
 
 Let's say that there isn't ANY kind of file mapping. I want to use the default mapping behaviour for my TPerson class:
