@@ -1,1 +1,68 @@
 = Attributes Mapping Examples =
+
+==Case 1==
+There isn't ANY kind of file mapping. I want to use the default mapping behaviour for my TPerson class:
+
+{{{
+[dorm]
+TPerson = class
+public
+  property id: integer;
+  property Name: String...
+  property Address: String...
+  property Age: Integer...
+end;
+}}}
+
+This class i intended to be mapped to the following table:
+||TABLE NAME||PERSON||
+||PKFIELD||ID (INTEGER)||
+||FIELD1||NAME(VARCHAR with default size)||
+||FIELD2||ADDRESS(VARCHAR with default size)||
+||FIELD3||AGE (NUMBER)||
+
+So, we need also a "compatibility" mapping between DELPHI types and database types.
+
+Let's say I want to use a different table:
+{{{
+[dorm]
+[dorm_table('PEOPLE')]
+TPerson = class
+public
+  property id: integer;
+  property Name: String...
+  property Address: String...
+  property Age: Integer...
+end;
+}}}
+
+This class i intended to be mapped to the following table:
+||TABLE NAME||PEOPLE||
+||PKFIELD||ID (INTEGER)||
+||FIELD1||NAME(VARCHAR with default size)||
+||FIELD2||ADDRESS(VARCHAR with default size)||
+||FIELD3||AGE (NUMBER)||
+
+
+Let's say I want to use also a different field name and a specific size for the attribute "Name":
+{{{
+[dorm]
+[dorm_table('PEOPLE')]
+TPerson = class
+public
+  property id: integer;
+  [dorm_field('FULL_NAME', 60)]
+  property Name: String...
+  property Address: String...
+  property Age: Integer...
+end;
+}}}
+
+This class i intended to be mapped to the following table:
+||TABLE NAME||PEOPLE||
+||PKFIELD||ID (INTEGER)||
+||FIELD1||FULL_NAME(VARCHAR(60))||
+||FIELD2||ADDRESS(VARCHAR with default size)||
+||FIELD3||AGE (NUMBER)||
+
+
