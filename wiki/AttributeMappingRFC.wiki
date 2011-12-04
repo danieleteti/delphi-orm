@@ -156,7 +156,7 @@ public
 end;
 }}}
 
-All the relations table fields in this example are defined "by convention":
+All the relations table fields in this example are defined with attributes:
 ||TABLE NAME||PEOPLE||
 ||PKFIELD||ID (INTEGER)||
 ||FIELD1||FULL_NAME(VARCHAR(60))||
@@ -167,7 +167,6 @@ All the relations table fields in this example are defined "by convention":
 ||PKFIELD||ID (INTEGER)||
 ||FIELD1||NUMBER(VARCHAR with default size)||
 ||FIELD2||PARENT_PERSON_ID(INTEGER)||
-
 
 
 Please, add other mapping examples here... we've to share the ideas about the attributes mapping.
