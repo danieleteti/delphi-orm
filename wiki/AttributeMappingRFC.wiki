@@ -18,7 +18,6 @@ public
   property Age: Integer...
 end;
 }}}
-
 This class is intended to be mapped to the following table:
 
 ||TABLE NAME||PERSON||
@@ -28,7 +27,6 @@ This class is intended to be mapped to the following table:
 ||ADDRESS||VARCHAR with default size||
 ||AGE ||NUMBER||
 
-----
 If we have a primary key column with different name we can map:
 {{{
   [Id]
@@ -39,7 +37,7 @@ And if is necessary use a different generator class strategy of default to used 
   [Id('dorm.adapter.Firebird.TFirebirdTableSequence')]
   property Id: integer;
 }}}
-----
+
 Let's say we want to use a different table name to same classe. we can map:
 {{{
 [Entity('PEOPLE')]
@@ -59,7 +57,7 @@ The above mapping is analogue to first sample but persist to *PEOPLE* table. Loo
 ||NAME||VARCHAR with default size||
 ||ADDRESS||VARCHAR with default size||
 ||AGE ||NUMBER||
-----
+
 Let's say I want to use also a different field name and a specific size for the attribute "Name":
 {{{
 [Entity('PEOPLE')]
@@ -81,7 +79,6 @@ This class i intended to be mapped to the following table:
 ||ADDRESS||VARCHAR with default siz)||
 ||AGE ||NUMBER||
 
-----
 Now I want to define a new "IsAdult" transient (when corresponding field not exists on database) property:
 {{{
 [Entity('PEOPLE')]
@@ -97,29 +94,26 @@ public
 end;
 }}}
 This mapping will be equal to prior sample.
-----
 
 = TO REVISION =
 
 Now I want to define a new has_many relation with class "TPhone":
 {{{
-[dorm]
-[dorm_table('PEOPLE')]
+[Entity('PEOPLE')]
 TPerson = class
 public
   property id: integer;
-  [dorm_field('FULL_NAME', 60)]
+  [Column('FULL_NAME', 60)]
   property Name: String...
   property Address: String...
   property Age: Integer...
-  [dorm_transient_field]
+  [Transient]
   property IsAdult read GetIsAdult;
-  [dorm_has_many(TPhone)]
+  [HasMany(TPhone)]
   property Phones: TObjectList<TPhone>...
 end;
 
-[dorm]
-[dorm_table('PHONES')]
+[Entity('PHONES')]
 TPhone = class
 protected
   property PersonOID: integer...
