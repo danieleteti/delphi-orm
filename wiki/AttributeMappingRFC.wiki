@@ -8,6 +8,7 @@ Each property is mapped for a column with same name. The property types will be 
 The first property with name *Id* property will be considered the table's primary key.
 Lets I want to use the default mapping behaviour for my TPerson class:
 
+===Sample 1===
 {{{
 [Entity]
 TPerson = class
@@ -18,7 +19,7 @@ public
   property Age: Integer...
 end;
 }}}
-This class is intended to be mapped to the following table:
+This class will be directly mapped to the following table structure:
 
 ||TABLE NAME||PERSON||
 ||Columns||Type/Size/PK||
@@ -27,73 +28,100 @@ This class is intended to be mapped to the following table:
 ||ADDRESS||VARCHAR with default size||
 ||AGE ||NUMBER||
 
-If we have a primary key column with different name we can map:
+===Sample 2===
 {{{
+[Entity('PEOPLE')]
+TPerson = class
+public
+  property id: integer;
+  property Name: String...
+...
+}}}
+On this case we have the Person class but in database we need map this class to table named *PEOPLE*. 
+
+===Sample 3===
+{{{
+[Entity('PEOPLE')]
+TPerson = class
+public
+  property id: integer;
+  [Column('FULL_NAME', 60)]
+  property Name: String...
+  property Address: String...
+  property Age: Integer...
+end;
+}}}
+On this case the table PEOPLE don't the *Name* column, but have *FULL_NAME* column with VARCHAR(60).
+
+===Sample 4===
+{{{
+[Entity]
+TPerson = class
+public
   [Id]
   property Identifier: integer;
+  property Name: String...
+  property Address: String...
+  property Age: Integer...
+end;
 }}}
-And if is necessary use a different generator class strategy of default to used database, we can map:
+On this case, we have a property called *Identifier* that will be persisted to a column with same name, but this column is too the table's primary key column. We need annotate this property with _[Id]_ to Dorm knows that this field is the primary key column.
+
+===Sample 5===
 {{{
-  [Id('dorm.adapter.Firebird.TFirebirdTableSequence')]
+[Entity]
+TPerson = class
+public
+  [Id]
+  [Column('Identifier')]
+  property MyOtherIdentifier: integer;
+  property Name: String...
+  property Address: String...
+  property Age: Integer...
+end;
+}}}
+Look that we can too put more that one annotation for same property. In this case my table column is called *Identifier* and is primary key.
+
+===Sample 6===
+{{{
+[Entity]
+TCar = class
+public
+  [Id('dorm.adapter.Firebird.TMyOwnerTableSequence')]
   property Id: integer;
-}}}
-
-Let's say we want to use a different table name to same classe. we can map:
-{{{
-[Entity('PEOPLE')]
-TPerson = class
-public
-  property id: integer;
-  property Name: String...
-  property Address: String...
-  property Age: Integer...
+  ...
 end;
 }}}
-The above mapping is analogue to first sample but persist to *PEOPLE* table. Look the following table:
+On Dorm, Each database strategy has a default generator class strategy. 
+The default class to generate primary key to Firebird databases is *dorm.adapter.Firebird.TFirebirdTableSequence*
+When is necessary to use a different strategy we can map like above sample. *TMyOwnerTableSequence* will be used when Dorm need create a new sequence to Id field on Car table.
 
-||TABLE NAME||PEOPLE||
-||Columns||Type/Size/PK||
-||ID||INTEGER (PK)||
-||NAME||VARCHAR with default size||
-||ADDRESS||VARCHAR with default size||
-||AGE ||NUMBER||
+http://cdn1.iconfinder.com/data/icons/gnome-desktop-icons-png/PNG/32/Gnome-Dialog-Question-32.png We need define what the default strategy for each database or driver.
 
-Let's say I want to use also a different field name and a specific size for the attribute "Name":
+===Sample 7===
 {{{
-[Entity('PEOPLE')]
+[Entity]
 TPerson = class
+private
+  FAge: Integer;
+  ...
+  function GetIsAdult: boolean;
 public
   property id: integer;
-  [Column('FULL_NAME', 60)]
-  property Name: String...
-  property Address: String...
-  property Age: Integer...
-end;
-}}}
-This class i intended to be mapped to the following table:
-
-||TABLE NAME||PEOPLE||
-||Columns||Type/Size/PK||
-||ID||INTEGER (PK)||
-||FULL_NAME||VARCHAR(60)||
-||ADDRESS||VARCHAR with default siz)||
-||AGE ||NUMBER||
-
-Now I want to define a new "IsAdult" transient (when corresponding field not exists on database) property:
-{{{
-[Entity('PEOPLE')]
-TPerson = class
-public
-  property id: integer;
-  [Column('FULL_NAME', 60)]
   property Name: String...
   property Address: String...
   property Age: Integer...
   [Transient]
-  property IsAdult read GetIsAdult;
+  property IsAdult: boolean read GetIsAdult;
+end;
+
+function TPerson.GetIsAdult;
+begin
+  Result := FAge > 18;
 end;
 }}}
-This mapping will be equal to prior sample.
+Now we have a field called *"IsAdult"* that don't have a corresponding field on table *Person*). This is called transient property. To Dorm don't put this field on sql'a statments we can use this annotation [Transient]. This is very used when the class have calculated properties. 
+
 
 = TO REVISION =
 
