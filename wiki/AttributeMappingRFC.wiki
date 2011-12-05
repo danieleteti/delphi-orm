@@ -26,7 +26,7 @@ This class is intended to be mapped to the following table:
 ||NAME||VARCHAR with default size||
 ||ADDRESS||VARCHAR with default size||
 ||AGE ||NUMBER||
----
+----
 If we have a primary key column with different name we can map:
 {{{
   [Id]
@@ -37,7 +37,7 @@ And if is necessary use a different generator class strategy of default to used 
   [Id('dorm.adapter.Firebird.TFirebirdTableSequence')]
   property Id: integer;
 }}}
----
+----
 Let's say we want to use a different table name to same classe. we can map:
 {{{
 [Entity('PEOPLE')]
@@ -57,7 +57,7 @@ The above mapping is analogue to first sample but persist to *PEOPLE* table. Loo
 ||NAME||VARCHAR with default size||
 ||ADDRESS||VARCHAR with default size||
 ||AGE ||NUMBER||
----
+----
 Let's say I want to use also a different field name and a specific size for the attribute "Name":
 {{{
 [Entity('PEOPLE')]
@@ -78,7 +78,7 @@ This class i intended to be mapped to the following table:
 ||FULL_NAME||VARCHAR(60)||
 ||ADDRESS||VARCHAR with default siz)||
 ||AGE ||NUMBER||
----
+----
 Now I want to define a new "IsAdult" transient (when corresponding field not exists on database) property:
 {{{
 [Entity('PEOPLE')]
@@ -93,7 +93,9 @@ public
   property IsAdult read GetIsAdult;
 end;
 }}}
----
+----
+= TO REVISION =
+
 Now I want to define a new has_many relation with class "TPhone":
 {{{
 [dorm]
