@@ -4,7 +4,7 @@
 Let's say that there isn't ANY kind of file mapping.
 By convention:
 The classe is mapped for a table of same name without *"T"* prefix.
-Each property is mapped for a column with same name. The property types will be mapped for compatible database types, default sizes and scales.
+Each property is mapped for a column with same name. The property types will be mapped for compatible database column types, default sizes and scales.
 The first property with name *Id* property will be considered the table's primary key.
 Lets I want to use the default mapping behaviour for my TPerson class:
 
@@ -20,12 +20,14 @@ end;
 }}}
 
 This class is intended to be mapped to the following table:
+
 ||TABLE NAME||PERSON||
 ||Columns||Type/Size/PK||
 ||ID||INTEGER (PK)||
 ||NAME||VARCHAR with default size||
 ||ADDRESS||VARCHAR with default size||
 ||AGE ||NUMBER||
+
 ----
 If we have a primary key column with different name we can map:
 {{{
@@ -49,8 +51,8 @@ public
   property Age: Integer...
 end;
 }}}
-
 The above mapping is analogue to first sample but persist to *PEOPLE* table. Look the following table:
+
 ||TABLE NAME||PEOPLE||
 ||Columns||Type/Size/PK||
 ||ID||INTEGER (PK)||
@@ -70,14 +72,15 @@ public
   property Age: Integer...
 end;
 }}}
-
 This class i intended to be mapped to the following table:
+
 ||TABLE NAME||PEOPLE||
 ||Columns||Type/Size/PK||
 ||ID||INTEGER (PK)||
 ||FULL_NAME||VARCHAR(60)||
 ||ADDRESS||VARCHAR with default siz)||
 ||AGE ||NUMBER||
+
 ----
 Now I want to define a new "IsAdult" transient (when corresponding field not exists on database) property:
 {{{
@@ -93,7 +96,9 @@ public
   property IsAdult read GetIsAdult;
 end;
 }}}
+This mapping will be equal to prior sample.
 ----
+
 = TO REVISION =
 
 Now I want to define a new has_many relation with class "TPhone":
