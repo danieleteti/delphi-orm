@@ -1,10 +1,15 @@
 #labels Phase-Requirements,Phase-Design
 = Attributes Mapping Examples =
 
-Let's say that there isn't ANY kind of file mapping. I want to use the default mapping behaviour for my TPerson class:
+Let's say that there isn't ANY kind of file mapping.
+By convention:
+The classe is mapped for a table of same name without *"T"* prefix.
+Each property is mapped for a column with same name. The property types will be mapped for compatible database types, default sizes and scales.
+The first property with name *Id* property will be considered the table's primary key.
+Lets I want to use the default mapping behaviour for my TPerson class:
 
 {{{
-[dorm]
+[Entity]
 TPerson = class
 public
   property id: integer;
@@ -14,19 +19,28 @@ public
 end;
 }}}
 
-This class i intended to be mapped to the following table:
+This class is intended to be mapped to the following table:
 ||TABLE NAME||PERSON||
-||PKFIELD||ID (INTEGER)||
-||FIELD1||NAME(VARCHAR with default size)||
-||FIELD2||ADDRESS(VARCHAR with default size)||
-||FIELD3||AGE (NUMBER)||
-
-So, we need also a "compatibility" mapping between DELPHI types and database types.
-
-Let's say I want to use a different table:
+||Columns||Type/Size/PK||
+||ID||INTEGER (PK)||
+||NAME||VARCHAR with default size||
+||ADDRESS||VARCHAR with default size||
+||AGE ||NUMBER||
+---
+If we have a primary key column with different name we can map:
 {{{
-[dorm]
-[dorm_table('PEOPLE')]
+  [Id]
+  property Identifier: integer;
+}}}
+And if is necessary use a different generator class strategy of default to used database, we can map:
+{{{
+  [Id('dorm.adapter.Firebird.TFirebirdTableSequence')]
+  property Id: integer;
+}}}
+---
+Let's say we want to use a different table name to same classe. we can map:
+{{{
+[Entity('PEOPLE')]
 TPerson = class
 public
   property id: integer;
@@ -36,22 +50,21 @@ public
 end;
 }}}
 
-This class i intended to be mapped to the following table:
+The above mapping is analogue to first sample but persist to *PEOPLE* table. Look the following table:
 ||TABLE NAME||PEOPLE||
-||PKFIELD||ID (INTEGER)||
-||FIELD1||NAME(VARCHAR with default size)||
-||FIELD2||ADDRESS(VARCHAR with default size)||
-||FIELD3||AGE (NUMBER)||
-
-
+||Columns||Type/Size/PK||
+||ID||INTEGER (PK)||
+||NAME||VARCHAR with default size||
+||ADDRESS||VARCHAR with default size||
+||AGE ||NUMBER||
+---
 Let's say I want to use also a different field name and a specific size for the attribute "Name":
 {{{
-[dorm]
-[dorm_table('PEOPLE')]
+[Entity('PEOPLE')]
 TPerson = class
 public
   property id: integer;
-  [dorm_field('FULL_NAME', 60)]
+  [Column('FULL_NAME', 60)]
   property Name: String...
   property Address: String...
   property Age: Integer...
@@ -60,34 +73,27 @@ end;
 
 This class i intended to be mapped to the following table:
 ||TABLE NAME||PEOPLE||
-||PKFIELD||ID (INTEGER)||
-||FIELD1||FULL_NAME(VARCHAR(60))||
-||FIELD2||ADDRESS(VARCHAR with default size)||
-||FIELD3||AGE (NUMBER)||
-
-Now I want to define a new "IsAdult" transient property (not stored):
+||Columns||Type/Size/PK||
+||ID||INTEGER (PK)||
+||FULL_NAME||VARCHAR(60)||
+||ADDRESS||VARCHAR with default siz)||
+||AGE ||NUMBER||
+---
+Now I want to define a new "IsAdult" transient (when corresponding field not exists on database) property:
 {{{
-[dorm]
-[dorm_table('PEOPLE')]
+[Entity('PEOPLE')]
 TPerson = class
 public
   property id: integer;
-  [dorm_field('FULL_NAME', 60)]
+  [Column('FULL_NAME', 60)]
   property Name: String...
   property Address: String...
   property Age: Integer...
-  [dorm_transient_field]
+  [Transient]
   property IsAdult read GetIsAdult;
 end;
 }}}
-
-The "IsAdult" field is not stored, so this class is intended to be mapped to the same table as before:
-||TABLE NAME||PEOPLE||
-||PKFIELD||ID (INTEGER)||
-||FIELD1||FULL_NAME(VARCHAR(60))||
-||FIELD2||ADDRESS(VARCHAR with default size)||
-||FIELD3||AGE (NUMBER)||
-
+---
 Now I want to define a new has_many relation with class "TPhone":
 {{{
 [dorm]
