@@ -122,21 +122,15 @@ end;
 }}}
 Now we have a field called *"IsAdult"* that don't have a corresponding field on table *Person*). This is called transient property. To Dorm don't put this field on sql'a statments we can use this annotation [Transient]. This is very used when the class have calculated properties. 
 
-
-= TO REVISION =
-
-Now I want to define a new has_many relation with class "TPhone":
+===Sample 8===
 {{{
-[Entity('PEOPLE')]
+[Entity]
 TPerson = class
 public
   property id: integer;
-  [Column('FULL_NAME', 60)]
   property Name: String...
   property Address: String...
   property Age: Integer...
-  [Transient]
-  property IsAdult read GetIsAdult;
   [HasMany(TPhone)]
   property Phones: TObjectList<TPhone>...
 end;
@@ -150,59 +144,39 @@ public
   property Number: String...
 end;
 }}}
+On this new case we have relation between two tables. This relation is many _*one to many*_ (1:n). Dorm map this relation using the attribute *[HasMany]* so a person can have one or more phones.
+Look that with this kind of relation the table *PHONES* have a id (_*PersonOID*_) property that point to owner (some person). The property PersonOID is mapped as foreign key on TPhone class by convention without need map.
 
-All the relations table fields in this example are defined "by convention":
-||TABLE NAME||PEOPLE||
-||PKFIELD||ID (INTEGER)||
-||FIELD1||FULL_NAME(VARCHAR(60))||
-||FIELD2||ADDRESS(VARCHAR with default size)||
-||FIELD3||AGE (NUMBER)||
-
-||TABLE NAME||PHONES||
-||PKFIELD||ID (INTEGER)||
-||FIELD1||NUMBER(VARCHAR with default size)||
-||FIELD2||PERSON_OID(INTEGER)||
-
-Now I want to define a SPECIFIC fields for the has_many relation with class "TPhone":
+===Sample 9===
 {{{
-[dorm]
-[dorm_table('PEOPLE')]
+[Entity]
 TPerson = class
 public
   property id: integer;
-  [dorm_field('FULL_NAME', 60)]
   property Name: String...
   property Address: String...
   property Age: Integer...
-  [dorm_transient_field]
-  property IsAdult read GetIsAdult;
-  [dorm_has_many(TPhone, 'OwnerID')]
+  [HasMany(TPhone, 'OwnerID')]
   property Phones: TObjectList<TPhone>...
 end;
 
-[dorm]
-[dorm_table('PHONES')]
+[Entity('PHONES')]
 TPhone = class
 protected
-  [dorm_field('PARENT_PERSON_ID')]
+  [Column('PARENT_PERSON_ID')]
   property OwnerID: integer...
 public
   property id: integer...
   property Number: String...
 end;
 }}}
-
-All the relations table fields in this example are defined with attributes:
-||TABLE NAME||PEOPLE||
-||PKFIELD||ID (INTEGER)||
-||FIELD1||FULL_NAME(VARCHAR(60))||
-||FIELD2||ADDRESS(VARCHAR with default size)||
-||FIELD3||AGE (NUMBER)||
-
-||TABLE NAME||PHONES||
-||PKFIELD||ID (INTEGER)||
-||FIELD1||NUMBER(VARCHAR with default size)||
-||FIELD2||PARENT_PERSON_ID(INTEGER)||
-
+When we have a specific property name on many side (TPhone) we can define a second parameter on HasMany attribute point to it (OwnerOD). Look too that on many side the property can be mapped for a field with another name (PARENT_PERSON_ID).
 
 Please, add other mapping examples here... we've to share the ideas about the attributes mapping.
+
+http://cdn1.iconfinder.com/data/icons/gnome-desktop-icons-png/PNG/32/Gnome-Dialog-Question-32.png Need sample:
+ * Inheritance
+ * ManyToOne
+ * ManyToMany
+ * Cascade operations
+ * Inverse relations
