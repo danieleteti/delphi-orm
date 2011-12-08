@@ -73,7 +73,7 @@ type
   private
     FParameters: TdormParameters;
   public
-    constructor Create(AItemClassInfo: PTypeInfo; ASQL: string);reintroduce;
+    constructor Create(AItemClassInfo: PTypeInfo; ASQL: string); reintroduce;
     destructor Destroy; override;
     property Parameters: TdormParameters read FParameters;
   end;
@@ -138,7 +138,7 @@ type
     procedure FillList(ACollection: TObject; AItemClassInfo: PTypeInfo;
       Criteria: TdormCriteria = nil; FreeCriteria: Boolean = false); overload;
   public
-    constructor Create(Environment: TdormEnvironment);reintroduce; virtual;
+    constructor Create(Environment: TdormEnvironment); reintroduce; virtual;
     destructor Destroy; override;
     // Environments
     function GetEnv: string;
@@ -204,8 +204,8 @@ type
 implementation
 
 uses
-  //dorm.loggers.CodeSite,
-  //dorm.adapter.Firebird,
+  // dorm.loggers.CodeSite,
+  // dorm.adapter.Firebird,
   SysUtils,
   dorm.Utils;
 
@@ -214,7 +214,7 @@ uses
 procedure TSession.ClearOID(Obj: TObject);
 var
   rt: TRttiType;
-//  pk_value: TValue;
+  // pk_value: TValue;
 begin
   rt := FCTX.GetType(Obj.ClassType);
   TdormUtils.SetField(Obj, GetPKName(GetTableMapping(rt.ToString)),
@@ -313,8 +313,15 @@ begin
   else
   begin
     l := FCTX.FindType(LogClassName);
-    if Supports(l.AsInstance.MetaclassType, IdormLogger) then
-      Supports(l.AsInstance.MetaclassType.Create, IdormLogger, Result);
+    if assigned(l) then
+    begin
+      if Supports(l.AsInstance.MetaclassType, IdormLogger) then
+        Supports(l.AsInstance.MetaclassType.Create, IdormLogger, Result);
+    end
+    else
+    begin
+      raise EdormException.CreateFmt('Logger class unknown: [%s]', [LogClassName]);
+    end;
   end;
 end;
 
@@ -363,7 +370,7 @@ var
   _child_type: TRttiType;
   i, x: Integer;
   Coll: TObject;
-//  O: TObject;
+  // O: TObject;
   DuckObject: IdormDuckTypedList;
 begin
   GetLogger.EnterLevel('has_many ' + AClassName);
@@ -384,12 +391,12 @@ begin
       { todo: optimize the delete? }
 
       if assigned(Coll) then
-          begin
+      begin
         DuckObject := TDuckTypedList.Create(Coll);
         for x := 0 to DuckObject.Count - 1 do
           Delete(DuckObject.GetItem(x));
+      end;
     end;
-  end;
   end;
   GetLogger.ExitLevel('has_many ' + AClassName);
 end;
@@ -742,7 +749,7 @@ function TSession.GetPKValueFromObject(Obj: TObject;
   var pktype: TdormKeyType): TValue;
 var
   rt: TRttiType;
-//  pk_value: TValue;
+  // pk_value: TValue;
 begin
   rt := FCTX.GetType(Obj.ClassType);
   pktype := GetStrategy.GetKeyType;
@@ -847,7 +854,7 @@ var
   v: TValue;
   List: TObject;
   _child_type: TRttiType;
-//  SearchChildCriteria: IdormSearchCriteria;
+  // SearchChildCriteria: IdormSearchCriteria;
   i: Integer;
   _table_mapping: TArray<TdormFieldMapping>;
   AttributeNameInTheParentObject: string;
@@ -930,7 +937,7 @@ var
   v: TValue;
   _child_type: TRttiType;
   i: Integer;
-//  _parent_field_key_value: TValue;
+  // _parent_field_key_value: TValue;
   _child_field_name: string;
   SrcObj: TObject;
   DestObj: TObject;
@@ -965,7 +972,7 @@ begin
         end
         else
           DestObj := nil;
-        if Assigned(DestObj) then
+        if assigned(DestObj) then
           TdormUtils.CopyObject(SrcObj, DestObj);
         FreeAndNil(SrcObj);
       end;
@@ -1002,7 +1009,7 @@ end;
 
 procedure TSession.Persist(AObject: TObject);
 var
-//  rt: TRttiType;
+  // rt: TRttiType;
   pk_value: TValue;
   pktype: TdormKeyType;
 begin
@@ -1224,7 +1231,7 @@ begin
 
       List := v.AsObject;
       if assigned(List) then
-        begin
+      begin
         DuckList := TDuckTypedList.Create(List);
         for j := 0 to DuckList.Count - 1 do
         begin
@@ -1236,8 +1243,8 @@ begin
           Save(DuckList.GetItem(j));
           // Save(TdormUtils.MethodCall(List, 'GetItem', [j]).AsObject);
         end;
+      end;
     end;
-  end;
   end;
   GetLogger.ExitLevel('has_many ' + AClassName);
 end;
@@ -1248,9 +1255,9 @@ var
   _child_field_name, _child_class_name: string;
   _has_one: TSuperArray;
   v: TValue;
-//  List: TdormCollection;
+  // List: TdormCollection;
   _child_type: TRttiType;
-  i{, j}: Integer;
+  i { , j } : Integer;
   Obj: TObject;
 begin
   GetLogger.EnterLevel('has_one ' + AClassName);
@@ -1287,10 +1294,10 @@ var
   _parent_id_attribute_name, _parent_class_name: string;
   _belongs_to: TSuperArray;
   v: TValue;
-//  List: TdormCollection;
-//  _child_type: TRttiType;
-  i{, j}: Integer;
-//  Obj: TObject;
+  // List: TdormCollection;
+  // _child_type: TRttiType;
+  i { , j } : Integer;
+  // Obj: TObject;
   _parent_type: TRttiType;
   ParentObject: TObject;
 begin
