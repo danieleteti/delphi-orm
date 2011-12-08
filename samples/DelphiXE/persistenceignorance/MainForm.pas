@@ -5,6 +5,8 @@ interface
 uses
   dorm,
   dorm.Commons,
+  dorm.adapter.Firebird,
+  dorm.loggers.FileLog,
   Windows,
   Messages,
   SysUtils,
