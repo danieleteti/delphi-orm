@@ -3,12 +3,14 @@
 			<ProjectGuid>{83D7E00E-1949-446B-97EE-AF1D9F4C293C}</ProjectGuid>
 			<MainSource>DORM_UnitTests_XE.dpr</MainSource>
 			<Base>True</Base>
-			<Config Condition="'$(Config)'==''">SQLITE3_STRATEGY</Config>
-			<Platform>Win32</Platform>
+			<Config Condition="'$(Config)'==''">FIREBIRD_STRATEGY</Config>
 			<AppType>Application</AppType>
 			<FrameworkType>VCL</FrameworkType>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
-			<ProjectVersion>12.3</ProjectVersion>
+			<ProjectVersion>13.4</ProjectVersion>
+			<Platform Condition="'$(Platform)'==''">Win32</Platform>
+			<TargetedPlatforms>1</TargetedPlatforms>
+			<Platform>Win32</Platform>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
 			<Base>true</Base>
@@ -37,10 +39,12 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+			<VerInfo_Locale>1040</VerInfo_Locale>
+			<DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;Winapi;$(DCC_Namespace)</DCC_Namespace>
 			<DCC_UnitSearchPath>..\lib\sqlitewrap\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_E>false</DCC_E>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
-			<DCC_UnitAlias>WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;WinTypes=Windows;WinProcs=Windows;$(DCC_UnitAlias)</DCC_UnitAlias>
 			<DCC_F>false</DCC_F>
 			<DCC_S>false</DCC_S>
 			<DCC_N>false</DCC_N>
@@ -89,7 +93,10 @@
 			<DCCReference Include="..\source\dorm.adapter.DBExpress.Factory.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Firebird.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Interbase.pas"/>
-			<DCCReference Include="..\source\dorm.adapter.Sqlite3.pas"/>
+			<DCCReference Include="..\source\dorm.Filters.pas"/>
+			<DCCReference Include="..\source\dorm.Mappings.pas"/>
+			<DCCReference Include="..\source\dorm.Mappings.Strategies.pas"/>
+			<DCCReference Include="TestMappings.pas"/>
 			<BuildConfiguration Include="INTERBASE_STRATEGY">
 				<Key>Cfg_4</Key>
 				<CfgParent>Cfg_3</CfgParent>
@@ -121,7 +128,7 @@
 						<Source Name="MainSource">DORM_UnitTests_XE.dpr</Source>
 					</Source>
 					<VersionInfo>
-						<VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
 						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
 						<VersionInfo Name="MajorVer">1</VersionInfo>
 						<VersionInfo Name="MinorVer">0</VersionInfo>
@@ -147,8 +154,13 @@
 						<VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
 						<VersionInfoKeys Name="Comments"/>
 					</VersionInfoKeys>
+					<Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+					</Excluded_Packages>
 				</Delphi.Personality>
 				<Platforms>
+					<Platform value="Win64">False</Platform>
 					<Platform value="Win32">True</Platform>
 				</Platforms>
 				<UnitTesting>

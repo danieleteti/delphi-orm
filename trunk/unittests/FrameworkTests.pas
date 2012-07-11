@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -24,13 +24,15 @@ uses
   Generics.Collections,
   dorm.tests.bo,
   dorm,
+  dorm.Filters,
   dorm.Collections,
   dorm.Commons,
+  dorm.InterposedObject,
   Generics.Defaults;
 
 type
 {$RTTI EXPLICIT FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished]) METHODS([vcPrivate, vcProtected, vcPublic, vcPublished]) PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
-  TPeople = class(TObjectList<TPerson>)
+  TPeople = class({$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND})
   protected
     function GetElement(const index: Integer): TPerson;
   end;
@@ -50,6 +52,7 @@ type
     procedure TestLastInsertedOID;
     procedure TestCollectionSorting;
     procedure TestListDuckTyping;
+    procedure TestWrapAsList;
   end;
 
   TPersonComparer = class(TComparer<TObject>)
@@ -105,7 +108,7 @@ begin
     finally
       fs.Free;
     end;
-    Session.Save(p);
+    Session.Insert(p);
     Session.Commit;
     oid := p.ID;
   finally
@@ -200,10 +203,13 @@ end;
 
 procedure TFrameworkTests.TestCollectionSorting;
 var
-  Coll: TdormCollection;
+  Coll: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
   p: TPerson;
+  cmp: TdormComparer<TPerson>;
+  revCmp: TdormReverseComparer<TPerson>;
 begin
-  Coll := NewList();
+  Coll := {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND}.
+    Create(true);
   try
     p := TPerson.NewPerson;
     p.LastName := 'abc';
@@ -226,19 +232,34 @@ begin
     p.BornDate := EncodeDate(2000, 4, 10);
     Coll.Add(p);
 
-    Coll.Sort(TdormComparer.Create('LastName'));
+    cmp := TdormComparer<TPerson>.Create('LastName');
+    Coll.Sort(cmp);
+    cmp.Free;
     CheckEquals('abc', TPerson(Coll[0]).LastName);
-    Coll.ReverseSort(TdormComparer.Create('LastName'));
+
+    revCmp := TdormReverseComparer<TPerson>.Create('LastName');
+    Coll.Sort(revCmp);
+    revCmp.Free;
     CheckEquals('def', TPerson(Coll[0]).LastName);
 
-    Coll.Sort(TdormComparer.Create('Age'));
+    cmp := TdormComparer<TPerson>.Create('Age');
+    Coll.Sort(cmp);
+    cmp.Free;
     CheckEquals(27, TPerson(Coll[0]).Age);
-    Coll.ReverseSort(TdormComparer.Create('Age'));
+
+    revCmp := TdormReverseComparer<TPerson>.Create('Age');
+    Coll.Sort(revCmp);
+    revCmp.Free;
     CheckEquals(30, TPerson(Coll[0]).Age);
 
-    Coll.Sort(TdormComparer.Create('BornDate'));
+    cmp := TdormComparer<TPerson>.Create('BornDate');
+    Coll.Sort(cmp);
+    cmp.Free;
+
     CheckEquals(EncodeDate(2000, 1, 10), TPerson(Coll[0]).BornDate);
-    Coll.ReverseSort(TdormComparer.Create('BornDate'));
+    revCmp := TdormReverseComparer<TPerson>.Create('BornDate');
+    Coll.Sort(revCmp);
+    revCmp.Free;
     CheckEquals(EncodeDate(2000, 4, 10), TPerson(Coll[0]).BornDate);
 
   finally
@@ -281,9 +302,10 @@ begin
   end;
 end;
 
+{$HINTS OFF}
 procedure TFrameworkTests.TestEnumerableCollection;
 var
-  people: TdormCollection;
+  people: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
   person: TObject;
   I: Integer;
   x: Integer;
@@ -302,20 +324,21 @@ begin
   begin
     p := TPerson.NewPerson;
     p.FirstName := p.FirstName + inttostr(I);
-    Session.Save(p);
+    Session.Insert(p);
     p.Free;
   end;
 
   people := Session.ListAll<TPerson>;
   try
     x := 0;
-    for person in people do
+    for I := 0 to (people.Count - 1) do
       inc(x);
     CheckEquals(10, x);
   finally
     people.Free;
   end;
 end;
+{$HINTS ON}
 
 procedure TFrameworkTests.TestGeneratorID;
 var
@@ -324,7 +347,7 @@ begin
   T := TPerson.NewPerson;
   try
     CheckTrue(T.ID = 0);
-    Session.Save(T);
+    Session.Insert(T);
     CheckFalse(T.ID = 0);
   finally
     T.Free;
@@ -346,48 +369,73 @@ begin
     p.Email := nil;
     p.Car.Free;
     p.Car := nil;
-    Session.Save(p);
+    Session.Insert(p);
     CheckTrue(p.ID = Session.Strategy.GetLastInsertOID.AsInt64);
   finally
     p.Free;
   end;
 end;
 
+{$HINTS OFF}
 procedure TFrameworkTests.TestListDuckTyping;
 var
 {$IF CompilerVersion = 22}
   ObjectList: TPeople;
 {$ELSE}
-  ObjectList: TObjectList<TPerson>;
+  ObjectList: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
 {$IFEND}
-  List: IdormDuckTypedList;
+  List: IWrappedList;
+  o: TObject;
+  p: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
+  c: Integer;
 begin
   ObjectList :=
 {$IF CompilerVersion = 22}
     TPeople.Create;
 {$ELSE}
-    TObjectList<TPerson>.Create;
+{$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND}.Create;
 {$IFEND}
   try
-    List := TDuckTypedlist.Create(ObjectList);
+    List := WrapAsList(ObjectList);
+    for o in List do
+      Fail('There arent records, so you should not enter in the loop');
+    p := CreateRandomPeople;
+    try
+      c := p.Count;
+      Session.DeleteAll(TPerson);
+      Session.InsertCollection(p);
+      p.Clear;
+      Session.FillList<TPerson>(p);
+      CheckEquals(c, p.Count);
+      c := 0;
+      List := WrapAsList(p);
+      for o in List do
+        inc(c);
+      CheckEquals(c, p.Count);
+    finally
+      p.Free;
+    end;
   finally
     ObjectList.Free;
   end;
 end;
+{$HINTS ON}
 
 procedure TFrameworkTests.TestLoadByAttribute;
 var
-  Coll: TdormCollection;
-  Criteria: TdormCriteria;
+  Coll: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
+  Criteria: ICriteria;
   m_id: Int64;
   p: TPerson;
+  obj: TPerson;
 begin
+  m_id := 0;
   Session.DeleteAll(TPerson);
 
   p := TPerson.NewPerson;
   try
     p.Age := 32;
-    Session.Save(p);
+    Session.Insert(p);
   finally
     p.Free;
   end;
@@ -396,47 +444,45 @@ begin
   try
     p.Age := 30;
     p.FirstName := 'Jack';
-    Session.Save(p);
+    Session.Insert(p);
   finally
     p.Free;
   end;
 
   Criteria := TdormCriteria.Create;
+
+  Criteria._And('FirstName', coEqual, 'Daniele')._And('FirstName',
+    coNotEqual, 'Jack');
+  Coll := Session.LoadList<TPerson>(Criteria);
   try
-    Criteria.Add('FirstName', Equal, 'Daniele').AddAnd('FirstName',
-      Different, 'Jack');
-    Coll := Session.List<TPerson>(Criteria, false);
-    try
-      CheckEquals(1, Coll.Count);
-      m_id := TPerson(Coll.GetItem(0)).ID;
-    finally
-      Coll.Free;
-    end;
-
-    Criteria.Add('ID', Equal, m_id);
-    Coll := Session.List<TPerson>(Criteria, false);
-    try
-      CheckEquals(1, Coll.Count);
-    finally
-      Coll.Free;
-    end;
-
-    Criteria.Add('ID', GreaterThan, m_id);
-    Coll := Session.List<TPerson>(Criteria, false);
-    try
-      CheckEquals(0, Coll.Count);
-    finally
-      Coll.Free;
-    end;
+    CheckEquals(1, Coll.Count);
+    for obj in Coll do
+      m_id := obj.ID;
   finally
-    Criteria.Free;
+    Coll.Free;
+  end;
+
+  Criteria._And('ID', coEqual, m_id);
+  Coll := Session.LoadList<TPerson>(Criteria);
+  try
+    CheckEquals(1, Coll.Count);
+  finally
+    Coll.Free;
+  end;
+
+  Criteria._And('ID', coGreaterThan, m_id);
+  Coll := Session.LoadList<TPerson>(Criteria);
+  try
+    CheckEquals(0, Coll.Count);
+  finally
+    Coll.Free;
   end;
 end;
 
 procedure TFrameworkTests.TestLoadByAttributeWithRelationOperators;
 var
-  Coll: TdormCollection;
-  Criteria: TdormCriteria;
+  Coll: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
+  Criteria: ICriteria;
   p: TPerson;
 begin
   Session.DeleteAll(TPerson);
@@ -444,7 +490,7 @@ begin
   p := TPerson.NewPerson;
   try
     p.Age := 32;
-    Session.Save(p);
+    Session.Insert(p);
   finally
     p.Free;
   end;
@@ -452,22 +498,22 @@ begin
   p := TPerson.NewPerson;
   try
     p.Age := 30;
-    Session.Save(p);
+    Session.Insert(p);
   finally
     p.Free;
   end;
 
-  Criteria := TdormCriteria.NewCriteria('FirstName', Equal, 'Daniele')
-    .AddOr('LastName', Equal, 'Teti');
-  Coll := Session.List<TPerson>(Criteria, true);
+  Criteria := TdormCriteria.NewCriteria('FirstName', coEqual, 'Daniele')
+    ._Or('LastName', coEqual, 'Teti');
+  Coll := Session.LoadList<TPerson>(Criteria);
   try
     CheckEquals(2, Coll.Count);
   finally
     Coll.Free;
   end;
 
-  Criteria := TdormCriteria.NewCriteria('Age', Equal, 32);
-  Coll := Session.List<TPerson>(Criteria, true);
+  Criteria := TdormCriteria.NewCriteria('Age', coEqual, 32);
+  Coll := Session.LoadList<TPerson>(Criteria);
   try
     CheckEquals(1, Coll.Count);
   finally
@@ -486,7 +532,7 @@ begin
   p := TPerson.NewPerson;
   try
     p.BornDate := dt;
-    Session.Save(p);
+    Session.Insert(p);
     p_id := p.ID;
   finally
     p.Free;
@@ -513,7 +559,7 @@ begin
   p := TPerson.NewPerson;
   try
     p.BornTimeStamp := dt;
-    Session.Save(p);
+    Session.Insert(p);
     p_id := p.ID;
   finally
     p.Free;
@@ -527,6 +573,33 @@ begin
     p.Free;
   end;
 
+end;
+
+procedure TFrameworkTests.TestWrapAsList;
+var
+  List: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
+  WrappedList: IWrappedList;
+  obj: TObject;
+  c: Integer;
+begin
+  List := {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND}.
+    Create(true);
+  try
+    List.Add(TPerson.NewPerson);
+    List.Add(TPerson.NewPerson);
+    List.Add(TPerson.NewPerson);
+    List.Add(TPerson.NewPerson);
+    c := 0;
+    WrappedList := WrapAsList(List);
+    for obj in WrappedList do
+    begin
+      inc(c);
+      CheckEquals('Daniele', TPerson(obj).FirstName);
+    end;
+    CheckEquals(4, c);
+  finally
+    List.Free;
+  end;
 end;
 
 { TPersonComparer }

@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 unit dorm.InterposedObject;
 
 interface
+
+uses
+  Generics.Collections;
 
 type
   TdormObject = class(TObject)
@@ -44,6 +47,23 @@ type
   private
     class procedure RegisterClass;
   end;
+
+{$IF CompilerVersion = 22}
+  // In DelphiXE you cannot use directly TObjectList<T> because
+  // GetItem method is private. SO you have to use a specific typed list
+  // as this sample show. However, you can avoid default delphi collections
+  // and use whatever list you want. The only requirements are the following methods:
+  // - function Add(Object: TObject)
+  // - procedure Clear
+  // - property Count: Integer
+  // - function GetItem(Index: Integer): TObject
+
+  TdormObjectList<T: class> = class(TObjectList<T>)
+  public
+    function GetElement(Index: Integer): T;
+  end;
+{$IFEND}
+
 
 implementation
 
@@ -109,6 +129,16 @@ function TdormObject.ValidationErrors: string;
 begin
   Result := FValidationErrors;
 end;
+
+{ TdormObjectList<T> }
+{$IF CompilerVersion = 22}
+
+
+function TdormObjectList<T>.GetElement(index: Integer): T;
+begin
+  Result := Items[index];
+end;
+{$IFEND}
 
 initialization
 

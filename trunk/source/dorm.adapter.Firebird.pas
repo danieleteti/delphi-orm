@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -34,10 +34,14 @@ uses
   superobject,
   TypInfo,
   FMTBcd,
-  dorm.Collections;
+  dorm.Filters,
+  Generics.Collections,
+  dorm.Collections,
+  dorm.Mappings,
+  dorm.adapter.Base;
 
 type
-  TFirebirdPersistStrategy = class(TdormInterfacedObject, IdormPersistStrategy)
+  TFirebirdPersistStrategy = class(TBaseAdapter, IdormPersistStrategy)
   strict protected
     FB: TDBXFactory;
     FLogger: IdormLogger;
@@ -49,9 +53,9 @@ type
     FLastInsertOID: TValue;
     function CreateDBXFactory(Conf: ISuperObject): TDBXFactory; virtual;
     function CreateObjectFromDBXReader(ARttiType: TRttiType;
-      AReader: TDBXReader; AFieldsMapping: TArray<TdormFieldMapping>): TObject;
+      AReader: TDBXReader; AFieldsMapping: TMappingFieldList): TObject;
     function LoadObjectFromDBXReader(ARttiType: TRttiType; AReader: TDBXReader;
-      AFieldsMapping: TArray<TdormFieldMapping>; AObject: TObject): Boolean;
+      AFieldsMapping: TMappingFieldList; AObject: TObject): Boolean;
     function GetLogger: IdormLogger;
     procedure SetDBXParameterValue(aFieldType: string;
       aParameter: TDBXParameter; aValue: TValue);
@@ -62,28 +66,28 @@ type
       const Entity: string): TValue; overload;
     function FillPrimaryKeyParam(PKParam: TDBXParameter;
       const Value: TValue): TValue;
-    function EscapeString(const Value: String): String;
-    function EscapeDate(const Value: TDate): String;
-    function EscapeDateTime(const Value: TDate): String;
+    function EscapeString(const Value: string): string;
+    function EscapeDate(const Value: TDate): string;
+    function EscapeDateTime(const Value: TDate): string;
     function GetLastInsertOID: TValue;
     function GetKeysGenerator: IdormKeysGenerator;
     function Insert(ARttiType: TRttiType; AObject: TObject; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>): TValue;
+      AFieldsMapping: TMappingFieldList): TValue;
     function Update(ARttiType: TRttiType; AObject: TObject; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>): TValue;
+      AMappingFields: TMappingFieldList): TValue;
     function Load(ARttiType: TRttiType; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>; const Value: TValue)
+      AFieldsMapping: TMappingFieldList; const Value: TValue)
       : TObject; overload;
 
     function List(ARttiType: TRttiType; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>;
-      AdormSearchCriteria: IdormSearchCriteria): TdormCollection;
+      AFieldsMapping: TMappingFieldList;
+      AdormSearchCriteria: IdormSearchCriteria): TObjectList<TObject>;
     procedure FillList(AList: TObject; ARttiType: TRttiType;
-      ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>;
+      ATableName: string; AFieldsMapping: TMappingFieldList;
       AdormSearchCriteria: IdormSearchCriteria);
 
     function Delete(ARttiType: TRttiType; AObject: TObject; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>): TObject;
+      AMappingFields: TMappingFieldList): TObject;
     procedure DeleteAll(ATableName: string);
     function Count(ATableName: string): Int64;
     procedure ConfigureStrategy(ConfigurationInfo: ISuperObject); virtual;
@@ -116,12 +120,13 @@ type
 implementation
 
 uses
+  StrUtils,
   dorm.Utils;
 
 function TFirebirdPersistStrategy.Update(ARttiType: TRttiType; AObject: TObject;
-  ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>): TValue;
+  ATableName: string; AMappingFields: TMappingFieldList): TValue;
 var
-  field: TdormFieldMapping;
+  field: TMappingField;
   SQL: string;
   Query: TDBXCommand;
   I, pk_idx: Integer;
@@ -130,36 +135,36 @@ var
   pk_field: string;
 begin
   sql_fields_names := '';
-  for field in AFieldsMapping do
-    if not field.pk then
-      sql_fields_names := sql_fields_names + ',"' + field.field + '" = ?';
+  for field in AMappingFields do
+    if not field.IsPK then
+      sql_fields_names := sql_fields_names + ',"' + field.FieldName + '" = ?';
   System.Delete(sql_fields_names, 1, 1);
 
-  pk_field := AFieldsMapping[GetPKMappingIndex(AFieldsMapping)].field;
+  pk_field := AMappingFields[GetPKMappingIndex(AMappingFields)].FieldName;
   SQL := Format('UPDATE %S SET %S WHERE %S = ?', [ATableName, sql_fields_names,
     pk_field]);
 
-  GetLogger.Debug(AFieldsMapping[GetPKMappingIndex(AFieldsMapping)].field);
+  GetLogger.Debug(AMappingFields[GetPKMappingIndex(AMappingFields)].FieldName);
 
   GetLogger.Debug('PREPARING: ' + SQL);
   Query := FB.Prepare(SQL);
   try
     I := 0;
-    for field in AFieldsMapping do
+    for field in AMappingFields do
     begin
       v := TdormUtils.GetField(AObject, field.name);
 
-      if field.pk then
+      if field.IsPK then
         Continue
       else
       begin
-        SetDBXParameterValue(field.field_type, Query.Parameters[I], v);
+        SetDBXParameterValue(field.FieldType, Query.Parameters[I], v);
       end;
       inc(I);
     end;
-    pk_idx := GetPKMappingIndex(AFieldsMapping);
+    pk_idx := GetPKMappingIndex(AMappingFields);
 
-    v := ARttiType.GetProperty(AFieldsMapping[pk_idx].name).GetValue(AObject);
+    v := ARttiType.GetProperty(AMappingFields[pk_idx].name).GetValue(AObject);
     FillPrimaryKeyParam(Query.Parameters[I], v);
     GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
     FB.Execute(Query);
@@ -233,26 +238,6 @@ begin
   end;
 end;
 
-// function TFirebirdPersistStrategy.CreateChildLoaderSearch(AChildClassTypeInfo
-// : PTypeInfo; AChildClassName, AChildTableName, AChildRelationField: string;
-// APKValue: TValue): IdormSearchCriteria;
-// var
-// SQL: string;
-// begin
-// SQL := 'SELECT * FROM ' + AChildTableName + ' WHERE ' +
-// AChildRelationField + ' = ';
-// case FKeyType of
-// ktInteger:
-// SQL := SQL + IntToStr(APKValue.AsInt64);
-// ktString:
-// SQL := SQL + '''' + StringReplace(APKValue.AsString, '''', '''''',
-// [rfReplaceAll]) + '''';
-// end;
-//
-// GetLogger.Debug('CreateChildLoaderSearch: ' + SQL);
-// Result := TdormSimpleSearchCriteria.Create(nil, SQL);
-// end;
-
 function TFirebirdPersistStrategy.CreateDBXFactory(Conf: ISuperObject)
   : TDBXFactory;
 begin
@@ -260,18 +245,19 @@ begin
 end;
 
 function TFirebirdPersistStrategy.Delete(ARttiType: TRttiType; AObject: TObject;
-  ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>): TObject;
+  ATableName: string;
+  AMappingFields: TMappingFieldList): TObject;
 var
   pk_idx: Integer;
   pk_value: TValue;
   pk_attribute_name, pk_field_name, SQL: string;
   cmd: TDBXCommand;
 begin
-  pk_idx := GetPKMappingIndex(AFieldsMapping);
+  pk_idx := GetPKMappingIndex(AMappingFields);
   if pk_idx = -1 then
     raise Exception.Create('Invalid primary key for table ' + ATableName);
-  pk_attribute_name := AFieldsMapping[pk_idx].name;
-  pk_field_name := AFieldsMapping[pk_idx].field;
+  pk_attribute_name := AMappingFields[pk_idx].name;
+  pk_field_name := AMappingFields[pk_idx].FieldName;
   pk_value := ARttiType.GetProperty(pk_attribute_name).GetValue(AObject);
   SQL := 'DELETE FROM ' + ATableName + ' WHERE ' + pk_field_name + ' = ?';
   GetLogger.Debug('PREPARING: ' + SQL);
@@ -301,17 +287,19 @@ begin
   inherited;
 end;
 
-function TFirebirdPersistStrategy.EscapeDate(const Value: TDate): String;
+function TFirebirdPersistStrategy.EscapeDate(const Value: TDate): string;
 begin
   Result := FormatDateTime('YYYY-MM-DD', Value);
 end;
 
-function TFirebirdPersistStrategy.EscapeDateTime(const Value: TDate): String;
+function TFirebirdPersistStrategy.EscapeDateTime
+  (const Value: TDate): string;
 begin
   Result := FormatDateTime('YYYY-MM-DD HH:NN:SS', Value);
 end;
 
-function TFirebirdPersistStrategy.EscapeString(const Value: String): String;
+function TFirebirdPersistStrategy.EscapeString
+  (const Value: string): string;
 begin
   Result := StringReplace(Value, '''', '''''', [rfReplaceAll]);
 end;
@@ -407,28 +395,28 @@ begin
 end;
 
 function TFirebirdPersistStrategy.Insert(ARttiType: TRttiType; AObject: TObject;
-  ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>): TValue;
+  ATableName: string; AFieldsMapping: TMappingFieldList): TValue;
 var
-  field: TdormFieldMapping;
-  sql_fields_names, sql_fields_values, SQL: ansistring;
+  field: TMappingField;
+  sql_fields_values, SQL,
+    sql_fields_names: ansistring;
   Query: TDBXCommand;
   I, pk_idx: Integer;
   v, pk_value: TValue;
 begin
   sql_fields_names := '';
   for field in AFieldsMapping do
-    sql_fields_names := sql_fields_names + ',"' + AnsiString(field.field) + '"';
+    sql_fields_names := sql_fields_names + ',"' +
+      ansistring(field.FieldName) + '"';
 
   System.Delete(sql_fields_names, 1, 1);
 
-  sql_fields_values := '';
-  for field in AFieldsMapping do
-    sql_fields_values := sql_fields_values + ',?';
+  sql_fields_values := ansistring(DupeString(',?', AFieldsMapping.Count));
   System.Delete(sql_fields_values, 1, 1);
 
-  SQL := AnsiString(Format('INSERT INTO %s (%S) VALUES (%S)',
+  SQL := ansistring(Format('INSERT INTO %s (%S) VALUES (%S)',
     [ATableName, sql_fields_names, sql_fields_values]));
-  GetLogger.Debug('PREPARING :' + String(SQL));
+  GetLogger.Debug('PREPARING :' + string(SQL));
   Query := FB.Prepare(string(SQL));
   try
     I := 0;
@@ -436,12 +424,12 @@ begin
     begin
       v := TdormUtils.GetField(AObject, field.name);
 
-      if field.pk then
+      if field.IsPK then
         pk_value := GenerateAndFillPrimaryKeyParam(Query.Parameters[I],
           ATableName)
       else
       begin
-        SetDBXParameterValue(field.field_type, Query.Parameters[I], v);
+        SetDBXParameterValue(field.FieldType, Query.Parameters[I], v);
       end;
       inc(I);
     end;
@@ -467,8 +455,8 @@ begin
       Result := Value.AsInt64 = FNullKeyValue.AsInt64;
     ktString:
       Result := Value.AsString = FNullKeyValue.AsString;
-  else
-    raise EdormException.Create('Unknown key type');
+    else
+      raise EdormException.Create('Unknown key type');
   end;
 end;
 
@@ -478,16 +466,16 @@ begin
 end;
 
 function TFirebirdPersistStrategy.List(ARttiType: TRttiType; ATableName: string;
-  AFieldsMapping: TArray<TdormFieldMapping>;
-  AdormSearchCriteria: IdormSearchCriteria): TdormCollection;
+  AFieldsMapping: TMappingFieldList;
+  AdormSearchCriteria: IdormSearchCriteria): TObjectList<TObject>;
 begin
-  Result :=NewList();
+  Result := NewList();
   FillList(Result, ARttiType, ATableName, AFieldsMapping, AdormSearchCriteria);
 end;
 
 procedure TFirebirdPersistStrategy.FillList(AList: TObject;
   ARttiType: TRttiType; ATableName: string;
-  AFieldsMapping: TArray<TdormFieldMapping>;
+  AFieldsMapping: TMappingFieldList;
   AdormSearchCriteria: IdormSearchCriteria);
 var
   SQL: string;
@@ -502,10 +490,9 @@ begin
     reader := cmd.ExecuteQuery;
     try
       while reader.Next do
-        TdormUtils.MethodCall(AList, 'Add', [CreateObjectFromDBXReader(ARttiType, reader,
+        TdormUtils.MethodCall(AList, 'Add',
+          [CreateObjectFromDBXReader(ARttiType, reader,
           AFieldsMapping)]);
-//        AList.Add(CreateObjectFromDBXReader(ARttiType, reader,
-//          AFieldsMapping));
     finally
       reader.Free;
     end;
@@ -515,7 +502,7 @@ begin
 end;
 
 function TFirebirdPersistStrategy.Load(ARttiType: TRttiType; ATableName: string;
-  AFieldsMapping: TArray<TdormFieldMapping>; const Value: TValue): TObject;
+  AFieldsMapping: TMappingFieldList; const Value: TValue): TObject;
 var
   pk_idx: Integer;
   pk_attribute_name, pk_field_name, SQL: string;
@@ -527,7 +514,7 @@ begin
   if pk_idx = -1 then
     raise Exception.Create('Invalid primary key for table ' + ATableName);
   pk_attribute_name := AFieldsMapping[pk_idx].name;
-  pk_field_name := AFieldsMapping[pk_idx].field;
+  pk_field_name := AFieldsMapping[pk_idx].FieldName;
   SQL := 'SELECT ' + GetSelectFieldsList(AFieldsMapping, true) + ' FROM ' +
     ATableName + ' WHERE ' + pk_field_name + ' = ?';
   GetLogger.Debug('PREPARING: ' + SQL);
@@ -548,28 +535,26 @@ begin
 end;
 
 function TFirebirdPersistStrategy.LoadObjectFromDBXReader(ARttiType: TRttiType;
-  AReader: TDBXReader; AFieldsMapping: TArray<TdormFieldMapping>;
+  AReader: TDBXReader; AFieldsMapping: TMappingFieldList;
   AObject: TObject): Boolean;
 var
   obj: TObject;
-  field: TdormFieldMapping;
+  field: TMappingField;
   v: TValue;
 begin
-//  Result := False;
   obj := AObject;
   for field in AFieldsMapping do
   begin
-    if CompareText(field.field_type, 'string') = 0 then
-      v := AReader.Value[AReader.GetOrdinal(field.field)].AsString
-    else if CompareText(field.field_type, 'integer') = 0 then
-      v := AReader.Value[AReader.GetOrdinal(field.field)].AsInt32
-    else if CompareText(field.field_type, 'date') = 0 then
+    if CompareText(field.FieldType, 'string') = 0 then
+      v := AReader.Value[AReader.GetOrdinal(field.FieldName)].AsString
+    else if CompareText(field.FieldType, 'integer') = 0 then
+      v := AReader.Value[AReader.GetOrdinal(field.FieldName)].AsInt32
+    else if CompareText(field.FieldType, 'date') = 0 then
     begin
-      v := AReader.Value[AReader.GetOrdinal(field.field)].AsDate
-
+      v := AReader.Value[AReader.GetOrdinal(field.FieldName)].AsDate
     end
     else
-      raise Exception.Create('Unknown field type for ' + field.field);
+      raise Exception.Create('Unknown field type for ' + field.FieldName);
     TdormUtils.SetField(obj, field.name, v);
   end;
   Result := true;
@@ -583,45 +568,44 @@ end;
 
 function TFirebirdPersistStrategy.CreateObjectFromDBXReader
   (ARttiType: TRttiType; AReader: TDBXReader;
-  AFieldsMapping: TArray<TdormFieldMapping>): TObject;
+  AFieldsMapping: TMappingFieldList): TObject;
 var
   obj: TObject;
-  // obj1: TStringBuilder;
-  field: TdormFieldMapping;
+  field: TMappingField;
   v: TValue;
   t: TTimeStamp;
   S: string;
   sourceStream: TStream;
   targetStream: TMemoryStream;
-//  v1: TValue;
 begin
-//  Result := nil;
+  // Result := nil;
   try
     obj := TdormUtils.CreateObject(ARttiType);
     for field in AFieldsMapping do
     begin
-      if CompareText(field.field_type, 'string') = 0 then
+      if CompareText(field.FieldType, 'string') = 0 then
       begin
-        v := AReader.Value[AReader.GetOrdinal(field.field)].AsString;
-        S := field.field + ' as string';
+        v := AReader.Value[AReader.GetOrdinal(field.FieldName)].AsString;
+        S := field.FieldName + ' as string';
       end
-      else if CompareText(field.field_type, 'integer') = 0 then
+      else if CompareText(field.FieldType, 'integer') = 0 then
       begin
-        v := AReader.Value[AReader.GetOrdinal(field.field)].AsInt32;
-        S := field.field + ' as integer';
+        v := AReader.Value[AReader.GetOrdinal(field.FieldName)].AsInt32;
+        S := field.FieldName + ' as integer';
       end
-      else if CompareText(field.field_type, 'date') = 0 then
+      else if CompareText(field.FieldType, 'date') = 0 then
       begin
-        t.Date := AReader.Value[AReader.GetOrdinal(field.field)].AsDate;
+        t.Date := AReader.Value[AReader.GetOrdinal(field.FieldName)].AsDate;
         t.Time := 0;
         v := TimeStampToDateTime(t);
-        S := field.field + ' as date';
+        S := field.FieldName + ' as date';
       end
-      else if CompareText(field.field_type, 'blob') = 0 then
+      else if CompareText(field.FieldType, 'blob') = 0 then
       begin
         targetStream := nil;
-        sourceStream := AReader.Value[AReader.GetOrdinal(field.field)].AsStream;
-        S := field.field + ' as blob';
+        sourceStream := AReader.Value[AReader.GetOrdinal(field.FieldName)
+          ].AsStream;
+        S := field.FieldName + ' as blob';
         if assigned(sourceStream) then
         begin
           sourceStream.Position := 0;
@@ -631,23 +615,23 @@ begin
         end;
         v := targetStream;
       end
-      else if CompareText(field.field_type, 'decimal') = 0 then
+      else if CompareText(field.FieldType, 'decimal') = 0 then
       begin
-        v := AReader.Value[AReader.GetOrdinal(field.field)].AsDouble;
-        S := field.field + ' as decimal';
+        v := AReader.Value[AReader.GetOrdinal(field.FieldName)].AsDouble;
+        S := field.FieldName + ' as decimal';
       end
-      else if CompareText(field.field_type, 'boolean') = 0 then
+      else if CompareText(field.FieldType, 'boolean') = 0 then
       begin
-        v := AReader.Value[AReader.GetOrdinal(field.field)].AsBoolean;
-        S := field.field + ' as boolean';
+        v := AReader.Value[AReader.GetOrdinal(field.FieldName)].AsBoolean;
+        S := field.FieldName + ' as boolean';
       end
-      else if CompareText(field.field_type, 'datetime') = 0 then
+      else if CompareText(field.FieldType, 'datetime') = 0 then
       begin
-        v := AReader.Value[AReader.GetOrdinal(field.field)].AsDateTime;
-        S := field.field + ' as datetime';
+        v := AReader.Value[AReader.GetOrdinal(field.FieldName)].AsDateTime;
+        S := field.FieldName + ' as datetime';
       end
       else
-        raise Exception.Create('Unknown field type for ' + field.field);
+        raise Exception.Create('Unknown field type for ' + field.FieldName);
       try
         TdormUtils.SetField(obj, field.name, v);
       except
@@ -769,7 +753,7 @@ begin
       aDBXValue.AsInt16 := 0;
   end
   else
-    raise Exception.Create('Unsupported type ' + IntToStr(ord(aValue.Kind)));
+    raise Exception.Create('Unsupported type ' + inttostr(ord(aValue.Kind)));
 
 end;
 

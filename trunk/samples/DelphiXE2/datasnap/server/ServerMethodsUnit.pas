@@ -2,8 +2,14 @@ unit ServerMethodsUnit;
 
 interface
 
-uses System.SysUtils, System.Classes, Datasnap.DSServer, Datasnap.DSAuth, dorm,
-  BusinessObjects, Generics.Collections;
+uses System.SysUtils,
+  System.Classes,
+  Datasnap.DSServer,
+  Datasnap.DSAuth,
+  dorm,
+  dorm.Configuration,
+  BusinessObjects,
+  Generics.Collections;
 
 type
 {$METHODINFO ON}
@@ -30,7 +36,11 @@ implementation
 {$R *.dfm}
 
 
-uses System.StrUtils, dorm.Commons, dorm.Collections, dorm.Utils;
+uses System.StrUtils,
+  dorm.Commons,
+  dorm.Collections,
+  dorm.Utils,
+  dorm.Filters;
 
 procedure TdormServerSample.DataModuleCreate(Sender: TObject);
 var
@@ -39,16 +49,26 @@ begin
 {$IFDEF SQLITE3_STRATEGY}
   ConfigFileName := 'dorm_sqlite3.conf';
 {$ENDIF}
-{$IFDEF FIREBIRD_STRATEGY}
-  ConfigFileName := 'dorm_firebird.conf';
-{$ENDIF}
 {$IFDEF INTERBASE_STRATEGY}
   ConfigFileName := 'dorm_interbase.conf';
 {$ENDIF}
-  Session := TSession.CreateConfigured(TStreamReader.Create(ConfigFileName),
+{$IFDEF FIREBIRD_STRATEGY}
+  ConfigFileName := 'dorm_firebird.conf';
+{$ENDIF}
+{$IFDEF FIREBIRD_UIB_STRATEGY}
+  ConfigFileName := 'dorm_firebird_uib.conf';
+{$ENDIF}
+{$IFDEF INTERBASE_UIB_STRATEGY}
+  ConfigFileName := 'dorm_interbase_uib.conf';
+{$ENDIF}
+{$IFDEF SQLSERVER_STRATEGY}
+  ConfigFileName := 'dorm_sqlserver.conf';
+{$ENDIF}
+  Session := TSession.CreateConfigured(
+    TStreamReader.Create(ConfigFileName),
+    TStreamReader.Create('samples.mapping'),
+
     deDevelopment);
-//  Session := TSession.CreateConfigured(TStreamReader.Create('dorm.conf'),
-//    deDevelopment);
 end;
 
 procedure TdormServerSample.DataModuleDestroy(Sender: TObject);
@@ -79,7 +99,7 @@ end;
 
 procedure TdormServerSample.LoadRelations(var APerson: TPerson);
 begin
-  Session.LoadRelations(APerson, [HasMany, HasOne]);
+  Session.LoadRelations(APerson, [drHasMany, drHasOne]);
 end;
 
 function TdormServerSample.Persist(AObject: TObject): Integer;
@@ -93,17 +113,15 @@ begin
   Result := System.StrUtils.ReverseString(Value);
 end;
 
-function TdormServerSample.SearchByName(const AName: String)
-  : TObjectList<TPerson>;
+function TdormServerSample.SearchByName(const AName: String): TObjectList<TPerson>;
 var
-  Criteria: TdormCriteria;
+  Criteria: ICriteria;
 begin
   Result := TObjectList<TPerson>.Create;
   Criteria := nil;
   if AName <> EmptyStr then
     Criteria := TdormCriteria.
-      NewCriteria('FirstName', TdormCompareOperator.Equal, AName).
-      AddOr('LastName', TdormCompareOperator.Equal, AName);
+      NewCriteria('FirstName', coEqual, AName)._Or('LastName', coEqual, AName);
   Session.FillList<TPerson>(Result, Criteria);
 end;
 

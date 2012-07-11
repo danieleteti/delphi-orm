@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ type
     database_connection_string: string;
     username: string;
     password: string;
+    hostname: string;
   public
     constructor Create(const DBXLibraryName: String; const DriverName: String;
       ConfigurationInfo: ISuperObject);
@@ -49,6 +50,7 @@ type
     function Execute(ASQLCommand: TDBXCommand): Int64; overload;
     function ExecuteQuery(ASQLCommand: TDBXCommand): TDBXReader; overload;
     function Prepare(ASQL: string): TDBXCommand;
+    property ConnectionProps: TDBXProperties read FConnectionProps;
   end;
 
 implementation
@@ -93,6 +95,7 @@ begin
     ['database_connection_string'];
   username := ConfigurationInfo.S['username'];
   password := ConfigurationInfo.S['password'];
+  hostname := ConfigurationInfo.S['hostname'];
 end;
 
 constructor TDBXFactory.Create(const DBXLibraryName: String;
@@ -101,23 +104,20 @@ begin
   inherited Create;
   Configure(ConfigurationInfo);
   FConnectionProps := TDBXProperties.Create;
-  try
-    FConnectionFactory := TDBXConnectionFactory.GetConnectionFactory;
-    FConnectionProps.Add(TDBXPropertyNames.username, username);
-    FConnectionProps.Add(TDBXPropertyNames.password, password);
-    FConnectionProps.Add('ServerCharSet', 'utf8');
-    FConnectionProps.Add(TDBXPropertyNames.Database,
-      database_connection_string);
-    FConnectionProps.Add(TDBXPropertyNames.DriverName, DriverName);
-    FConnectionProps.Add(TDBXPropertyNames.LibraryName, DBXLibraryName);
-    FDBXConnection := FConnectionFactory.GetConnection(FConnectionProps);
-  finally
-    FConnectionProps.Free;
-  end;
+  FConnectionFactory := TDBXConnectionFactory.GetConnectionFactory;
+  FConnectionProps.Add(TDBXPropertyNames.username, username);
+  FConnectionProps.Add(TDBXPropertyNames.password, password);
+  FConnectionProps.Add(TDBXPropertyNames.HostName, hostname);
+  //FConnectionProps.Add('ServerCharSet', 'utf8');
+  FConnectionProps.Add(TDBXPropertyNames.Database,
+    database_connection_string);
+  FConnectionProps.Add(TDBXPropertyNames.DriverName, DriverName);
+  FConnectionProps.Add(TDBXPropertyNames.LibraryName, DBXLibraryName);
 end;
 
 destructor TDBXFactory.Destroy;
 begin
+  FConnectionProps.Free;
   if assigned(FDBXConnection) then
   begin
     if FDBXConnection.IsOpen then
@@ -140,6 +140,8 @@ end;
 
 function TDBXFactory.GetConnection: TDBXConnection;
 begin
+  if FDBXConnection = nil then
+    FDBXConnection := FConnectionFactory.GetConnection(FConnectionProps);
   Result := FDBXConnection;
 end;
 

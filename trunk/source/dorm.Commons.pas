@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -25,23 +25,23 @@ uses
   Generics.Collections,
   SysUtils,
   TypInfo,
-  dorm.Collections;
+  dorm.Mappings,
+  dorm.Filters,
+  dorm.Collections,
+  dorm.Utils;
 
 type
+  TDuckTypedList = class;
+
   EdormException = class(Exception)
 
   end;
 
   TdormEnvironment = (deDevelopment, deTest, deRelease);
   TdormObjectOwner = (ooItself, ooParent);
-  TdormIndexType = (itNone, itIndex, itUnique);
   TdormSaveType = (stAllGraph, stSingleObject);
-  TdormKeyType = (ktInteger, ktString);
-  TdormCompareOperator = (Equal, GreaterThan, LowerThan, GreaterOrEqual,
-    LowerOrEqual, Different);
-  TdormLogicRelation = (lrAnd, lrOr);
-  TdormCriteriaItem = class;
-  TdormRelations = set of (BelongsTo, HasMany, HasOne);
+  TdormRelations = set of (drBelongsTo, drHasMany, drHasOne);
+  TdormFillOptions = set of (CallAfterLoadEvent);
 
   TdormInterfacedObject = class(TInterfacedObject)
     constructor Create; virtual;
@@ -57,25 +57,6 @@ type
     procedure Debug(const Value: string);
   end;
 
-  IdormSearchCriteria = interface
-    ['{7F19727A-8113-43F0-8211-A3EFB47E57EB}']
-    function GetSQL: string;
-    function GetItemClassInfo: PTypeInfo;
-  end;
-
-  TdormFieldMapping = record
-    pk: boolean;
-    name: string;
-    field: string;
-    field_type: string;
-    default_value: string;
-    size: Cardinal;
-    precision: Cardinal;
-    index_type: TdormIndexType;
-    procedure parseFieldMapping(json: ISuperObject; IsPK: boolean = false);
-    function ToString: string;
-  end;
-
   IList = interface
     ['{2A1BCB3C-17A2-4F8D-B6FB-32B2A1BFE840}']
     function Add(const Value: TObject): Integer;
@@ -86,24 +67,26 @@ type
 
   IdormPersistStrategy = interface
     ['{04A7F5C2-9B9B-4259-90C2-F23894189717}']
-    function Insert(ARttiType: TRttiType; AObject: TObject; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>): TValue;
-    function Update(ARttiType: TRttiType; AObject: TObject; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>): TValue;
-    function Load(ARttiType: TRttiType; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>; const Value: TValue)
-      : TObject; overload;
-    function List(ARttiType: TRttiType; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>;
-      AdormSearchCriteria: IdormSearchCriteria): TdormCollection; overload;
-    procedure FillList(AList: TObject; ARttiType: TRttiType;
-      ATableName: string; AFieldsMapping: TArray<TdormFieldMapping>;
-      AdormSearchCriteria: IdormSearchCriteria); overload;
-    function Delete(ARttiType: TRttiType; AObject: TObject; ATableName: string;
-      AFieldsMapping: TArray<TdormFieldMapping>): TObject;
-    function GetKeyType: TdormKeyType;
-    procedure DeleteAll(ATableName: string);
-    function Count(ATableName: string): Int64;
+    function Insert(ARttiType: TRttiType; AObject: TObject; AMappingTable: TMappingTable): TValue;
+    function Update(ARttiType: TRttiType; AObject: TObject; AMappingTable: TMappingTable): TValue;
+    function Delete(ARttiType: TRttiType; AObject: TObject; AMappingTable: TMappingTable): TObject;
+    function Load(ARttiType: TRttiType; AMappingTable: TMappingTable; const Value: TValue;
+      AObject: TObject): boolean;
+      overload;
+    function Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
+      AMappingRelationField: TMappingField; const Value: TValue; AObject: TObject)
+      : boolean; overload;
+    procedure DeleteAll(AMappingTable: TMappingTable);
+    function Count(AMappingTable: TMappingTable): Int64;
+
+    // function List(ARttiType: TRttiType; ATableName: string;
+    // AMappingFields: TMappingFieldList;
+    // AdormSearchCriteria: ICustomCriteria): TObjectList<TObject>; overload;
+    // procedure FillList(AList: TObject; ARttiType: TRttiType;
+    // ATableName: string; AMappingFields: TMappingFieldList;
+    // AdormSearchCriteria: ICustomCriteria); overload;
+    procedure LoadList(AList: TObject; ARttiType: TRttiType;
+      AMappingTable: TMappingTable; ACriteria: ICriteria); overload;
     function GetLastInsertOID: TValue;
     procedure ConfigureStrategy(ConfigurationInfo: ISuperObject);
     procedure InitStrategy;
@@ -111,14 +94,24 @@ type
     procedure Commit;
     procedure Rollback;
     function InTransaction: boolean;
-    function IsNullKey(const Value: TValue): boolean;
-    function GetNullKeyValue: TValue;
     procedure SetLogger(ALogger: IdormLogger);
     function RawExecute(SQL: string): Int64;
     function ExecuteAndGetFirst(SQL: string): Int64;
     function EscapeString(const Value: string): string;
     function EscapeDate(const Value: TDate): string;
     function EscapeDateTime(const Value: TDate): string;
+    function GetSelectSQL(ACriteria: ICriteria; AMappingTable: TMappingTable): string;
+  end;
+
+  TdormListEnumerator = class(TEnumerator<TObject>)
+  protected
+    FPosition: Int64;
+    FDuckTypedList: TDuckTypedList;
+  protected
+    function DoGetCurrent: TObject; override;
+    function DoMoveNext: boolean; override;
+  public
+    constructor Create(ADuckTypedList: TDuckTypedList);
   end;
 
   IdormKeysGenerator = interface
@@ -129,127 +122,103 @@ type
       : IdormPersistStrategy);
   end;
 
-  TdormCriteriaItem = class
-  private
-    FCompareOperator: TdormCompareOperator;
-    FAttribute: string;
-    FValue: TValue;
-    FLogicRelation: TdormLogicRelation;
-    procedure SetAttribute(const Value: string);
-    procedure SetCompareOperator(const Value: TdormCompareOperator);
-    procedure SetValue(const Value: TValue);
-    procedure SetLogicRelation(const Value: TdormLogicRelation);
-  public
-    property Attribute: string read FAttribute write SetAttribute;
-    property CompareOperator: TdormCompareOperator read FCompareOperator
-      write SetCompareOperator;
-    property Value: TValue read FValue write SetValue;
-    property LogicRelation: TdormLogicRelation read FLogicRelation
-      write SetLogicRelation;
-  end;
-
-  IdormDuckTypedList = interface
+  IWrappedList = interface
     ['{B60AF5A6-7C31-4EAA-8DFB-D8BD3E112EE7}']
     function Count: Integer;
     function GetItem(const index: Integer): TObject;
     procedure Add(const AObject: TObject);
     procedure Clear;
+    function GetEnumerator: TdormListEnumerator;
   end;
 
-function GetPKMappingIndex(const AMapping: TArray<TdormFieldMapping>): Integer;
-function GetPKName(const AMapping: TArray<TdormFieldMapping>): string;
-function GetPKValue(AType: TRttiType; const AMapping: TArray<TdormFieldMapping>;
-  AObject: TObject): TValue;
-function GetRelationMappingIndexByPropertyName(AHasManyMapping: TSuperArray;
-  APropertyName: string): Integer;
-function GetSelectFieldsList(AMapping: TArray<TdormFieldMapping>;
+  TDuckTypedList = class(TInterfacedObject, IWrappedList)
+  protected
+    FObjectAsDuck: TObject;
+    FAddMethod: TRttiMethod;
+    FClearMethod: TRttiMethod;
+    FCountProperty: TRttiProperty;
+    FGetItemMethod: TRttiMethod;
+    function Count: Integer;
+    function GetItem(const index: Integer): TObject;
+    procedure Add(const AObject: TObject);
+    procedure Clear;
+  public
+    constructor Create(AObjectAsDuck: TObject);
+    destructor Destroy; override;
+    function GetEnumerator: TdormListEnumerator;
+  end;
+
+function GetPKMappingIndex(const AMappingFields: TMappingFieldList): Integer;
+function GetMappingRelationByPropertyName(ARelationList: TMappingRelationList;
+  const APropertyName: string): TMappingRelation;
+function GetMappingBelongsToByPropertyName(ARelationList: TMappingBelongsToList;
+  const APropertyName: string): TMappingBelongsTo;
+function GetSelectFieldsList(AMapping: TMappingFieldList;
   AWithPrimaryKey: boolean): string;
+
+function WrapAsList(const AObject: TObject): IWrappedList;
 
 implementation
 
 uses
-  dorm,
-  dorm.Utils;
+  dorm;
 
-function GetSelectFieldsList(AMapping: TArray<TdormFieldMapping>;
+function GetSelectFieldsList(AMapping: TMappingFieldList;
   AWithPrimaryKey: boolean): string;
 var
-  field: TdormFieldMapping;
+  field: TMappingField;
 begin
   Result := '';
   if AWithPrimaryKey then
     for field in AMapping do
     begin
-      Result := Result + ',"' + field.field + '"';
+      Result := Result + ',"' + field.FieldName + '"';
     end
   else
     for field in AMapping do
     begin
-      if not field.pk then
-        Result := Result + ',"' + field.field + '"';
+      if not field.IsPK then
+        Result := Result + ',"' + field.FieldName + '"';
     end;
   System.Delete(Result, 1, 1);
 end;
 
-function GetRelationMappingIndexByPropertyName(AHasManyMapping: TSuperArray;
-  APropertyName: string): Integer;
+function GetMappingRelationByPropertyName(ARelationList: TMappingRelationList;
+  const APropertyName: string): TMappingRelation;
 var
-  I: Integer;
+  _relation: TMappingRelation;
 begin
-  Result := -1;
-  for I := 0 to AHasManyMapping.Length - 1 do
-    if CompareText(AHasManyMapping[I].S['name'], APropertyName) = 0 then
+  Result := nil;
+  for _relation in ARelationList do
+    if CompareText(_relation.Name, APropertyName) = 0 then
     begin
-      Result := I;
+      Result := _relation;
       Break;
     end;
 end;
 
-function GetPKValue(AType: TRttiType; const AMapping: TArray<TdormFieldMapping>;
-  AObject: TObject): TValue;
+function GetMappingBelongsToByPropertyName(ARelationList: TMappingBelongsToList;
+  const APropertyName: string): TMappingBelongsTo;
+var
+  _relation: TMappingBelongsTo;
 begin
-  Result := TdormUtils.GetField(AObject, GetPKName(AMapping));
+  Result := nil;
+  for _relation in ARelationList do
+    if CompareText(_relation.Name, APropertyName) = 0 then
+    begin
+      Result := _relation;
+      Break;
+    end;
 end;
 
-function GetPKName(const AMapping: TArray<TdormFieldMapping>): string;
-begin
-  Result := AMapping[GetPKMappingIndex(AMapping)].name;
-end;
-
-function GetPKMappingIndex(const AMapping: TArray<TdormFieldMapping>): Integer;
+function GetPKMappingIndex(const AMappingFields: TMappingFieldList): Integer;
 var
   I: Integer;
 begin
-  for I := 0 to Length(AMapping) - 1 do
-    if AMapping[I].pk then
+  for I := 0 to AMappingFields.Count - 1 do
+    if AMappingFields[I].IsPK then
       Exit(I);
   Exit(-1);
-end;
-
-procedure TdormFieldMapping.parseFieldMapping(json: ISuperObject;
-  IsPK: boolean);
-var
-  S: string;
-begin
-  pk := IsPK;
-  name := json.S['name'];
-  field := json.S['field'];
-  size := json.I['size'];
-  field_type := json.S['field_type'];
-  default_value := json.S['default_value'];
-  precision := json.I['precision'];
-  index_type := itNone;
-  S := json.S['index_type'];
-  if SameText(S, 'index') then
-    index_type := itIndex
-  else if SameText(S, 'unique') then
-    index_type := itUnique;
-end;
-
-function TdormFieldMapping.ToString: string;
-begin
-  Result := Format('PK: %s, name: %s, field: %s, field type: %s',
-    [BoolToStr(pk, True), name, field, field_type]);
 end;
 
 { TdormInterfacedObject }
@@ -259,25 +228,100 @@ begin
   inherited Create;
 end;
 
-procedure TdormCriteriaItem.SetAttribute(const Value: string);
+constructor TdormListEnumerator.Create(ADuckTypedList: TDuckTypedList);
 begin
-  FAttribute := Value;
+  inherited Create;
+  FDuckTypedList := ADuckTypedList;
+  FPosition := -1;
 end;
 
-procedure TdormCriteriaItem.SetCompareOperator(const Value
-  : TdormCompareOperator);
+function TdormListEnumerator.DoGetCurrent: TObject;
 begin
-  FCompareOperator := Value;
+  if FPosition > -1 then
+    Result := FDuckTypedList.GetItem(FPosition)
+  else
+    raise Exception.Create('Enumerator error: Call MoveNext first');
 end;
 
-procedure TdormCriteriaItem.SetLogicRelation(const Value: TdormLogicRelation);
+function TdormListEnumerator.DoMoveNext: boolean;
 begin
-  FLogicRelation := Value;
+  if FPosition < FDuckTypedList.Count - 1 then
+  begin
+    Inc(FPosition);
+    Result := True;
+  end
+  else
+    Result := false;
 end;
 
-procedure TdormCriteriaItem.SetValue(const Value: TValue);
+function TDuckTypedList.GetEnumerator: TdormListEnumerator;
 begin
-  FValue := Value;
+  Result := TdormListEnumerator.Create(self);
+end;
+
+procedure TDuckTypedList.Add(const AObject: TObject);
+begin
+  FAddMethod.Invoke(FObjectAsDuck, [AObject]);
+end;
+
+procedure TDuckTypedList.Clear;
+begin
+  FClearMethod.Invoke(FObjectAsDuck, []);
+end;
+
+function TDuckTypedList.Count: Integer;
+begin
+  Result := FCountProperty.GetValue(FObjectAsDuck).AsInteger;
+end;
+
+constructor TDuckTypedList.Create(AObjectAsDuck: TObject);
+begin
+  inherited Create;
+  FObjectAsDuck := AObjectAsDuck;
+  FAddMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetMethod('Add');
+  if not Assigned(FAddMethod) then
+    raise EdormException.Create('Cannot find method "Add" in the duck object');
+  FClearMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetMethod('Clear');
+  if not Assigned(FClearMethod) then
+    raise EdormException.Create
+      ('Cannot find method "Clear" in the duck object');
+  FGetItemMethod := nil;
+{$IF CompilerVersion >= 23}
+  FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetIndexedProperty('Items').ReadMethod;
+{$IFEND}
+  if not Assigned(FGetItemMethod) then
+    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+      .GetMethod('GetItem');
+  if not Assigned(FGetItemMethod) then
+    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+      .GetMethod('GetElement');
+  if not Assigned(FGetItemMethod) then
+    raise EdormException.Create
+      ('Cannot find method Indexed property "Items" or method "GetItem" or method "GetElement" in the duck object');
+  FCountProperty := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
+    .GetProperty('Count');
+  if not Assigned(FCountProperty) then
+    raise EdormException.Create
+      ('Cannot find property "Count" in the duck object');
+end;
+
+destructor TDuckTypedList.Destroy;
+begin
+
+  inherited;
+end;
+
+function TDuckTypedList.GetItem(const index: Integer): TObject;
+begin
+  Result := FGetItemMethod.Invoke(FObjectAsDuck, [index]).AsObject;
+end;
+
+function WrapAsList(const AObject: TObject): IWrappedList;
+begin
+  Result := TDuckTypedList.Create(AObject);
 end;
 
 end.

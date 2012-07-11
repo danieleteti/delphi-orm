@@ -1,13 +1,52 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2011/11/13 23.00.00.000.265,C:\ProgettiMiei\dorm_generics_collections\tools\dc\Unit1.pas=C:\ProgettiMiei\dorm_generics_collections\tools\dc\lib\dorm.DBCreator.Sqlite3.pas</Transaction>
-    <Transaction>2011/11/13 23.00.00.000.732,=C:\ProgettiMiei\dorm_generics_collections\lib\sqlite3\Source\SQLiteTable3.pas</Transaction>
-    <Transaction>2011/11/13 23.00.00.000.711,=C:\ProgettiMiei\dorm_generics_collections\tools\dc\Unit1.pas</Transaction>
-    <Transaction>2011/11/13 23.00.00.000.666,=C:\ProgettiMiei\dorm_generics_collections\lib\sqlite3\Source\SQLite3.pas</Transaction>
+    <Transaction>2011/11/13 23.00.00.000.265,C:\ProgettiMiei\dorm_generics_collections\tools\dc\lib\dorm.DBCreator.Sqlite3.pas=C:\ProgettiMiei\dorm_generics_collections\tools\dc\Unit1.pas</Transaction>
     <Transaction>2011/11/13 23.00.00.000.685,=C:\ProgettiMiei\dorm_generics_collections\lib\sqlite3\Source\SQLite3Dataset.pas</Transaction>
-    <Transaction>2011/11/14 00.00.00.000.305,C:\ProgettiMiei\dorm_generics_collections\tools\dc\Unit1.pas=C:\ProgettiMiei\dorm_generics_collections\source\dorm.adapter.Sqlite3.pas</Transaction>
+    <Transaction>2011/11/13 23.00.00.000.711,=C:\ProgettiMiei\dorm_generics_collections\tools\dc\Unit1.pas</Transaction>
+    <Transaction>2011/11/13 23.00.00.000.732,=C:\ProgettiMiei\dorm_generics_collections\lib\sqlite3\Source\SQLiteTable3.pas</Transaction>
+    <Transaction>2011/11/13 23.00.00.000.666,=C:\ProgettiMiei\dorm_generics_collections\lib\sqlite3\Source\SQLite3.pas</Transaction>
+    <Transaction>2011/11/14 00.00.00.000.305,C:\ProgettiMiei\dorm_generics_collections\source\dorm.adapter.Sqlite3.pas=C:\ProgettiMiei\dorm_generics_collections\tools\dc\Unit1.pas</Transaction>
     <Transaction>2011/11/14 00.00.00.000.878,=C:\ProgettiMiei\dorm_generics_collections\tools\dc\Unit1.pas</Transaction>
-    <Transaction>2011/11/25 16.34.11.841,C:\ProgettiMiei\dorm\lib\superobject\superobject.pas=</Transaction>
+    <Transaction>2011/11/25 16.00.00.000.841,C:\ProgettiMiei\dorm\lib\superobject\superobject.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.304,D:\Dorm\source\dorm.adapter.Interbase.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.413,D:\Dorm\source\dorm.utils.Sequences.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.350,D:\Dorm\source\dorm.loggers.CodeSite.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.319,D:\Dorm\source\dorm.adapter.Sqlite3.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.288,D:\Dorm\source\dorm.adapter.Firebird.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.397,D:\Dorm\source\dorm.UOW.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.366,D:\Dorm\source\dorm.loggers.FileLog.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.397,D:\Dorm\source\dorm.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.241,D:\Dorm\source\dorm.adapter.DBExpress.Factory.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.335,D:\Dorm\source\dorm.Commons.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.413,D:\Dorm\source\dorm.Utils.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.335,D:\Dorm\source\dorm.Core.IdentityMap.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.350,D:\Dorm\source\dorm.InterposedObject.pas=</Transaction>
+    <Transaction>2011/12/13 08.48.53.000.319,D:\Dorm\source\dorm.Collections.pas=</Transaction>
+    <Transaction>2011/12/13 09.47.03.000.070,=D:\Dorm\source\dorm.adapter.Firebird.pas</Transaction>
+    <Transaction>2011/12/13 10.05.19.000.988,=D:\Dorm\source\dorm.utils.Sequences.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.253,=D:\Dorm\source\dorm.InterposedObject.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.129,=D:\Dorm\source\dorm.adapter.SQLServer.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.097,=D:\Dorm\source\dorm.adapter.Sqlite3.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.378,=D:\Dorm\source\dorm.UOW.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.316,=D:\Dorm\source\dorm.Mappings.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.363,=D:\Dorm\source\dorm.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.191,=D:\Dorm\source\dorm.Filters.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.332,=D:\Dorm\source\dorm.Mappings.Strategies.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.394,=D:\Dorm\source\dorm.Utils.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.144,=D:\Dorm\source\dorm.Collections.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.082,=D:\Dorm\source\dorm.adapter.Interbase.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.144,=D:\Dorm\source\dorm.adapter.SQLServerDevart.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.160,=D:\Dorm\source\dorm.Commons.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.113,=D:\Dorm\source\dorm.adapter.SQLServer9.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.269,=D:\Dorm\source\dorm.loggers.CodeSite.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.004,=D:\Dorm\source\dorm.adapter.all.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.300,=D:\Dorm\source\dorm.loggers.FileLog.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.347,=D:\Dorm\source\dorm.Metadata.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.238,=D:\Dorm\source\dorm.Finders.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.175,=D:\Dorm\source\dorm.Core.IdentityMap.pas</Transaction>
+    <Transaction>2011/12/13 10.05.20.000.035,=D:\Dorm\source\dorm.adapter.DBExpress.Factory.pas</Transaction>
+    <Transaction>2011/12/13 11.48.01.000.048,D:\Dorm\tools\dc\lib\dorm.DBCreator.Firebird.pas=D:\Dorm\tools\dc\lib\dorm.DBCreator.SQLServer.pas</Transaction>
+    <Transaction>2011/12/13 11.48.54.000.158,=D:\Dorm\tools\dc\lib\dorm.DBCreator.Firebird.pas</Transaction>
   </Transactions>
 </BorlandProject>

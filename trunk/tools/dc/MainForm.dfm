@@ -120,7 +120,13 @@ object frmMain: TfrmMain
       end>
     FileTypeIndex = 0
     Options = [fdoFileMustExist]
-    Left = 152
-    Top = 160
+    Left = 208
+    Top = 176
+  end
+  object OpenDialog1: TOpenDialog
+    DefaultExt = '*.conf'
+    Filter = 'dorm config file|*.conf|All Files|*.*'
+    Left = 240
+    Top = 176
   end
 end

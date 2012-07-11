@@ -112,7 +112,6 @@
 			<DCCReference Include="ClientClassesUnit.pas"/>
 			<DCCReference Include="ClientModuleUnit.pas">
 				<Form>ClientProxy</Form>
-				<FormType>dfm</FormType>
 				<DesignClass>TDataModule</DesignClass>
 			</DCCReference>
 			<BuildConfiguration Include="Release">

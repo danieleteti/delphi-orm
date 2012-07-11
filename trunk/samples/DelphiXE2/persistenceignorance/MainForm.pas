@@ -3,12 +3,26 @@ unit MainForm;
 interface
 
 uses
-  dorm, dorm.Commons,
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants,
-  System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+  dorm,
+  dorm.Commons,
+  dorm.adapters,
+  dorm.loggers,
+  dorm.Configuration,
+  dorm.Mappings,
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls;
 
 type
+
+  [NoAutomapping]
   TButton = class(Vcl.StdCtrls.TButton)
   public
     constructor Create; // A parameterless constructor
@@ -22,7 +36,7 @@ type
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
   private
-    ButtonID, EditID: Integer;
+    ButtonID: Integer;
     Session: TSession;
   public
     { Public declarations }
@@ -34,6 +48,7 @@ var
 implementation
 
 {$R *.dfm}
+
 
 procedure TForm11.Button1Click(Sender: TObject);
 begin
@@ -57,7 +72,9 @@ end;
 
 procedure TForm11.FormCreate(Sender: TObject);
 begin
-  Session := TSession.CreateConfigured(TStreamReader.Create('dorm.conf'),
+  Session := TSession.CreateConfigured(
+    TStreamReader.Create('dorm.conf'),
+    TStreamReader.Create('dorm.mapping'),
     deDevelopment);
 end;
 

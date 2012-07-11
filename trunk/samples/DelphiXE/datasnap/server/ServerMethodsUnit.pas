@@ -40,11 +40,15 @@ uses
   StrUtils,
   dorm.Commons,
   dorm.Collections,
-  dorm.Utils;
+  dorm.Filters,
+  dorm.Utils,
+  Windows;
 
 procedure TdormServerSample.DataModuleCreate(Sender: TObject);
 begin
-  Session := TSession.CreateConfigured(TStreamReader.Create('dorm.conf'),
+  Session := TSession.CreateConfigured(
+    TStreamReader.Create('dorm.conf'),
+    TStreamReader.Create('dorm.mapping'),
     deDevelopment);
 end;
 
@@ -99,8 +103,8 @@ begin
   Criteria := nil;
   if AName <> EmptyStr then
     Criteria := TdormCriteria.
-      NewCriteria('FirstName', TdormCompareOperator.Equal, AName).
-      AddOr('LastName', TdormCompareOperator.Equal, AName);
+      NewCriteria('FirstName', TdormCompareOperator.coEqual, AName).
+      AddOr('LastName', TdormCompareOperator.coEqual, AName);
   Session.FillList<TPerson>(Result, Criteria);
 end;
 

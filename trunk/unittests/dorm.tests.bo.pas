@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -16,41 +16,30 @@
 
 unit dorm.tests.bo;
 
-{$RTTI EXPLICIT FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished]) METHODS([vcPrivate, vcProtected, vcPublic, vcPublished]) PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
+{$RTTI EXPLICIT
+  FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
+  METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
+  PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
 
 interface
 
 uses
   dorm.Commons,
-{$IFDEF VER210}System.{$ENDIF}Classes,
+  Classes,
   Generics.Collections,
+  dorm.Mappings,
   dorm.InterposedObject;
 
 type
   TPerson = class;
   TPhone = class;
-
-{$IF CompilerVersion = 22}
-  // In DelphiXE you cannot use directly TObjectList<T> because
-  // GetItem method is private. SO you have to use a specific typed list
-  // as this sample show. However, you can avoid default delphi collections
-  // and use whatever list you want. The only requirements are the following methods:
-  // - function Add(Object: TObject)
-  // - procedure Clear
-  // - property Count: Integer
-  // - function GetItem(Index: Integer): TObject
-
-  TdormObjectList<T: class> = class(TObjectList<T>)
-  protected
-    function GetElement(index: Integer): T;
-  end;
-{$IFEND}
+  TEmployee = class;
 
   TPhones = class(
-{$IF CompilerVersion = 22}
-    TdormObjectList<TPhone>
-{$ELSE}
+{$IF CompilerVersion >= 23}
     TObjectList<TPhone>
+{$ELSE}
+    TdormObjectList<TPhone>
 {$IFEND}
     )
   end;
@@ -82,6 +71,7 @@ type
     FValue: string;
     FPersonID: Integer;
     FID: Integer;
+    FCopiedValue: String; // used only for the test
     procedure SetValue(const Value: string);
     procedure SetPersonID(const Value: Integer);
     procedure SetID(const Value: Integer);
@@ -90,8 +80,11 @@ type
   public
     class function NewEmail: TEmail;
     function Validate: Boolean; override;
+    procedure OnAfterLoad; override;
     property ID: Integer read FID write SetID;
     property Value: string read FValue write SetValue;
+    [Transient]
+    property CopiedValue: String read FCopiedValue write FCopiedValue;
   end;
 
   TPerson = class
@@ -115,6 +108,7 @@ type
     procedure SetEmail(const Value: TEmail);
     procedure SetBornTimeStamp(const Value: TDateTime);
     procedure SetPhoto(const Value: TStream);
+    function GetFullName: string;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -131,6 +125,8 @@ type
     property Car: TCar read FCar write SetCar;
     property Email: TEmail read FEmail write SetEmail;
     property Photo: TStream read FPhoto write SetPhoto;
+    [Transient]
+    property FullName: string read GetFullName;
   end;
 
   TPhone = class
@@ -149,10 +145,53 @@ type
     class constructor Create;
     class procedure register;
     constructor Create;
-  published
     property Number: string read FNumber write SetNumber;
     property Model: string read FModel write SetModel;
     property ID: Integer read FID write SetID;
+  end;
+
+  TEmployees = class({$IF CompilerVersion >= 23}TObjectList<TEmployee>{$ELSE}TdormObjectList<TEmployee>{$IFEND})
+  end;
+
+  TDepartment = class
+  private
+    FDepartmentName: string;
+    FID: string;
+    FEmployees: TEmployees;
+    procedure setDepartmentName(const Value: string);
+    procedure setEmployees(const Value: TEmployees);
+    procedure SetID(const Value: string);
+  public
+    constructor Create(); virtual;
+    destructor Destroy; override;
+    class function NewDepartment(DepName: string): TDepartment;
+    property ID: string read FID write SetID;
+    property DepartmentName: string read FDepartmentName
+      write setDepartmentName;
+    property Employees: TEmployees read FEmployees write setEmployees;
+  end;
+
+  TEmployee = class
+  private
+    FLastName: string;
+    FEmployeeID: string;
+    FAddress: string;
+    FFirstName: string;
+    FDepartment: TDepartment;
+    FDepartmentID: string;
+    procedure setAddress(const Value: string);
+    procedure setDepartment(const Value: TDepartment);
+    procedure setEmployeeID(const Value: string);
+    procedure SetFirstName(const Value: string);
+    procedure SetLastName(const Value: string);
+    property DepartmentID: string read FDepartmentID write FDepartmentID;
+  public
+    class function NewEmployee(): TEmployee;
+    property EmployeeID: string read FEmployeeID write setEmployeeID;
+    property FirstName: string read FFirstName write SetFirstName;
+    property LastName: string read FLastName write SetLastName;
+    property Address: string read FAddress write setAddress;
+    property Department: TDepartment read FDepartment write setDepartment;
   end;
 
 implementation
@@ -169,7 +208,8 @@ function IsValidEmail(const Value: string): Boolean;
   begin
     Result := false;
     for i := 1 to Length(s) do
-      if not(s[i] in ['a' .. 'z', 'A' .. 'Z', '0' .. '9', '_', '-', '.']) then
+      if not(CharInSet(s[i], ['a' .. 'z', 'A' .. 'Z', '0' .. '9', '_', '-',
+        '.'])) then
         Exit;
     Result := true;
   end;
@@ -211,6 +251,11 @@ begin
   FreeAndNil(FCar);
   FreeAndNil(FEmail);
   inherited;
+end;
+
+function TPerson.GetFullName: string;
+begin
+  Result := FirstName + ' ' + LastName;
 end;
 
 class function TPerson.NewPerson: TPerson;
@@ -355,6 +400,12 @@ begin
   Result.Value := 'd.teti@bittime.it';
 end;
 
+procedure TEmail.OnAfterLoad;
+begin
+  inherited;
+  CopiedValue := UpperCase(Value);
+end;
+
 procedure TEmail.SetID(const Value: Integer);
 begin
   FID := Value;
@@ -377,14 +428,74 @@ begin
     AddError('Invalid email');
 end;
 
-{$IF CompilerVersion = 22}
+{ TDepartment }
 
-
-{ TdormObjectList<T> }
-function TdormObjectList<T>.GetElement(index: Integer): T;
+constructor TDepartment.Create;
 begin
-  Result := Items[index];
+  inherited;
+  FEmployees := TEmployees.Create();
 end;
-{$IFEND}
+
+destructor TDepartment.Destroy;
+begin
+  FEmployees.Free;
+  inherited;
+end;
+
+class function TDepartment.NewDepartment(DepName: string): TDepartment;
+begin
+  Result := TDepartment.Create();
+  Result.DepartmentName := DepName;
+end;
+
+procedure TDepartment.setDepartmentName(const Value: string);
+begin
+  FDepartmentName := Value;
+end;
+
+procedure TDepartment.setEmployees(const Value: TEmployees);
+begin
+  FEmployees := Value;
+end;
+
+procedure TDepartment.SetID(const Value: string);
+begin
+  FID := Value;
+end;
+
+{ TEmployee }
+
+class function TEmployee.NewEmployee: TEmployee;
+begin
+  Result := TEmployee.Create;
+  Result.FirstName := 'Jack';
+  Result.LastName := 'Sheppard';
+  Result.Address := 'Perdido en una isla desierta';
+end;
+
+procedure TEmployee.setAddress(const Value: string);
+begin
+  FAddress := Value;
+end;
+
+procedure TEmployee.setDepartment(const Value: TDepartment);
+begin
+  FDepartment := Value;
+end;
+
+procedure TEmployee.setEmployeeID(const Value: string);
+begin
+  FEmployeeID := Value;
+end;
+
+procedure TEmployee.SetFirstName(const Value: string);
+begin
+  FFirstName := Value;
+end;
+
+procedure TEmployee.SetLastName(const Value: string);
+begin
+  FLastName := Value;
+end;
 
 end.

@@ -6,9 +6,6 @@
 			<Projects Include="server\datasnapserver.dproj">
 				<Dependencies/>
 			</Projects>
-			<Projects Include="client\dsclient.dproj">
-				<Dependencies/>
-			</Projects>
 		</ItemGroup>
 		<ProjectExtensions>
 			<Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -26,23 +23,14 @@
 		<Target Name="datasnapserver:Make">
 			<MSBuild Projects="server\datasnapserver.dproj" Targets="Make"/>
 		</Target>
-		<Target Name="dsclient">
-			<MSBuild Projects="client\dsclient.dproj"/>
-		</Target>
-		<Target Name="dsclient:Clean">
-			<MSBuild Projects="client\dsclient.dproj" Targets="Clean"/>
-		</Target>
-		<Target Name="dsclient:Make">
-			<MSBuild Projects="client\dsclient.dproj" Targets="Make"/>
-		</Target>
 		<Target Name="Build">
-			<CallTarget Targets="datasnapserver;dsclient"/>
+			<CallTarget Targets="datasnapserver"/>
 		</Target>
 		<Target Name="Clean">
-			<CallTarget Targets="datasnapserver:Clean;dsclient:Clean"/>
+			<CallTarget Targets="datasnapserver:Clean"/>
 		</Target>
 		<Target Name="Make">
-			<CallTarget Targets="datasnapserver:Make;dsclient:Make"/>
+			<CallTarget Targets="datasnapserver:Make"/>
 		</Target>
 		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
 	</Project>

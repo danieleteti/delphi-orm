@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -23,17 +23,80 @@ uses
   BaseTestCase,
   dorm.Finders,
   dorm,
-  dorm.Collections;
+  dorm.Collections,
+  dorm.Filters,
+  TypInfo;
 
 type
   TFindersTests = class(TBaseTestCase)
   published
+    procedure TestSimpleFinder;
+  end;
 
+  TPeopleFinder = class(TdormCriteria, ICustomCriteria)
+  private
+    FPersonName: string;
+  public
+    constructor Create(APersonName: string);
+    function GetSQL: string;
+    function GetItemClassInfo: PTypeInfo;
   end;
 
 implementation
 
-{ TestFinders }
+uses
+  Generics.Collections,
+  dorm.tests.bo,
+  dorm.InterposedObject,
+  SysUtils;
+
+{ TFindersTests }
+
+procedure TFindersTests.TestSimpleFinder;
+var
+  Coll: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
+  P: TPerson;
+begin
+  Session.DeleteAll(TPerson);
+  Coll := {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND}.Create;
+  try
+    Session.FillList<TPerson>(Coll, TPeopleFinder.Create('Daniele'));
+    CheckEquals(0, Coll.Count);
+    P := TPerson.NewPerson;
+    try
+      P.FirstName := 'Daniele';
+      Session.Persist(P);
+    finally
+      P.Free;
+    end;
+    Session.FillList<TPerson>(Coll, TPeopleFinder.Create('Daniele'));
+    CheckEquals(1, Coll.Count);
+    Session.FillList<TPerson>(Coll, TPeopleFinder.Create('WrongName'));
+    CheckEquals(0, Coll.Count, 'WrongName returns data!');
+  finally
+    Coll.Free;
+  end;
+end;
+
+{ TPeopleFinder }
+
+constructor TPeopleFinder.Create(APersonName: string);
+begin
+  inherited Create;
+  FPersonName := APersonName;
+end;
+
+function TPeopleFinder.GetItemClassInfo: PTypeInfo;
+begin
+  Result := TypeInfo(TPerson);
+end;
+
+function TPeopleFinder.GetSQL: string;
+begin
+  Result :=
+    Format('SELECT * FROM PEOPLE WHERE FIRST_NAME = ''%s''',
+    [StringReplace(FPersonName, '''', '''''', [rfReplaceAll])]);
+end;
 
 initialization
 

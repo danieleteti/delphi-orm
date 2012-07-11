@@ -1,26 +1,37 @@
 unit MainForm;
 
-
-// Activate the strategy you want to use
-{$DEFINE FIREBIRD_STRATEGY }
-{.$DEFINE INTERBASE_STRATEGY }
-{.$DEFINE SQLITE3_STRATEGY}
-
-
 interface
 
 uses
-  dorm,
-  dorm.adapter.all, // includes all the available adapters
-  dorm.Collections, dorm.Commons,
+  Data.Bind.EngExt,
+  Fmx.Bind.DBEngExt,
+  System.Rtti,
+  System.Bindings.Outputs,
+  Data.Bind.Components,
+  Fmx.Edit,
+  Fmx.ListBox,
+  Fmx.Objects,
   Generics.Collections,
-  System.SysUtils, System.Types, System.UITypes, System.Classes,
+  System.SysUtils,
+  System.Types,
+  System.UITypes,
+  System.Classes,
   System.Variants,
-  FMX.Types, FMX.Controls, FMX.Forms, FMX.Dialogs, FMX.Layouts, FMX.ListBox,
-  BusinessObjects, Data.Bind.EngExt, FMX.Bind.DBEngExt, Data.Bind.Components,
-  System.Rtti, System.Bindings.Outputs, System.Bindings.Helper,
-  FMX.Edit, FMX.Objects,
-  FMX.Bind.Editors; // Used to bind ListBox1 (Editor)
+  Fmx.Types,
+  Fmx.Controls,
+  Fmx.Forms,
+  Fmx.Dialogs,
+  Fmx.Layouts,
+  BusinessObjects,
+  System.Bindings.Helper,
+  Fmx.Bind.Editors,  // Used to bind ListBox1 (Editor)
+  dorm,
+  dorm.adapters, // includes all the available adapters
+  dorm.Collections,
+  dorm.Commons,
+  dorm.Configuration,
+  dorm.Loggers,
+  dorm.Filters;
 
 type
   TForm11 = class(TForm)
@@ -83,7 +94,6 @@ implementation
 
 {$R *.fmx}
 
-
 procedure TForm11.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   Session.Free;
@@ -96,15 +106,26 @@ begin
 {$IFDEF SQLITE3_STRATEGY}
   ConfigFileName := 'dorm_sqlite3.conf';
 {$ENDIF}
-{$IFDEF FIREBIRD_STRATEGY}
-  ConfigFileName := 'dorm_firebird.conf';
-{$ENDIF}
 {$IFDEF INTERBASE_STRATEGY}
   ConfigFileName := 'dorm_interbase.conf';
 {$ENDIF}
+{$IFDEF FIREBIRD_STRATEGY}
+  ConfigFileName := 'dorm_firebird.conf';
+{$ENDIF}
+{$IFDEF FIREBIRD_UIB_STRATEGY}
+  ConfigFileName := 'dorm_firebird_uib.conf';
+{$ENDIF}
+{$IFDEF INTERBASE_UIB_STRATEGY}
+  ConfigFileName := 'dorm_interbase_uib.conf';
+{$ENDIF}
+{$IFDEF SQLSERVER_STRATEGY}
+  ConfigFileName := 'dorm_sqlserver.conf';
+{$ENDIF}
   Caption := Caption + ' using ' + ConfigFileName;
 
-  Session := TSession.CreateConfigured(TStreamReader.Create(ConfigFileName),
+  Session := TSession.CreateConfigured(
+    TStreamReader.Create(ConfigFileName),
+    TStreamReader.Create('samples.mapping'),
     deDevelopment);
 {$REGION 'Insert some data'}
   InitializeData;
@@ -138,7 +159,7 @@ begin
 
   People.Add(TPerson.Create('Sue', 'Storm', 35));
   People.Add(TPerson.Create('Peter', 'Parker', 17));
-  Session.InsertCollection(People);
+  Session.InsertCollection(TObjectList<TObject>(People));
   People.Free;
 end;
 
@@ -164,7 +185,7 @@ end;
 
 procedure TForm11.Button4Click(Sender: TObject);
 var
-  Criteria: TdormCriteria;
+  Criteria: ICriteria;
 begin
   BindScopePeople.Active := False;
   if Edit3.Text = EmptyStr then
@@ -174,7 +195,7 @@ begin
   else
   begin
     Criteria := TdormCriteria.NewCriteria('FirstName',
-      TdormCompareOperator.Equal, Edit3.Text);
+      TdormCompareOperator.coEqual, Edit3.Text);
     Session.FillList<TPerson>(People, Criteria);
   end;
   BindScopePeople.DataObject := People;

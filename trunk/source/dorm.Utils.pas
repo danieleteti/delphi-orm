@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -19,36 +19,21 @@ unit dorm.Utils;
 interface
 
 uses
-  CodeSiteLogging, // remove!!
   RTTI,
   DB,
-  dorm.Commons,
+  Generics.Collections,
   dorm.InterposedObject;
 
 type
-  TDuckTypedList = class(TInterfacedObject, IdormDuckTypedList)
-  protected
-    FObjectAsDuck: TObject;
-    FAddMethod: TRttiMethod;
-    FClearMethod: TRttiMethod;
-    FCountProperty: TRttiProperty;
-    FGetItemMethod: TRttiMethod;
-    function Count: Integer;
-    function GetItem(const index: Integer): TObject;
-    procedure Add(const AObject: TObject);
-    procedure Clear;
-  public
-    constructor Create(AObjectAsDuck: TObject);
-  end;
-
   TdormUtils = class sealed
-  protected
+  public
     class var ctx: TRttiContext;
   public
     class function MethodCall(AObject: TObject; AMethodName: string;
       AParameters: array of TValue): TValue; static;
     class procedure SetProperty(Obj: TObject; const PropertyName: string;
       const Value: TValue); static;
+    class function GetFieldType(AProp: TRttiProperty): string;
     class procedure ObjectToDataSet(Obj: TObject; Field: TField;
       var Value: Variant);
     class procedure DatasetToObject(Dataset: TDataset; Obj: TObject);
@@ -60,7 +45,10 @@ type
     class function Clone(Obj: TObject): TObject; static;
     class procedure CopyObject(SourceObj, TargetObj: TObject); static;
     class function CreateObject(ARttiType: TRttiType): TObject; static;
-
+    class function GetAttribute<T: TCustomAttribute>(const Obj: TRttiObject): T; overload;
+    class function GetAttribute<T: TCustomAttribute>(const Obj: TRttiType): T; overload;
+    class function HasAttribute<T: TCustomAttribute>(const Obj: TRttiObject): Boolean;
+    class function EqualValues(source, destination: TValue): Boolean;
   end;
 
 function FieldFor(const PropertyName: string): string; inline;
@@ -70,6 +58,8 @@ implementation
 uses
   SysUtils,
   Classes,
+  TypInfo,
+  dorm.Commons,
   dorm.Collections;
 
 class function TdormUtils.MethodCall(AObject: TObject; AMethodName: string;
@@ -88,6 +78,30 @@ end;
 function FieldFor(const PropertyName: string): string; inline;
 begin
   Result := 'F' + PropertyName;
+end;
+
+class function TdormUtils.GetAttribute<T>(const Obj: TRttiObject): T;
+var
+  Attr: TCustomAttribute;
+begin
+  Result := nil;
+  for Attr in Obj.GetAttributes do
+  begin
+    if Attr.ClassType.InheritsFrom(T) then
+      Exit(T(Attr));
+  end;
+end;
+
+class function TdormUtils.GetAttribute<T>(const Obj: TRttiType): T;
+var
+  Attr: TCustomAttribute;
+begin
+  Result := nil;
+  for Attr in Obj.GetAttributes do
+  begin
+    if Attr.ClassType.InheritsFrom(T) then
+      Exit(T(Attr));
+  end;
 end;
 
 class function TdormUtils.GetField(Obj: TObject;
@@ -133,6 +147,11 @@ begin
   else
     raise Exception.CreateFmt('Property is not readable [%s.%s]',
       [ARttiType.ToString, PropertyName]);
+end;
+
+class function TdormUtils.HasAttribute<T>(const Obj: TRttiObject): Boolean;
+begin
+  Result := Assigned(GetAttribute<T>(Obj));
 end;
 
 class procedure TdormUtils.SetField(Obj: TObject; const PropertyName: string;
@@ -181,6 +200,29 @@ begin
       [ARttiType.ToString, PropertyName]);
 end;
 
+class function TdormUtils.GetFieldType(AProp: TRttiProperty): string;
+var
+  _PropInfo: PTypeInfo;
+begin
+  _PropInfo := AProp.PropertyType.Handle;
+  if _PropInfo.Kind in [tkString, tkWString, tkChar, tkWChar, tkLString, tkUString] then
+    Result := 'string'
+  else if _PropInfo.Kind in [tkInteger, tkInt64] then
+    Result := 'integer'
+  else if _PropInfo = TypeInfo(TDate) then
+    Result := 'date'
+  else if _PropInfo = TypeInfo(TDateTime) then
+    Result := 'datetime'
+  else if _PropInfo = TypeInfo(Currency) then
+    Result := 'decimal'
+  else if _PropInfo.Kind = tkFloat then
+    Result := 'float'
+  else if AProp.PropertyType.IsInstance and AProp.PropertyType.AsInstance.MetaclassType.InheritsFrom(TStream) then
+    Result := 'blob'
+  else
+    Result := EmptyStr;
+end;
+
 class procedure TdormUtils.ObjectToDataSet(Obj: TObject; Field: TField;
   var Value: Variant);
 begin
@@ -210,6 +252,12 @@ begin
     end;
 end;
 
+class function TdormUtils.EqualValues(source, destination: TValue): Boolean;
+begin
+  // Really UniCodeCompareStr (Annoying VCL Name for backwards compatablity)
+  Result := AnsiCompareStr(source.ToString, destination.ToString) = 0;
+end;
+
 class procedure TdormUtils.CopyObject(SourceObj, TargetObj: TObject);
 var
   _ARttiType: TRttiType;
@@ -219,14 +267,14 @@ var
   sourceStream: TStream;
   SavedPosition: Int64;
   targetStream: TStream;
-  targetCollection: TdormCollection;
-  sourceCollection: TdormCollection;
+  targetCollection: TObjectList<TObject>;
+  sourceCollection: TObjectList<TObject>;
   I: Integer;
   sourceObject: TObject;
   targetObject: TObject;
 begin
   if not Assigned(TargetObj) then
-    exit;
+    Exit;
 
   _ARttiType := ctx.GetType(SourceObj.ClassType);
   cloned := TargetObj;
@@ -255,17 +303,17 @@ begin
         targetStream.Position := SavedPosition;
         sourceStream.Position := SavedPosition;
       end
-      else if Src is TdormCollection then
+      else if Src is TObjectList<TObject> then
       begin
-        sourceCollection := TdormCollection(Src);
+        sourceCollection := TObjectList<TObject>(Src);
         if Field.GetValue(cloned).IsEmpty then
         begin
-          targetCollection := TdormCollection.Create;
+          targetCollection := TObjectList<TObject>.Create;
           Field.SetValue(cloned, targetCollection);
         end
         else
           targetCollection := Field.GetValue(cloned)
-            .AsObject as TdormCollection;
+            .AsObject as TObjectList<TObject>;
         for I := 0 to sourceCollection.Count - 1 do
         begin
           targetCollection.Add(TdormUtils.Clone(sourceCollection[I]));
@@ -325,15 +373,15 @@ var
   sourceStream: TStream;
   SavedPosition: Int64;
   targetStream: TStream;
-  targetCollection: TdormCollection;
-  sourceCollection: TdormCollection;
+  targetCollection: TObjectList<TObject>;
+  sourceCollection: TObjectList<TObject>;
   I: Integer;
   sourceObject: TObject;
   targetObject: TObject;
 begin
   Result := nil;
   if not Assigned(Obj) then
-    exit;
+    Exit;
 
   _ARttiType := ctx.GetType(Obj.ClassType);
   cloned := CreateObject(_ARttiType);
@@ -362,17 +410,17 @@ begin
         targetStream.Position := SavedPosition;
         sourceStream.Position := SavedPosition;
       end
-      else if Src is TdormCollection then
+      else if Src is TObjectList<TObject> then
       begin
-        sourceCollection := TdormCollection(Src);
+        sourceCollection := TObjectList<TObject>(Src);
         if Field.GetValue(cloned).IsEmpty then
         begin
-          targetCollection := TdormCollection.Create;
+          targetCollection := TObjectList<TObject>.Create;
           Field.SetValue(cloned, targetCollection);
         end
         else
           targetCollection := Field.GetValue(cloned)
-            .AsObject as TdormCollection;
+            .AsObject as TObjectList<TObject>;
         for I := 0 to sourceCollection.Count - 1 do
         begin
           targetCollection.Add(TdormUtils.Clone(sourceCollection[I]));
@@ -401,64 +449,5 @@ begin
 end;
 
 { TListDuckTyping }
-
-procedure TDuckTypedList.Add(const AObject: TObject);
-begin
-  FAddMethod.Invoke(FObjectAsDuck, [AObject]);
-end;
-
-procedure TDuckTypedList.Clear;
-begin
-  FClearMethod.Invoke(FObjectAsDuck, []);
-end;
-
-function TDuckTypedList.Count: Integer;
-begin
-  Result := FCountProperty.GetValue(FObjectAsDuck).AsInteger;
-end;
-
-constructor TDuckTypedList.Create(AObjectAsDuck: TObject);
-begin
-  inherited Create;
-  FObjectAsDuck := AObjectAsDuck;
-
-  FAddMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-    .GetMethod('Add');
-  if not Assigned(FAddMethod) then
-    raise EdormException.Create('Cannot find method "Add" in the duck object');
-
-  FClearMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-    .GetMethod('Clear');
-  if not Assigned(FClearMethod) then
-    raise EdormException.Create
-      ('Cannot find method "Clear" in the duck object');
-
-  FGetItemMethod := nil;
-{$IF CompilerVersion >= 23}
-  FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-    .GetIndexedProperty('Items').ReadMethod;
-{$IFEND}
-  if not Assigned(FGetItemMethod) then
-    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-      .GetMethod('GetItem');
-  if not Assigned(FGetItemMethod) then
-    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-      .GetMethod('GetElement');
-
-  if not Assigned(FGetItemMethod) then
-    raise EdormException.Create
-      ('Cannot find method Indexed property "Items" or method "GetItem" or method "GetElement" in the duck object');
-
-  FCountProperty := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-    .GetProperty('Count');
-  if not Assigned(FCountProperty) then
-    raise EdormException.Create
-      ('Cannot find property "Count" in the duck object');
-end;
-
-function TDuckTypedList.GetItem(const index: Integer): TObject;
-begin
-  Result := FGetItemMethod.Invoke(FObjectAsDuck, [index]).AsObject;
-end;
 
 end.

@@ -1,0 +1,54 @@
+package dormCore;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$LIBSUFFIX 'D16'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  SuperObject,
+  vcl,
+  dbrtl,
+  CodeSiteExpressPkg;
+
+contains
+  dorm.Collections in '..\..\dorm.Collections.pas',
+  dorm.Commons in '..\..\dorm.Commons.pas',
+  dorm.Core.IdentityMap in '..\..\dorm.Core.IdentityMap.pas',
+  dorm.Filters in '..\..\dorm.Filters.pas',
+  dorm.Finders in '..\..\dorm.Finders.pas',
+  dorm.InterposedObject in '..\..\dorm.InterposedObject.pas',
+  dorm.Mappings in '..\..\dorm.Mappings.pas',
+  dorm.Mappings.Strategies in '..\..\dorm.Mappings.Strategies.pas',
+  dorm in '..\..\dorm.pas',
+  dorm.UOW in '..\..\dorm.UOW.pas',
+  dorm.Utils in '..\..\dorm.Utils.pas',
+  dorm.utils.Sequences in '..\..\dorm.utils.Sequences.pas';
+
+end.
+

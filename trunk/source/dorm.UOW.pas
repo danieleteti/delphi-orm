@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -21,25 +21,31 @@ interface
 uses
   rtti,
   dorm.Commons,
-  dorm.Collections;
+  dorm.Collections,
+  Generics.Collections,
+  dorm.InterposedObject;
 
 type
   TdormUOW = class
   protected
-    FUOWInsert, FUOWUpdate, FUOWDelete: TdormCollection;
+    FUOWInsert, FUOWUpdate, FUOWDelete:
+{$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
   public
     constructor Create; virtual;
     destructor Destroy; override;
     function AddInsertOrUpdate(Obj: TObject;
-      const OIDPropertyName: String = 'ID'): TdormUOW;
+      const OIDPropertyName: string = 'ID'): TdormUOW;
     function AddDelete(Obj: TObject): TdormUOW;
     function AddInsert(Obj: TObject): TdormUOW;
     function AddUpdate(Obj: TObject): TdormUOW;
-    function GetUOWInsert: TdormCollection;
-    function GetUOWUpdate: TdormCollection;
-    function GetUOWDelete: TdormCollection;
+    function GetUOWInsert:
+{$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
+    function GetUOWUpdate:
+{$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
+    function GetUOWDelete:
+{$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
     procedure Clear;
-    procedure Cancel;
+    procedure FreeDeleted;
   end;
 
 implementation
@@ -72,8 +78,8 @@ begin
 end;
 
 function TdormUOW.AddInsert(Obj: TObject): TdormUOW;
-//var
-//  v: TValue;
+// var
+// v: TValue;
 begin
   Result := Self;
   if (FUOWInsert.IndexOf(Obj) > -1) then
@@ -81,7 +87,7 @@ begin
   FUOWInsert.Add(Obj)
 end;
 
-function TdormUOW.AddInsertOrUpdate(Obj: TObject; const OIDPropertyName: String)
+function TdormUOW.AddInsertOrUpdate(Obj: TObject; const OIDPropertyName: string)
   : TdormUOW;
 var
   v: TValue;
@@ -114,8 +120,6 @@ begin
 end;
 
 function TdormUOW.AddUpdate(Obj: TObject): TdormUOW;
-//var
-//  v: TValue;
 begin
   Result := Self;
   if (FUOWUpdate.IndexOf(Obj) > -1) then
@@ -123,19 +127,11 @@ begin
   FUOWUpdate.Add(Obj);
 end;
 
-procedure TdormUOW.Cancel;
-var
-  I: Integer;
-begin
-  for I := 0 to FUOWDelete.Count - 1 do
-    FUOWDelete.Extract(I);
-end;
-
 procedure TdormUOW.Clear;
 begin
   FUOWInsert.Clear;
   FUOWUpdate.Clear;
-  FUOWDelete.Clear; // this MUST delete also the objects
+  FUOWDelete.Clear; // this DONT delete also the objects
 end;
 
 constructor TdormUOW.Create;
@@ -143,7 +139,8 @@ begin
   inherited;
   FUOWInsert := NewList(false);
   FUOWUpdate := NewList(false);
-  FUOWDelete := NewList(true); // this MUST delete also the objects
+  FUOWDelete := NewList(false);
+  // check issue 24 (http://code.google.com/p/delphi-orm/issues/detail?id=24)
 end;
 
 destructor TdormUOW.Destroy;
@@ -154,17 +151,32 @@ begin
   inherited;
 end;
 
-function TdormUOW.GetUOWDelete: TdormCollection;
+procedure TdormUOW.FreeDeleted;
+var
+  o: TObject;
+begin
+  while FUOWDelete.Count > 0 do
+  begin
+    o := FUOWDelete[0];
+    FUOWDelete.Delete(0);
+    FreeAndNil(o);
+  end;
+end;
+
+function TdormUOW.GetUOWDelete:
+{$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
 begin
   Result := FUOWDelete;
 end;
 
-function TdormUOW.GetUOWInsert: TdormCollection;
+function TdormUOW.GetUOWInsert:
+{$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
 begin
   Result := FUOWInsert;
 end;
 
-function TdormUOW.GetUOWUpdate: TdormCollection;
+function TdormUOW.GetUOWUpdate:
+{$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
 begin
   Result := FUOWUpdate;
 end;

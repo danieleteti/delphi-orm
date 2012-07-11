@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -22,13 +22,14 @@ uses
   dorm,
   dorm.Commons,
   dorm.Collections,
+  dorm.Filters,
   rtti,
   Classes,
   SysUtils,
   TypInfo;
 
 type
-  TLimitedQuery = class abstract(TdormInterfacedObject, IdormSearchCriteria)
+  TLimitedQuery = class abstract(TdormCriteria, ICustomCriteria)
   private
     FMaxRows: Integer;
     procedure SetMaxRows(const Value: Integer);
@@ -39,7 +40,7 @@ type
     property MaxRows: Integer read FMaxRows write SetMaxRows;
   end;
 
-  TLikeFilter = class(TdormInterfacedObject, IdormSearchCriteria)
+  TLikeFilter = class(TdormCriteria, ICustomCriteria)
   private
     FFieldName: string;
     FValue: string;

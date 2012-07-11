@@ -12,8 +12,9 @@ uses
   DSCommonServer,
   DSAuth,
   BusinessObjects,
+  dorm.adapter.Firebird,
   Generics.Collections,
-  dorm;
+  dorm, IndyPeerImpl;
 
 type
   TServerContainer = class(TDataModule)
@@ -37,6 +38,7 @@ var
 implementation
 
 uses
+  dorm.loggers,
   Windows,
   ServerMethodsUnit,
   dorm.Commons;
@@ -48,7 +50,9 @@ procedure TServerContainer.DataModuleCreate(Sender: TObject);
 var
   Session: TSession;
 begin
-  Session := TSession.CreateConfigured(TStreamReader.Create('dorm.conf'),
+  Session := TSession.CreateConfigured(
+    TStreamReader.Create('dorm.conf'),
+    TStreamReader.Create('dorm.mapping'),
     deDevelopment);
 {$REGION 'Insert some data'}
   InitializeData(Session);

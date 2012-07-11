@@ -1,0 +1,46 @@
+<project name="dorm" default="tests" basedir=".">
+    <description>
+        dorm, "The Delphi ORM" Build File
+    </description>
+  <!-- set global properties for this build -->
+  <property name="src" location="source"/>
+  <property name="unittestbuild" location="unittests"/>
+  <property name="dist"  location="dist"/>
+	
+	<!-- Compile with DELPHIXE2 -->  
+  <property name="BDS" value="C:\Program Files (x86)\Embarcadero\RAD Studio\9.0"/>
+  <property name="BDSCOMMONDIR" value="C:\Users\Public\Documents\RAD Studio\9.0"/>
+	<property name="FrameworkDir" value="C:\Windows\Microsoft.NET\Framework\v3.5"/>
+
+	<!-- Compile with DELPHIXE -->  
+  <property name="BDS_XE" value="C:\Program Files (x86)\Embarcadero\RAD Studio\8.0"/>
+  <property name="BDSCOMMONDIR_XE" value="C:\Users\Public\Documents\RAD Studio\8.0"/>
+	<property name="FrameworkDir_XE" value="C:\Windows\Microsoft.NET\Framework\v2.0"/>
+
+	<target name = "tests" depends="compile">
+	  <exec dir="${unittestbuild}" failonerror="true" searchpath="true" executable="${unittestbuild}\DORM_UnitTests.exe"/> 	  
+	</target>
+
+  <target name="compile" depends="clean" description="compile the source " >  
+    <exec dir="." failonerror="true" searchpath="true" executable="${FrameworkDir}\msbuild.exe">
+   		<env key="BDS" value="${BDS}"/>
+      <env key="BDSCOMMONDIR" value="${BDSCOMMONDIR}"/>               	      
+      <arg value="/nologo"/>
+      <arg value="/target:Build"/>
+      <arg value="/property:config=CI"/>
+      <arg value="${unittestbuild}\DORM_UnitTests.dproj"/>
+    </exec>
+  </target>
+
+  <target name="dist" depends="compile" description="RUN UNITESTS" >    
+    
+  </target>
+
+  <target name="clean" description="clean up" >
+  <!-- Delete the ${build} and ${dist} directory trees -->
+  <delete failonerror="false">
+    <fileset dir="." includes="**/*.dcu"/>
+    <fileset dir="." includes="**/*.exe"/>
+  </delete>
+  </target>
+</project>

@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@ unit TestDORMSpeed;
 interface
 
 uses
-  TestFramework, dorm, BaseTestCase;
+  TestFramework,
+  dorm,
+  Generics.Collections,
+  BaseTestCase;
 
 type
   TTestDORMSpeed = class(TBaseTestCase)
@@ -37,8 +40,11 @@ uses
   windows,
   Classes,
   SysUtils,
-  dorm.Commons, dorm.Collections, dorm.tests.bo,
-  {$IFDEF VER210}System.{$ENDIF}DateUtils;
+  dorm.Commons,
+  dorm.Collections,
+  dorm.tests.bo,
+  DateUtils,
+  dorm.InterposedObject;
 
 { TTestDORMSpeed }
 
@@ -57,33 +63,43 @@ procedure TTestDORMSpeed.TestList;
 var
   I: Integer;
   p: TPerson;
-  persone: TdormCollection;
+  persone: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
   start: TDateTime;
+  cmp: TdormComparer<TPerson>;
+const
+  OBJECTS_NUMBER = 1000;
 begin
   start := now;
-  for I := 1 to 1000 do
+  for I := 1 to OBJECTS_NUMBER do
   begin
     p := TPerson.NewPerson;
     p.FirstName := p.FirstName + Format('%4d', [I]);
-    Session.Save(p);
+    Session.Insert(p);
     p.Free;
   end;
   Session.Commit;
   Session.StartTransaction;
-  persone := Session.ListAll<TPerson>;
+  persone := Session.LoadList<TPerson>;
   try
-    CheckEquals(1000, persone.Count);
-    persone.Sort(TdormComparer.Create('FirstName'));
-    for I := 1 to 1000 do
-      CheckEquals('Daniele' + Format('%4d', [I]), TPerson(persone[I-1]).FirstName);
-    persone.ReverseSort(TdormComparer.Create('FirstName'));
-    for I := 1 to 1000 do
-      CheckEquals('Daniele' + Format('%4d', [I]), TPerson(persone[1000-I]).FirstName);
+    CheckEquals(OBJECTS_NUMBER, persone.Count);
+    cmp := TdormComparer<TPerson>.Create('FirstName');
+    persone.Sort(cmp);
+    cmp.Free;
+    for I := 1 to 100 do
+      CheckEquals('Daniele' + Format('%4d', [I]), TPerson(persone[I - 1])
+        .FirstName);
+    cmp := TdormComparer<TPerson>.Create('FirstName');
+    persone.Sort(cmp);
+    persone.Reverse;
+    cmp.Free;
+    for I := 1 to 100 do
+      CheckEquals('Daniele' + Format('%4d', [I]), TPerson(persone[1000 - I])
+        .FirstName);
     Session.Commit;
   finally
     persone.Free;
   end;
-  CheckTrue(MilliSecondsBetween(now, start) < 25000,
+  CheckTrue(MilliSecondsBetween(now, start) < 35000,
     'Too slow: ' + inttostr(MilliSecondsBetween(now, start)));
 end;
 
@@ -98,12 +114,12 @@ begin
   begin
     p := TPerson.NewPerson;
     p.FirstName := p.FirstName + Format('%4d', [I]);
-    Session.Save(p);
+    Session.Insert(p);
     p.Free;
   end;
   Session.Commit;
   CheckEquals(1000, Session.Count(TPerson));
-  CheckTrue(MilliSecondsBetween(now, start) < 25000,
+  CheckTrue(MilliSecondsBetween(now, start) < 45000,
     'Too slow: ' + inttostr(MilliSecondsBetween(now, start)));
 end;
 

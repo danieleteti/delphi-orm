@@ -1,0 +1,164 @@
+{
+ "TViewPeopleSummary": {
+  "has_one": [],
+  "fields": [
+   {
+    "field_type": "integer",
+    "field": "ID",
+    "name": "Id"
+   },{
+    "field_type": "string",
+    "field": "FIRST_NAME",
+    "size": 200,
+    "name": "FirstName"
+   },{
+    "field_type": "string",
+    "field": "LAST_NAME",
+    "size": 200,
+    "name": "LastName"
+   },{
+    "field_type": "integer",
+    "field": "AGE",
+    "name": "Age"
+   },{
+    "field_type": "date",
+    "field": "BORN_DATE",
+    "name": "BornDate"
+   },{
+    "field_type": "datetime",
+    "field": "BORN_DATE_TIME",
+    "name": "BornDateTime"
+   },{
+    "field_type": "blob",
+    "field": "PHOTO",
+    "name": "Photo"
+   },{
+    "field_type": "integer",
+    "field": "EMAILS_COUNT",
+    "name": "EmailsCount"
+   }],
+  "package": "BusinessObjects",
+  "has_many": [],
+  "table": "VIEW_PEOPLE_SUMMARY",
+  "belongs_to": []
+ },
+ "TEmail": {
+  "has_one": [],
+  "fields": [
+   {
+    "field_type": "string",
+    "field": "ADDRESS",
+    "size": 400,
+    "name": "Address"
+   },{
+    "field_type": "integer",
+    "field": "ID_PERSON",
+    "name": "IdPerson"
+   }],
+  "package": "BusinessObjects",
+  "has_many": [],
+  "id": {
+   "field_type": "integer",
+   "field": "ID",
+   "name": "Id"
+  },
+  "table": "EMAILS",
+  "belongs_to": []
+ },
+ "TPeople": {
+  "has_one": [],
+  "fields": [
+   {
+    "field_type": "string",
+    "field": "FIRST_NAME",
+    "size": 200,
+    "name": "FirstName"
+   },{
+    "field_type": "string",
+    "field": "LAST_NAME",
+    "size": 200,
+    "name": "LastName"
+   },{
+    "field_type": "integer",
+    "field": "AGE",
+    "name": "Age"
+   },{
+    "field_type": "date",
+    "field": "BORN_DATE",
+    "name": "BornDate"
+   },{
+    "field_type": "datetime",
+    "field": "BORN_DATE_TIME",
+    "name": "BornDateTime"
+   },{
+    "field_type": "blob",
+    "field": "PHOTO",
+    "name": "Photo"
+   }],
+  "package": "BusinessObjects",
+  "has_many": [],
+  "id": {
+   "field_type": "integer",
+   "field": "ID",
+   "name": "Id"
+  },
+  "table": "PEOPLE",
+  "belongs_to": []
+ },
+ "TPhone": {
+  "has_one": [],
+  "fields": [
+   {
+    "field_type": "string",
+    "field": "NUMBER",
+    "size": 200,
+    "name": "Number"
+   },{
+    "field_type": "string",
+    "field": "MODEL",
+    "size": 200,
+    "name": "Model"
+   },{
+    "field_type": "integer",
+    "field": "ID_PERSON",
+    "name": "IdPerson"
+   }],
+  "package": "BusinessObjects",
+  "has_many": [],
+  "id": {
+   "field_type": "integer",
+   "field": "ID",
+   "name": "Id"
+  },
+  "table": "PHONES",
+  "belongs_to": []
+ },
+ "TCar": {
+  "has_one": [],
+  "fields": [
+   {
+    "field_type": "string",
+    "field": "BRAND",
+    "size": 120,
+    "name": "Brand"
+   },{
+    "field_type": "string",
+    "field": "MODEL",
+    "size": 120,
+    "name": "Model"
+   },{
+    "field_type": "integer",
+    "field": "ID_PERSON",
+    "name": "IdPerson"
+   }],
+  "package": "BusinessObjects",
+  "has_many": [],
+  "id": {
+   "field_type": "integer",
+   "field": "ID",
+   "name": "Id"
+  },
+  "table": "CARS",
+  "belongs_to": []
+ }
+}
