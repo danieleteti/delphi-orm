@@ -30,11 +30,11 @@ begin
 {$IFDEF SQLITE3_STRATEGY}
   Caption := Caption + ' using dorm_sqlite3.conf';
 {$ENDIF}
-{$IFDEF FIREBIRD_STRATEGY}
-  Caption := Caption + ' using dorm_firebird.conf';
+{$IFDEF FIREBIRD_UIB_STRATEGY}
+  Caption := Caption + ' using dorm_firebird_uib.conf';
 {$ENDIF}
-{$IFDEF INTERBASE_STRATEGY}
-  Caption := Caption + ' using dorm_interbase.conf';
+{$IFDEF INTERBASE_UIB_STRATEGY}
+  Caption := Caption + ' using dorm_interbase_uib.conf';
 {$ENDIF}
 end;
 

@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ uses
   TestFramework,
   TypInfo,
   dorm,
-  dorm.Commons, BaseTestCase;
+  dorm.Commons,
+  BaseTestCase;
 
 type
   TTestDORMRelations = class(TBaseTestCase)
@@ -41,7 +42,9 @@ implementation
 uses
   Rtti,
   Classes,
-  dorm.Collections, dorm.tests.bo;
+  dorm.Collections,
+  dorm.tests.bo,
+  SysUtils;
 
 { TTestDORMRelations }
 
@@ -64,13 +67,13 @@ begin
   Exit;
   CarOwner := TPerson.NewPerson;
   try
-    Session.Save(CarOwner);
+    Session.Insert(CarOwner);
     Car := TCar.Create;
     try
       Car.Brand := 'Ford';
       Car.Model := 'Focus 1.8 TDCi';
       Car.Owner := CarOwner;
-      Session.Save(Car);
+      Session.Insert(Car);
       car_id := Car.ID;
     finally
       Car.Free;
@@ -85,7 +88,8 @@ begin
     CheckNull(Car.Owner);
     Session.LoadRelations(Car);
     CheckNull(Car.Owner);
-    Session.SetLazyLoadFor(TypeInfo(TCar), 'Owner', false);
+    Session.DisableLazyLoad(TCar, 'Owner');
+    // Session.SetLazyLoadFor(TypeInfo(TCar), 'Owner', false);
     { todo: This still not works!!! }
     Session.LoadRelations(Car);
     CheckNotNull(Car.Owner);
@@ -99,13 +103,13 @@ end;
 procedure TTestDORMRelations.TestHasManyLazyLoad;
 var
   p: TPerson;
-  t: TPhone;
+  // t: TPhone;
   ID: Integer;
 begin
   p := TPerson.NewPerson;
   try
     p.Phones.Add(TPhone.Create);
-    Session.Save(p);
+    Session.Insert(p);
     ID := p.ID;
     Session.Commit;
   finally
@@ -114,7 +118,8 @@ begin
 
   Session.StartTransaction;
   // Now Test with lazy load ON
-  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Phones', true);
+  Session.EnableLazyLoad(TPerson, 'Phones');
+  // Session.SetLazyLoadFor(TypeInfo(TPerson), 'Phones', true);
   p := Session.Load<TPerson>(ID);
   try
     CheckEquals(0, p.Phones.Count);
@@ -125,7 +130,7 @@ begin
 
   Session.StartTransaction;
   // Test with lazy load OFF
-  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Phones', false);
+  Session.DisableLazyLoad(TPerson, 'Phones');
   p := Session.Load<TPerson>(ID);
   try
     CheckEquals(1, p.Phones.Count); // Child objects are loaded
@@ -143,6 +148,7 @@ var
 begin
   p := TPerson.NewPerson;
   try
+    p.Email.Value := 'hello@there.com';
     t := TPhone.Create;
     t.Number := '555-7765123';
     t.Model := 'Casa';
@@ -153,7 +159,7 @@ begin
     p.Phones.Add(t1);
     p.Car.Brand := 'Ford';
     p.Car.Model := 'Focus 1.8 TDCi';
-    Session.Save(p); // save Person and telefoni
+    Session.Insert(p); // save Person, telefoni and Car
     ID := p.ID;
     Session.Commit;
   finally
@@ -166,6 +172,7 @@ begin
     CheckEquals(2, p.Phones.Count);
     CheckEquals('Ford', p.Car.Brand);
     CheckEquals('Focus 1.8 TDCi', p.Car.Model);
+    CheckEquals(UpperCase(p.Email.Value), p.Email.CopiedValue);
     Session.Commit;
   finally
     p.Free;
@@ -177,12 +184,12 @@ var
   p: TPerson;
   oid: Integer;
 begin
-  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Car', true);
-  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Phones', true);
-  Session.SetLazyLoadFor(TypeInfo(TPerson), 'Email', true);
+  Session.EnableLazyLoad(TPerson, 'Car');
+  Session.EnableLazyLoad(TPerson, 'Phones');
+  Session.EnableLazyLoad(TPerson, 'Email');
   p := TPerson.NewPerson;
   try
-    Session.Save(p);
+    Session.Insert(p);
     oid := p.ID;
   finally
     p.Free;
@@ -190,21 +197,21 @@ begin
 
   p := Session.Load<TPerson>(oid);
   try
-    Session.SetLazyLoadFor(TypeInfo(TPerson), 'Car', false);
-    Session.SetLazyLoadFor(TypeInfo(TPerson), 'Phones', false);
-    Session.SetLazyLoadFor(TypeInfo(TPerson), 'Email', false);
+    Session.DisableLazyLoad(TPerson, 'Car');
+    Session.DisableLazyLoad(TPerson, 'Phones');
+    Session.DisableLazyLoad(TPerson, 'Email');
     CheckFalse(Session.OIDIsSet(p.Car));
     CheckEquals(0, p.Phones.Count);
     CheckFalse(Session.OIDIsSet(p.Email));
-    Session.LoadRelations(p, [BelongsTo]);
+    Session.LoadRelations(p, [drBelongsTo]);
     CheckFalse(Session.OIDIsSet(p.Car));
     CheckEquals(0, p.Phones.Count);
     CheckFalse(Session.OIDIsSet(p.Email));
-    Session.LoadRelations(p, [HasMany]);
+    Session.LoadRelations(p, [drHasMany]);
     CheckFalse(Session.OIDIsSet(p.Car));
     CheckEquals(0, p.Phones.Count);
     CheckFalse(Session.OIDIsSet(p.Email));
-    Session.LoadRelations(p, [HasOne]);
+    Session.LoadRelations(p, [drHasOne]);
     CheckTrue(Session.OIDIsSet(p.Car));
     CheckEquals(0, p.Phones.Count);
     CheckTrue(Session.OIDIsSet(p.Email));

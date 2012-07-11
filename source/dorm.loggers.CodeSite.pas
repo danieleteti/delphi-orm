@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -20,10 +20,13 @@ interface
 
 uses
   dorm.Commons,
-  Classes;
+  Classes,
+  CodeSiteLogging;
 
 type
-  TdormFileLog = class(TdormInterfacedObject, IdormLogger)
+  TdormCodeSiteBaseLog = class abstract(TdormInterfacedObject, IdormLogger)
+  protected
+    dest: TCodeSiteDestination;
   public
     class procedure register;
     destructor Destroy; override;
@@ -36,64 +39,104 @@ type
     procedure AfterConstruction; override;
   end;
 
+  TdormFileLog = class(TdormCodeSiteBaseLog)
+    procedure AfterConstruction; override;
+  end;
+
+  TdormLiveLog = class(TdormCodeSiteBaseLog)
+    procedure AfterConstruction; override;
+  end;
+
 implementation
 
 uses
-  SysUtils,
-  CodeSiteLogging;
+  SysUtils;
+
+{ TdormCodeSiteBaseLog }
+
+procedure TdormCodeSiteBaseLog.AfterConstruction;
+begin
+  inherited;
+  CodeSite.Enabled := CodeSite.Installed;
+end;
+
+procedure TdormCodeSiteBaseLog.Debug(const Value: string);
+begin
+  CodeSite.Send(Value);
+end;
+
+destructor TdormCodeSiteBaseLog.Destroy;
+begin
+  Info(ClassName + ' Logger is shutting down');
+  dest.Free;
+  inherited;
+end;
+
+procedure TdormCodeSiteBaseLog.EnterLevel(const Value: string);
+begin
+  CodeSite.EnterMethod(Value);
+end;
+
+procedure TdormCodeSiteBaseLog.Error(const Value: string);
+begin
+  CodeSite.SendError(Value);
+end;
+
+procedure TdormCodeSiteBaseLog.ExitLevel(const Value: string);
+begin
+  CodeSite.ExitMethod(Value);
+end;
+
+procedure TdormCodeSiteBaseLog.Info(const Value: string);
+begin
+  CodeSite.Send(Value);
+end;
+
+class procedure TdormCodeSiteBaseLog.register;
+begin
+  //
+end;
+
+procedure TdormCodeSiteBaseLog.Warning(const Value: string);
+begin
+  CodeSite.SendWarning(Value);
+end;
+
+{ TdormLiveLog }
+
+procedure TdormLiveLog.AfterConstruction;
+begin
+  inherited;
+  dest := TCodeSiteDestination.Create(nil);
+  dest.Viewer.Active := true;
+  dest.LogFile.Active := false;
+  CodeSite.Destination := dest;
+  Info(ClassName + ' Logger initialized');
+end;
 
 { TdormFileLog }
 
 procedure TdormFileLog.AfterConstruction;
 begin
   inherited;
+  dest := TCodeSiteDestination.Create(nil);
+  dest.Viewer.Active := false;
+  dest.LogFile.Active := true;
+  dest.LogFile.FilePath :=
+    ExtractFilePath(GetModuleName(HInstance));
+  dest.LogFile.FileName :=
+    ChangeFileExt(ExtractFileName(GetModuleName(HInstance)), '.csl');
+  dest.LogFile.MaxSize := 1024 * 5;
+  dest.LogFile.MaxParts := 5;
+  dest.Viewer.Active := false;
+  CodeSite.Destination := dest;
   Info(ClassName + ' Logger initialized');
-end;
-
-procedure TdormFileLog.Debug(const Value: string);
-begin
-  CodeSite.Send(Value);
-end;
-
-destructor TdormFileLog.Destroy;
-begin
-  Info(ClassName + ' Logger is shutting down');
-  inherited;
-end;
-
-procedure TdormFileLog.EnterLevel(const Value: string);
-begin
-  CodeSite.EnterMethod(Value);
-end;
-
-procedure TdormFileLog.Error(const Value: string);
-begin
-  CodeSite.SendError(Value);
-end;
-
-procedure TdormFileLog.ExitLevel(const Value: string);
-begin
-  CodeSite.ExitMethod(Value);
-end;
-
-procedure TdormFileLog.Info(const Value: string);
-begin
-  CodeSite.Send(Value);
-end;
-
-class procedure TdormFileLog.register;
-begin
-  //
-end;
-
-procedure TdormFileLog.Warning(const Value: string);
-begin
-  CodeSite.SendWarning(Value);
 end;
 
 initialization
 
-CodeSite.Enabled := CodeSite.Installed;
+
 TdormFileLog.register;
+TdormLiveLog.register;
 
 end.

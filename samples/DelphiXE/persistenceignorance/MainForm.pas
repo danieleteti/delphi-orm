@@ -5,7 +5,8 @@ interface
 uses
   dorm,
   dorm.Commons,
-  dorm.adapter.Firebird,
+  dorm.Configuration,
+  dorm.adapter.UIB.Firebird,
   dorm.loggers.FileLog,
   Windows,
   Messages,
@@ -68,7 +69,9 @@ end;
 
 procedure TForm11.FormCreate(Sender: TObject);
 begin
-  Session := TSession.CreateConfigured(TStreamReader.Create('dorm.conf'),
+  Session := TSession.CreateConfigured(
+    TStreamReader.Create('dorm.conf'),
+    TStreamReader.Create('dorm.mappings'),
     deDevelopment);
 end;
 

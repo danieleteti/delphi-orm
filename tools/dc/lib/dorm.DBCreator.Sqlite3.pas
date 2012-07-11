@@ -32,7 +32,7 @@ var
   EnvMapping: ISuperObject;
   // password: string;
 begin
-  EnvMapping := FSession.GetMapping.O['persistence'].O[EnvDesc(CurrentEnv)];
+  EnvMapping := FMapping.O['persistence'].O[EnvDesc(CurrentEnv)];
   filename := EnvMapping.s['database_connection_string'];
   // password := EnvMapping.s['password'];
   db := TSQLiteDatabase.Create(filename);
@@ -71,8 +71,8 @@ begin
           for Table in Tables do
           begin
             FSession.GetLogger.Debug(Table);
-            TableName := FSession.GetTableName(Table);
-            TableMapping := FSession.GetTableMapping(Table);
+            TableName := FMetadata.GetTableName(Table);
+            TableMapping := FMetadata.GetTableMapping(Table);
             // FSQL.Add('DROP SEQUENCE SEQ_' + TableName + '_ID;');
             // FSQL.Add('CREATE SEQUENCE SEQ_' + TableName + '_ID;');
             // FSQL.Add('ALTER SEQUENCE SEQ_' + TableName +

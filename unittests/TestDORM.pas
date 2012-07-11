@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -21,26 +21,28 @@ interface
 uses
   TestFramework,
   dorm,
+  dorm.Filters,
   Generics.Collections,
-  BaseTestCase;
+  dorm.Collections,
+  BaseTestCase,
+  DateUtils;
 
 type
   TTestDORM = class(TBaseTestCase)
-  private
   protected
-    procedure SetUp; override;
   public
+    procedure SetUp; override;
     procedure LoadPersonaPassingNilAsReturnObject;
   published
-    procedure TestSave;
+    procedure TestInsert;
     procedure TestUpdate;
     procedure TestCRUD;
     procedure TestCRUDAndFree;
     procedure TestUOW;
     procedure TestDormObject;
+    procedure TestDormObjectEventAfterLoad;
+    procedure TestDormObjectFillListEventAfterLoad;
     procedure TestFindOne;
-    procedure TestFindOneNoObject;
-    procedure TestFindOneManyObjects;
     procedure TestBulkCollectionOperations;
   end;
 
@@ -49,47 +51,40 @@ implementation
 uses
   Classes,
   SysUtils,
-  Rtti,
   dorm.Commons,
   dorm.tests.bo,
   dorm.UOW,
   dorm.InterposedObject;
 
-function FirstNameIs(const FirstName: String): TdormCriteria;
-begin
-  Result := TdormCriteria.Create;
-  Result.Add('FirstName', Equal, TValue.From(FirstName));
-end;
-
 { TTestDORM }
 
 procedure TTestDORM.TestBulkCollectionOperations;
 var
-  People: TObjectList<TPerson>;
+  People: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
 begin
-  // People := CreateRandomPeople;
-  // try
-  // Session.InsertCollection(People);
-  // finally
-  // People.Free
-  // end;
-  //
-  // People := TObjectList<TPerson>.Create;
-  // try
-  // Session.FillList<TPerson>(People, TdormCriteria.Create);
-  // Session.UpdateCollection(People);
-  // finally
-  // People.Free;
-  // end;
-  //
-  // People := TObjectList<TPerson>.Create;
-  // try
-  // Session.FillList<TPerson>(People);
-  // Session.DeleteCollection(People);
-  // finally
-  // People.Free;
-  // end;
-  // Session.Commit;
+  People := CreateRandomPeople;
+  try
+    Session.InsertCollection(People);
+  finally
+    People.Free
+  end;
+
+  People := {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND}.Create;
+  try
+    Session.LoadList<TPerson>(TdormCriteria.Create, People);
+    Session.UpdateCollection(People);
+  finally
+    People.Free;
+  end;
+
+  People := {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND}.Create;
+  try
+    Session.LoadList<TPerson>(nil, People);
+    Session.DeleteCollection(People);
+  finally
+    People.Free;
+  end;
+  Session.Commit;
 end;
 
 procedure TTestDORM.TestCRUD;
@@ -100,7 +95,7 @@ var
 begin
   p1 := TPerson.NewPerson;
   try
-    Session.Save(p1);
+    Session.Insert(p1);
     p1asstring := p1.ToString;
     id := p1.id;
     Session.Commit;
@@ -154,11 +149,11 @@ end;
 procedure TTestDORM.TestCRUDAndFree;
 var
   p1: TPerson;
-  p1asstring: string;
+  // p1asstring: string;
   id: integer;
 begin
   p1 := TPerson.NewPerson;
-  id := Session.SaveAndFree(p1).AsInt64;
+  id := Session.InsertAndFree(p1).AsInt64;
 
   p1 := Session.Load<TPerson>(id);
   try
@@ -193,7 +188,7 @@ begin
   try
     p.Email.Value := 'not_a_real_email';
     try
-      Session.Save(p);
+      Session.Insert(p);
       Fail('There should be an exception here. The email is not valid!');
     except
       on E: Exception do
@@ -206,67 +201,56 @@ begin
   end;
 end;
 
-procedure TTestDORM.TestFindOneManyObjects;
+procedure TTestDORM.TestDormObjectEventAfterLoad;
 var
-  p: TPerson;
+  Email: TEmail;
+  id: integer;
 begin
-  p := TPerson.NewPerson;
+  Email := TEmail.NewEmail;
   try
-    Session.Save(p);
+    Session.Insert(Email);
+    id := Email.id;
   finally
-    p.Free;
+    Email.Free;
   end;
-
-  p := TPerson.NewPerson;
+  Email := Session.Load<TEmail>(id);
   try
-    Session.Save(p);
+    CheckEquals(UpperCase(Email.Value), Email.CopiedValue,
+      'OnAfterLoad has not be called');
   finally
-    p.Free;
-  end;
-
-  Session.Commit;
-
-  try
-    Session.FindOne<TPerson>(FirstNameIs('Daniele'));
-    Fail('TSession.FindOne must raise an EdormException when more than one object is found');
-  except
-    on EdormException do
-      CheckTrue(True);
-  end;
-
-  try
-    Session.FindOne<TPerson>(FirstNameIs('Daniele'));
-    Fail('TSession.FindOne must raise an EdormException when more than one object is found');
-  except
-    on EdormException do
-      CheckTrue(True);
+    Email.Free;
   end;
 end;
 
-procedure TTestDORM.TestFindOneNoObject;
+procedure TTestDORM.TestDormObjectFillListEventAfterLoad;
 var
-  p: TPerson;
+  Email: TEmail;
+  id: integer;
+  emails: TObjectList<TEmail>;
 begin
-  p := TPerson.NewPerson;
+  Email := TEmail.NewEmail;
   try
-    Session.Save(p);
-    Session.Commit;
+    Session.Insert(Email);
+    id := Email.id;
   finally
-    p.Free;
+    Email.Free;
   end;
 
-  p := Session.FindOne<TPerson>(FirstNameIs('SomeOneThatDoesntExist'));
+  emails := TObjectList<TEmail>.Create(true);
   try
-    CheckNull(p, 'TSession.FindOne should return nil then no object is found');
-  finally
-    p.Free;
-  end;
+    Session.LoadList<TEmail>(TdormCriteria.NewCriteria('ID',
+      coEqual, id), Email);
+    CheckEquals(1, emails.Count);
+    CheckNotEquals(UpperCase(emails[0].Value), emails[0].CopiedValue,
+      'OnAfterLoad has been called but it shouldn''t');
 
-  p := Session.FindOne<TPerson>(FirstNameIs('SomeOneThatDoesntExist'));
-  try
-    CheckNull(p, 'TSession.FindOne should return nil then no object is found');
+    Session.LoadList<TEmail>(TdormCriteria.NewCriteria('ID',
+      coEqual, id), Email, [CallAfterLoadEvent]);
+    CheckEquals(1, emails.Count);
+    CheckEquals(UpperCase(emails[0].Value), emails[0].CopiedValue,
+      'OnAfterLoad has not been called');
   finally
-    p.Free;
+    emails.Free;
   end;
 end;
 
@@ -278,8 +262,8 @@ begin
   p := TPerson.NewPerson;
   try
     Session.Persist(p);
-    p1 := Session.FindOne<TPerson>(TdormCriteria.NewCriteria('ID',
-      TdormCompareOperator.Equal, p.id));
+    p1 := Session.Load<TPerson>(TdormCriteria.NewCriteria('ID',
+      TdormCompareOperator.coEqual, p.id));
     try
       CheckEquals(p.id, p1.id); // same data
       CheckFalse(p = p1); // different objects
@@ -289,11 +273,18 @@ begin
   finally
     p.Free;
   end;
+
+  CheckNull(Session.Load<TPerson>(NewCriteria('ID', coLowerThan, 0)));
+
+  Session.InsertAndFree(TPerson.NewPerson);
+  Session.InsertAndFree(TPerson.NewPerson);
+  ExpectedException := EdormException;
+  Session.Load<TPerson>(NewCriteria('ID', coGreaterOrEqual, 1));
 end;
 
 procedure TTestDORM.LoadPersonaPassingNilAsReturnObject;
 begin
-  // Session.Load<TPerson>(nil);
+  Session.Load<TPerson>(nil);
 end;
 
 procedure TTestDORM.SetUp;
@@ -305,13 +296,18 @@ begin
   Session.DeleteAll(TPhone);
 end;
 
-procedure TTestDORM.TestSave;
+procedure TTestDORM.TestInsert;
 var
   p: TPerson;
 begin
-  p := TPerson.NewPerson;
+  p := TPerson.Create;
+  p.FirstName := 'Daniele';
+  p.LastName := 'Teti';
+  p.Age := 32;
+  p.BornDate := EncodeDate(1979, 11, 4);
+  p.BornTimeStamp := EncodeDateTime(1979, 11, 4, 16, 10, 00, 0);
   try
-    Session.Save(p);
+    Session.Insert(p);
     Session.Commit;
   finally
     p.Free;
@@ -325,21 +321,25 @@ var
   p1: TPerson;
   p2: TPerson;
 begin
-  UOW := TdormUOW.Create;
+
+  p1 := TPerson.NewPerson;
   try
-    p1 := TPerson.NewPerson;
+    p1.FirstName := 'John';
+    p1.LastName := 'Doe';
+    p2 := TPerson.NewPerson;
     try
-      p1.FirstName := 'John';
-      p1.LastName := 'Doe';
-      p2 := TPerson.NewPerson;
+      UOW := TdormUOW.Create;
       try
         p1.FirstName := 'Scott';
         p1.LastName := 'Summer';
         CheckFalse(Session.OIDIsSet(p1));
         UOW.AddInsert(p1);
         Session.Save(UOW);
+
+        UOW.FreeDeleted; // free nothing... there aren't "deleted" objects
         CheckTrue(Session.OIDIsSet(p1));
         UOW.Clear;
+
         p1.FirstName := 'John';
         UOW.AddUpdate(p1);
         Session.Save(UOW);
@@ -348,8 +348,6 @@ begin
         UOW.AddDelete(p1);
         Session.Save(UOW);
         UOW.GetUOWDelete.Extract(p1);
-        // otherwise, p1 is owned by the "delete" TdormCollection
-        Session.ClearOID(p1);
         UOW.AddInsert(p1);
         // This will not actually add the object to the collection.
         UOW.AddInsert(p1);
@@ -357,14 +355,28 @@ begin
         Session.Save(UOW);
         CheckTrue(Session.OIDIsSet(p1));
       finally
-        p2.Free;
+        UOW.Free;
+      end;
+
+      UOW := TdormUOW.Create;
+      try
+        Session.ClearOID(p1);
+        Session.ClearOID(p1.Car); // contained objects
+        Session.ClearOID(p1.Email); // contained objects
+        Session.ClearOID(p2);
+        UOW.AddInsert(p1);
+        UOW.AddDelete(p2);
+        Session.Save(UOW);
+      finally
+        UOW.Free;
       end;
     finally
-      p1.Free;
+      p2.Free;
     end;
   finally
-    UOW.Free;
+    p1.Free;
   end;
+
 end;
 
 procedure TTestDORM.TestUpdate;
@@ -378,7 +390,7 @@ begin
     p.LastName := 'Teti';
     p.Age := 30;
     p.BornDate := EncodeDate(1979, 11, 04);
-    Session.Save(p);
+    Session.Insert(p);
     id := p.id;
     Session.Commit;
   finally
@@ -404,6 +416,7 @@ begin
   finally
     p.Free;
   end;
+
 end;
 
 initialization

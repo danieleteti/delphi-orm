@@ -3,7 +3,9 @@ unit BusinessObjects;
 interface
 
 uses
-  Generics.Collections, dorm.Collections;
+  Generics.Collections,
+  dorm.Mappings,
+  dorm.Collections;
 
 type
   TPerson = class;
@@ -54,6 +56,7 @@ type
     property FirstName: String read FFirstName write SetFirstName;
     property LastName: String read FLastName write SetLastName;
     property Age: Integer read FAge write SetAge;
+    [Transient]
     property IsAdult: Boolean read GetIsAdult;
     property Laptops: TObjectList<TLaptop> read FLaptops;
   end;
@@ -61,7 +64,8 @@ type
 implementation
 
 uses
-  System.Bindings.Helper, System.SysUtils;
+  System.Bindings.Helper,
+  System.SysUtils;
 
 { TPerson }
 

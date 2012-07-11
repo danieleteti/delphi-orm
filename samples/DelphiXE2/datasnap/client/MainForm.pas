@@ -69,6 +69,9 @@ var
 
 implementation
 
+uses
+  dorm.Filters;
+
 {$R *.fmx}
 
 

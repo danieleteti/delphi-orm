@@ -14,7 +14,6 @@ uses
   Dialogs,
   StdCtrls,
   dorm,
-
   dorm.Commons,
   dorm.DBCreator, Vcl.ActnList, Vcl.Buttons;
 
@@ -30,6 +29,7 @@ type
     ListBox1: TListBox;
     SpeedButton1: TSpeedButton;
     FileOpenDialog1: TFileOpenDialog;
+    OpenDialog1: TOpenDialog;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -107,12 +107,22 @@ end;
 
 procedure TfrmMain.SpeedButton1Click(Sender: TObject);
 begin
-  if FileExists(ConfigFileName) then
-    FileOpenDialog1.DefaultFolder := ExtractFilePath(ConfigFileName);
-  if FileOpenDialog1.Execute then
-  begin
-    if FileExists(FileOpenDialog1.FileName) then
-      ConfigFileName := FileOpenDialog1.FileName
+  if Win32MajorVersion > 5 then begin
+    if FileExists(ConfigFileName) then
+      FileOpenDialog1.DefaultFolder := ExtractFilePath(ConfigFileName);
+    if FileOpenDialog1.Execute then
+    begin
+      if FileExists(FileOpenDialog1.FileName) then
+        ConfigFileName := FileOpenDialog1.FileName
+    end;
+  end else begin
+    if FileExists(ConfigFileName) then
+      OpenDialog1.InitialDir := ExtractFilePath(ConfigFileName);
+    if OpenDialog1.Execute then
+    begin
+      if FileExists(OpenDialog1.FileName) then
+        ConfigFileName := OpenDialog1.FileName
+    end;
   end;
 end;
 

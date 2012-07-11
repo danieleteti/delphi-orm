@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2011 Daniele Teti
+  Copyright 2010-2012 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -22,14 +22,18 @@ uses
   TestFramework,
   Generics.Collections,
   dorm,
-  dorm.Collections, dorm.tests.bo;
+  dorm.Collections,
+  dorm.tests.bo,
+  dorm.InterposedObject;
 
 type
   TBaseTestCase = class(TTestCase)
   protected
     Session: dorm.TSession;
-    function GetDORMConfigFileName: String;
-    function CreateRandomPeople: TObjectList<TPerson>;
+    function GetDORMConfigFileName: string;
+    function GetDORMMappingFileName: string;
+    function CreateRandomPeople:
+{$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
   public
     procedure SetUp; override;
     procedure TearDown; override;
@@ -42,11 +46,12 @@ uses
   classes,
   dorm.Commons;
 
-function TBaseTestCase.CreateRandomPeople: TObjectList<TPerson>;
+function TBaseTestCase.CreateRandomPeople:
+{$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
 var
   p: TPerson;
 begin
-  Result := TObjectList<TPerson>.Create;
+  Result := {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND}.Create;
   Result.Add(TPerson.NewPerson);
   p := TPerson.Create;
   p.FirstName := 'Scott';
@@ -70,20 +75,40 @@ begin
   Result.Add(p);
 end;
 
-function TBaseTestCase.GetDORMConfigFileName: String;
+function TBaseTestCase.GetDORMConfigFileName: string;
 begin
 {$IFDEF INTERBASE_STRATEGY}
   Result := 'dorm_interbase.conf';
 {$ENDIF}
+{$IFDEF INTERBASE_UIB_STRATEGY}
+  Result := 'dorm_interbase_uib.conf';
+{$ENDIF}
 {$IFDEF FIREBIRD_STRATEGY}
   Result := 'dorm_firebird.conf';
+{$ENDIF}
+{$IFDEF FIREBIRD_UIB_STRATEGY}
+  Result := 'dorm_firebird_uib.conf';
+{$ENDIF}
+{$IFDEF CONSOLE_TESTRUNNER}
+  Result := 'dorm_firebird_uib_ci.conf';
+{$ENDIF}
+{$IFDEF SQLSERVER_STRATEGY}
+  Result := 'dorm_sqlserver.conf';
+{$ENDIF}
+{$IFDEF SQLSERVER_DEVART_STRATEGY}
+  Result := 'dorm_sqlserver_devart.conf';
 {$ENDIF}
 {$IFDEF SQLITE3_STRATEGY}
   Result := 'dorm_sqlite3.conf';
 {$ENDIF}
 {$IFNDEF INTERBASE_STRATEGY}
+{$IFNDEF INTERBASE_UIB_STRATEGY}
 {$IFNDEF FIREBIRD_STRATEGY}
+{$IFNDEF FIREBIRD_UIB_STRATEGY}
 {$IFNDEF SQLITE3_STRATEGY}
+{$IFNDEF SQLSERVER_STRATEGY}
+{$IFNDEF SQLSERVER_DEVART_STRATEGY}
+{$IFNDEF CONSOLE_TESTRUNNER}
 {$MESSAGE ERROR '**************************************************'}
 {$MESSAGE ERROR '**>>> There are not strategy conditionals defined '}
 {$MESSAGE ERROR '**>>> You should select a REAL BUILD configuration'}
@@ -91,13 +116,31 @@ begin
 {$ENDIF}
 {$ENDIF}
 {$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+{$ENDIF}
+end;
+
+function TBaseTestCase.GetDORMMappingFileName: string;
+begin
+  Result := 'dorm_tests.mapping';
 end;
 
 procedure TBaseTestCase.SetUp;
 begin
   inherited;
-  Session := TSession.Create(deTest);
-  Session.Configure(TStreamReader.Create(GetDORMConfigFileName));
+  Session := TSession.CreateSession(deTest);
+  Session.Configure(
+    TStreamReader.Create(GetDORMConfigFileName),
+    TStreamReader.Create(GetDORMMappingFileName));
+  Session.StartTransaction;
+  Session.DeleteAll(TPerson);
+  Session.DeleteAll(TPhone);
+  Session.DeleteAll(TEmail);
+  Session.DeleteAll(TCar);
+  Session.Commit;
   Session.StartTransaction;
 end;
 

@@ -7,12 +7,15 @@ uses
   Classes,
   SysUtils,
   superobject,
-  dorm.Commons, Generics.Collections;
+  dorm.Commons,
+  dorm.Metadata,
+  Generics.Collections;
 
 type
   TdormDBCreator = class
   protected
     FSession: TSession;
+    FMetadata: TdormMetadata;
     FMapping: ISuperObject;
     FSQL: TStringList;
     function GetDatabaseFieldDeclaration(const dormFieldMapping
@@ -49,7 +52,8 @@ constructor TdormDBCreator.Create(Session: dorm.TSession);
 begin
   inherited Create;
   FSession := Session;
-  FMapping := FSession.GetMapping;
+  FMapping := TdormMetadata.Metadata.Mapping;
+  FMetadata := TdormMetadata.Metadata;
   FSQL := TStringList.Create;
 end;
 

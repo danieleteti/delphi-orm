@@ -2,13 +2,22 @@ unit ServerContainerUnit;
 
 interface
 
-uses System.SysUtils, System.Classes,
+uses
+  System.SysUtils,
+  System.Classes,
   Datasnap.DSTCPServerTransport,
-  Datasnap.DSHTTPCommon, Datasnap.DSHTTP,
-  Datasnap.DSServer, Datasnap.DSCommonServer,
-  Datasnap.DSAuth, IndyPeerImpl, BusinessObjects,
-  Generics.Collections, dorm,
-  dorm.adapter.all; // includes all the available adapters;
+  Datasnap.DSHTTPCommon,
+  Datasnap.DSHTTP,
+  Datasnap.DSServer,
+  Datasnap.DSCommonServer,
+  Datasnap.DSAuth,
+  IndyPeerImpl,
+  BusinessObjects,
+  Generics.Collections,
+  dorm,
+  dorm.Configuration,
+  dorm.Loggers,
+  dorm.adapters;
 
 type
   TServerContainer = class(TDataModule)
@@ -31,7 +40,10 @@ var
 
 implementation
 
-uses Winapi.Windows, ServerMethodsUnit, dorm.Commons;
+uses
+  Winapi.Windows,
+  ServerMethodsUnit,
+  dorm.Commons;
 
 {$R *.dfm}
 
@@ -44,13 +56,24 @@ begin
 {$IFDEF SQLITE3_STRATEGY}
   ConfigFileName := 'dorm_sqlite3.conf';
 {$ENDIF}
-{$IFDEF FIREBIRD_STRATEGY}
-  ConfigFileName := 'dorm_firebird.conf';
-{$ENDIF}
 {$IFDEF INTERBASE_STRATEGY}
   ConfigFileName := 'dorm_interbase.conf';
 {$ENDIF}
-  Session := TSession.CreateConfigured(TStreamReader.Create(ConfigFileName),
+{$IFDEF FIREBIRD_STRATEGY}
+  ConfigFileName := 'dorm_firebird.conf';
+{$ENDIF}
+{$IFDEF FIREBIRD_UIB_STRATEGY}
+  ConfigFileName := 'dorm_firebird_uib.conf';
+{$ENDIF}
+{$IFDEF INTERBASE_UIB_STRATEGY}
+  ConfigFileName := 'dorm_interbase_uib.conf';
+{$ENDIF}
+{$IFDEF SQLSERVER_STRATEGY}
+  ConfigFileName := 'dorm_sqlserver.conf';
+{$ENDIF}
+  Session := TSession.CreateConfigured(
+    TStreamReader.Create(ConfigFileName),
+    TStreamReader.Create('samples.mapping'),
     deDevelopment);
 {$REGION 'Insert some data'}
   InitializeData(Session);

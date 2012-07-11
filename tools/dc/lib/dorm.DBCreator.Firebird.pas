@@ -48,8 +48,8 @@ begin
           for Table in Tables do
           begin
             FSession.GetLogger.Debug(Table);
-            TableName := FSession.GetTableName(Table);
-            TableMapping := FSession.GetTableMapping(Table);
+            TableName := FMetadata.GetTableName(Table);
+            TableMapping := FMetadata.GetTableMapping(Table);
             FSQL.Add('DROP SEQUENCE SEQ_' + TableName + '_ID;');
             FSQL.Add('CREATE SEQUENCE SEQ_' + TableName + '_ID;');
             FSQL.Add('ALTER SEQUENCE SEQ_' + TableName + '_ID RESTART WITH 0;');

@@ -2,7 +2,7 @@
 		<PropertyGroup>
 			<ProjectGuid>{6E22397B-AA4C-4AD3-AA92-7D61C3E8FBD4}</ProjectGuid>
 			<ProjectVersion>13.4</ProjectVersion>
-			<Config Condition="'$(Config)'==''">SQLITE3_STRATEGY</Config>
+			<Config Condition="'$(Config)'==''">FIREBIRD_UIB_STRATEGY</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<MainSource>DORM_UnitTests.dpr</MainSource>
 			<Base>True</Base>
@@ -57,13 +57,70 @@
 			<Cfg_1>true</Cfg_1>
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='SQLSERVER_STRATEGY' or '$(Cfg_5)'!=''">
+			<Cfg_5>true</Cfg_5>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_5)'=='true') or '$(Cfg_5_Win32)'!=''">
+			<Cfg_5_Win32>true</Cfg_5_Win32>
+			<CfgParent>Cfg_5</CfgParent>
+			<Cfg_5>true</Cfg_5>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='SQLSERVER_DEVART_STRATEGY' or '$(Cfg_6)'!=''">
+			<Cfg_6>true</Cfg_6>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_6)'=='true') or '$(Cfg_6_Win32)'!=''">
+			<Cfg_6_Win32>true</Cfg_6_Win32>
+			<CfgParent>Cfg_6</CfgParent>
+			<Cfg_6>true</Cfg_6>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='FIREBIRD_UIB_STRATEGY' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+			<Cfg_2_Win32>true</Cfg_2_Win32>
+			<CfgParent>Cfg_2</CfgParent>
+			<Cfg_2>true</Cfg_2>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='CI' or '$(Cfg_8)'!=''">
+			<Cfg_8>true</Cfg_8>
+			<CfgParent>Cfg_2</CfgParent>
+			<Cfg_2>true</Cfg_2>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_8)'=='true') or '$(Cfg_8_Win32)'!=''">
+			<Cfg_8_Win32>true</Cfg_8_Win32>
+			<CfgParent>Cfg_8</CfgParent>
+			<Cfg_8>true</Cfg_8>
+			<Cfg_2>true</Cfg_2>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='INTERBASE_UIB_STRATEGY' or '$(Cfg_7)'!=''">
+			<Cfg_7>true</Cfg_7>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_7)'=='true') or '$(Cfg_7_Win32)'!=''">
+			<Cfg_7_Win32>true</Cfg_7_Win32>
+			<CfgParent>Cfg_7</CfgParent>
+			<Cfg_7>true</Cfg_7>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
 			<Manifest_File>None</Manifest_File>
 			<VerInfo_Locale>1040</VerInfo_Locale>
 			<DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
 			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 			<DCC_DebugDCUs>true</DCC_DebugDCUs>
-			<DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\lib\fastmm;..\lib\superobject;..\lib\sqlitewrap\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\lib\fastmm;..\lib\superobject;..\lib\sqlitewrap\source;..\lib\uib\source;..\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_DependencyCheckOutputName>DORM_UnitTests.exe</DCC_DependencyCheckOutputName>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_Optimize>false</DCC_Optimize>
@@ -74,7 +131,7 @@
 			<DCC_S>false</DCC_S>
 			<DCC_F>false</DCC_F>
 			<DCC_MapFile>3</DCC_MapFile>
-			<DCC_DcuOutput>.</DCC_DcuOutput>
+			<DCC_DcuOutput>.\dcu</DCC_DcuOutput>
 			<DCC_E>false</DCC_E>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base_Win64)'!=''">
@@ -86,11 +143,13 @@
 		<PropertyGroup Condition="'$(Base_Win32)'!=''">
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
-			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
 			<VerInfo_Locale>1033</VerInfo_Locale>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_3_Win32)'!=''">
+			<DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+			<DCC_MapFile>0</DCC_MapFile>
+			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<DCC_Define>DEBUG;FIREBIRD_STRATEGY;$(DCC_Define)</DCC_Define>
 			<VerInfo_Locale>1033</VerInfo_Locale>
@@ -111,6 +170,44 @@
 			<VerInfo_Locale>1033</VerInfo_Locale>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_5_Win32)'!=''">
+			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<DCC_Define>DEBUG;SQLSERVER_STRATEGY;$(DCC_Define)</DCC_Define>
+			<DCC_DebugDCUs>false</DCC_DebugDCUs>
+			<VerInfo_Locale>1033</VerInfo_Locale>
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_6_Win32)'!=''">
+			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<DCC_Define>DEBUG;SQLSERVER_DEVART_STRATEGY;$(DCC_Define)</DCC_Define>
+			<VerInfo_Locale>1033</VerInfo_Locale>
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+			<DCC_DebugDCUs>false</DCC_DebugDCUs>
+			<ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
+			<BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
+			<BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
+			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<DCC_Define>FIREBIRD_UIB_STRATEGY;$(DCC_Define)</DCC_Define>
+			<VerInfo_Locale>1033</VerInfo_Locale>
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_8_Win32)'!=''">
+			<DCC_UnitSearchPath>$(BDS)\Source\DUnit\Contrib\XMLReporting\;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<DCC_Define>CONSOLE_TESTRUNNER;$(DCC_Define)</DCC_Define>
+			<VerInfo_Locale>1033</VerInfo_Locale>
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_7_Win32)'!=''">
+			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<DCC_Define>INTERBASE_UIB_STRATEGY;$(DCC_Define)</DCC_Define>
+			<VerInfo_Locale>1033</VerInfo_Locale>
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+		</PropertyGroup>
 		<ItemGroup>
 			<DelphiCompile Include="$(MainSource)">
 				<MainSource>MainSource</MainSource>
@@ -123,7 +220,6 @@
 			<DCCReference Include="..\source\dorm.Commons.pas"/>
 			<DCCReference Include="..\source\dorm.Core.IdentityMap.pas"/>
 			<DCCReference Include="..\source\dorm.InterposedObject.pas"/>
-			<DCCReference Include="..\source\dorm.loggers.FileLog.pas"/>
 			<DCCReference Include="..\source\dorm.pas"/>
 			<DCCReference Include="..\source\dorm.UOW.pas"/>
 			<DCCReference Include="..\source\dorm.Utils.pas"/>
@@ -133,21 +229,59 @@
 			<DCCReference Include="FindersTests.pas"/>
 			<DCCReference Include="FrameworkTests.pas"/>
 			<DCCReference Include="..\source\dorm.Finders.pas"/>
-			<DCCReference Include="..\source\dorm.loggers.CodeSite.pas"/>
-			<DCCReference Include="..\source\dorm.adapter.DBExpress.Factory.pas"/>
-			<DCCReference Include="..\source\dorm.adapter.Firebird.pas"/>
-			<DCCReference Include="..\source\dorm.adapter.Interbase.pas"/>
-			<DCCReference Include="..\source\dorm.adapter.Sqlite3.pas"/>
+			<DCCReference Include="..\source\dorm.Filters.pas"/>
+			<DCCReference Include="..\source\dorm.Mappings.pas"/>
+			<DCCReference Include="..\source\dorm.Mappings.Strategies.pas"/>
+			<DCCReference Include="TestToolsCore.pas"/>
+			<DCCReference Include="..\tools\mappingcreator\lib\dorm.CodeGenerator.pas"/>
+			<DCCReference Include="..\tools\mappingcreator\lib\dorm.CodeGenerator.Delphi.pas"/>
+			<DCCReference Include="..\source\dorm.loggers.pas"/>
+			<DCCReference Include="..\source\dorm.loggers.FileLog.pas"/>
+			<DCCReference Include="..\source\dorm.adapters.pas"/>
+			<DCCReference Include="TestDORMMapping.Merge.pas"/>
+			<DCCReference Include="TestDORMMapping.Attributes.pas"/>
+			<DCCReference Include="TestDORMMapping.CoC.pas"/>
+			<DCCReference Include="TestDORMMapping.FileJSON.pas"/>
+			<DCCReference Include="..\source\dorm.adapter.Base.pas"/>
+			<None Include="ModelSupport_DORM_UnitTests\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests\dorm\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests\DORM_UnitTests\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests\dorm\Metadata\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests\dorm\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests\dorm\Metadata\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests\dorm\Mappings\default.txvpck"/>
+			<None Include="..\source\dorm.INC"/>
 			<BuildConfiguration Include="INTERBASE_STRATEGY">
 				<Key>Cfg_4</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="SQLSERVER_STRATEGY">
+				<Key>Cfg_5</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="SQLSERVER_DEVART_STRATEGY">
+				<Key>Cfg_6</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="INTERBASE_UIB_STRATEGY">
+				<Key>Cfg_7</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="FIREBIRD_UIB_STRATEGY">
+				<Key>Cfg_2</Key>
 				<CfgParent>Base</CfgParent>
 			</BuildConfiguration>
 			<BuildConfiguration Include="FIREBIRD_STRATEGY">
 				<Key>Cfg_3</Key>
 				<CfgParent>Base</CfgParent>
 			</BuildConfiguration>
-			<BuildConfiguration Include="Base">
-				<Key>Base</Key>
+			<BuildConfiguration Include="CI">
+				<Key>Cfg_8</Key>
+				<CfgParent>Cfg_2</CfgParent>
 			</BuildConfiguration>
 			<BuildConfiguration Include="SQLITE3_STRATEGY">
 				<Key>Cfg_1</Key>
@@ -193,6 +327,10 @@
 						<Source Name="MainSource">DORM_UnitTests.dpr</Source>
 					</Source>
 					<Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\svnide160.bpl">Embarcadero Subversion Integration</Excluded_Packages>
+						<Excluded_Packages Name="C:\windows\system32\OpenWireEditorDsnD16.bpl">(untitled)</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\bcboffice2k160.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\bcbofficexp160.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
 						<Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
 					</Excluded_Packages>
@@ -207,6 +345,7 @@
 					<Platform value="Win64">True</Platform>
 					<Platform value="Win32">True</Platform>
 				</Platforms>
+				<ModelSupport>True</ModelSupport>
 			</BorlandProject>
 			<ProjectFileVersion>12</ProjectFileVersion>
 		</ProjectExtensions>

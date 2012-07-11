@@ -32,7 +32,10 @@ uses
   dorm.adapter.DBExpress.Factory in '..\source\dorm.adapter.DBExpress.Factory.pas',
   dorm.adapter.Firebird in '..\source\dorm.adapter.Firebird.pas',
   dorm.adapter.Interbase in '..\source\dorm.adapter.Interbase.pas',
-  dorm.adapter.Sqlite3 in '..\source\dorm.adapter.Sqlite3.pas';
+  dorm.Filters in '..\source\dorm.Filters.pas',
+  dorm.Mappings in '..\source\dorm.Mappings.pas',
+  dorm.Mappings.Strategies in '..\source\dorm.Mappings.Strategies.pas',
+  TestMappings in 'TestMappings.pas';
 
 {$R *.RES}
 

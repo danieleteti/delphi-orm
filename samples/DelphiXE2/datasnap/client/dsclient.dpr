@@ -1,7 +1,7 @@
 program dsclient;
 
 uses
-  FastMM4,
+  //FastMM4,
   FMX.Forms,
   MainForm in 'MainForm.pas' {frmClientMain},
   BusinessObjects in '..\..\BusinessObjects.pas',

@@ -667,6 +667,7 @@ object frmClientMain: TfrmClientMain
       OnChange = SpinBox1Change
       Min = 1.000000000000000000
       Max = 100.000000000000000000
+      Value = 1.000000000000000000
       Increment = 1.000000000000000000
       object Label3: TLabel
         Position.Point = '(0,-16)'

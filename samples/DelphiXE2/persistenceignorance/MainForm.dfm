@@ -2,7 +2,7 @@ object Form11: TForm11
   Left = 0
   Top = 0
   Caption = 'Form11'
-  ClientHeight = 256
+  ClientHeight = 152
   ClientWidth = 346
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -16,11 +16,11 @@ object Form11: TForm11
   PixelsPerInch = 96
   TextHeight = 19
   object Button1: TButton
-    Left = 24
-    Top = 160
-    Width = 273
+    Left = 8
+    Top = 8
+    Width = 330
     Height = 65
-    Caption = 'Persist VCL controls to database'
+    Caption = '1) Persist VCL controls to database'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clWindowText
     Font.Height = -16
@@ -33,10 +33,10 @@ object Form11: TForm11
   end
   object Button2: TButton
     Left = 8
-    Top = 8
-    Width = 313
-    Height = 49
-    Caption = 'Reload controls from database'
+    Top = 79
+    Width = 330
+    Height = 64
+    Caption = '2) Reload controls from database  '
     TabOrder = 1
     OnClick = Button2Click
   end
