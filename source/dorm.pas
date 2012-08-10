@@ -371,7 +371,6 @@ begin
   Result := TSession.CreateSession(AEnvironment);
   try
     Result.Configure(APersistenceConfiguration, AMappingConfiguration);
-    Result.StartTransaction;
   except
     FreeAndNil(Result);
     raise;
