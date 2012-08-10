@@ -303,6 +303,8 @@ begin
 end;
 
 {$HINTS OFF}
+
+
 procedure TFrameworkTests.TestEnumerableCollection;
 var
   people: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
@@ -312,10 +314,10 @@ var
   p: TPerson;
 begin
   Session.DeleteAll(TPerson);
-  people := Session.ListAll<TPerson>;
+  people := Session.LoadList<TPerson>;
   try
     for person in people do
-      Fail('There arent record!!!');
+      Fail('There arent records!!!');
   finally
     people.Free;
   end;
@@ -328,7 +330,7 @@ begin
     p.Free;
   end;
 
-  people := Session.ListAll<TPerson>;
+  people := Session.LoadList<TPerson>;
   try
     x := 0;
     for I := 0 to (people.Count - 1) do
@@ -339,6 +341,7 @@ begin
   end;
 end;
 {$HINTS ON}
+
 
 procedure TFrameworkTests.TestGeneratorID;
 var
@@ -377,6 +380,8 @@ begin
 end;
 
 {$HINTS OFF}
+
+
 procedure TFrameworkTests.TestListDuckTyping;
 var
 {$IF CompilerVersion = 22}
@@ -420,6 +425,7 @@ begin
   end;
 end;
 {$HINTS ON}
+
 
 procedure TFrameworkTests.TestLoadByAttribute;
 var
