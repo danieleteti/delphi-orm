@@ -457,7 +457,8 @@ begin
     Exit;
   ParseTable(AType, ATable);
   for prop in AType.GetProperties do
-    if TdormUtils.HasAttribute<Transient>(prop) then
+    if (TdormUtils.HasAttribute<Transient>(prop) or TdormUtils.HasAttribute<NoAutomapping>(prop))
+    then
       Continue
     else if prop.PropertyType.IsInstance then
     begin
