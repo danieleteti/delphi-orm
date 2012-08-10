@@ -385,6 +385,7 @@ end;
 procedure TCar.SetOwner(const Value: TPerson);
 begin
   FOwner := Value;
+  self.FPersonID := FOwner.ID;
 end;
 
 procedure TCar.SetPersonID(const Value: Integer);

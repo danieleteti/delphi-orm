@@ -189,7 +189,7 @@ object frmMain: TfrmMain
     Top = 112
   end
   object MainMenu1: TMainMenu
-    Left = 312
+    Left = 272
     Top = 96
     object File1: TMenuItem
       Caption = '&File'

@@ -46,6 +46,10 @@ type
     FLogger: IdormLogger;
     FEnvironment: TdormEnvironment;
     EnvironmentNames: TArray<string>;
+    FLoadEnterExitCounter: Integer;
+    LoadedObjects: TObjectDictionary<string, TObject>;
+    procedure LoadEnter;
+    procedure LoadExit;
     procedure DoOnAfterLoad(AObject: TObject);
     procedure DoOnBeforeDelete(AObject: TObject);
     procedure DoOnBeforeUpdate(AObject: TObject);
@@ -53,6 +57,13 @@ type
     function GetIdValue(AIdMappingField: TMappingField;
       AObject: TObject): TValue;
     procedure ReadIDConfig(const AJsonPersistenceConfig: ISuperObject);
+    /// this method load an object using a value and a specific mapping field. is used to load the
+    // relations between objects
+    function LoadByMappingField(ATypeInfo: PTypeInfo; AMappingField: TMappingField;
+      const Value: TValue)
+      : TObject; overload;
+    function LoadByMappingField(ATypeInfo: PTypeInfo; AMappingField: TMappingField;
+      const Value: TValue; AObject: TObject): boolean; overload;
   protected
     // Validations
     procedure DoUpdateValidation(AObject: TObject);
@@ -92,14 +103,25 @@ type
     function Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject; overload;
 
     // Internal use
-    function Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject): Boolean; overload;
+    function Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject): boolean; overload;
     procedure SetLazyLoadFor(ATypeInfo: PTypeInfo; const APropertyName: string;
-      const Value: Boolean);
+      const Value: boolean);
 
     // function FindOne(AItemClassInfo: PTypeInfo; Criteria: ICriteria;
     // FillOptions: TdormFillOptions = []; FreeCriteria: Boolean = true)
     // : TObject; overload; deprecated;
-    function IsNullKey(ATableMap: TMappingTable; const AValue: TValue): Boolean;
+    function IsNullKey(ATableMap: TMappingTable; const AValue: TValue): boolean;
+
+    ///
+    procedure AddAsLoadedObject(AObject: TObject; AMappingField: TMappingField); overload;
+    procedure AddAsLoadedObject(ACollection: IWrappedList; AMappingField: TMappingField); overload;
+    function IsAlreadyLoaded(ATypeInfo: PTypeInfo; AValue: TValue;
+      out AOutObject: TObject): boolean;
+    function GetLoadedObjectHashCode(AObject: TObject; AMappingField: TMappingField)
+      : String; overload;
+    function GetLoadedObjectHashCode(ATypeInfo: PTypeInfo;
+      AValue: TValue): String; overload;
+
   public
     constructor CreateSession(Environment: TdormEnvironment); virtual;
     destructor Destroy; override;
@@ -110,13 +132,13 @@ type
     procedure CopyObject(SourceObject, TargetObject: TObject);
     function GetLogger: IdormLogger;
     function Strategy: IdormPersistStrategy;
-    function OIDIsSet(AObject: TObject): Boolean;
+    function OIDIsSet(AObject: TObject): boolean;
     procedure ClearOID(AObject: TObject);
     // Configuration
     procedure Configure(APersistenceConfiguration: TTextReader;
       AMappingConfiguration: TTextReader = nil;
-      AOwnPersistenceConfigurationReader: Boolean = true;
-      AOwnMappingConfigurationReader: Boolean = true);
+      AOwnPersistenceConfigurationReader: boolean = true;
+      AOwnMappingConfigurationReader: boolean = true);
     class function CreateConfigured(APersistenceConfiguration: TTextReader;
       AMappingConfiguration: TTextReader; AEnvironment: TdormEnvironment): TSession;
     // Persistence
@@ -140,7 +162,7 @@ type
     { Load 0 or 1 object by OID (first parameter). The Session will create and returned object of type <T> }
     function Load<T: class>(const Value: TValue): T; overload;
     { Load 0 or 1 object by OID (first parameter). The Session doesn't create the object, just fill the instance passed on second parameter. This function return true if the OID was found in database. }
-    function Load<T: class>(const Value: TValue; AObject: TObject): Boolean; overload;
+    function Load<T: class>(const Value: TValue; AObject: TObject): boolean; overload;
     { Load 0 or 1 object by Criteria. The Session will create and returned object of type <T> }
     function Load<T: class>(ACriteria: ICriteria): T; overload;
 
@@ -180,6 +202,19 @@ uses
 
 { TSession }
 
+procedure TSession.AddAsLoadedObject(AObject: TObject; AMappingField: TMappingField);
+begin
+  LoadedObjects.Add(GetLoadedObjectHashCode(AObject, AMappingField), AObject);
+end;
+
+procedure TSession.AddAsLoadedObject(ACollection: IWrappedList; AMappingField: TMappingField);
+var
+  Obj: TObject;
+begin
+  for Obj in ACollection do
+    AddAsLoadedObject(Obj, AMappingField);
+end;
+
 procedure TSession.ClearOID(AObject: TObject);
 var
   rt: TRttiType;
@@ -202,8 +237,8 @@ end;
 
 procedure TSession.Configure(APersistenceConfiguration: TTextReader;
   AMappingConfiguration: TTextReader = nil;
-  AOwnPersistenceConfigurationReader: Boolean = true;
-  AOwnMappingConfigurationReader: Boolean = true);
+  AOwnPersistenceConfigurationReader: boolean = true;
+  AOwnMappingConfigurationReader: boolean = true);
 var
   _ConfigText: string;
   _MappingText: string;
@@ -326,6 +361,8 @@ begin
   EnvironmentNames[ord(deDevelopment)] := 'development';
   EnvironmentNames[ord(deTest)] := 'test';
   EnvironmentNames[ord(deRelease)] := 'release';
+  FLoadEnterExitCounter := 0;
+  LoadedObjects := TObjectDictionary<string, TObject>.Create;
 end;
 
 class function TSession.CreateConfigured(APersistenceConfiguration: TTextReader;
@@ -452,6 +489,7 @@ end;
 
 destructor TSession.Destroy;
 begin
+  LoadedObjects.Free;
   if assigned(FPersistStrategy) then
   begin
     if FPersistStrategy.InTransaction then
@@ -465,7 +503,7 @@ end;
 
 procedure TSession.DisableLazyLoad(AClass: TClass; const APropertyName: string);
 begin
-  SetLazyLoadFor(AClass.ClassInfo, APropertyName, False);
+  SetLazyLoadFor(AClass.ClassInfo, APropertyName, false);
 end;
 
 procedure TSession.DoDeleteValidation(AObject: TObject);
@@ -484,7 +522,7 @@ begin
   begin
     if not(TdormObject(AObject).Validate and TdormObject(AObject).InsertValidate)
     then
-      raise EdormException.Create(TdormObject(AObject).ValidationErrors);
+      raise EdormValidationException.Create(TdormObject(AObject).ValidationErrors);
   end;
 end;
 
@@ -602,6 +640,17 @@ end;
 // {$IFEND}
 // end;
 
+function TSession.GetLoadedObjectHashCode(AObject: TObject; AMappingField: TMappingField): String;
+begin
+  Result := AObject.ClassName + '_' + inttostr(GetIdValue(AMappingField, AObject).AsInt64);
+end;
+
+function TSession.GetLoadedObjectHashCode(ATypeInfo: PTypeInfo;
+  AValue: TValue): String;
+begin
+  Result := ATypeInfo.Name + '_' + inttostr(AValue.AsInt64);
+end;
+
 function TSession.GetLogger: IdormLogger;
 begin
   Result := FLogger;
@@ -675,7 +724,8 @@ begin
   Result := EnvironmentNames[ord(FEnvironment)];
 end;
 
-function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject;
+function TSession.LoadByMappingField(ATypeInfo: PTypeInfo; AMappingField: TMappingField;
+  const Value: TValue): TObject;
 var
   rt: TRttiType;
   _table: TMappingTable;
@@ -683,34 +733,97 @@ var
   Obj: TObject;
 begin
   Obj := nil;
+  LoadEnter;
+
   rt := FCTX.GetType(ATypeInfo);
   GetLogger.EnterLevel('Load ' + rt.ToString);
   _table := FMappingStrategy.GetMapping(rt);
-  try
-    Obj := TdormUtils.CreateObject(rt);
-    if FPersistStrategy.Load(rt, _table, Value, Obj) then
-      Result := Obj
-    else
-    begin
-      Obj.Free;
-      Result := nil;
-    end;
-  except
-    Obj.Free;
-    raise;
-  end;
-
-  // Result := FPersistStrategy.Load(rt, _table.TableName, _fields, Value);
-
-  if assigned(Result) then
+  if not IsAlreadyLoaded(ATypeInfo, Value, Result) then { todo: optimize... please }
   begin
-    _idValue := GetIdValue(_table.Id, Result);
-    LoadBelongsToRelation(_table, _idValue, rt, Result);
-    LoadHasManyRelation(_table, _idValue, rt, Result);
-    LoadHasOneRelation(_table, _idValue, rt, Result);
+    Obj := TdormUtils.CreateObject(rt);
+    try
+      if FPersistStrategy.Load(rt, _table, AMappingField, Value, Obj) then
+      begin
+        Result := Obj;
+        AddAsLoadedObject(Result, _table.Id); // mark this object as already loaded
+      end
+      else
+      begin
+        Obj.Free;
+        Result := nil;
+      end;
+    except
+      Obj.Free;
+      raise;
+    end;
+
+    // Result := FPersistStrategy.Load(rt, _table.TableName, _fields, Value);
+
+    if assigned(Result) then
+    begin
+      _idValue := GetIdValue(_table.Id, Result);
+      LoadBelongsToRelation(_table, _idValue, rt, Result);
+      LoadHasManyRelation(_table, _idValue, rt, Result);
+      LoadHasOneRelation(_table, _idValue, rt, Result);
+    end;
+    DoOnAfterLoad(Result);
   end;
-  DoOnAfterLoad(Result);
+  LoadExit;
   GetLogger.ExitLevel('Load ' + rt.ToString);
+end;
+
+function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject;
+var
+  rt: TRttiType;
+  _table: TMappingTable;
+  // _idValue: TValue;
+  // Obj: TObject;
+begin
+  rt := FCTX.GetType(ATypeInfo);
+  GetLogger.EnterLevel('Load ' + rt.ToString);
+  _table := FMappingStrategy.GetMapping(rt);
+
+  Result := LoadByMappingField(ATypeInfo, _table.Id, Value);
+  GetLogger.ExitLevel('Load ' + rt.ToString);
+
+  // Obj := nil;
+  // LoadEnter;
+  //
+  // rt := FCTX.GetType(ATypeInfo);
+  // GetLogger.EnterLevel('Load ' + rt.ToString);
+  // _table := FMappingStrategy.GetMapping(rt);
+  // try
+  // if IsAlreadyLoaded(ATypeInfo, Value, Result) then { todo: optimize... please }
+  // Exit;
+  //
+  // Obj := TdormUtils.CreateObject(rt);
+  // if FPersistStrategy.Load(rt, _table, Value, Obj) then
+  // begin
+  // Result := Obj;
+  // AddAsLoadedObject(Result, _table.Id); // mark this object as already loaded
+  // end
+  // else
+  // begin
+  // Obj.Free;
+  // Result := nil;
+  // end;
+  // except
+  // Obj.Free;
+  // raise;
+  // end;
+  //
+  // // Result := FPersistStrategy.Load(rt, _table.TableName, _fields, Value);
+  //
+  // if assigned(Result) then
+  // begin
+  // _idValue := GetIdValue(_table.Id, Result);
+  // LoadBelongsToRelation(_table, _idValue, rt, Result);
+  // LoadHasManyRelation(_table, _idValue, rt, Result);
+  // LoadHasOneRelation(_table, _idValue, rt, Result);
+  // end;
+  // DoOnAfterLoad(Result);
+  // LoadExit;
+  // GetLogger.ExitLevel('Load ' + rt.ToString);
 end;
 
 function TSession.Load<T>(const Value: TValue): T;
@@ -724,12 +837,13 @@ begin
   Result := LoadList<T>(nil, FillOptions);
 end;
 
-function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject): Boolean;
+function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject): boolean;
 var
   rt: TRttiType;
   _table: TMappingTable;
   _idValue: TValue;
 begin
+  LoadEnter;
   rt := FCTX.GetType(ATypeInfo);
   GetLogger.EnterLevel('Load ' + rt.ToString);
   _table := FMappingStrategy.GetMapping(rt);
@@ -745,9 +859,10 @@ begin
   end;
   DoOnAfterLoad(AObject);
   GetLogger.ExitLevel('Load ' + rt.ToString);
+  LoadExit;
 end;
 
-function TSession.Load<T>(const Value: TValue; AObject: TObject): Boolean;
+function TSession.Load<T>(const Value: TValue; AObject: TObject): boolean;
 begin
   Result := Load(TypeInfo(T), Value, AObject);
 end;
@@ -797,6 +912,7 @@ begin
       GetIdValue(FMappingStrategy.GetMapping(ARttiType).Id, AObject));
     ChildTable := FMappingStrategy.GetMapping(_child_type);
     GetStrategy.LoadList(Coll, _child_type, ChildTable, Criteria); { todo: callafterloadevent }
+    AddAsLoadedObject(WrapAsList(Coll), ChildTable.Id);
     // LoadList<TObject>(Criteria, Coll, [CallAfterLoadEvent]);
     LoadRelationsForEachElement(Coll);
   end
@@ -841,7 +957,7 @@ var
   _table: TMappingTable;
   _has_one: TMappingRelation;
   _child_type: TRttiType;
-  DestObj: TObject;
+  DestObj, Obj: TObject;
 begin
   GetLogger.Debug('Loading HAS_ONE for ' + AClassName + '.' + APropertyName);
   _table := FMappingStrategy.GetMapping(ARttiType);
@@ -863,20 +979,39 @@ begin
       // If the HasOne reference is not created, then Create It!
       if not assigned(DestObj) then
       begin
-        DestObj := TdormUtils.CreateObject(_child_type);
-        if GetStrategy.Load(_child_type, FMappingStrategy.GetMapping(_child_type),
-          FMappingStrategy.GetMapping(_child_type).FindByName(_has_one.ChildFieldName),
-          AIdValue, DestObj) then
-          TdormUtils.SetProperty(AObject, _has_one.Name, DestObj);
+        if IsAlreadyLoaded(_child_type.Handle, AIdValue, Obj) then
+          DestObj := Obj
+        else
+          // DestObj := TdormUtils.CreateObject(_child_type);
+          DestObj := LoadByMappingField(
+            _child_type.Handle,
+            FMappingStrategy.GetMapping(_child_type).FindByName(_has_one.ChildFieldName),
+            AIdValue);
+
+        // if GetStrategy.Load(_child_type, FMappingStrategy.GetMapping(_child_type),
+        // FMappingStrategy.GetMapping(_child_type).FindByName(_has_one.ChildFieldName),
+        // AIdValue, DestObj) then
+        TdormUtils.SetProperty(AObject, _has_one.Name, DestObj);
       end
       else
       begin
-        if not GetStrategy.Load(_child_type, FMappingStrategy.GetMapping(_child_type),
-          FMappingStrategy.GetMapping(_child_type).FindByName(_has_one.ChildFieldName),
-          AIdValue, DestObj) then
+        if IsAlreadyLoaded(_child_type.Handle, AIdValue, Obj) then
         begin
           DestObj.Free;
-          DestObj := nil;
+          DestObj := Obj;
+        end
+        else
+        begin
+          LoadByMappingField(_child_type.Handle,
+            FMappingStrategy.GetMapping(_child_type).FindByName(_has_one.ChildFieldName),
+            AIdValue, DestObj);
+          // if not GetStrategy.Load(_child_type, FMappingStrategy.GetMapping(_child_type),
+          // FMappingStrategy.GetMapping(_child_type).FindByName(_has_one.ChildFieldName),
+          // AIdValue, DestObj) then
+          // begin
+          // DestObj.Free;
+          // DestObj := nil;
+          // end;
         end;
       end;
       if assigned(DestObj) then
@@ -890,7 +1025,8 @@ end;
 function TSession.LoadList<T>(Criteria: ICriteria; FillOptions: TdormFillOptions):
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
 begin
-  Result := {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}.Create(true);
+  Result := {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}.Create
+    (true);
   LoadList<T>(Criteria, Result, FillOptions);
 end;
 
@@ -948,7 +1084,7 @@ begin
     LoadRelations(el, ARelationsSet);
 end;
 
-function TSession.OIDIsSet(AObject: TObject): Boolean;
+function TSession.OIDIsSet(AObject: TObject): boolean;
 var
   _table: TMappingTable;
   _idValue: TValue;
@@ -1013,6 +1149,8 @@ var
   _belong_type: TRttiType;
   _belong_field_key_value: TValue;
   v: TValue;
+  parent_mapping: TMappingTable;
+  parent_field_mapping: TMappingField;
 begin
   GetLogger.Debug('Loading BELONGS_TO for ' + AClassName + '.' + APropertyName);
   _table := FMappingStrategy.GetMapping(ARttiType);
@@ -1026,12 +1164,60 @@ begin
       raise Exception.Create('Unknown type ' + _belongs_to.OwnerClassName);
     _belong_field_key_value := TdormUtils.GetProperty(AObject,
       _belongs_to.RefFieldName);
-    v := Load(FCTX.FindType(Qualified(_table, _belongs_to.OwnerClassName))
-      .Handle, _belong_field_key_value);
+
+    parent_mapping := FMappingStrategy.GetMapping
+      (FCTX.FindType(Qualified(_table, _belongs_to.OwnerClassName)));
+
+    // parent_field_mapping := child_mapping.Id;
+
+    v := LoadByMappingField(
+      FCTX.FindType(Qualified(_table, _belongs_to.OwnerClassName)).Handle,
+      parent_mapping.Id,
+      _belong_field_key_value);
+    //
+    // _belong_field_key_value);
     TdormUtils.SetField(AObject, _belongs_to.Name, v);
   end
   else
     raise Exception.Create('Unknown property name ' + APropertyName);
+end;
+
+function TSession.LoadByMappingField(ATypeInfo: PTypeInfo; AMappingField: TMappingField;
+  const Value: TValue; AObject: TObject): boolean;
+var
+  rt: TRttiType;
+  _table: TMappingTable;
+  _idValue: TValue;
+begin
+  LoadEnter;
+  rt := FCTX.GetType(ATypeInfo);
+  GetLogger.EnterLevel('Load ' + rt.ToString);
+  _table := FMappingStrategy.GetMapping(rt);
+
+  Result := FPersistStrategy.Load(rt, _table, AMappingField, Value, AObject);
+
+  if Result then
+  begin
+    _idValue := GetIdValue(_table.Id, AObject);
+    LoadBelongsToRelation(_table, _idValue, rt, AObject);
+    LoadHasManyRelation(_table, _idValue, rt, AObject);
+    LoadHasOneRelation(_table, _idValue, rt, AObject);
+  end;
+  DoOnAfterLoad(AObject);
+  GetLogger.ExitLevel('Load ' + rt.ToString);
+  LoadExit;
+end;
+
+procedure TSession.LoadEnter;
+begin
+  Inc(FLoadEnterExitCounter);
+end;
+
+procedure TSession.LoadExit;
+begin
+  Dec(FLoadEnterExitCounter);
+  if FLoadEnterExitCounter = 0 then
+    LoadedObjects.Clear;
 end;
 
 function TSession.Qualified(AMappingTable: TMappingTable;
@@ -1097,7 +1283,7 @@ begin
 end;
 
 procedure TSession.SetLazyLoadFor(ATypeInfo: PTypeInfo;
-  const APropertyName: string; const Value: Boolean);
+  const APropertyName: string; const Value: boolean);
 var
   _rttitype: TRttiType;
   _has_many, _has_one: TMappingRelation;
@@ -1212,8 +1398,15 @@ begin
   GetLogger.ExitLevel('has_one ' + ARttiType.ToString);
 end;
 
+function TSession.IsAlreadyLoaded(ATypeInfo: PTypeInfo; AValue: TValue;
+  out AOutObject: TObject): boolean;
+begin
+  Result := LoadedObjects.TryGetValue(GetLoadedObjectHashCode(ATypeInfo, AValue),
+    AOutObject);
+end;
+
 function TSession.IsNullKey(ATableMap: TMappingTable;
-  const AValue: TValue): Boolean;
+  const AValue: TValue): boolean;
 begin
   Result := TdormUtils.EqualValues(AValue, FIdNullValue);
 end;
