@@ -139,6 +139,7 @@ type
     procedure SetModel(const Value: string);
     procedure SetID(const Value: Integer);
     procedure SetPersonID(const Value: Integer);
+    function GetIsItalianNumber: Boolean;
     // Private!!!
     property PersonID: Integer read FPersonID write SetPersonID;
   public
@@ -148,6 +149,8 @@ type
     property Number: string read FNumber write SetNumber;
     property Model: string read FModel write SetModel;
     property ID: Integer read FID write SetID;
+    [NoAutomapping]
+    property IsItalianNumber: Boolean read GetIsItalianNumber;
   end;
 
   TEmployees = class({$IF CompilerVersion >= 23}TObjectList<TEmployee>{$ELSE}TdormObjectList<TEmployee>{$IFEND})
@@ -333,6 +336,12 @@ begin
   inherited;
 end;
 
+function TPhone.GetIsItalianNumber: Boolean;
+begin
+  Result := (Copy(Self.Number, 1, 3) = '+39') or
+    (Copy(Self.Number, 1, 4) = '0039');
+end;
+
 class procedure TPhone.register;
 begin
 
@@ -385,7 +394,7 @@ end;
 procedure TCar.SetOwner(const Value: TPerson);
 begin
   FOwner := Value;
-  self.FPersonID := FOwner.ID;
+  Self.FPersonID := FOwner.ID;
 end;
 
 procedure TCar.SetPersonID(const Value: Integer);

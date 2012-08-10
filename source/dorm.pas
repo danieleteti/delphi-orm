@@ -192,6 +192,9 @@ type
     procedure StartTransaction;
     procedure Commit;
     procedure Rollback;
+
+    // expose mapping
+    function GetMapping: ICacheMappingStrategy;
   end;
 
 implementation
@@ -653,6 +656,11 @@ end;
 function TSession.GetLogger: IdormLogger;
 begin
   Result := FLogger;
+end;
+
+function TSession.GetMapping: ICacheMappingStrategy;
+begin
+  Result := FMappingStrategy;
 end;
 
 function TSession.GetPackageName(AMappingTable: TMappingTable;
