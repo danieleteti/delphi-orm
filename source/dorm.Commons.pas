@@ -37,6 +37,10 @@ type
 
   end;
 
+  EdormValidationException = class(EdormException)
+
+  end;
+
   TdormEnvironment = (deDevelopment, deTest, deRelease);
   TdormObjectOwner = (ooItself, ooParent);
   TdormSaveType = (stAllGraph, stSingleObject);

@@ -9,7 +9,6 @@ uses
   Forms,
   TestFramework,
   GUITestRunner,
-  XMLTestRunner,
   TextTestRunner,
   TestDORM in 'TestDORM.pas',
   TestDORMSearchCriteria in 'TestDORMSearchCriteria.pas',

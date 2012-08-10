@@ -193,7 +193,7 @@ begin
     except
       on E: Exception do
       begin
-        CheckTrue(E.ClassName = 'EdormException');
+        CheckTrue(E.ClassName = 'EdormValidationException');
       end;
     end;
   finally

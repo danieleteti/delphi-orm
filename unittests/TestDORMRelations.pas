@@ -64,7 +64,6 @@ var
   CarOwner: TPerson;
   car_id: Integer;
 begin
-  Exit;
   CarOwner := TPerson.NewPerson;
   try
     Session.Insert(CarOwner);
@@ -90,7 +89,7 @@ begin
     CheckNull(Car.Owner);
     Session.DisableLazyLoad(TCar, 'Owner');
     // Session.SetLazyLoadFor(TypeInfo(TCar), 'Owner', false);
-    { todo: This still not works!!! }
+    { todo: check this }
     Session.LoadRelations(Car);
     CheckNotNull(Car.Owner);
   finally
@@ -98,6 +97,20 @@ begin
     Car.Free;
   end;
 
+  // LazyLoaded is enabled in the conf file
+  Session.DisableLazyLoad(TCar, 'Owner');
+  Session.DisableLazyLoad(TPerson, 'Car');
+  Car := Session.Load<TCar>(car_id);
+  try
+    CheckTrue(Assigned(Car.Owner));
+    CheckEquals('Daniele', Car.Owner.FirstName);
+    CheckEquals('Teti', Car.Owner.LastName);
+    CheckEquals(32, Car.Owner.Age);
+    CheckEquals('d.teti@bittime.it', Car.Owner.Email.Value);
+  finally
+    Car.Owner.Free;
+    Car.Free;
+  end;
 end;
 
 procedure TTestDORMRelations.TestHasManyLazyLoad;
