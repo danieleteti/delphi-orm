@@ -9,8 +9,9 @@
         {"name":"LastName", "field":"LAST_NAME", "field_type":"string", "size": 50},
         {"name":"Age", "field":"AGE", "field_type":"integer"},
         {"name":"BornDate", "field":"BORN_DATE", "field_type":"date"},
-				{"name":"BornTimeStamp", "field":"BORN_DATE_TIME", "field_type":"datetime"},          
-				{"name":"Photo", "field":"PHOTO", "field_type":"blob"}
+		{"name":"BornTimeStamp", "field":"BORN_DATE_TIME", "field_type":"datetime"},          
+		{"name":"Photo", "field":"PHOTO", "field_type":"blob"},
+		{"name":"IsMale", "field":"IS_MALE", "field_type":"boolean"}		
 				],
       "has_many":[{
         "name": "Phones",

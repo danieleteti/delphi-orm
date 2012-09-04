@@ -99,6 +99,7 @@ type
     FEmail: TEmail;
     FBornTimeStamp: TDateTime;
     FPhoto: TStream;
+    FIsMale: Boolean;
     procedure SetLastName(const Value: string);
     procedure SetAge(const Value: Int32);
     procedure SetFirstName(const Value: string);
@@ -109,6 +110,7 @@ type
     procedure SetBornTimeStamp(const Value: TDateTime);
     procedure SetPhoto(const Value: TStream);
     function GetFullName: string;
+    procedure SetIsMale(const Value: Boolean);
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -125,6 +127,7 @@ type
     property Car: TCar read FCar write SetCar;
     property Email: TEmail read FEmail write SetEmail;
     property Photo: TStream read FPhoto write SetPhoto;
+    property IsMale: Boolean read FIsMale write SetIsMale;
     [Transient]
     property FullName: string read GetFullName;
   end;
@@ -304,6 +307,11 @@ end;
 procedure TPerson.SetID(const Value: Integer);
 begin
   FID := Value;
+end;
+
+procedure TPerson.SetIsMale(const Value: Boolean);
+begin
+  FIsMale := Value;
 end;
 
 procedure TPerson.SetFirstName(const Value: string);

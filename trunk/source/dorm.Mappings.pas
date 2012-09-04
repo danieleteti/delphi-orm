@@ -210,9 +210,9 @@ end;
 constructor Column.Create;
 begin
   inherited Create;
-  FFieldName := '';
-  FFieldType := '';
-  FDefaultValue := '';
+  FFieldName := EmptyStr; // must be EmptyStr
+  FFieldType := EmptyStr; // must be EmptyStr
+  FDefaultValue := EmptyStr; // must be EmptyStr
   FSize := 0;
   FPrecision := 0;
 end;

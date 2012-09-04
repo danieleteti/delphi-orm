@@ -18,7 +18,8 @@ uses
   dorm.Collections,
   dorm.adapter.UIB.Facade,
   UIB,
-  dorm.adapter.Base;
+  dorm.adapter.Base,
+  dorm.Mappings.Strategies;
 
 type
   TUIBBaseAdapter = class(TBaseAdapter, IdormPersistStrategy)
@@ -85,6 +86,8 @@ type
     function GetKeyType: TdormKeyType;
     function RawExecute(SQL: string): Int64;
     function ExecuteAndGetFirst(SQL: string): Int64;
+    function GetDatabaseBuilder(AEntities: TList<String>; AMappings: ICacheMappingStrategy)
+      : IDataBaseBuilder;
   end;
 
   TUIBBaseTableSequence = class(TdormInterfacedObject, IdormKeysGenerator)
@@ -320,6 +323,13 @@ begin
       raise EdormException.Create('Error during fill primary key for query. ' +
         E.Message);
   end;
+end;
+
+function TUIBBaseAdapter.GetDatabaseBuilder(AEntities: TList<String>;
+  AMappings: ICacheMappingStrategy): IDataBaseBuilder;
+begin
+  AEntities.Free; // just to hide the memory leak
+  raise Exception.Create('Not implemented for ' + self.ClassName);
 end;
 
 function TUIBBaseAdapter.GetKeysGenerator: IdormKeysGenerator;

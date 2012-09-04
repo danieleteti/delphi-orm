@@ -21,7 +21,7 @@ uses
   dorm in '..\source\dorm.pas',
   dorm.UOW in '..\source\dorm.UOW.pas',
   dorm.Utils in '..\source\dorm.Utils.pas',
-  dorm.Utils.Sequences in '..\source\dorm.utils.Sequences.pas',
+  dorm.utils.Sequences in '..\source\dorm.utils.Sequences.pas',
   dorm.tests.bo in 'dorm.tests.bo.pas',
   BaseTestCase in 'BaseTestCase.pas',
   FindersTests in 'FindersTests.pas',
@@ -40,7 +40,9 @@ uses
   TestDORMMapping.Attributes in 'TestDORMMapping.Attributes.pas',
   TestDORMMapping.CoC in 'TestDORMMapping.CoC.pas',
   TestDORMMapping.FileJSON in 'TestDORMMapping.FileJSON.pas',
-  dorm.adapter.Base in '..\source\dorm.adapter.Base.pas';
+  dorm.adapter.Base in '..\source\dorm.adapter.Base.pas',
+  dorm.DBCreator in '..\tools\dc\lib\dorm.DBCreator.pas',
+  dorm.DBCreator.Sqlite3 in '..\tools\dc\lib\dorm.DBCreator.Sqlite3.pas';
 
 {$R *.RES}
 

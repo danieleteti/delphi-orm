@@ -188,7 +188,9 @@ type
     FEmail: TEmailATR;
     FBornTimeStamp: TDateTime;
     FPhoto: TStream;
+    FIsMale: boolean;
     function GetFullName: string;
+    procedure SetIsMale(const Value: boolean);
   public
     [Id]
     [Column('ID')]
@@ -205,6 +207,8 @@ type
     property BornTimeStamp: TDateTime read FBornTimeStamp write FBornTimeStamp;
     [Column('PHOTO')]
     property Photo: TStream read FPhoto write FPhoto;
+    [Column('IS_MALE')]
+    property IsMale: boolean read FIsMale write SetIsMale;
     [HasMany('PersonID')]
     property Phones: TPhones read FPhones;
     [HasOne('PersonID')]
@@ -240,6 +244,11 @@ type
 function TPersonATR.GetFullName: string;
 begin
   // Fake
+end;
+
+procedure TPersonATR.SetIsMale(const Value: boolean);
+begin
+  FIsMale := Value;
 end;
 
 { TAttributesMappingStrategyTests }
@@ -372,7 +381,7 @@ begin
     FMapping.GetMapping(FContext.GetType(TPersonATR), _Table);
     CheckEquals('PEOPLE', _Table.TableName);
     CheckEquals('dorm.tests.bo', _Table.Package);
-    CheckEquals(7, _Table.Fields.Count);
+    CheckEquals(8, _Table.Fields.Count);
     CheckEquals(2, _Table.HasOneList.Count);
     CheckEquals(1, _Table.HasManyList.Count);
     CheckEquals(0, _Table.BelongsToList.Count);

@@ -128,6 +128,7 @@ type
     // Environments
     function GetEnv: string;
     // Utils
+    procedure BuildDatabase;
     function Clone<T: class, constructor>(Obj: T): T;
     procedure CopyObject(SourceObject, TargetObject: TObject);
     function GetLogger: IdormLogger;
@@ -195,6 +196,7 @@ type
 
     // expose mapping
     function GetMapping: ICacheMappingStrategy;
+    function GetEntitiesNames: TList<String>;
   end;
 
 implementation
@@ -216,6 +218,11 @@ var
 begin
   for Obj in ACollection do
     AddAsLoadedObject(Obj, AMappingField);
+end;
+
+procedure TSession.BuildDatabase;
+begin
+  FPersistStrategy.GetDatabaseBuilder(GetEntitiesNames, GetMapping).Execute;
 end;
 
 procedure TSession.ClearOID(AObject: TObject);
@@ -726,6 +733,27 @@ begin
   Result := TdormUtils.GetField(AObject, AIdMappingField.Name);
 end;
 
+function TSession.GetEntitiesNames: TList<String>;
+var
+  alltypes: TArray<TRttiType>;
+  _Type: TRttiType;
+  _attributes: TArray<TCustomAttribute>;
+  _attrib: TCustomAttribute;
+begin
+  Result := TList<String>.Create;
+  alltypes := FCTX.GetTypes;
+  for _Type in alltypes do
+  begin
+    _attributes := _Type.GetAttributes;
+    for _attrib in _attributes do
+      if _attrib is Entity then
+      begin
+        Result.Add(_Type.QualifiedClassName);
+        Break;
+      end;
+  end;
+end;
+
 function TSession.GetEnv: string;
 begin
   Result := EnvironmentNames[ord(FEnvironment)];
@@ -1157,7 +1185,6 @@ var
   _belong_field_key_value: TValue;
   v: TValue;
   parent_mapping: TMappingTable;
-  parent_field_mapping: TMappingField;
 begin
   GetLogger.Debug('Loading BELONGS_TO for ' + AClassName + '.' + APropertyName);
   _table := FMappingStrategy.GetMapping(ARttiType);
