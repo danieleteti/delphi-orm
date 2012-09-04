@@ -35,7 +35,8 @@ uses
   FMTBcd,
   Generics.Collections,
   dorm.Collections,
-  dorm.adapter.Base;
+  dorm.adapter.Base,
+  dorm.Mappings.Strategies;
 
 type
   TSqlite3PersistStrategy = class(TBaseAdapter, IdormPersistStrategy)
@@ -97,6 +98,8 @@ type
     function GetKeyType: TdormKeyType;
     function RawExecute(SQL: string): Int64;
     function ExecuteAndGetFirst(SQL: string): Int64;
+    function GetDatabaseBuilder(AEntities: TList<String>; AMappings: ICacheMappingStrategy)
+      : IDataBaseBuilder;
   end;
 
   TSqlite3TableSequence = class(TdormInterfacedObject, IdormKeysGenerator)
@@ -113,7 +116,8 @@ type
 implementation
 
 uses
-  dorm.Utils;
+  dorm.Utils,
+  dorm.DBCreator.Sqlite3;
 
 function TSqlite3PersistStrategy.Update(ARttiType: TRttiType; AObject: TObject;
   AMappingTable: TMappingTable): TValue;
@@ -271,6 +275,13 @@ end;
 function TSqlite3PersistStrategy.ExecuteAndGetFirst(SQL: string): Int64;
 begin
   Result := DB.GetTableValue(SQL);
+end;
+
+function TSqlite3PersistStrategy.GetDatabaseBuilder(AEntities: TList<String>;
+  AMappings: ICacheMappingStrategy)
+  : IDataBaseBuilder;
+begin
+  Result := TdormSqlite3DBCreator.Create(AMappings, AEntities);
 end;
 
 function TSqlite3PersistStrategy.GetKeysGenerator: IdormKeysGenerator;

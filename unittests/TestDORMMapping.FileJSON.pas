@@ -133,7 +133,7 @@ begin
     FMapping.GetMapping(FContext.GetType(TPerson), _Table);
     CheckEquals('PEOPLE', _Table.TableName);
     CheckEquals('dorm.tests.bo', _Table.Package);
-    CheckEquals(7, _Table.Fields.Count);
+    CheckEquals(8, _Table.Fields.Count);
     CheckEquals(2, _Table.HasOneList.Count);
     CheckEquals(1, _Table.HasManyList.Count);
     CheckEquals(0, _Table.BelongsToList.Count);

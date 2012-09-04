@@ -206,6 +206,8 @@
 			<DCCReference Include="TestDORMMapping.CoC.pas"/>
 			<DCCReference Include="TestDORMMapping.FileJSON.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Base.pas"/>
+			<DCCReference Include="..\tools\dc\lib\dorm.DBCreator.pas"/>
+			<DCCReference Include="..\tools\dc\lib\dorm.DBCreator.Sqlite3.pas"/>
 			<None Include="ModelSupport_DORM_UnitTests\default.txaPackage"/>
 			<None Include="ModelSupport_DORM_UnitTests\default.txvpck"/>
 			<None Include="ModelSupport_DORM_UnitTests\dorm\default.txvpck"/>

@@ -6,7 +6,6 @@ uses
   Rtti,
   Generics.Collections,
   superobject,
-  dorm.Commons,
   dorm.Mappings;
 
 type
@@ -161,7 +160,7 @@ begin
         FMappingStrategies[i].GetMapping(AType, tables[i]);
       FMerger.Merge(Result, tables);
       if Result.TableName = EmptyStr then
-        raise Exception.Create(Format('Cound not find mapping to Class %s', [AType.ClassName]));
+        raise Exception.Create(Format('Cound not find mapping to Class %s', [AType.QualifiedName]));
       FMappings.Add(AType, Result);
     finally
       for i := 0 to High(tables) do
@@ -319,6 +318,7 @@ procedure TAttributesMappingStrategy.ParseField(const AType: TRttiType;
 var
   field: TMappingField;
   attribute: TCustomAttribute;
+  C: Column;
 begin
   if TdormUtils.HasAttribute<Transient>(AProp) then
     Exit;
@@ -334,13 +334,11 @@ begin
   if Assigned(attribute) then
   begin
     field := GetOrCreateField(ATable, AProp);
-    with Column(attribute) do
-    begin
-      field.FieldName := FieldName;
-      field.Size := Size;
-      field.Precision := Precision;
-      field.DefaultValue := DefaultValue;
-    end;
+    C := Column(attribute);
+    field.FieldName := C.FieldName;
+    field.Size := C.Size;
+    field.Precision := C.Precision;
+    field.DefaultValue := C.DefaultValue;
   end;
 
   attribute := TdormUtils.GetAttribute<Size>(AProp);

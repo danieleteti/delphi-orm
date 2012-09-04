@@ -10,18 +10,21 @@ uses
 type
   TBaseAdapter = class abstract(TdormInterfacedObject)
   protected
-    function GetWhereSQL(ACriteria: ICriteria; AMappingTable: TMappingTable): string; overload;
-    function GetWhereSQL(ACriteriaItem: ICriteriaItem; AMappingTable: TMappingTable)
+    function GetWhereSQL(ACriteria: ICriteria; AMappingTable: TMappingTable)
       : string; overload;
+    function GetWhereSQL(ACriteriaItem: ICriteriaItem;
+      AMappingTable: TMappingTable): string; overload;
     // function GetFieldMappingByAttribute(AttributeName: string;
     // AMappingTable: TMappingTable): TMappingField;
     function EscapeString(const Value: string): string;
     function EscapeDate(const Value: TDate): string;
     function EscapeDateTime(const Value: TDate): string;
+
+    //
+    function GetBooleanValueAsString(Value: Boolean): String; virtual;
   public
-    function GetSelectSQL(Criteria: ICriteria;
-      AMappingTable: TMappingTable): string;
-      overload; virtual;
+    function GetSelectSQL(Criteria: ICriteria; AMappingTable: TMappingTable)
+      : string; overload; virtual;
     function GetSelectSQL(Criteria: ICustomCriteria): string; overload;
   end;
 
@@ -43,7 +46,8 @@ uses
 // raise EdormException.CreateFmt('Unknown field attribute %s', [AttributeName]);
 // end;
 
-function TBaseAdapter.GetWhereSQL(ACriteria: ICriteria; AMappingTable: TMappingTable): string;
+function TBaseAdapter.GetWhereSQL(ACriteria: ICriteria;
+  AMappingTable: TMappingTable): string;
 var
   I: Integer;
   SQL: String;
@@ -77,15 +81,16 @@ begin
       SQL := ''
     else
     begin
-      CritItem := TdormCriteriaItem.Create(ACriteria.GetAttribute, ACriteria.GetCompareOperator,
-        ACriteria.GetValue);
+      CritItem := TdormCriteriaItem.Create(ACriteria.GetAttribute,
+        ACriteria.GetCompareOperator, ACriteria.GetValue);
       SQL := GetWhereSQL(CritItem, AMappingTable);
     end;
   end;
   Result := SQL;
 end;
 
-function TBaseAdapter.GetSelectSQL(Criteria: ICriteria; AMappingTable: TMappingTable): string;
+function TBaseAdapter.GetSelectSQL(Criteria: ICriteria;
+  AMappingTable: TMappingTable): string;
 var
   SQL: string;
   _fields: TMappingFieldList;
@@ -104,6 +109,11 @@ begin
   else // Criteria is nil or is empty
     SQL := 'SELECT ' + select_fields + ' FROM ' + AMappingTable.TableName + ' ';
   Result := SQL;
+end;
+
+function TBaseAdapter.GetBooleanValueAsString(Value: Boolean): String;
+begin
+  Result := BoolToStr(Value, true);
 end;
 
 function TBaseAdapter.GetSelectSQL(Criteria: ICustomCriteria): string;
@@ -148,9 +158,7 @@ begin
   else if fm.FieldType = 'integer' then
     SQL := SQL + inttostr(ACriteriaItem.GetValue.AsInteger)
   else if fm.FieldType = 'boolean' then
-    SQL := SQL + BoolToStr(ACriteriaItem.GetValue.AsBoolean)
-  else if fm.FieldType = 'boolean' then
-    SQL := SQL + BoolToStr(ACriteriaItem.GetValue.AsBoolean)
+    SQL := SQL + GetBooleanValueAsString(ACriteriaItem.GetValue.AsBoolean)
   else if fm.FieldType = 'date' then
   begin
     d := ACriteriaItem.GetValue.AsExtended;
@@ -162,7 +170,8 @@ begin
     SQL := SQL + '''' + EscapeDateTime(dt) + ''''
   end
   else
-    raise EdormException.CreateFmt('Unknown type %s in criteria', [fm.FieldType]);
+    raise EdormException.CreateFmt('Unknown type %s in criteria',
+      [fm.FieldType]);
   Result := SQL;
 end;
 

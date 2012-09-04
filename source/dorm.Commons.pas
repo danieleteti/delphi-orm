@@ -28,7 +28,8 @@ uses
   dorm.Mappings,
   dorm.Filters,
   dorm.Collections,
-  dorm.Utils;
+  dorm.Utils,
+  dorm.Mappings.Strategies;
 
 type
   TDuckTypedList = class;
@@ -59,6 +60,11 @@ type
     procedure Warning(const Value: string);
     procedure Info(const Value: string);
     procedure Debug(const Value: string);
+  end;
+
+  IDataBaseBuilder = interface
+    ['{71C310B8-FB56-40E6-AED4-D3104CDC9069}']
+    procedure Execute;
   end;
 
   IList = interface
@@ -105,6 +111,8 @@ type
     function EscapeDate(const Value: TDate): string;
     function EscapeDateTime(const Value: TDate): string;
     function GetSelectSQL(ACriteria: ICriteria; AMappingTable: TMappingTable): string;
+    function GetDatabaseBuilder(AEntities: TList<String>; AMappings: ICacheMappingStrategy): IDataBaseBuilder;
+
   end;
 
   TdormListEnumerator = class(TEnumerator<TObject>)
@@ -163,9 +171,6 @@ function GetSelectFieldsList(AMapping: TMappingFieldList;
 function WrapAsList(const AObject: TObject): IWrappedList;
 
 implementation
-
-uses
-  dorm;
 
 function GetSelectFieldsList(AMapping: TMappingFieldList;
   AWithPrimaryKey: boolean): string;
