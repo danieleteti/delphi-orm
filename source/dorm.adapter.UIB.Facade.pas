@@ -19,7 +19,8 @@ unit dorm.adapter.UIB.Facade;
 interface
 
 uses
-  UIB, superobject;
+  UIB,
+  superobject;
 
 type
   TUIBFacade = class
@@ -39,9 +40,10 @@ type
       AUserName, APassword, AConnectionString: String);
     destructor Destroy; override;
     function GetConnection: TUIBDatabase;
+    function GetCurrentTransaction: TUIBTransaction;
     procedure StartTransaction;
     procedure CommitTransaction;
-    procedure RollabackTransaction;
+    procedure RollbackTransaction;
     function Execute(ASQL: string): Int64; overload;
     function Execute(ASQLCommand: TUIBStatement): Int64; overload;
     function ExecuteQuery(ASQLCommand: TUIBQuery): TUIBQuery; overload;
@@ -51,7 +53,9 @@ type
 implementation
 
 uses
-  sysutils, dorm.Commons, uiblib;
+  sysutils,
+  dorm.Commons,
+  uiblib;
 
 { Factory }
 
@@ -66,7 +70,7 @@ begin
   FCurrentTransaction.Commit;
 end;
 
-procedure TUIBFacade.RollabackTransaction;
+procedure TUIBFacade.RollbackTransaction;
 begin
   FCurrentTransaction.RollBack;
 end;
@@ -150,6 +154,14 @@ begin
     FCurrentTransaction.DataBase := GetConnection;
   end;
   Result := FUIBDatabase;
+end;
+
+function TUIBFacade.GetCurrentTransaction: TUIBTransaction;
+begin
+  if assigned(FCurrentTransaction) then
+    Result := FCurrentTransaction
+  else
+    raise EdormException.Create('Transaction not started');
 end;
 
 function TUIBFacade.NewStatement: TUIBStatement;

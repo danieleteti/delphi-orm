@@ -131,5 +131,80 @@
         {"name":"Societa", "field":"SOCIETA", "field_type":"string", "size":1},
         {"name":"NoteFat", "field":"NOTEFAT", "field_type":"string", "size":10}
       ]
-    } 
+    },
+	
+	
+	
+	"TPersonDirty":
+    {
+      "package":"dorm.tests.bo",
+      "table": "PEOPLE",
+      "id": {"name":"ID", "field":"ID", "field_type":"integer"},
+      "fields":[
+        {"name":"FirstName", "field":"FIRST_NAME", "field_type":"string", "size": 50},
+        {"name":"LastName", "field":"LAST_NAME", "field_type":"string", "size": 50},
+        {"name":"Age", "field":"AGE", "field_type":"integer"},
+        {"name":"BornDate", "field":"BORN_DATE", "field_type":"date"},
+		{"name":"BornTimeStamp", "field":"BORN_DATE_TIME", "field_type":"datetime"},          
+		{"name":"Photo", "field":"PHOTO", "field_type":"blob"},
+		{"name":"IsMale", "field":"IS_MALE", "field_type":"boolean"}		
+				],
+      "has_many":[{
+        "name": "Phones",
+        "class_name":"TPhoneDirty",
+        "child_field_name":"PersonID",
+        "lazy_load": false
+      }],
+      "has_one":[{
+        "name": "Car",
+        "class_name":"TCarDirty",
+        "child_field_name":"PersonID",
+        "lazy_load": false
+      },
+			{
+        "name": "Email",
+        "class_name":"TEmailDirty",
+        "child_field_name":"PersonID",
+        "lazy_load": false
+      }				
+			]								
+	},
+	"TPhoneDirty":
+    {
+      "package":"dorm.tests.bo",
+      "table": "PHONES",
+      "id": {"name":"ID", "field":"ID", "field_type":"integer"},
+      "fields":[
+        {"name":"Number", "field":"NUMBER", "field_type":"string", "size": 50},
+        {"name":"Model", "field":"MODEL", "field_type":"string", "size": 50},
+        {"name":"PersonID", "field":"ID_PERSON", "field_type":"integer", "index": "normal"}
+				]				
+		},
+	"TCarDirty":
+    {
+      "package":"dorm.tests.bo",
+      "table": "CARS",
+      "id": {"name":"ID", "field":"ID", "field_type":"integer"},
+      "fields":[
+        {"name":"Brand", "field":"BRAND", "field_type":"string", "size": 30},
+        {"name":"Model", "field":"MODEL", "field_type":"string", "size": 30},
+        {"name":"PersonID", "field":"ID_PERSON", "field_type":"integer", "index": "normal"}
+				],
+      "belongs_to":[{
+        "name": "Owner",
+        "class_name":"TPersonDirty",
+        "ref_field_name":"PersonID",
+        "lazy_load": true
+      }]
+		},
+	"TEmailDirty":
+    {
+      "package":"dorm.tests.bo",
+      "table": "EMAILS",
+      "id": {"name":"ID", "field":"ID", "field_type":"integer"},
+      "fields":[
+        {"name":"Value", "field":"ADDRESS", "field_type":"string", "size": 100},
+        {"name":"PersonID", "field":"ID_PERSON", "field_type":"integer", "index": "normal"}
+        ]
+    }		
 }
