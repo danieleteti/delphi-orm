@@ -67,12 +67,16 @@ begin
   CarOwner := TPerson.NewPerson;
   try
     Session.Insert(CarOwner);
-    Car := CarOwner.Car;
-    Car.Brand := 'Ford';
-    Car.Model := 'Focus 1.8 TDCi';
-    Car.Owner := CarOwner;
-    Session.Update(Car);
-    car_id := Car.ID;
+    Car := TCar.Create;
+    try
+      Car.Brand := 'Ford';
+      Car.Model := 'Focus 1.8 TDCi';
+      Car.Owner := CarOwner;
+      Session.Insert(Car);
+      car_id := Car.ID;
+    finally
+      Car.Free;
+    end;
   finally
     CarOwner.Free;
   end;
