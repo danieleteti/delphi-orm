@@ -158,10 +158,7 @@ end;
 
 function TUIBFacade.GetCurrentTransaction: TUIBTransaction;
 begin
-  if assigned(FCurrentTransaction) then
-    Result := FCurrentTransaction
-  else
-    raise EdormException.Create('Transaction not started');
+  Result := FCurrentTransaction
 end;
 
 function TUIBFacade.NewStatement: TUIBStatement;

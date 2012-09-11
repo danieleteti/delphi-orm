@@ -416,8 +416,13 @@ begin
 end;
 
 function TUIBBaseAdapter.InTransaction: Boolean;
+var
+  tr: TUIBTransaction;
 begin
-  Result := FB.GetCurrentTransaction.InTransaction;
+  tr := FB.GetCurrentTransaction;
+  Result := assigned(tr);
+  if Result then
+    Result := tr.InTransaction
 end;
 
 function TUIBBaseAdapter.IsNullKey(const Value: TValue): Boolean;
