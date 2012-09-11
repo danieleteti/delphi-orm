@@ -2,7 +2,7 @@
 		<PropertyGroup>
 			<ProjectGuid>{6E22397B-AA4C-4AD3-AA92-7D61C3E8FBD4}</ProjectGuid>
 			<ProjectVersion>13.4</ProjectVersion>
-			<Config Condition="'$(Config)'==''">SQLITE3_STRATEGY</Config>
+			<Config Condition="'$(Config)'==''">FIREBIRD_UIB_STRATEGY</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<MainSource>DORM_UnitTests_XE2.dpr</MainSource>
 			<Base>True</Base>

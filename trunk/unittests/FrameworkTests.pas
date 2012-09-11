@@ -55,6 +55,11 @@ type
     procedure TestWrapAsList;
   end;
 
+  TObjectStatusModelTests = class(TBaseTestCase)
+  published
+    procedure TestDirtyLifeCycle;
+  end;
+
   TPersonComparer = class(TComparer<TObject>)
     function Compare(const Left, Right: TObject): Integer; override;
   end;
@@ -631,8 +636,122 @@ begin
   result := Items[index];
 end;
 
+{ TObjectStatusModelTests }
+
+{ todo: this test is really really too big. I've to refactor in a million of other test methods }
+procedure TObjectStatusModelTests.TestDirtyLifeCycle;
+var
+  p: TPersonDirty;
+  ID: Integer;
+  p1: TPerson;
+  phone1: TPhoneDirty;
+  Phone1ID: Integer;
+  Phone2ID: Integer;
+  Car: TCar;
+  p2: TPersonDirty;
+begin
+  p := TPersonDirty.Create;
+  try
+    CheckTrue(p.ObjStatus = osDirty);
+    Session.SetObjectStatus(p, osClean);
+    CheckTrue(p.ObjStatus = osClean);
+    Session.SetObjectStatus(p, osUnknown);
+    CheckTrue(p.ObjStatus = osUnknown);
+    Session.SetObjectStatus(p, osDeleted);
+    CheckTrue(p.ObjStatus = osDeleted);
+  finally
+    p.Free;
+  end;
+
+  p := TPersonDirty.Create;
+  try
+    p.Car.Free;
+    p.Car := TCarDirty.Create; // I'm too lazy to creanote another TPhone with a differetn TCar type
+
+    p.Email.Free;
+    p.Email := TEmailDirty.Create;
+    p.Email.Value := 'daniele.teti@gmail.com';
+
+    p.FirstName := 'Daniele';
+    p.LastName := 'Teti';
+    p.Age := 32;
+    p.BornDate := EncodeDate(1979, 11, 4);
+    p.BornTimeStamp := EncodeDateTime(1979, 11, 4, 16, 10, 00, 0);
+    phone1 := TPhoneDirty.Create;
+    phone1.Number := '324-678654';
+    phone1.Model := 'Samsung Galaxy S';
+    p.Phones.Add(phone1);
+    phone1 := TPhoneDirty.Create;
+    phone1.Number := '876-12121212';
+    phone1.Model := 'Samsung Galaxy S III';
+    p.Phones.Add(phone1);
+    Session.Persist(p); // insert object and his relations
+    ID := p.ID;
+    Phone1ID := TPhoneDirty(p.Phones.Items[0]).ID;
+    Phone2ID := TPhoneDirty(p.Phones.Items[1]).ID;
+
+    CheckTrue(p.ObjStatus = osClean);
+    CheckTrue(TPhoneDirty(p.Phones.Items[0]).ObjStatus = osClean);
+    CheckTrue(TPhoneDirty(p.Phones.Items[1]).ObjStatus = osClean);
+
+    phone1 := Session.Load<TPhoneDirty>(Phone1ID);
+    CheckNotNull(phone1);
+    phone1.Free;
+
+    phone1 := Session.Load<TPhoneDirty>(Phone2ID);
+    CheckNotNull(phone1);
+    phone1.Free;
+
+    Session.Persist(p); // do nothing
+    CheckTrue(p.ObjStatus = osClean);
+    CheckTrue(TPhoneDirty(p.Phones.Items[0]).ObjStatus = osClean);
+    CheckTrue(TPhoneDirty(p.Phones.Items[1]).ObjStatus = osClean);
+    CheckEquals(1, Session.Count(TPerson));
+
+    TPhoneDirty(p.Phones.Items[0]).Model := 'changed model';
+    TPhoneDirty(p.Phones.Items[0]).ObjStatus := osDirty;
+    Session.Persist(p); // do nothing
+    phone1 := Session.Load<TPhoneDirty>(Phone1ID);
+    CheckNotNull(phone1);
+    CheckEquals('changed model', phone1.Model);
+    phone1.Free;
+
+    // check the has one relation
+    p.Car.Brand := 'Ford';
+    p.Car.Model := 'Focus';
+    Session.Persist(p);
+
+    Car := Session.Load<TCarDirty>(p.Car.ID);
+    CheckNotNull(Car);
+    Car.Free;
+
+    // One last check
+    Session.Commit;
+    Session.StartTransaction;
+    p2 := Session.Load<TPersonDirty>(p.ID);
+    try
+      CheckEquals(2, p2.Phones.Count);
+      CheckEquals('Ford', p2.Car.Brand);
+      CheckEquals('Focus', p2.Car.Model);
+      CheckEquals('daniele.teti@gmail.com', p2.Email.Value);
+    finally
+      p2.Free;
+    end;
+
+    p.ObjStatus := osDeleted;
+    Session.Persist(p); // delete person and related objects
+    p1 := Session.Load<TPerson>(ID);
+    CheckNull(p1, 'Person is not deleted');
+    Session.Commit;
+    CheckEquals(0, Session.Count(TPerson));
+  finally
+    p.Free;
+  end;
+end;
+
 initialization
 
 RegisterTest(TFrameworkTests.Suite);
+RegisterTest(TObjectStatusModelTests.Suite);
 
 end.

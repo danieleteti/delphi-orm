@@ -200,6 +200,43 @@ type
     property Department: TDepartment read FDepartment write setDepartment;
   end;
 
+  [Entity('PEOPLE')]
+  TPersonDirty = class(TPerson)
+  private
+    FObjStatus: TdormObjectStatus;
+    procedure SetObjStatus(const Value: TdormObjectStatus);
+  public
+    [Transient]
+    property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
+  end;
+
+  TPhoneDirty = class(TPhone)
+  private
+    FObjStatus: TdormObjectStatus;
+    procedure SetObjStatus(const Value: TdormObjectStatus);
+  public
+    [Transient]
+    property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
+  end;
+
+  TCarDirty = class(TCar)
+  private
+    FObjStatus: TdormObjectStatus;
+    procedure SetObjStatus(const Value: TdormObjectStatus);
+  public
+    [Transient]
+    property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
+  end;
+
+  TEmailDirty = class(TEmail)
+  private
+    FObjStatus: TdormObjectStatus;
+    procedure SetObjStatus(const Value: TdormObjectStatus);
+  public
+    [Transient]
+    property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
+  end;
+
 implementation
 
 uses
@@ -514,6 +551,34 @@ end;
 procedure TEmployee.SetLastName(const Value: string);
 begin
   FLastName := Value;
+end;
+
+{ TPersonDirty }
+
+procedure TPersonDirty.SetObjStatus(const Value: TdormObjectStatus);
+begin
+  FObjStatus := Value;
+end;
+
+{ TPhoneDirty }
+
+procedure TPhoneDirty.SetObjStatus(const Value: TdormObjectStatus);
+begin
+  FObjStatus := Value;
+end;
+
+{ TCarDirty }
+
+procedure TCarDirty.SetObjStatus(const Value: TdormObjectStatus);
+begin
+  FObjStatus := Value;
+end;
+
+{ TEmailDirty }
+
+procedure TEmailDirty.SetObjStatus(const Value: TdormObjectStatus);
+begin
+  FObjStatus := Value;
 end;
 
 end.

@@ -34,6 +34,8 @@ uses
 type
   TDuckTypedList = class;
 
+  TdormObjectStatus = (osDirty = 0, osClean, osUnknown, osDeleted);
+
   EdormException = class(Exception)
 
   end;
@@ -111,7 +113,8 @@ type
     function EscapeDate(const Value: TDate): string;
     function EscapeDateTime(const Value: TDate): string;
     function GetSelectSQL(ACriteria: ICriteria; AMappingTable: TMappingTable): string;
-    function GetDatabaseBuilder(AEntities: TList<String>; AMappings: ICacheMappingStrategy): IDataBaseBuilder;
+    function GetDatabaseBuilder(AEntities: TList<String>; AMappings: ICacheMappingStrategy)
+      : IDataBaseBuilder;
 
   end;
 
