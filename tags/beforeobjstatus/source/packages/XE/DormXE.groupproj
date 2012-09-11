@@ -1,0 +1,144 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{A54E85AD-35BF-49A1-A7F5-DCE02599195C}</ProjectGuid>
+		</PropertyGroup>
+		<ItemGroup>
+			<Projects Include="..\..\..\lib\uib\packages\UIBD15Win32R.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="..\..\..\lib\uib\packages\UIBD15Win32D.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="SQLite3.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="SuperObject.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="dormCore.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="dorm.DBExpress.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="dorm.SQLite.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="dorm.UIB.dproj">
+				<Dependencies/>
+			</Projects>
+			<Projects Include="dorm.loggers.dproj">
+				<Dependencies>dormCore.dproj</Dependencies>
+			</Projects>
+			<Projects Include="..\..\..\unittests\DORM_UnitTests_XE.dproj">
+				<Dependencies/>
+			</Projects>
+		</ItemGroup>
+		<ProjectExtensions>
+			<Borland.Personality>Default.Personality.12</Borland.Personality>
+			<Borland.ProjectType/>
+			<BorlandProject>
+				<Default.Personality/>
+			</BorlandProject>
+		</ProjectExtensions>
+		<Target Name="UIBD15Win32R">
+			<MSBuild Projects="..\..\..\lib\uib\packages\UIBD15Win32R.dproj"/>
+		</Target>
+		<Target Name="UIBD15Win32R:Clean">
+			<MSBuild Projects="..\..\..\lib\uib\packages\UIBD15Win32R.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="UIBD15Win32R:Make">
+			<MSBuild Projects="..\..\..\lib\uib\packages\UIBD15Win32R.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="UIBD15Win32D">
+			<MSBuild Projects="..\..\..\lib\uib\packages\UIBD15Win32D.dproj"/>
+		</Target>
+		<Target Name="UIBD15Win32D:Clean">
+			<MSBuild Projects="..\..\..\lib\uib\packages\UIBD15Win32D.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="UIBD15Win32D:Make">
+			<MSBuild Projects="..\..\..\lib\uib\packages\UIBD15Win32D.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="SQLite3">
+			<MSBuild Projects="SQLite3.dproj"/>
+		</Target>
+		<Target Name="SQLite3:Clean">
+			<MSBuild Projects="SQLite3.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="SQLite3:Make">
+			<MSBuild Projects="SQLite3.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="SuperObject">
+			<MSBuild Projects="SuperObject.dproj"/>
+		</Target>
+		<Target Name="SuperObject:Clean">
+			<MSBuild Projects="SuperObject.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="SuperObject:Make">
+			<MSBuild Projects="SuperObject.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dormCore">
+			<MSBuild Projects="dormCore.dproj"/>
+		</Target>
+		<Target Name="dormCore:Clean">
+			<MSBuild Projects="dormCore.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dormCore:Make">
+			<MSBuild Projects="dormCore.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dorm_DBExpress">
+			<MSBuild Projects="dorm.DBExpress.dproj"/>
+		</Target>
+		<Target Name="dorm_DBExpress:Clean">
+			<MSBuild Projects="dorm.DBExpress.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dorm_DBExpress:Make">
+			<MSBuild Projects="dorm.DBExpress.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dorm_SQLite">
+			<MSBuild Projects="dorm.SQLite.dproj"/>
+		</Target>
+		<Target Name="dorm_SQLite:Clean">
+			<MSBuild Projects="dorm.SQLite.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dorm_SQLite:Make">
+			<MSBuild Projects="dorm.SQLite.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dorm_UIB">
+			<MSBuild Projects="dorm.UIB.dproj"/>
+		</Target>
+		<Target Name="dorm_UIB:Clean">
+			<MSBuild Projects="dorm.UIB.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dorm_UIB:Make">
+			<MSBuild Projects="dorm.UIB.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="dorm_loggers" DependsOnTargets="dormCore">
+			<MSBuild Projects="dorm.loggers.dproj"/>
+		</Target>
+		<Target Name="dorm_loggers:Clean" DependsOnTargets="dormCore:Clean">
+			<MSBuild Projects="dorm.loggers.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="dorm_loggers:Make" DependsOnTargets="dormCore:Make">
+			<MSBuild Projects="dorm.loggers.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="DORM_UnitTests_XE">
+			<MSBuild Projects="..\..\..\unittests\DORM_UnitTests_XE.dproj"/>
+		</Target>
+		<Target Name="DORM_UnitTests_XE:Clean">
+			<MSBuild Projects="..\..\..\unittests\DORM_UnitTests_XE.dproj" Targets="Clean"/>
+		</Target>
+		<Target Name="DORM_UnitTests_XE:Make">
+			<MSBuild Projects="..\..\..\unittests\DORM_UnitTests_XE.dproj" Targets="Make"/>
+		</Target>
+		<Target Name="Build">
+			<CallTarget Targets="UIBD15Win32R;UIBD15Win32D;SQLite3;SuperObject;dormCore;dorm_DBExpress;dorm_SQLite;dorm_UIB;dorm_loggers;DORM_UnitTests_XE"/>
+		</Target>
+		<Target Name="Clean">
+			<CallTarget Targets="UIBD15Win32R:Clean;UIBD15Win32D:Clean;SQLite3:Clean;SuperObject:Clean;dormCore:Clean;dorm_DBExpress:Clean;dorm_SQLite:Clean;dorm_UIB:Clean;dorm_loggers:Clean;DORM_UnitTests_XE:Clean"/>
+		</Target>
+		<Target Name="Make">
+			<CallTarget Targets="UIBD15Win32R:Make;UIBD15Win32D:Make;SQLite3:Make;SuperObject:Make;dormCore:Make;dorm_DBExpress:Make;dorm_SQLite:Make;dorm_UIB:Make;dorm_loggers:Make;DORM_UnitTests_XE:Make"/>
+		</Target>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')" Project="$(BDS)\Bin\CodeGear.Group.Targets"/>
+	</Project>
