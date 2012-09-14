@@ -291,8 +291,10 @@ destructor TPerson.Destroy;
 begin
   FreeAndNil(FPhoto);
   FreeAndNil(FPhones);
-  FreeAndNil(FCar);
-  FreeAndNil(FEmail);
+  if assigned(FCar) then
+    FreeAndNil(FCar);
+  if assigned(FEmail) then
+    FreeAndNil(FEmail);
   inherited;
 end;
 
@@ -582,4 +584,3 @@ begin
 end;
 
 end.
-

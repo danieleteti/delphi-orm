@@ -239,13 +239,13 @@ begin
   emails := TObjectList<TEmail>.Create(true);
   try
     Session.LoadList<TEmail>(TdormCriteria.NewCriteria('ID',
-      coEqual, id), Email);
+      coEqual, id), emails);
     CheckEquals(1, emails.Count);
     CheckNotEquals(UpperCase(emails[0].Value), emails[0].CopiedValue,
       'OnAfterLoad has been called but it shouldn''t');
 
     Session.LoadList<TEmail>(TdormCriteria.NewCriteria('ID',
-      coEqual, id), Email, [CallAfterLoadEvent]);
+      coEqual, id), emails, [CallAfterLoadEvent]);
     CheckEquals(1, emails.Count);
     CheckEquals(UpperCase(emails[0].Value), emails[0].CopiedValue,
       'OnAfterLoad has not been called');

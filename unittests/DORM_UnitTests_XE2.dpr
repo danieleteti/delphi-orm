@@ -4,6 +4,7 @@ program DORM_UnitTests_XE2;
 {$APPTYPE CONSOLE}
 {$ENDIF}
 
+
 uses
   FastMM4,
   Forms,
@@ -21,7 +22,7 @@ uses
   dorm in '..\source\dorm.pas',
   dorm.UOW in '..\source\dorm.UOW.pas',
   dorm.Utils in '..\source\dorm.Utils.pas',
-  dorm.utils.Sequences in '..\source\dorm.utils.Sequences.pas',
+  dorm.Utils.Sequences in '..\source\dorm.utils.Sequences.pas',
   dorm.tests.bo in 'dorm.tests.bo.pas',
   BaseTestCase in 'BaseTestCase.pas',
   FindersTests in 'FindersTests.pas',
@@ -30,7 +31,6 @@ uses
   dorm.Filters in '..\source\dorm.Filters.pas',
   dorm.Mappings in '..\source\dorm.Mappings.pas',
   dorm.Mappings.Strategies in '..\source\dorm.Mappings.Strategies.pas',
-  TestToolsCore in 'TestToolsCore.pas',
   dorm.CodeGenerator in '..\tools\mappingcreator\lib\dorm.CodeGenerator.pas',
   dorm.CodeGenerator.Delphi in '..\tools\mappingcreator\lib\dorm.CodeGenerator.Delphi.pas',
   dorm.loggers in '..\source\dorm.loggers.pas',
@@ -40,9 +40,7 @@ uses
   TestDORMMapping.Attributes in 'TestDORMMapping.Attributes.pas',
   TestDORMMapping.CoC in 'TestDORMMapping.CoC.pas',
   TestDORMMapping.FileJSON in 'TestDORMMapping.FileJSON.pas',
-  dorm.adapter.Base in '..\source\dorm.adapter.Base.pas',
-  dorm.DBCreator in '..\tools\dc\lib\dorm.DBCreator.pas',
-  dorm.DBCreator.Sqlite3 in '..\tools\dc\lib\dorm.DBCreator.Sqlite3.pas';
+  dorm.adapter.Base in '..\source\dorm.adapter.Base.pas';
 
 {$R *.RES}
 

@@ -30,7 +30,7 @@ type
     class var ctx: TRttiContext;
   public
     class function MethodCall(AObject: TObject; AMethodName: string;
-      AParameters: array of TValue): TValue; static;
+      AParameters: array of TValue): TValue;
     class procedure SetProperty(Obj: TObject; const PropertyName: string;
       const Value: TValue); static;
     class function GetFieldType(AProp: TRttiProperty): string;
@@ -66,10 +66,18 @@ class function TdormUtils.MethodCall(AObject: TObject; AMethodName: string;
   AParameters: array of TValue): TValue;
 var
   m: TRttiMethod;
+  p: TArray<TValue>;
 begin
   m := ctx.GetType(AObject.ClassInfo).GetMethod(AMethodName);
   if Assigned(m) then
-    Result := m.Invoke(AObject, AParameters)
+  begin
+    // Setlength(p, length(AParameters));
+    // if length(p) > 0 then
+    // p[0] := AParameters[0];
+    // Result := m.Invoke(AObject, p);
+    Result := m.Invoke(AObject, AParameters);
+    { todo: somethimes I get an "Invalid Class type cast" here... why??? }
+  end
   else
     raise EdormException.CreateFmt('Cannot find method "%s" in the object',
       [AMethodName]);
@@ -217,7 +225,8 @@ begin
     Result := 'decimal'
   else if _PropInfo.Kind = tkFloat then
     Result := 'float'
-  else if AProp.PropertyType.IsInstance and AProp.PropertyType.AsInstance.MetaclassType.InheritsFrom(TStream) then
+  else if AProp.PropertyType.IsInstance and AProp.PropertyType.AsInstance.MetaclassType.InheritsFrom
+    (TStream) then
     Result := 'blob'
   else
     Result := EmptyStr;
@@ -348,7 +357,7 @@ begin
   Method := nil;
   for Method in ARttiType.GetMethods do
     if Method.HasExtendedInfo and Method.IsConstructor then
-      if Length(Method.GetParameters) = 0 then
+      if length(Method.GetParameters) = 0 then
       begin
         metaClass := ARttiType.AsInstance.MetaclassType;
         Break;
