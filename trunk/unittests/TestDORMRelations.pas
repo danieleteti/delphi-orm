@@ -63,6 +63,7 @@ var
   Car: TCar;
   CarOwner: TPerson;
   car_id: Integer;
+  p: TPerson;
 begin
   CarOwner := TPerson.NewPerson;
   try
@@ -104,8 +105,10 @@ begin
     CheckEquals(32, Car.Owner.Age);
     CheckEquals('d.teti@bittime.it', Car.Owner.Email.Value);
   finally
-    Car.Owner.Free;
+    p := Car.Owner;
     Car.Free;
+    Car := nil;
+    p.Free;
   end;
 end;
 

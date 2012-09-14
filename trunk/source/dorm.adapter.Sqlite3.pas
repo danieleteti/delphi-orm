@@ -116,8 +116,7 @@ type
 implementation
 
 uses
-  dorm.Utils,
-  dorm.DBCreator.Sqlite3;
+  dorm.Utils;
 
 function TSqlite3PersistStrategy.Update(ARttiType: TRttiType; AObject: TObject;
   AMappingTable: TMappingTable): TValue;
@@ -281,7 +280,8 @@ function TSqlite3PersistStrategy.GetDatabaseBuilder(AEntities: TList<String>;
   AMappings: ICacheMappingStrategy)
   : IDataBaseBuilder;
 begin
-  Result := TdormSqlite3DBCreator.Create(AMappings, AEntities);
+  raise EdormException.Create('Not implemented');
+  // Result := TdormSqlite3DBCreator.Create(AMappings, AEntities);
 end;
 
 function TSqlite3PersistStrategy.GetKeysGenerator: IdormKeysGenerator;
@@ -412,6 +412,8 @@ var
   SQL: string;
   reader: TSqliteTable;
   CustomCriteria: ICustomCriteria;
+  obj: TObject;
+  v: TValue;
 begin
   if Assigned(ACriteria) and TInterfacedObject(ACriteria).GetInterface(ICustomCriteria,
     CustomCriteria) then
@@ -424,8 +426,8 @@ begin
   try
     while not reader.Eof do
     begin
-      TdormUtils.MethodCall(AList, 'Add',
-        [CreateObjectFromSqliteTable(ARttiType, reader, AMappingTable)]);
+      v := CreateObjectFromSqliteTable(ARttiType, reader, AMappingTable);
+      TdormUtils.MethodCall(AList, 'Add', [v]);
       reader.Next;
     end;
   finally

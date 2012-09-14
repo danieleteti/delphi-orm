@@ -2,7 +2,7 @@
 		<PropertyGroup>
 			<ProjectGuid>{6E22397B-AA4C-4AD3-AA92-7D61C3E8FBD4}</ProjectGuid>
 			<ProjectVersion>13.4</ProjectVersion>
-			<Config Condition="'$(Config)'==''">FIREBIRD_UIB_STRATEGY</Config>
+			<Config Condition="'$(Config)'==''">SQLITE3_STRATEGY</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<MainSource>DORM_UnitTests_XE2.dpr</MainSource>
 			<Base>True</Base>
@@ -128,6 +128,8 @@
 			<DCC_Define>SQLITE3_STRATEGY;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 			<VerInfo_Locale>1033</VerInfo_Locale>
@@ -195,7 +197,6 @@
 			<DCCReference Include="..\source\dorm.Filters.pas"/>
 			<DCCReference Include="..\source\dorm.Mappings.pas"/>
 			<DCCReference Include="..\source\dorm.Mappings.Strategies.pas"/>
-			<DCCReference Include="TestToolsCore.pas"/>
 			<DCCReference Include="..\tools\mappingcreator\lib\dorm.CodeGenerator.pas"/>
 			<DCCReference Include="..\tools\mappingcreator\lib\dorm.CodeGenerator.Delphi.pas"/>
 			<DCCReference Include="..\source\dorm.loggers.pas"/>
@@ -206,8 +207,6 @@
 			<DCCReference Include="TestDORMMapping.CoC.pas"/>
 			<DCCReference Include="TestDORMMapping.FileJSON.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Base.pas"/>
-			<DCCReference Include="..\tools\dc\lib\dorm.DBCreator.pas"/>
-			<DCCReference Include="..\tools\dc\lib\dorm.DBCreator.Sqlite3.pas"/>
 			<None Include="ModelSupport_DORM_UnitTests\default.txaPackage"/>
 			<None Include="ModelSupport_DORM_UnitTests\default.txvpck"/>
 			<None Include="ModelSupport_DORM_UnitTests\dorm\default.txvpck"/>
