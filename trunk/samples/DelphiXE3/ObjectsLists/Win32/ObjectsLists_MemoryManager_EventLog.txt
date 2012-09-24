@@ -1,0 +1,1698 @@
+
+--------------------------------2011/12/25 22:29:18--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x15B8, and the stack trace (return addresses) at the time was:
+404C3A 
+40622F 
+4068EA 
+76F910 
+775E4D 
+7ACB8B 
+7AD1D8 
+7AD3C9 
+771A86 
+76D0F0 
+76CFF6 
+
+The block is currently used for an object of class: TDBXError
+
+The allocation number is: 49246
+
+Current memory dump of 256 bytes starting at pointer address 7ED2A7C0:
+C0 48 75 00 3C D5 F5 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 16 00 00 00 3C D5 F5 7E
+00 00 00 00 53 7F 8E 79 00 00 00 00 91 A6 D2 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+41 B9 00 00 3A 4C 40 00 23 7F 40 00 02 93 40 00 31 E4 76 00 62 A5 45 00 D9 E5 76 00 E9 DB 76 00
+7E DC 76 00 10 DD 76 00 E1 E0 76 00 39 51 7D 00 B8 15 00 00 B8 15 00 00 DD 7F 40 00 09 9B 40 00
+51 9A 40 00 51 9B 40 00 19 A8 40 00 25 A5 40 00 5C A5 40 00 E5 C8 45 00 CE A6 40 00 43 A8 45 00
+76 A1 45 00 24 00 00 00 B0 04 02 00 5F 23 F9 85 88 32 95 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 A0 DC 06 7A 00 00 00 00 01 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 1E 71 00 00 3A 4C 40 00 23 7F 40 00 54 81 40 00
+¿  H  u  .  <  ’  ı  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  <  ’  ı  ~
+.  .  .  .  S    é  y  .  .  .  .  ë  ¶  “  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+A  π  .  .  :  L  @  .  #    @  .  .  ì  @  .  1  ‰  v  .  b  •  E  .  Ÿ  Â  v  .  È  €  v  .
+~  ‹  v  .  .  ›  v  .  ·  ‡  v  .  9  Q  }  .  ∏  .  .  .  ∏  .  .  .  ›    @  .  .  õ  @  .
+Q  ö  @  .  Q  õ  @  .  .  ®  @  .  %  •  @  .  \  •  @  .  Â  »  E  .  Œ  ¶  @  .  C  ®  E  .
+v  °  E  .  $  .  .  .  ∞  .  .  .  _  #  ˘  Ö  à  2  ï  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  †  ‹  .  z  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  q  .  .  :  L  @  .  #    @  .  T  Å  @  .
+
+--------------------------------2011/12/25 22:29:18--------------------------------
+A memory block has been leaked. The size is: 388
+
+This block was allocated by thread 0x15B8, and the stack trace (return addresses) at the time was:
+404C3A 
+407F23 
+408154 
+428FF8 
+650062 
+740020 
+740020 
+650062 
+77560AD6 [Unknown function at RtlpNtEnumerateSubKey]
+7756135A [Unknown function at RtlpNtEnumerateSubKey]
+7756133E [Unknown function at RtlpNtEnumerateSubKey]
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 49249
+
+Current memory dump of 256 bytes starting at pointer address 7EF5D530:
+B0 04 02 00 02 00 00 00 B6 00 00 00 44 00 42 00 58 00 20 00 45 00 72 00 72 00 6F 00 72 00 3A 00
+20 00 20 00 44 00 72 00 69 00 76 00 65 00 72 00 20 00 63 00 6F 00 75 00 6C 00 64 00 20 00 6E 00
+6F 00 74 00 20 00 62 00 65 00 20 00 70 00 72 00 6F 00 70 00 65 00 72 00 6C 00 79 00 20 00 69 00
+6E 00 69 00 74 00 69 00 61 00 6C 00 69 00 7A 00 65 00 64 00 2E 00 20 00 20 00 43 00 6C 00 69 00
+65 00 6E 00 74 00 20 00 6C 00 69 00 62 00 72 00 61 00 72 00 79 00 20 00 6D 00 61 00 79 00 20 00
+62 00 65 00 20 00 6D 00 69 00 73 00 73 00 69 00 6E 00 67 00 2C 00 20 00 6E 00 6F 00 74 00 20 00
+69 00 6E 00 73 00 74 00 61 00 6C 00 6C 00 65 00 64 00 20 00 70 00 72 00 6F 00 70 00 65 00 72 00
+6C 00 79 00 2C 00 20 00 6F 00 66 00 20 00 74 00 68 00 65 00 20 00 77 00 72 00 6F 00 6E 00 67 00
+∞  .  .  .  .  .  .  .  ∂  .  .  .  D  .  B  .  X  .     .  E  .  r  .  r  .  o  .  r  .  :  .
+   .     .  D  .  r  .  i  .  v  .  e  .  r  .     .  c  .  o  .  u  .  l  .  d  .     .  n  .
+o  .  t  .     .  b  .  e  .     .  p  .  r  .  o  .  p  .  e  .  r  .  l  .  y  .     .  i  .
+n  .  i  .  t  .  i  .  a  .  l  .  i  .  z  .  e  .  d  .  .  .     .     .  C  .  l  .  i  .
+e  .  n  .  t  .     .  l  .  i  .  b  .  r  .  a  .  r  .  y  .     .  m  .  a  .  y  .     .
+b  .  e  .     .  m  .  i  .  s  .  s  .  i  .  n  .  g  .  ,  .     .  n  .  o  .  t  .     .
+i  .  n  .  s  .  t  .  a  .  l  .  l  .  e  .  d  .     .  p  .  r  .  o  .  p  .  e  .  r  .
+l  .  y  .  ,  .     .  o  .  f  .     .  t  .  h  .  e  .     .  w  .  r  .  o  .  n  .  g  .
+
+--------------------------------2011/12/25 22:29:18--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+21 - 36 bytes: TDBXError x 1
+341 - 388 bytes: UnicodeString x 1
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
+
+--------------------------------2012/1/5 15:17:36--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x8C8, and the stack trace (return addresses) at the time was:
+404C3A 
+40622F 
+4068EA 
+42DD5F 
+5F0D89 
+654243 
+654872 
+918DED 
+598526 
+406958 
+59A6BA 
+
+The block is currently used for an object of class: EdormException
+
+The allocation number is: 21082
+
+Current memory dump of 256 bytes starting at pointer address 7ED595E0:
+34 24 64 00 3C CF ED 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 EA A3 46 79
+80 80 80 80 80 80 80 80 00 00 00 00 E1 8F D5 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+48 52 00 00 3A 4C 40 00 23 7F 40 00 54 81 40 00 F9 EA 5E 00 95 DC 5E 00 21 FC 5E 00 09 42 65 00
+72 48 65 00 ED 8D 91 00 26 85 59 00 58 69 40 00 C8 08 00 00 C8 08 00 00 56 4C 40 00 DD 7F 40 00
+09 9B 40 00 51 9A 40 00 03 63 40 00 46 62 40 00 35 69 40 00 86 62 40 00 93 62 40 00 4F 50 5F 00
+05 53 5F 00 1C 00 00 00 B0 04 02 00 72 AE AE 85 88 32 95 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 8D 51 51 7A 80 80 80 80 80 80 80 80 00 00 00 00 11 96 D5 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 49 52 00 00 3A 4C 40 00 2F 62 40 00 EA 68 40 00
+4  $  d  .  <  œ  Ì  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Í  £  F  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  ·  è  ’  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+H  R  .  .  :  L  @  .  #    @  .  T  Å  @  .  ˘  Í  ^  .  ï  ‹  ^  .  !  ¸  ^  .  .  B  e  .
+r  H  e  .  Ì  ç  ë  .  &  Ö  Y  .  X  i  @  .  »  .  .  .  »  .  .  .  V  L  @  .  ›    @  .
+.  õ  @  .  Q  ö  @  .  .  c  @  .  F  b  @  .  5  i  @  .  Ü  b  @  .  ì  b  @  .  O  P  _  .
+.  S  _  .  .  .  .  .  ∞  .  .  .  r  Æ  Æ  Ö  à  2  ï  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  ç  Q  Q  z  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  ñ  ’  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  I  R  .  .  :  L  @  .  /  b  @  .  Í  h  @  .
+
+--------------------------------2012/1/5 15:17:36--------------------------------
+A memory block has been leaked. The size is: 180
+
+This block was allocated by thread 0x8C8, and the stack trace (return addresses) at the time was:
+404C3A 
+407F23 
+4083B0 
+42DD6F 
+654243 
+654872 
+918DED 
+598526 
+406958 
+59A6BA 
+597B4F 
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 21083
+
+Current memory dump of 256 bytes starting at pointer address 7EEDCF30:
+B0 04 02 00 01 00 00 00 53 00 00 00 57 00 41 00 52 00 4E 00 49 00 4E 00 47 00 21 00 20 00 49 00
+73 00 20 00 6E 00 6F 00 20 00 6D 00 6F 00 72 00 65 00 20 00 61 00 6C 00 6C 00 6F 00 77 00 65 00
+64 00 20 00 74 00 6F 00 20 00 73 00 70 00 65 00 63 00 69 00 66 00 79 00 20 00 74 00 68 00 65 00
+20 00 6D 00 61 00 70 00 70 00 69 00 6E 00 67 00 20 00 66 00 69 00 6C 00 65 00 20 00 69 00 6E 00
+73 00 69 00 64 00 65 00 20 00 74 00 68 00 65 00 20 00 70 00 65 00 72 00 73 00 69 00 73 00 74 00
+65 00 6E 00 63 00 65 00 20 00 66 00 69 00 6C 00 65 00 00 00 C6 7F 32 7A 00 00 00 00 71 13 EE 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 88 54 00 00 3A 4C 40 00 23 7F 40 00 02 93 40 00
+FA 73 5C 00 D2 74 5C 00 6C 70 5C 00 36 8F 5B 00 E4 AE 5B 00 88 56 65 00 0A 52 65 00 93 62 40 00
+∞  .  .  .  .  .  .  .  S  .  .  .  W  .  A  .  R  .  N  .  I  .  N  .  G  .  !  .     .  I  .
+s  .     .  n  .  o  .     .  m  .  o  .  r  .  e  .     .  a  .  l  .  l  .  o  .  w  .  e  .
+d  .     .  t  .  o  .     .  s  .  p  .  e  .  c  .  i  .  f  .  y  .     .  t  .  h  .  e  .
+   .  m  .  a  .  p  .  p  .  i  .  n  .  g  .     .  f  .  i  .  l  .  e  .     .  i  .  n  .
+s  .  i  .  d  .  e  .     .  t  .  h  .  e  .     .  p  .  e  .  r  .  s  .  i  .  s  .  t  .
+e  .  n  .  c  .  e  .     .  f  .  i  .  l  .  e  .  .  .  ∆    2  z  .  .  .  .  q  .  Ó  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  à  T  .  .  :  L  @  .  #    @  .  .  ì  @  .
+˙  s  \  .  “  t  \  .  l  p  \  .  6  è  [  .  ‰  Æ  [  .  à  V  e  .  .  R  e  .  ì  b  @  .
+
+--------------------------------2012/1/5 15:17:36--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+21 - 36 bytes: EdormException x 1
+165 - 180 bytes: UnicodeString x 1
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
+
+--------------------------------2012/1/5 15:19:52--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x17C4, and the stack trace (return addresses) at the time was:
+404C3A 
+40622F 
+4068EA 
+42DD5F 
+5F0D89 
+65426F 
+6548A0 
+918E30 
+598526 
+406958 
+59A6BA 
+
+The block is currently used for an object of class: EdormException
+
+The allocation number is: 21037
+
+Current memory dump of 256 bytes starting at pointer address 7ED59690:
+34 24 64 00 3C CF ED 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 35 84 46 79
+80 80 80 80 80 80 80 80 00 00 00 00 91 90 D5 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+1B 52 00 00 3A 4C 40 00 23 7F 40 00 54 81 40 00 F9 EA 5E 00 95 DC 5E 00 21 FC 5E 00 35 42 65 00
+A0 48 65 00 30 8E 91 00 26 85 59 00 58 69 40 00 C4 17 00 00 C4 17 00 00 56 4C 40 00 DD 7F 40 00
+09 9B 40 00 51 9A 40 00 03 63 40 00 46 62 40 00 35 69 40 00 86 62 40 00 93 62 40 00 4F 50 5F 00
+05 53 5F 00 1C 00 00 00 B0 04 02 00 8A CD AE 85 88 32 95 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 75 32 51 7A 80 80 80 80 80 80 80 80 00 00 00 00 C1 96 D5 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 1C 52 00 00 3A 4C 40 00 2F 62 40 00 EA 68 40 00
+4  $  d  .  <  œ  Ì  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  5  Ñ  F  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  ë  ê  ’  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  R  .  .  :  L  @  .  #    @  .  T  Å  @  .  ˘  Í  ^  .  ï  ‹  ^  .  !  ¸  ^  .  5  B  e  .
+†  H  e  .  0  é  ë  .  &  Ö  Y  .  X  i  @  .  ƒ  .  .  .  ƒ  .  .  .  V  L  @  .  ›    @  .
+.  õ  @  .  Q  ö  @  .  .  c  @  .  F  b  @  .  5  i  @  .  Ü  b  @  .  ì  b  @  .  O  P  _  .
+.  S  _  .  .  .  .  .  ∞  .  .  .  ä  Õ  Æ  Ö  à  2  ï  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  u  2  Q  z  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  ¡  ñ  ’  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  R  .  .  :  L  @  .  /  b  @  .  Í  h  @  .
+
+--------------------------------2012/1/5 15:19:52--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x17C4, and the stack trace (return addresses) at the time was:
+404C3A 
+40622F 
+4068EA 
+46888F 
+53C997 
+918E13 
+598526 
+406958 
+59A6BA 
+597B4F 
+539965 
+
+The block is currently used for an object of class: TStreamReader
+
+The allocation number is: 20860
+
+Current memory dump of 256 bytes starting at pointer address 7ED63300:
+54 32 45 00 80 79 FA 7E 00 04 00 00 01 00 00 00 90 1F ED 7E 00 01 00 00 E0 78 FA 7E 00 00 00 00
+92 BB 45 7A 80 80 80 80 00 00 00 00 F1 35 D6 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+8C 4F 00 00 3A 4C 40 00 2F 62 40 00 EA 68 40 00 12 7B 45 00 DE 7D 45 00 92 D1 45 00 BD E4 45 00
+CC DF 45 00 D6 D8 45 00 50 F6 45 00 B8 D8 45 00 C4 17 00 00 C4 17 00 00 56 4C 40 00 4D 62 40 00
+35 69 40 00 66 7B 45 00 93 62 40 00 E5 7E 45 00 A3 7D 45 00 93 62 40 00 62 C7 90 00 D2 65 46 00
+18 63 46 00 1C 00 00 00 88 27 90 00 5C 0D 86 85 88 32 95 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 A3 F2 79 7A 80 80 80 80 80 80 80 80 00 00 00 00 31 33 D6 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 8D 4F 00 00 A9 4C 40 00 F2 A5 40 00 CE A6 40 00
+T  2  E  .  Ä  y  ˙  ~  .  .  .  .  .  .  .  .  ê  .  Ì  ~  .  .  .  .  ‡  x  ˙  ~  .  .  .  .
+í  ª  E  z  Ä  Ä  Ä  Ä  .  .  .  .  Ò  5  ÷  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+å  O  .  .  :  L  @  .  /  b  @  .  Í  h  @  .  .  {  E  .  ﬁ  }  E  .  í  —  E  .  Ω  ‰  E  .
+Ã  ﬂ  E  .  ÷  ÿ  E  .  P  ˆ  E  .  ∏  ÿ  E  .  ƒ  .  .  .  ƒ  .  .  .  V  L  @  .  M  b  @  .
+5  i  @  .  f  {  E  .  ì  b  @  .  Â  ~  E  .  £  }  E  .  ì  b  @  .  b  «  ê  .  “  e  F  .
+.  c  F  .  .  .  .  .  à  '  ê  .  \  .  Ü  Ö  à  2  ï  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  £  Ú  y  z  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  1  3  ÷  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ç  O  .  .  ©  L  @  .  Ú  •  @  .  Œ  ¶  @  .
+
+--------------------------------2012/1/5 15:19:52--------------------------------
+A memory block has been leaked. The size is: 52
+
+This block was allocated by thread 0x17C4, and the stack trace (return addresses) at the time was:
+404CA9 
+40A5F2 
+4151E4 
+40A6CE 
+432BF3 
+4068EA 
+431AF6 
+46872E 
+45B3D8 
+468631 
+4688B0 
+
+The block is currently used for an object of class: Unknown
+
+The allocation number is: 20864
+
+Current memory dump of 256 bytes starting at pointer address 7ED65F30:
+01 00 00 00 10 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 FE D9 FA 7A 80 80 80 80 80 80 80 80 80 80 80 80 00 00 00 00 31 5D D6 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 B2 51 00 00 3A 4C 40 00 23 7F 40 00 54 81 40 00
+F1 F8 5E 00 95 DC 5E 00 F6 41 65 00 A0 48 65 00 30 8E 91 00 26 85 59 00 58 69 40 00 BA A6 59 00
+C4 17 00 00 C4 17 00 00 56 4C 40 00 DD 7F 40 00 09 9B 40 00 51 9A 40 00 03 63 40 00 46 62 40 00
+35 69 40 00 86 62 40 00 93 62 40 00 4F 50 5F 00 05 53 5F 00 2A 00 00 00 B0 04 02 00 31 4E AA 85
+88 32 95 00 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 CE B1 55 7A 80 80 80 80 80 80 80 80 80 80 00 00 00 00 F1 5D D6 7E
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  ˛  Ÿ  ˙  z  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  1  ]  ÷  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ≤  Q  .  .  :  L  @  .  #    @  .  T  Å  @  .
+Ò  ¯  ^  .  ï  ‹  ^  .  ˆ  A  e  .  †  H  e  .  0  é  ë  .  &  Ö  Y  .  X  i  @  .  ∫  ¶  Y  .
+ƒ  .  .  .  ƒ  .  .  .  V  L  @  .  ›    @  .  .  õ  @  .  Q  ö  @  .  .  c  @  .  F  b  @  .
+5  i  @  .  Ü  b  @  .  ì  b  @  .  O  P  _  .  .  S  _  .  *  .  .  .  ∞  .  .  .  1  N  ™  Ö
+à  2  ï  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Œ  ±  U  z  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  Ò  ]  ÷  ~
+
+--------------------------------2012/1/5 15:19:52--------------------------------
+A memory block has been leaked. The size is: 52
+
+This block was allocated by thread 0x17C4, and the stack trace (return addresses) at the time was:
+404C3A 
+407F23 
+4083B0 
+45B51D 
+406238 
+4068EA 
+45B3CD 
+4688A5 
+918E13 
+598526 
+406958 
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 20862
+
+Current memory dump of 256 bytes starting at pointer address 7EEB80B0:
+B0 04 02 00 01 00 00 00 0F 00 00 00 73 00 61 00 6D 00 70 00 6C 00 65 00 73 00 2E 00 6D 00 61 00
+70 00 70 00 69 00 6E 00 67 00 00 00 52 FD 9D 7A 80 80 80 80 80 80 80 80 80 00 00 00 31 BC EB 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 61 07 00 00 3A 4C 40 00 23 7F 40 00 54 81 40 00
+50 3F 43 00 05 3F 43 00 65 EC 45 00 76 95 45 00 6B CA 45 00 39 88 45 00 E3 DF 45 00 D6 D8 45 00
+C4 17 00 00 C4 17 00 00 DD 7F 40 00 09 9B 40 00 51 9A 40 00 51 9B 40 00 19 A8 40 00 25 A5 40 00
+5C A5 40 00 E5 C8 45 00 CE A6 40 00 43 A8 45 00 76 A1 45 00 32 00 00 00 B0 04 02 00 87 11 AE 84
+88 32 95 00 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 78 EE 51 7B 80 80 00 00 00 00 71 82 EB 7E
+∞  .  .  .  .  .  .  .  .  .  .  .  s  .  a  .  m  .  p  .  l  .  e  .  s  .  .  .  m  .  a  .
+p  .  p  .  i  .  n  .  g  .  .  .  R  ˝  ù  z  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  1  º  Î  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  a  .  .  .  :  L  @  .  #    @  .  T  Å  @  .
+P  ?  C  .  .  ?  C  .  e  Ï  E  .  v  ï  E  .  k     E  .  9  à  E  .  „  ﬂ  E  .  ÷  ÿ  E  .
+ƒ  .  .  .  ƒ  .  .  .  ›    @  .  .  õ  @  .  Q  ö  @  .  Q  õ  @  .  .  ®  @  .  %  •  @  .
+\  •  @  .  Â  »  E  .  Œ  ¶  @  .  C  ®  E  .  v  °  E  .  2  .  .  .  ∞  .  .  .  á  .  Æ  Ñ
+à  2  ï  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  x  Ó  Q  {  Ä  Ä  .  .  .  .  q  Ç  Î  ~
+
+--------------------------------2012/1/5 15:19:52--------------------------------
+A memory block has been leaked. The size is: 180
+
+This block was allocated by thread 0x17C4, and the stack trace (return addresses) at the time was:
+404C3A 
+407F23 
+4083B0 
+42DD6F 
+65426F 
+6548A0 
+918E30 
+598526 
+406958 
+59A6BA 
+597B4F 
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 21038
+
+Current memory dump of 256 bytes starting at pointer address 7EEDCF30:
+B0 04 02 00 01 00 00 00 53 00 00 00 57 00 41 00 52 00 4E 00 49 00 4E 00 47 00 21 00 20 00 49 00
+73 00 20 00 6E 00 6F 00 20 00 6D 00 6F 00 72 00 65 00 20 00 61 00 6C 00 6C 00 6F 00 77 00 65 00
+64 00 20 00 74 00 6F 00 20 00 73 00 70 00 65 00 63 00 69 00 66 00 79 00 20 00 74 00 68 00 65 00
+20 00 6D 00 61 00 70 00 70 00 69 00 6E 00 67 00 20 00 66 00 69 00 6C 00 65 00 20 00 69 00 6E 00
+73 00 69 00 64 00 65 00 20 00 74 00 68 00 65 00 20 00 70 00 65 00 72 00 73 00 69 00 73 00 74 00
+65 00 6E 00 63 00 65 00 20 00 66 00 69 00 6C 00 65 00 00 00 5E 61 32 7A 00 00 00 00 31 F9 ED 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 5B 54 00 00 3A 4C 40 00 23 7F 40 00 02 93 40 00
+FA 73 5C 00 D2 74 5C 00 6C 70 5C 00 36 8F 5B 00 E4 AE 5B 00 B8 56 65 00 3A 52 65 00 93 62 40 00
+∞  .  .  .  .  .  .  .  S  .  .  .  W  .  A  .  R  .  N  .  I  .  N  .  G  .  !  .     .  I  .
+s  .     .  n  .  o  .     .  m  .  o  .  r  .  e  .     .  a  .  l  .  l  .  o  .  w  .  e  .
+d  .     .  t  .  o  .     .  s  .  p  .  e  .  c  .  i  .  f  .  y  .     .  t  .  h  .  e  .
+   .  m  .  a  .  p  .  p  .  i  .  n  .  g  .     .  f  .  i  .  l  .  e  .     .  i  .  n  .
+s  .  i  .  d  .  e  .     .  t  .  h  .  e  .     .  p  .  e  .  r  .  s  .  i  .  s  .  t  .
+e  .  n  .  c  .  e  .     .  f  .  i  .  l  .  e  .  .  .  ^  a  2  z  .  .  .  .  1  ˘  Ì  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  [  T  .  .  :  L  @  .  #    @  .  .  ì  @  .
+˙  s  \  .  “  t  \  .  l  p  \  .  6  è  [  .  ‰  Æ  [  .  ∏  V  e  .  :  R  e  .  ì  b  @  .
+
+--------------------------------2012/1/5 15:19:52--------------------------------
+A memory block has been leaked. The size is: 20
+
+This block was allocated by thread 0x17C4, and the stack trace (return addresses) at the time was:
+404C3A 
+40622F 
+4068EA 
+45B3B9 
+406238 
+4688A5 
+918E13 
+598526 
+406958 
+59A6BA 
+597B4F 
+
+The block is currently used for an object of class: TFileStream
+
+The allocation number is: 20861
+
+Current memory dump of 256 bytes starting at pointer address 7EFA78E0:
+80 BF 44 00 A4 02 00 00 BC 80 EB 7E 00 00 00 00 D5 13 E1 79 80 80 80 80 00 00 00 00 A0 18 FA 7E
+00 00 00 00 00 00 00 00 F4 50 41 00 00 00 00 00 7F 51 00 00 3A 4C 40 00 2F 62 40 00 EA 68 40 00
+D6 1A 43 00 58 69 40 00 2E 87 46 00 D8 B3 45 00 31 86 46 00 B0 88 46 00 13 8E 91 00 26 85 59 00
+C4 17 00 00 C4 17 00 00 56 4C 40 00 4D 62 40 00 35 69 40 00 01 61 45 00 93 62 40 00 42 5D 45 00
+A5 5E 45 00 84 81 59 00 AF A6 59 00 4F 7B 59 00 65 99 53 00 14 00 00 00 C0 78 44 00 AA 90 FB 85
+EC 48 42 00 38 5F D6 7E 00 00 00 00 FF FF FF 7F 00 00 00 00 55 6F 04 7A 00 00 00 00 41 7A FA 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 9A 51 00 00 3A 4C 40 00 2F 62 40 00 EA 68 40 00
+18 44 5F 00 EA 68 40 00 40 CC 5E 00 68 CC 5E 00 B7 E2 5E 00 95 DC 5E 00 F6 41 65 00 A0 48 65 00
+Ä  ø  D  .  §  .  .  .  º  Ä  Î  ~  .  .  .  .  ’  .  ·  y  Ä  Ä  Ä  Ä  .  .  .  .  †  .  ˙  ~
+.  .  .  .  .  .  .  .  Ù  P  A  .  .  .  .  .    Q  .  .  :  L  @  .  /  b  @  .  Í  h  @  .
+÷  .  C  .  X  i  @  .  .  á  F  .  ÿ  ≥  E  .  1  Ü  F  .  ∞  à  F  .  .  é  ë  .  &  Ö  Y  .
+ƒ  .  .  .  ƒ  .  .  .  V  L  @  .  M  b  @  .  5  i  @  .  .  a  E  .  ì  b  @  .  B  ]  E  .
+•  ^  E  .  Ñ  Å  Y  .  Ø  ¶  Y  .  O  {  Y  .  e  ô  S  .  .  .  .  .  ¿  x  D  .  ™  ê  ˚  Ö
+Ï  H  B  .  8  _  ÷  ~  .  .  .  .  ˇ  ˇ  ˇ    .  .  .  .  U  o  .  z  .  .  .  .  A  z  ˙  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ö  Q  .  .  :  L  @  .  /  b  @  .  Í  h  @  .
+.  D  _  .  Í  h  @  .  @  Ã  ^  .  h  Ã  ^  .  ∑  ‚  ^  .  ï  ‹  ^  .  ˆ  A  e  .  †  H  e  .
+
+--------------------------------2012/1/5 15:19:52--------------------------------
+A memory block has been leaked. The size is: 20
+
+This block was allocated by thread 0x17C4, and the stack trace (return addresses) at the time was:
+404C3A 
+40622F 
+4068EA 
+431AD6 
+406958 
+46872E 
+45B3D8 
+468631 
+4688B0 
+918E13 
+598526 
+
+The block is currently used for an object of class: TStringBuilder
+
+The allocation number is: 20863
+
+Current memory dump of 256 bytes starting at pointer address 7EFA7980:
+EC 48 42 00 38 5F D6 7E 00 00 00 00 FF FF FF 7F 00 00 00 00 55 6F 04 7A 00 00 00 00 41 7A FA 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 9A 51 00 00 3A 4C 40 00 2F 62 40 00 EA 68 40 00
+18 44 5F 00 EA 68 40 00 40 CC 5E 00 68 CC 5E 00 B7 E2 5E 00 95 DC 5E 00 F6 41 65 00 A0 48 65 00
+C4 17 00 00 C4 17 00 00 56 4C 40 00 4D 62 40 00 35 69 40 00 62 44 5F 00 93 62 40 00 03 CE 5E 00
+74 2E 5F 00 BB BE 40 00 61 9B 40 00 51 9A 40 00 03 63 40 00 10 00 00 00 F4 2C 5E 00 59 E1 20 86
+88 32 95 00 80 80 80 80 80 80 80 80 80 80 80 80 A6 1E DF 79 80 80 80 80 00 00 00 00 01 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 44 52 00 00 3A 4C 40 00 2F 62 40 00 49 BF 40 00
+EA 68 40 00 F6 90 5B 00 D8 0A 5F 00 65 2E 5F 00 27 92 5B 00 99 92 5B 00 D8 AE 5B 00 B8 56 65 00
+Ï  H  B  .  8  _  ÷  ~  .  .  .  .  ˇ  ˇ  ˇ    .  .  .  .  U  o  .  z  .  .  .  .  A  z  ˙  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ö  Q  .  .  :  L  @  .  /  b  @  .  Í  h  @  .
+.  D  _  .  Í  h  @  .  @  Ã  ^  .  h  Ã  ^  .  ∑  ‚  ^  .  ï  ‹  ^  .  ˆ  A  e  .  †  H  e  .
+ƒ  .  .  .  ƒ  .  .  .  V  L  @  .  M  b  @  .  5  i  @  .  b  D  _  .  ì  b  @  .  .  Œ  ^  .
+t  .  _  .  ª  æ  @  .  a  õ  @  .  Q  ö  @  .  .  c  @  .  .  .  .  .  Ù  ,  ^  .  Y  ·     Ü
+à  2  ï  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  ¶  .  ﬂ  y  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  D  R  .  .  :  L  @  .  /  b  @  .  I  ø  @  .
+Í  h  @  .  ˆ  ê  [  .  ÿ  .  _  .  e  .  _  .  '  í  [  .  ô  í  [  .  ÿ  Æ  [  .  ∏  V  e  .
+
+--------------------------------2012/1/5 15:19:52--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+13 - 20 bytes: TStringBuilder x 1, TFileStream x 1
+21 - 36 bytes: TStreamReader x 1, EdormException x 1
+37 - 52 bytes: UnicodeString x 1, Unknown x 1
+165 - 180 bytes: UnicodeString x 1
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
+
+--------------------------------2012/1/5 15:20:52--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x1788, and the stack trace (return addresses) at the time was:
+404C3A 
+40622F 
+4068EA 
+42DDA0 
+5B8F79 
+65496C 
+654391 
+6548A0 
+918E30 
+598526 
+406958 
+
+The block is currently used for an object of class: EdormException
+
+The allocation number is: 27807
+
+Current memory dump of 256 bytes starting at pointer address 7ED3B610:
+34 24 64 00 4C 7E F1 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 BC 4D 94 79
+80 80 80 80 80 80 80 80 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+95 6C 00 00 3A 4C 40 00 23 7F 40 00 93 91 40 00 1F C4 40 00 DC 73 5C 00 D2 74 5C 00 6C 70 5C 00
+36 8F 5B 00 E4 AE 5B 00 45 49 65 00 91 43 65 00 88 17 00 00 88 17 00 00 56 4C 40 00 DD 7F 40 00
+0D C4 40 00 DC 73 5C 00 D2 74 5C 00 6C 70 5C 00 36 8F 5B 00 E4 AE 5B 00 45 49 65 00 91 43 65 00
+A0 48 65 00 22 00 00 00 B0 04 02 00 BA 98 2D 86 88 32 95 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 45 67 D2 79 80 80 00 00 00 00 A1 B7 D3 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 F2 54 00 00 3A 4C 40 00 23 7F 40 00 02 93 40 00
+4  $  d  .  L  ~  Ò  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  º  M  î  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+ï  l  .  .  :  L  @  .  #    @  .  ì  ë  @  .  .  ƒ  @  .  ‹  s  \  .  “  t  \  .  l  p  \  .
+6  è  [  .  ‰  Æ  [  .  E  I  e  .  ë  C  e  .  à  .  .  .  à  .  .  .  V  L  @  .  ›    @  .
+.  ƒ  @  .  ‹  s  \  .  “  t  \  .  l  p  \  .  6  è  [  .  ‰  Æ  [  .  E  I  e  .  ë  C  e  .
+†  H  e  .  "  .  .  .  ∞  .  .  .  ∫  ò  -  Ü  à  2  ï  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  E  g  “  y  Ä  Ä  .  .  .  .  °  ∑  ”  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Ú  T  .  .  :  L  @  .  #    @  .  .  ì  @  .
+
+--------------------------------2012/1/5 15:20:52--------------------------------
+A memory block has been leaked. The size is: 132
+
+This block was allocated by thread 0x1788, and the stack trace (return addresses) at the time was:
+404C3A 
+407F23 
+408154 
+428FF8 
+77AA3442 [Unknown function at RtlInterlockedFlushSList]
+77AA3070 [Unknown function at RtlInterlockedFlushSList]
+77B40AD6 [Unknown function at RtlpNtEnumerateSubKey]
+77B4135A [Unknown function at RtlpNtEnumerateSubKey]
+77B4133E [Unknown function at RtlpNtEnumerateSubKey]
+77B4133E [Unknown function at RtlpNtEnumerateSubKey]
+77AFAC93 [Unknown function at RtlUlonglongByteSwap]
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 27808
+
+Current memory dump of 256 bytes starting at pointer address 7EF17E40:
+B0 04 02 00 01 00 00 00 37 00 00 00 43 00 61 00 6E 00 6E 00 6F 00 74 00 20 00 66 00 69 00 6E 00
+64 00 20 00 6C 00 6F 00 67 00 67 00 65 00 72 00 20 00 5B 00 64 00 6F 00 72 00 6D 00 2E 00 6C 00
+6F 00 67 00 67 00 65 00 72 00 73 00 2E 00 43 00 6F 00 64 00 65 00 53 00 69 00 74 00 65 00 2E 00
+54 00 64 00 6F 00 72 00 6D 00 46 00 69 00 6C 00 65 00 4C 00 6F 00 67 00 5D 00 00 00 0D 7A F4 39
+80 80 80 80 80 80 80 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+∞  .  .  .  .  .  .  .  7  .  .  .  C  .  a  .  n  .  n  .  o  .  t  .     .  f  .  i  .  n  .
+d  .     .  l  .  o  .  g  .  g  .  e  .  r  .     .  [  .  d  .  o  .  r  .  m  .  .  .  l  .
+o  .  g  .  g  .  e  .  r  .  s  .  .  .  C  .  o  .  d  .  e  .  S  .  i  .  t  .  e  .  .  .
+T  .  d  .  o  .  r  .  m  .  F  .  i  .  l  .  e  .  L  .  o  .  g  .  ]  .  .  .  .  z  Ù  9
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+
+--------------------------------2012/1/5 15:20:52--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+21 - 36 bytes: EdormException x 1
+117 - 132 bytes: UnicodeString x 1
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
+
+--------------------------------2012/1/5 15:22:39--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x10A0, and the stack trace (return addresses) at the time was:
+404C3A 
+40622F 
+4068EA 
+42DDA0 
+5B8F79 
+65496C 
+654391 
+6548A0 
+918E38 
+598526 
+406958 
+
+The block is currently used for an object of class: EdormException
+
+The allocation number is: 27807
+
+Current memory dump of 256 bytes starting at pointer address 7ED3B610:
+34 24 64 00 4C 7E F1 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 84 5B 94 79
+80 80 80 80 80 80 80 80 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+95 6C 00 00 3A 4C 40 00 23 7F 40 00 93 91 40 00 1F C4 40 00 DC 73 5C 00 D2 74 5C 00 6C 70 5C 00
+36 8F 5B 00 E4 AE 5B 00 45 49 65 00 91 43 65 00 A0 10 00 00 A0 10 00 00 56 4C 40 00 DD 7F 40 00
+0D C4 40 00 DC 73 5C 00 D2 74 5C 00 6C 70 5C 00 36 8F 5B 00 E4 AE 5B 00 45 49 65 00 91 43 65 00
+A0 48 65 00 22 00 00 00 B0 04 02 00 EA 8A 2D 86 88 32 95 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 15 75 D2 79 80 80 00 00 00 00 A1 B7 D3 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 F2 54 00 00 3A 4C 40 00 23 7F 40 00 02 93 40 00
+4  $  d  .  L  ~  Ò  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Ñ  [  î  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+ï  l  .  .  :  L  @  .  #    @  .  ì  ë  @  .  .  ƒ  @  .  ‹  s  \  .  “  t  \  .  l  p  \  .
+6  è  [  .  ‰  Æ  [  .  E  I  e  .  ë  C  e  .  †  .  .  .  †  .  .  .  V  L  @  .  ›    @  .
+.  ƒ  @  .  ‹  s  \  .  “  t  \  .  l  p  \  .  6  è  [  .  ‰  Æ  [  .  E  I  e  .  ë  C  e  .
+†  H  e  .  "  .  .  .  ∞  .  .  .  Í  ä  -  Ü  à  2  ï  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  u  “  y  Ä  Ä  .  .  .  .  °  ∑  ”  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Ú  T  .  .  :  L  @  .  #    @  .  .  ì  @  .
+
+--------------------------------2012/1/5 15:22:39--------------------------------
+A memory block has been leaked. The size is: 132
+
+This block was allocated by thread 0x10A0, and the stack trace (return addresses) at the time was:
+404C3A 
+407F23 
+408154 
+428FF8 
+77AA3442 [Unknown function at RtlInterlockedFlushSList]
+77AA3070 [Unknown function at RtlInterlockedFlushSList]
+77B40AD6 [Unknown function at RtlpNtEnumerateSubKey]
+77B4135A [Unknown function at RtlpNtEnumerateSubKey]
+77B4133E [Unknown function at RtlpNtEnumerateSubKey]
+77B4133E [Unknown function at RtlpNtEnumerateSubKey]
+77AFAC93 [Unknown function at RtlUlonglongByteSwap]
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 27808
+
+Current memory dump of 256 bytes starting at pointer address 7EF17E40:
+B0 04 02 00 01 00 00 00 37 00 00 00 43 00 61 00 6E 00 6E 00 6F 00 74 00 20 00 66 00 69 00 6E 00
+64 00 20 00 6C 00 6F 00 67 00 67 00 65 00 72 00 20 00 5B 00 64 00 6F 00 72 00 6D 00 2E 00 6C 00
+6F 00 67 00 67 00 65 00 72 00 73 00 2E 00 43 00 6F 00 64 00 65 00 53 00 69 00 74 00 65 00 2E 00
+54 00 64 00 6F 00 72 00 6D 00 46 00 69 00 6C 00 65 00 4C 00 6F 00 67 00 5D 00 00 00 F5 80 F4 39
+80 80 80 80 80 80 80 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+∞  .  .  .  .  .  .  .  7  .  .  .  C  .  a  .  n  .  n  .  o  .  t  .     .  f  .  i  .  n  .
+d  .     .  l  .  o  .  g  .  g  .  e  .  r  .     .  [  .  d  .  o  .  r  .  m  .  .  .  l  .
+o  .  g  .  g  .  e  .  r  .  s  .  .  .  C  .  o  .  d  .  e  .  S  .  i  .  t  .  e  .  .  .
+T  .  d  .  o  .  r  .  m  .  F  .  i  .  l  .  e  .  L  .  o  .  g  .  ]  .  .  .  ı  Ä  Ù  9
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+
+--------------------------------2012/1/5 15:22:39--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+21 - 36 bytes: EdormException x 1
+117 - 132 bytes: UnicodeString x 1
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
+
+--------------------------------2012/1/9 15:50:32--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x1714, and the stack trace (return addresses) at the time was:
+404B16 
+4060EB 
+406792 
+42C4A4 
+5B82A9 
+653C7C 
+6536A1 
+653BB0 
+82784C 
+597CC6 
+406800 
+
+The block is currently used for an object of class: EdormException
+
+The allocation number is: 26254
+
+Current memory dump of 256 bytes starting at pointer address 7ED58D50:
+44 17 64 00 6C 6F F1 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 F1 5F A2 79
+80 80 80 80 80 80 80 80 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+7A 66 00 00 16 4B 40 00 CB 7D 40 00 17 90 40 00 73 C2 40 00 0C 67 5C 00 02 68 5C 00 9C 63 5C 00
+66 82 5B 00 14 A2 5B 00 55 3C 65 00 A1 36 65 00 14 17 00 00 14 17 00 00 32 4B 40 00 85 7E 40 00
+61 C2 40 00 0C 67 5C 00 02 68 5C 00 9C 63 5C 00 66 82 5B 00 14 A2 5B 00 55 3C 65 00 A1 36 65 00
+B0 3B 65 00 24 00 00 00 B0 04 02 00 5D 9E 2E 86 84 F2 85 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 A2 61 D1 79 00 00 00 00 E1 8E D5 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 C5 53 00 00 16 4B 40 00 CB 7D 40 00 86 91 40 00
+D  .  d  .  l  o  Ò  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Ò  _  ¢  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+z  f  .  .  .  K  @  .  À  }  @  .  .  ê  @  .  s  ¬  @  .  .  g  \  .  .  h  \  .  ú  c  \  .
+f  Ç  [  .  .  ¢  [  .  U  <  e  .  °  6  e  .  .  .  .  .  .  .  .  .  2  K  @  .  Ö  ~  @  .
+a  ¬  @  .  .  g  \  .  .  h  \  .  ú  c  \  .  f  Ç  [  .  .  ¢  [  .  U  <  e  .  °  6  e  .
+∞  ;  e  .  $  .  .  .  ∞  .  .  .  ]  û  .  Ü  Ñ  Ú  Ö  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  ¢  a  —  y  .  .  .  .  ·  é  ’  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ≈  S  .  .  .  K  @  .  À  }  @  .  Ü  ë  @  .
+
+--------------------------------2012/1/9 15:50:32--------------------------------
+A memory block has been leaked. The size is: 132
+
+This block was allocated by thread 0x1714, and the stack trace (return addresses) at the time was:
+404B16 
+407DCB 
+407FFC 
+4277D0 
+76FA3442 [Unknown function at RtlInterlockedFlushSList]
+76FA3070 [Unknown function at RtlInterlockedFlushSList]
+77040AD6 [Unknown function at RtlpNtEnumerateSubKey]
+7704135A [Unknown function at RtlpNtEnumerateSubKey]
+7704133E [Unknown function at RtlpNtEnumerateSubKey]
+7704133E [Unknown function at RtlpNtEnumerateSubKey]
+76FFAC93 [Unknown function at RtlUlonglongByteSwap]
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 26255
+
+Current memory dump of 256 bytes starting at pointer address 7EF16F60:
+B0 04 02 00 01 00 00 00 37 00 00 00 43 00 61 00 6E 00 6E 00 6F 00 74 00 20 00 66 00 69 00 6E 00
+64 00 20 00 6C 00 6F 00 67 00 67 00 65 00 72 00 20 00 5B 00 64 00 6F 00 72 00 6D 00 2E 00 6C 00
+6F 00 67 00 67 00 65 00 72 00 73 00 2E 00 43 00 6F 00 64 00 65 00 53 00 69 00 74 00 65 00 2E 00
+54 00 64 00 6F 00 72 00 6D 00 46 00 69 00 6C 00 65 00 4C 00 6F 00 67 00 5D 00 00 00 8E BE C4 3E
+80 80 80 80 80 80 80 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+∞  .  .  .  .  .  .  .  7  .  .  .  C  .  a  .  n  .  n  .  o  .  t  .     .  f  .  i  .  n  .
+d  .     .  l  .  o  .  g  .  g  .  e  .  r  .     .  [  .  d  .  o  .  r  .  m  .  .  .  l  .
+o  .  g  .  g  .  e  .  r  .  s  .  .  .  C  .  o  .  d  .  e  .  S  .  i  .  t  .  e  .  .  .
+T  .  d  .  o  .  r  .  m  .  F  .  i  .  l  .  e  .  L  .  o  .  g  .  ]  .  .  .  é  æ  ƒ  >
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+
+--------------------------------2012/1/9 15:50:32--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+21 - 36 bytes: EdormException x 1
+117 - 132 bytes: UnicodeString x 1
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
+
+--------------------------------2012/1/9 15:50:38--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x768, and the stack trace (return addresses) at the time was:
+404B16 
+4060EB 
+406792 
+42C4A4 
+5B82A9 
+653C7C 
+6536A1 
+653BB0 
+82784C 
+597CC6 
+406800 
+
+The block is currently used for an object of class: EdormException
+
+The allocation number is: 26254
+
+Current memory dump of 256 bytes starting at pointer address 7ED58D50:
+44 17 64 00 6C 6F F1 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 49 7F A2 79
+80 80 80 80 80 80 80 80 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+7A 66 00 00 16 4B 40 00 CB 7D 40 00 17 90 40 00 73 C2 40 00 0C 67 5C 00 02 68 5C 00 9C 63 5C 00
+66 82 5B 00 14 A2 5B 00 55 3C 65 00 A1 36 65 00 68 07 00 00 68 07 00 00 32 4B 40 00 85 7E 40 00
+61 C2 40 00 0C 67 5C 00 02 68 5C 00 9C 63 5C 00 66 82 5B 00 14 A2 5B 00 55 3C 65 00 A1 36 65 00
+B0 3B 65 00 24 00 00 00 B0 04 02 00 05 7F 2E 86 84 F2 85 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 FA 80 D1 79 00 00 00 00 E1 8E D5 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 C5 53 00 00 16 4B 40 00 CB 7D 40 00 86 91 40 00
+D  .  d  .  l  o  Ò  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  I    ¢  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+z  f  .  .  .  K  @  .  À  }  @  .  .  ê  @  .  s  ¬  @  .  .  g  \  .  .  h  \  .  ú  c  \  .
+f  Ç  [  .  .  ¢  [  .  U  <  e  .  °  6  e  .  h  .  .  .  h  .  .  .  2  K  @  .  Ö  ~  @  .
+a  ¬  @  .  .  g  \  .  .  h  \  .  ú  c  \  .  f  Ç  [  .  .  ¢  [  .  U  <  e  .  °  6  e  .
+∞  ;  e  .  $  .  .  .  ∞  .  .  .  .    .  Ü  Ñ  Ú  Ö  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  ˙  Ä  —  y  .  .  .  .  ·  é  ’  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ≈  S  .  .  .  K  @  .  À  }  @  .  Ü  ë  @  .
+
+--------------------------------2012/1/9 15:50:38--------------------------------
+A memory block has been leaked. The size is: 132
+
+This block was allocated by thread 0x768, and the stack trace (return addresses) at the time was:
+404B16 
+407DCB 
+407FFC 
+4277D0 
+76FA3442 [Unknown function at RtlInterlockedFlushSList]
+76FA3070 [Unknown function at RtlInterlockedFlushSList]
+77040AD6 [Unknown function at RtlpNtEnumerateSubKey]
+7704135A [Unknown function at RtlpNtEnumerateSubKey]
+7704133E [Unknown function at RtlpNtEnumerateSubKey]
+7704133E [Unknown function at RtlpNtEnumerateSubKey]
+76FFAC93 [Unknown function at RtlUlonglongByteSwap]
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 26255
+
+Current memory dump of 256 bytes starting at pointer address 7EF16F60:
+B0 04 02 00 01 00 00 00 37 00 00 00 43 00 61 00 6E 00 6E 00 6F 00 74 00 20 00 66 00 69 00 6E 00
+64 00 20 00 6C 00 6F 00 67 00 67 00 65 00 72 00 20 00 5B 00 64 00 6F 00 72 00 6D 00 2E 00 6C 00
+6F 00 67 00 67 00 65 00 72 00 73 00 2E 00 43 00 6F 00 64 00 65 00 53 00 69 00 74 00 65 00 2E 00
+54 00 64 00 6F 00 72 00 6D 00 46 00 69 00 6C 00 65 00 4C 00 6F 00 67 00 5D 00 00 00 3A CE C4 3E
+80 80 80 80 80 80 80 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+∞  .  .  .  .  .  .  .  7  .  .  .  C  .  a  .  n  .  n  .  o  .  t  .     .  f  .  i  .  n  .
+d  .     .  l  .  o  .  g  .  g  .  e  .  r  .     .  [  .  d  .  o  .  r  .  m  .  .  .  l  .
+o  .  g  .  g  .  e  .  r  .  s  .  .  .  C  .  o  .  d  .  e  .  S  .  i  .  t  .  e  .  .  .
+T  .  d  .  o  .  r  .  m  .  F  .  i  .  l  .  e  .  L  .  o  .  g  .  ]  .  .  .  :  Œ  ƒ  >
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+
+--------------------------------2012/1/9 15:50:38--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+21 - 36 bytes: EdormException x 1
+117 - 132 bytes: UnicodeString x 1
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
+
+--------------------------------2012/1/9 15:51:36--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x124C, and the stack trace (return addresses) at the time was:
+404B16 
+4060EB 
+406792 
+42C4A4 
+5B82A9 
+653C7C 
+6536A1 
+653BB0 
+82784C 
+597CC6 
+406800 
+
+The block is currently used for an object of class: EdormException
+
+The allocation number is: 26254
+
+Current memory dump of 256 bytes starting at pointer address 7ED58D50:
+44 17 64 00 6C 6F F1 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 81 69 A2 79
+80 80 80 80 80 80 80 80 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+7A 66 00 00 16 4B 40 00 CB 7D 40 00 17 90 40 00 73 C2 40 00 0C 67 5C 00 02 68 5C 00 9C 63 5C 00
+66 82 5B 00 14 A2 5B 00 55 3C 65 00 A1 36 65 00 4C 12 00 00 4C 12 00 00 32 4B 40 00 85 7E 40 00
+61 C2 40 00 0C 67 5C 00 02 68 5C 00 9C 63 5C 00 66 82 5B 00 14 A2 5B 00 55 3C 65 00 A1 36 65 00
+B0 3B 65 00 24 00 00 00 B0 04 02 00 CD 94 2E 86 84 F2 85 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 32 6B D1 79 00 00 00 00 E1 8E D5 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 C5 53 00 00 16 4B 40 00 CB 7D 40 00 86 91 40 00
+D  .  d  .  l  o  Ò  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Å  i  ¢  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+z  f  .  .  .  K  @  .  À  }  @  .  .  ê  @  .  s  ¬  @  .  .  g  \  .  .  h  \  .  ú  c  \  .
+f  Ç  [  .  .  ¢  [  .  U  <  e  .  °  6  e  .  L  .  .  .  L  .  .  .  2  K  @  .  Ö  ~  @  .
+a  ¬  @  .  .  g  \  .  .  h  \  .  ú  c  \  .  f  Ç  [  .  .  ¢  [  .  U  <  e  .  °  6  e  .
+∞  ;  e  .  $  .  .  .  ∞  .  .  .  Õ  î  .  Ü  Ñ  Ú  Ö  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  2  k  —  y  .  .  .  .  ·  é  ’  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ≈  S  .  .  .  K  @  .  À  }  @  .  Ü  ë  @  .
+
+--------------------------------2012/1/9 15:51:36--------------------------------
+A memory block has been leaked. The size is: 132
+
+This block was allocated by thread 0x124C, and the stack trace (return addresses) at the time was:
+404B16 
+407DCB 
+407FFC 
+4277D0 
+76FA3442 [Unknown function at RtlInterlockedFlushSList]
+76FA3070 [Unknown function at RtlInterlockedFlushSList]
+77040AD6 [Unknown function at RtlpNtEnumerateSubKey]
+7704135A [Unknown function at RtlpNtEnumerateSubKey]
+7704133E [Unknown function at RtlpNtEnumerateSubKey]
+7704133E [Unknown function at RtlpNtEnumerateSubKey]
+76FFAC93 [Unknown function at RtlUlonglongByteSwap]
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 26255
+
+Current memory dump of 256 bytes starting at pointer address 7EF16F60:
+B0 04 02 00 01 00 00 00 37 00 00 00 43 00 61 00 6E 00 6E 00 6F 00 74 00 20 00 66 00 69 00 6E 00
+64 00 20 00 6C 00 6F 00 67 00 67 00 65 00 72 00 20 00 5B 00 64 00 6F 00 72 00 6D 00 2E 00 6C 00
+6F 00 67 00 67 00 65 00 72 00 73 00 2E 00 43 00 6F 00 64 00 65 00 53 00 69 00 74 00 65 00 2E 00
+54 00 64 00 6F 00 72 00 6D 00 46 00 69 00 6C 00 65 00 4C 00 6F 00 67 00 5D 00 00 00 56 C3 C4 3E
+80 80 80 80 80 80 80 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+∞  .  .  .  .  .  .  .  7  .  .  .  C  .  a  .  n  .  n  .  o  .  t  .     .  f  .  i  .  n  .
+d  .     .  l  .  o  .  g  .  g  .  e  .  r  .     .  [  .  d  .  o  .  r  .  m  .  .  .  l  .
+o  .  g  .  g  .  e  .  r  .  s  .  .  .  C  .  o  .  d  .  e  .  S  .  i  .  t  .  e  .  .  .
+T  .  d  .  o  .  r  .  m  .  F  .  i  .  l  .  e  .  L  .  o  .  g  .  ]  .  .  .  V  √  ƒ  >
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+
+--------------------------------2012/1/9 15:51:36--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+21 - 36 bytes: EdormException x 1
+117 - 132 bytes: UnicodeString x 1
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
+
+--------------------------------2012/1/9 15:52:20--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0xFE8, and the stack trace (return addresses) at the time was:
+404B16 
+4060EB 
+406792 
+42C4A4 
+5B82A9 
+653C7C 
+6536A1 
+653BB0 
+82784C 
+597CC6 
+406800 
+
+The block is currently used for an object of class: EdormException
+
+The allocation number is: 26254
+
+Current memory dump of 256 bytes starting at pointer address 7ED58D50:
+44 17 64 00 6C 6F F1 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 49 6E A2 79
+80 80 80 80 80 80 80 80 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+7A 66 00 00 16 4B 40 00 CB 7D 40 00 17 90 40 00 73 C2 40 00 0C 67 5C 00 02 68 5C 00 9C 63 5C 00
+66 82 5B 00 14 A2 5B 00 55 3C 65 00 A1 36 65 00 E8 0F 00 00 E8 0F 00 00 32 4B 40 00 85 7E 40 00
+61 C2 40 00 0C 67 5C 00 02 68 5C 00 9C 63 5C 00 66 82 5B 00 14 A2 5B 00 55 3C 65 00 A1 36 65 00
+B0 3B 65 00 24 00 00 00 B0 04 02 00 05 90 2E 86 84 F2 85 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 FA 6F D1 79 00 00 00 00 E1 8E D5 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 C5 53 00 00 16 4B 40 00 CB 7D 40 00 86 91 40 00
+D  .  d  .  l  o  Ò  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  I  n  ¢  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+z  f  .  .  .  K  @  .  À  }  @  .  .  ê  @  .  s  ¬  @  .  .  g  \  .  .  h  \  .  ú  c  \  .
+f  Ç  [  .  .  ¢  [  .  U  <  e  .  °  6  e  .  Ë  .  .  .  Ë  .  .  .  2  K  @  .  Ö  ~  @  .
+a  ¬  @  .  .  g  \  .  .  h  \  .  ú  c  \  .  f  Ç  [  .  .  ¢  [  .  U  <  e  .  °  6  e  .
+∞  ;  e  .  $  .  .  .  ∞  .  .  .  .  ê  .  Ü  Ñ  Ú  Ö  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  ˙  o  —  y  .  .  .  .  ·  é  ’  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ≈  S  .  .  .  K  @  .  À  }  @  .  Ü  ë  @  .
+
+--------------------------------2012/1/9 15:52:20--------------------------------
+A memory block has been leaked. The size is: 132
+
+This block was allocated by thread 0xFE8, and the stack trace (return addresses) at the time was:
+404B16 
+407DCB 
+407FFC 
+4277D0 
+76FA3442 [Unknown function at RtlInterlockedFlushSList]
+76FA3070 [Unknown function at RtlInterlockedFlushSList]
+77040AD6 [Unknown function at RtlpNtEnumerateSubKey]
+7704135A [Unknown function at RtlpNtEnumerateSubKey]
+7704133E [Unknown function at RtlpNtEnumerateSubKey]
+7704133E [Unknown function at RtlpNtEnumerateSubKey]
+76FFAC93 [Unknown function at RtlUlonglongByteSwap]
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 26255
+
+Current memory dump of 256 bytes starting at pointer address 7EF16F60:
+B0 04 02 00 01 00 00 00 37 00 00 00 43 00 61 00 6E 00 6E 00 6F 00 74 00 20 00 66 00 69 00 6E 00
+64 00 20 00 6C 00 6F 00 67 00 67 00 65 00 72 00 20 00 5B 00 64 00 6F 00 72 00 6D 00 2E 00 6C 00
+6F 00 67 00 67 00 65 00 72 00 73 00 2E 00 43 00 6F 00 64 00 65 00 53 00 69 00 74 00 65 00 2E 00
+54 00 64 00 6F 00 72 00 6D 00 46 00 69 00 6C 00 65 00 4C 00 6F 00 67 00 5D 00 00 00 BA C5 C4 3E
+80 80 80 80 80 80 80 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+∞  .  .  .  .  .  .  .  7  .  .  .  C  .  a  .  n  .  n  .  o  .  t  .     .  f  .  i  .  n  .
+d  .     .  l  .  o  .  g  .  g  .  e  .  r  .     .  [  .  d  .  o  .  r  .  m  .  .  .  l  .
+o  .  g  .  g  .  e  .  r  .  s  .  .  .  C  .  o  .  d  .  e  .  S  .  i  .  t  .  e  .  .  .
+T  .  d  .  o  .  r  .  m  .  F  .  i  .  l  .  e  .  L  .  o  .  g  .  ]  .  .  .  ∫  ≈  ƒ  >
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+
+--------------------------------2012/1/9 15:52:20--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+21 - 36 bytes: EdormException x 1
+117 - 132 bytes: UnicodeString x 1
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
+
+--------------------------------2012/1/30 15:08:25--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x1934, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+42D8EC 
+5B65CD 
+6563CC 
+655ADF 
+656300 
+870F90 
+59684E 
+40681C 
+
+The block is currently used for an object of class: EdormException
+
+The allocation number is: 26967
+
+Current memory dump of 256 bytes starting at pointer address 7ED419D0:
+14 12 64 00 6C 72 F1 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 AC 12 9F 79
+80 80 80 80 80 80 80 80 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+4B 69 00 00 26 4C 40 00 7B 7D 40 00 8B 8F 40 00 7F C1 40 00 30 4A 5C 00 26 4B 5C 00 C0 46 5C 00
+8A 65 5B 00 38 85 5B 00 A5 63 65 00 DF 5A 65 00 34 19 00 00 34 19 00 00 42 4C 40 00 35 7E 40 00
+6D C1 40 00 30 4A 5C 00 26 4B 5C 00 C0 46 5C 00 8A 65 5B 00 38 85 5B 00 A5 63 65 00 DF 5A 65 00
+00 63 65 00 1E 00 00 00 B0 04 02 00 C8 CE 2C 86 88 A2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 37 31 D3 79 80 80 80 80 80 80 00 00 00 00 61 1B D4 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 74 54 00 00 26 4C 40 00 7B 7D 40 00 FA 90 40 00
+.  .  d  .  l  r  Ò  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ¨  .  ü  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+K  i  .  .  &  L  @  .  {  }  @  .  ã  è  @  .    ¡  @  .  0  J  \  .  &  K  \  .  ¿  F  \  .
+ä  e  [  .  8  Ö  [  .  •  c  e  .  ﬂ  Z  e  .  4  .  .  .  4  .  .  .  B  L  @  .  5  ~  @  .
+m  ¡  @  .  0  J  \  .  &  K  \  .  ¿  F  \  .  ä  e  [  .  8  Ö  [  .  •  c  e  .  ﬂ  Z  e  .
+.  c  e  .  .  .  .  .  ∞  .  .  .  »  Œ  ,  Ü  à  ¢  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  7  1  ”  y  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  a  .  ‘  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  t  T  .  .  &  L  @  .  {  }  @  .  ˙  ê  @  .
+
+--------------------------------2012/1/30 15:08:25--------------------------------
+A memory block has been leaked. The size is: 132
+
+This block was allocated by thread 0x1934, and the stack trace (return addresses) at the time was:
+404C26 
+407D7B 
+407FAC 
+428B88 
+7728A71A [Unknown function at RtlUlonglongByteSwap]
+77233C4A [Unknown function at RtlImageNtHeader]
+77232C8F [RtlInitializeCriticalSection]
+77233CC3 [Unknown function at RtlImageNtHeader]
+7728AC59 [Unknown function at RtlUlonglongByteSwap]
+7723389A [Unknown function at RtlImageNtHeader]
+77233CC3 [Unknown function at RtlImageNtHeader]
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 26968
+
+Current memory dump of 256 bytes starting at pointer address 7EF17260:
+B0 04 02 00 01 00 00 00 36 00 00 00 43 00 61 00 6E 00 6E 00 6F 00 74 00 20 00 66 00 69 00 6E 00
+64 00 20 00 6C 00 6F 00 67 00 67 00 65 00 72 00 20 00 5B 00 64 00 6F 00 72 00 6D 00 2E 00 6C 00
+6F 00 67 00 67 00 65 00 72 00 73 00 2E 00 46 00 69 00 6C 00 65 00 4C 00 6F 00 67 00 2E 00 54 00
+64 00 6F 00 72 00 6D 00 46 00 69 00 6C 00 65 00 4C 00 6F 00 67 00 5D 00 00 00 98 79 C7 3D 80 80
+80 80 80 80 80 80 80 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+∞  .  .  .  .  .  .  .  6  .  .  .  C  .  a  .  n  .  n  .  o  .  t  .     .  f  .  i  .  n  .
+d  .     .  l  .  o  .  g  .  g  .  e  .  r  .     .  [  .  d  .  o  .  r  .  m  .  .  .  l  .
+o  .  g  .  g  .  e  .  r  .  s  .  .  .  F  .  i  .  l  .  e  .  L  .  o  .  g  .  .  .  T  .
+d  .  o  .  r  .  m  .  F  .  i  .  l  .  e  .  L  .  o  .  g  .  ]  .  .  .  ò  y  «  =  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+
+--------------------------------2012/1/30 15:08:25--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+21 - 36 bytes: EdormException x 1
+117 - 132 bytes: UnicodeString x 1
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0xD30, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+64678E 
+409995 
+65C12C 
+659347 
+6453EB 
+65A2F9 
+40C204 
+40C219 
+
+The block is currently used for an object of class: TObjectList<System.TObject>
+
+The allocation number is: 217129
+
+Current memory dump of 256 bytes starting at pointer address 7E85E5C0:
+94 4E 64 00 00 00 00 00 00 00 00 00 BC 86 88 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00
+00 00 00 00 03 8C D1 79 00 00 00 00 31 EE 85 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+62 4C 03 00 26 4C 40 00 F3 60 40 00 AE 67 40 00 7F B0 57 00 67 69 58 00 C2 3F 41 00 D1 3F 41 00
+67 4F 41 00 94 4F 41 00 7C BE 4C 00 E3 CA 4C 00 30 0D 00 00 30 0D 00 00 42 4C 40 00 11 61 40 00
+F9 67 40 00 58 76 45 00 57 61 40 00 0D 6B 58 00 3C BF 4C 00 57 61 40 00 08 63 58 00 6E 4A 58 00
+23 6B 58 00 24 00 00 00 74 84 56 00 18 39 25 85 88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 E7 C6 DA 7A 00 00 00 00 D1 44 86 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CA 49 03 00 26 4C 40 00 C7 7D 40 00 54 82 40 00
+î  N  d  .  .  .  .  .  .  .  .  .  º  Ü  à  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  å  —  y  .  .  .  .  1  Ó  Ö  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+b  L  .  .  &  L  @  .  Û  `  @  .  Æ  g  @  .    ∞  W  .  g  i  X  .  ¬  ?  A  .  —  ?  A  .
+g  O  A  .  î  O  A  .  |  æ  L  .  „     L  .  0  .  .  .  0  .  .  .  B  L  @  .  .  a  @  .
+˘  g  @  .  X  v  E  .  W  a  @  .  .  k  X  .  <  ø  L  .  W  a  @  .  .  c  X  .  n  J  X  .
+#  k  X  .  $  .  .  .  t  Ñ  V  .  .  9  %  Ö  à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Á  ∆  ⁄  z  .  .  .  .  —  D  Ü  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .     I  .  .  &  L  @  .  «  }  @  .  T  Ç  @  .
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0xD30, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+64678E 
+409995 
+65C12C 
+659347 
+6453EB 
+65A2F9 
+40C204 
+40C219 
+
+The block is currently used for an object of class: TObjectList<System.TObject>
+
+The allocation number is: 222985
+
+Current memory dump of 256 bytes starting at pointer address 7E863C60:
+94 4E 64 00 00 00 00 00 00 00 00 00 BC 86 88 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00
+00 00 00 00 83 1E D1 79 00 00 00 00 31 E3 85 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+08 7E 03 00 26 4C 40 00 08 7E 40 00 F7 83 40 00 42 89 40 00 75 81 57 00 F5 4A 4D 00 C3 46 58 00
+8A 58 58 00 F5 58 58 00 F5 58 58 00 B0 9E 58 00 30 0D 00 00 30 0D 00 00 42 4C 40 00 A5 7E 40 00
+13 99 40 00 95 98 40 00 C7 61 40 00 0A 61 40 00 F9 67 40 00 79 4A 4D 00 57 61 40 00 08 63 58 00
+6E 4A 58 00 12 00 00 00 E4 04 01 00 45 EE EC 84 88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 BA 11 13 7B 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 00 00 00 00 51 3F 86 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 A8 4E 03 00 26 4C 40 00 F3 60 40 00 AE 67 40 00
+î  N  d  .  .  .  .  .  .  .  .  .  º  Ü  à  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  É  .  —  y  .  .  .  .  1  „  Ö  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  ~  .  .  &  L  @  .  .  ~  @  .  ˜  É  @  .  B  â  @  .  u  Å  W  .  ı  J  M  .  √  F  X  .
+ä  X  X  .  ı  X  X  .  ı  X  X  .  ∞  û  X  .  0  .  .  .  0  .  .  .  B  L  @  .  •  ~  @  .
+.  ô  @  .  ï  ò  @  .  «  a  @  .  .  a  @  .  ˘  g  @  .  y  J  M  .  W  a  @  .  .  c  X  .
+n  J  X  .  .  .  .  .  ‰  .  .  .  E  Ó  Ï  Ñ  à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  ∫  .  .  {  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  Q  ?  Ü  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ®  N  .  .  &  L  @  .  Û  `  @  .  Æ  g  @  .
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0xD30, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+642E3E 
+4060FC 
+641F7D 
+64204C 
+6453EB 
+65A2E7 
+40C204 
+40C219 
+
+The block is currently used for an object of class: TObjectList<dorm.Filters.TdormCriteriaItem>
+
+The allocation number is: 217126
+
+Current memory dump of 256 bytes starting at pointer address 7E864340:
+14 1A 64 00 20 B5 F7 7E 01 00 00 00 BC 86 88 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00
+00 00 00 00 2B B5 D4 79 00 00 00 00 11 42 86 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+F1 79 03 00 95 4C 40 00 36 A4 40 00 12 A5 40 00 57 64 45 00 D8 61 45 00 A5 5F 45 00 49 4B 58 00
+59 99 59 00 AC 22 2C 76 BA 22 2C 76 AA CC 53 00 30 0D 00 00 30 0D 00 00 42 4C 40 00 66 A6 40 00
+69 A3 40 00 A0 A3 40 00 10 39 41 00 12 A5 40 00 57 64 45 00 E5 5F 45 00 82 5F 45 00 57 61 40 00
+48 4A 58 00 18 00 00 00 00 00 00 00 6C 71 66 70 88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 93 8E 99 8F 80 80 80 80 80 80 80 80 80 80 80 80 00 00 00 00 81 3A 86 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 D1 4E 03 00 26 4C 40 00 C7 7D 40 00 D7 8F 40 00
+.  .  d  .     µ  ˜  ~  .  .  .  .  º  Ü  à  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  +  µ  ‘  y  .  .  .  .  .  B  Ü  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+Ò  y  .  .  ï  L  @  .  6  §  @  .  .  •  @  .  W  d  E  .  ÿ  a  E  .  •  _  E  .  I  K  X  .
+Y  ô  Y  .  ¨  "  ,  v  ∫  "  ,  v  ™  Ã  S  .  0  .  .  .  0  .  .  .  B  L  @  .  f  ¶  @  .
+i  £  @  .  †  £  @  .  .  9  A  .  .  •  @  .  W  d  E  .  Â  _  E  .  Ç  _  E  .  W  a  @  .
+H  J  X  .  .  .  .  .  .  .  .  .  l  q  f  p  à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  ì  é  ô  è  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  Å  :  Ü  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  —  N  .  .  &  L  @  .  «  }  @  .  ◊  è  @  .
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0xD30, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+642E3E 
+4060FC 
+641F7D 
+64204C 
+6453EB 
+65A2E7 
+40C204 
+40C219 
+
+The block is currently used for an object of class: TObjectList<dorm.Filters.TdormCriteriaItem>
+
+The allocation number is: 222982
+
+Current memory dump of 256 bytes starting at pointer address 7E864A20:
+14 1A 64 00 90 C4 F7 7E 01 00 00 00 BC 86 88 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00
+00 00 00 00 6B 97 D4 79 00 00 00 00 61 41 86 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+B3 65 03 00 26 4C 40 00 C7 7D 40 00 D7 8F 40 00 12 C1 66 00 98 F5 66 00 D7 93 67 00 C8 C2 40 00
+A9 7F 40 00 A9 5F 67 00 A9 66 67 00 0C 62 67 00 30 0D 00 00 30 0D 00 00 42 4C 40 00 81 7E 40 00
+4D 99 40 00 95 98 40 00 C7 61 40 00 0A 61 40 00 F9 67 40 00 4A 61 40 00 57 61 40 00 1A EB 86 00
+39 E7 86 00 20 00 00 00 B0 04 02 00 AA 9A 8B 85 88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 55 65 74 7A 80 80 80 80 00 00 00 00 61 DE 85 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 F6 7A 03 00 95 4C 40 00 36 A4 40 00 12 A5 40 00
+.  .  d  .  ê  ƒ  ˜  ~  .  .  .  .  º  Ü  à  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  k  ó  ‘  y  .  .  .  .  a  A  Ü  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+≥  e  .  .  &  L  @  .  «  }  @  .  ◊  è  @  .  .  ¡  f  .  ò  ı  f  .  ◊  ì  g  .  »  ¬  @  .
+©    @  .  ©  _  g  .  ©  f  g  .  .  b  g  .  0  .  .  .  0  .  .  .  B  L  @  .  Å  ~  @  .
+M  ô  @  .  ï  ò  @  .  «  a  @  .  .  a  @  .  ˘  g  @  .  J  a  @  .  W  a  @  .  .  Î  Ü  .
+9  Á  Ü  .     .  .  .  ∞  .  .  .  ™  ö  ã  Ö  à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  U  e  t  z  Ä  Ä  Ä  Ä  .  .  .  .  a  ﬁ  Ö  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ˆ  z  .  .  ï  L  @  .  6  §  @  .  .  •  @  .
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+A memory block has been leaked. The size is: 52
+
+This block was allocated by thread 0xD30, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+406128 
+409A01 
+641CD3 
+6453EB 
+64205F 
+6453EB 
+65A2E7 
+40C204 
+
+The block is currently used for an object of class: TdormCriteriaItem
+
+The allocation number is: 222983
+
+Current memory dump of 256 bytes starting at pointer address 7E878FF0:
+AC FD 63 00 00 00 00 00 8C 80 C7 7E 00 00 00 00 A0 10 40 00 28 3D 8A 00 F5 00 00 00 00 00 00 00
+EB 53 64 00 28 FB 18 00 00 00 00 00 00 00 00 00 00 00 00 00 09 B0 85 79 00 00 00 00 F1 90 87 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 EE 80 03 00 95 4C 40 00 36 A4 40 00 12 A5 40 00
+FD AF 59 00 22 C8 53 00 52 5E 26 00 C2 3F 41 00 D1 3F 41 00 49 10 6B 72 52 5E 26 00 10 39 41 00
+30 0D 00 00 30 0D 00 00 42 4C 40 00 66 A6 40 00 69 A3 40 00 A0 A3 40 00 10 FA 52 00 12 A5 40 00
+B9 B6 59 00 52 5E 26 00 10 39 41 00 2B BD 53 00 22 C8 53 00 28 00 00 00 00 00 00 00 6D 6B 74 F6
+88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 92 94 8B 09 80 80 80 80 80 80 80 80 80 80 80 80 00 00 00 00 31 8D 87 7E
+¨  ˝  c  .  .  .  .  .  å  Ä  «  ~  .  .  .  .  †  .  @  .  (  =  ä  .  ı  .  .  .  .  .  .  .
+Î  S  d  .  (  ˚  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ∞  Ö  y  .  .  .  .  Ò  ê  á  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  Ó  Ä  .  .  ï  L  @  .  6  §  @  .  .  •  @  .
+˝  Ø  Y  .  "  »  S  .  R  ^  &  .  ¬  ?  A  .  —  ?  A  .  I  .  k  r  R  ^  &  .  .  9  A  .
+0  .  .  .  0  .  .  .  B  L  @  .  f  ¶  @  .  i  £  @  .  †  £  @  .  .  ˙  R  .  .  •  @  .
+π  ∂  Y  .  R  ^  &  .  .  9  A  .  +  Ω  S  .  "  »  S  .  (  .  .  .  .  .  .  .  m  k  t  ˆ
+à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  í  î  ã  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  1  ç  á  ~
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+A memory block has been leaked. The size is: 52
+
+This block was allocated by thread 0xD30, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+406128 
+409A01 
+641CD3 
+6453EB 
+64205F 
+6453EB 
+65A2E7 
+40C204 
+
+The block is currently used for an object of class: TdormCriteriaItem
+
+The allocation number is: 217127
+
+Current memory dump of 256 bytes starting at pointer address 7E879230:
+AC FD 63 00 00 00 00 00 8C 80 C7 7E 00 00 00 00 A0 10 40 00 28 3D 8A 00 F4 00 00 00 00 00 00 00
+EB 53 64 00 28 FB 18 00 00 00 00 00 00 00 00 00 00 00 00 00 A9 C4 85 79 00 00 00 00 31 93 87 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 A9 4E 03 00 26 4C 40 00 F3 60 40 00 AE 67 40 00
+66 BC 5B 00 D1 9E 5C 00 AC AA 5B 00 FC AA 5B 00 A9 C4 5B 00 AC AA 5B 00 36 D8 5B 00 21 DA 5B 00
+30 0D 00 00 30 0D 00 00 42 4C 40 00 11 61 40 00 F9 67 40 00 89 52 5C 00 57 61 40 00 F2 12 5D 00
+77 9E 5C 00 57 61 40 00 23 AA 5B 00 0A 6B 5C 00 57 61 40 00 2C 00 00 00 6C B9 5B 00 D3 EE D6 85
+88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 2C 11 29 7A 80 80 80 80 80 80 80 80 00 00 00 00 F1 93 87 7E
+¨  ˝  c  .  .  .  .  .  å  Ä  «  ~  .  .  .  .  †  .  @  .  (  =  ä  .  Ù  .  .  .  .  .  .  .
+Î  S  d  .  (  ˚  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ©  ƒ  Ö  y  .  .  .  .  1  ì  á  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ©  N  .  .  &  L  @  .  Û  `  @  .  Æ  g  @  .
+f  º  [  .  —  û  \  .  ¨  ™  [  .  ¸  ™  [  .  ©  ƒ  [  .  ¨  ™  [  .  6  ÿ  [  .  !  ⁄  [  .
+0  .  .  .  0  .  .  .  B  L  @  .  .  a  @  .  ˘  g  @  .  â  R  \  .  W  a  @  .  Ú  .  ]  .
+w  û  \  .  W  a  @  .  #  ™  [  .  .  k  \  .  W  a  @  .  ,  .  .  .  l  π  [  .  ”  Ó  ÷  Ö
+à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  ,  .  )  z  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  Ò  ì  á  ~
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+A memory block has been leaked. The size is: 68
+
+This block was allocated by thread 0xD30, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+641F62 
+409AC1 
+64204C 
+6453EB 
+65A2E7 
+40C204 
+40C219 
+5BB483 
+
+The block is currently used for an object of class: TdormCriteria
+
+The allocation number is: 217125
+
+Current memory dump of 256 bytes starting at pointer address 7E8807E0:
+98 00 64 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 40 43 86 7E 00 00 00 00 00 00 00 00 30 A4 73 79
+80 80 80 80 80 80 80 80 00 00 00 00 00 DD 87 7E 00 00 00 00 00 00 00 00 A4 4E 41 00 00 00 00 00
+05 67 03 00 26 4C 40 00 F3 60 40 00 AE 67 40 00 62 1F 64 00 C1 9A 40 00 4C 20 64 00 EB 53 64 00
+E7 A2 65 00 04 C2 40 00 19 C2 40 00 83 B4 5B 00 30 0D 00 00 30 0D 00 00 42 4C 40 00 E6 7E 40 00
+F9 81 79 00 BA 7C 79 00 BF 7D 79 00 98 9E 65 00 EB 53 64 00 D9 A7 65 00 EB 53 64 00 1D A5 65 00
+B4 9C 65 00 3C 00 00 00 B0 04 02 00 7F 73 8C 86 98 00 64 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ò  .  d  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  @  C  Ü  ~  .  .  .  .  .  .  .  .  0  §  s  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  ›  á  ~  .  .  .  .  .  .  .  .  §  N  A  .  .  .  .  .
+.  g  .  .  &  L  @  .  Û  `  @  .  Æ  g  @  .  b  .  d  .  ¡  ö  @  .  L     d  .  Î  S  d  .
+Á  ¢  e  .  .  ¬  @  .  .  ¬  @  .  É  ¥  [  .  0  .  .  .  0  .  .  .  B  L  @  .  Ê  ~  @  .
+˘  Å  y  .  ∫  |  y  .  ø  }  y  .  ò  û  e  .  Î  S  d  .  Ÿ  ß  e  .  Î  S  d  .  .  •  e  .
+¥  ú  e  .  <  .  .  .  ∞  .  .  .    s  å  Ü  ò  .  d  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+A memory block has been leaked. The size is: 68
+
+This block was allocated by thread 0xD30, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+641F62 
+409AC1 
+64204C 
+6453EB 
+65A2E7 
+40C204 
+40C219 
+5BB483 
+
+The block is currently used for an object of class: TdormCriteria
+
+The allocation number is: 222981
+
+Current memory dump of 256 bytes starting at pointer address 7E8808B0:
+98 00 64 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 20 4A 86 7E 00 00 00 00 00 00 00 00 80 8C 73 79
+80 80 80 80 80 80 80 80 00 00 00 00 D1 09 88 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+E1 79 03 00 26 4C 40 00 F3 60 40 00 AE 67 40 00 1A C4 57 00 FC 60 40 00 17 BE 57 00 62 BF 57 00
+3C 21 58 00 60 1E 58 00 3E EF 52 00 D6 AE 59 00 30 0D 00 00 30 0D 00 00 42 4C 40 00 11 61 40 00
+F9 67 40 00 75 C6 57 00 57 61 40 00 47 BE 57 00 57 61 40 00 A7 BF 57 00 57 61 40 00 7B 1F 58 00
+94 F0 52 00 44 00 00 00 88 A4 56 00 D6 64 7C 85 88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80
+ò  .  d  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .     J  Ü  ~  .  .  .  .  .  .  .  .  Ä  å  s  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  —  .  à  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+·  y  .  .  &  L  @  .  Û  `  @  .  Æ  g  @  .  .  ƒ  W  .  ¸  `  @  .  .  æ  W  .  b  ø  W  .
+<  !  X  .  `  .  X  .  >  Ô  R  .  ÷  Æ  Y  .  0  .  .  .  0  .  .  .  B  L  @  .  .  a  @  .
+˘  g  @  .  u  ∆  W  .  W  a  @  .  G  æ  W  .  W  a  @  .  ß  ø  W  .  W  a  @  .  {  .  X  .
+î    R  .  D  .  .  .  à  §  V  .  ÷  d  |  Ö  à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0xD30, and the stack trace (return addresses) at the time was:
+404C26 
+407DC7 
+408FD7 
+40902E 
+64C716 
+64C424 
+64B3F6 
+658AE1 
+8750A2 
+874F5D 
+598CBA 
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 28917
+
+Current memory dump of 256 bytes starting at pointer address 7EC78080:
+B0 04 02 00 02 00 00 00 08 00 00 00 4C 00 61 00 70 00 74 00 6F 00 70 00 49 00 44 00 00 00 5C D2
+F8 7C 80 80 80 80 80 80 00 00 00 00 21 84 C7 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+5C 85 00 00 26 4C 40 00 C7 7D 40 00 D7 8F 40 00 12 C1 66 00 98 F5 66 00 D7 93 67 00 C8 C2 40 00
+A9 7F 40 00 A9 5F 67 00 A9 66 67 00 0C 62 67 00 30 0D 00 00 30 0D 00 00 42 4C 40 00 81 7E 40 00
+4D 99 40 00 95 98 40 00 C7 61 40 00 0A 61 40 00 F9 67 40 00 91 DD 86 00 57 61 40 00 36 65 87 00
+55 61 87 00 1C 00 00 00 B0 04 02 00 2E 61 11 86 88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 D1 9E EE 79 80 80 80 80 80 80 80 80 00 00 00 00 B1 80 C7 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 3A 85 00 00 26 4C 40 00 F3 60 40 00 AE 67 40 00
+∞  .  .  .  .  .  .  .  .  .  .  .  L  .  a  .  p  .  t  .  o  .  p  .  I  .  D  .  .  .  \  “
+¯  |  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  !  Ñ  «  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+\  Ö  .  .  &  L  @  .  «  }  @  .  ◊  è  @  .  .  ¡  f  .  ò  ı  f  .  ◊  ì  g  .  »  ¬  @  .
+©    @  .  ©  _  g  .  ©  f  g  .  .  b  g  .  0  .  .  .  0  .  .  .  B  L  @  .  Å  ~  @  .
+M  ô  @  .  ï  ò  @  .  «  a  @  .  .  a  @  .  ˘  g  @  .  ë  ›  Ü  .  W  a  @  .  6  e  á  .
+U  a  á  .  .  .  .  .  ∞  .  .  .  .  a  .  Ü  à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  —  û  Ó  y  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  ±  Ä  «  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  :  Ö  .  .  &  L  @  .  Û  `  @  .  Æ  g  @  .
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+A memory block has been leaked. The size is: 12
+
+This block was allocated by thread 0xD30, and the stack trace (return addresses) at the time was:
+404C95 
+40A436 
+40A512 
+6422C0 
+6423C1 
+6423E3 
+642672 
+641D08 
+6453EB 
+64205F 
+6453EB 
+
+The block is currently used for an object of class: Unknown
+
+The allocation number is: 217128
+
+Current memory dump of 256 bytes starting at pointer address 7EF7B518:
+01 00 00 00 01 00 00 00 30 92 87 7E AB EE E3 78 00 00 00 00 11 C1 F7 7E 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 95 9F 00 00 95 4C 40 00 36 A4 40 00 94 4F 41 00 12 A5 40 00 2A 0B 5B 00
+AA 0A 5B 00 A0 0E 5B 00 7A 65 7A 00 B3 60 7A 00 CD 64 7A 00 5A 64 7A 00 30 0D 00 00 30 0D 00 00
+42 4C 40 00 66 A6 40 00 B6 99 40 00 95 98 40 00 C7 61 40 00 0A 61 40 00 F9 67 40 00 E9 0B 5B 00
+F3 BD 40 00 A5 99 40 00 95 98 40 00 0C 00 00 00 00 00 00 00 3D 54 D6 85 88 E2 8A 00 80 80 80 80
+80 80 80 80 C2 AB 29 7A 00 00 00 00 31 B5 F7 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+98 9F 00 00 95 4C 40 00 36 A4 40 00 94 4F 41 00 12 A5 40 00 2A 0B 5B 00 AA 0A 5B 00 A0 0E 5B 00
+6F 64 7A 00 B5 5F 7A 00 13 6B 7A 00 17 56 7A 00 30 0D 00 00 30 0D 00 00 42 4C 40 00 66 A6 40 00
+.  .  .  .  .  .  .  .  0  í  á  ~  ´  Ó  „  x  .  .  .  .  .  ¡  ˜  ~  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  ï  ü  .  .  ï  L  @  .  6  §  @  .  î  O  A  .  .  •  @  .  *  .  [  .
+™  .  [  .  †  .  [  .  z  e  z  .  ≥  `  z  .  Õ  d  z  .  Z  d  z  .  0  .  .  .  0  .  .  .
+B  L  @  .  f  ¶  @  .  ∂  ô  @  .  ï  ò  @  .  «  a  @  .  .  a  @  .  ˘  g  @  .  È  .  [  .
+Û  Ω  @  .  •  ô  @  .  ï  ò  @  .  .  .  .  .  .  .  .  .  =  T  ÷  Ö  à  ‚  ä  .  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  ¬  ´  )  z  .  .  .  .  1  µ  ˜  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+ò  ü  .  .  ï  L  @  .  6  §  @  .  î  O  A  .  .  •  @  .  *  .  [  .  ™  .  [  .  †  .  [  .
+o  d  z  .  µ  _  z  .  .  k  z  .  .  V  z  .  0  .  .  .  0  .  .  .  B  L  @  .  f  ¶  @  .
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+A memory block has been leaked. The size is: 12
+
+This block was allocated by thread 0xD30, and the stack trace (return addresses) at the time was:
+404C95 
+40A436 
+40A512 
+6422C0 
+6423C1 
+6423E3 
+642672 
+641D08 
+6453EB 
+64205F 
+6453EB 
+
+The block is currently used for an object of class: Unknown
+
+The allocation number is: 222984
+
+Current memory dump of 256 bytes starting at pointer address 7EF7C488:
+01 00 00 00 01 00 00 00 F0 8F 87 7E 5B C8 E3 78 00 00 00 00 21 A8 F7 7E 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 93 8E 00 00 95 4C 40 00 36 A4 40 00 2C D4 5B 00 12 A5 40 00 89 D4 5B 00
+B0 D5 5B 00 47 D6 5B 00 06 B5 5B 00 A5 B5 5B 00 73 34 81 00 D9 30 81 00 30 0D 00 00 30 0D 00 00
+42 4C 40 00 66 A6 40 00 B6 99 40 00 95 98 40 00 C7 61 40 00 0A 61 40 00 F9 67 40 00 E9 AB 5B 00
+F9 67 40 00 57 61 40 00 F2 12 5D 00 0C 00 00 00 00 00 00 00 07 00 E0 85 88 E2 8A 00 80 80 80 80
+80 80 80 80 F8 FF 1F 7A 00 00 00 00 59 6D F7 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+EB 89 00 00 95 4C 40 00 36 A4 40 00 12 A5 40 00 E0 BC 5B 00 AC AA 5B 00 FC AA 5B 00 A9 C4 5B 00
+AC AA 5B 00 36 D8 5B 00 21 DA 5B 00 AF D6 5B 00 30 0D 00 00 30 0D 00 00 42 4C 40 00 66 A6 40 00
+.  .  .  .  .  .  .  .    è  á  ~  [  »  „  x  .  .  .  .  !  ®  ˜  ~  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  ì  é  .  .  ï  L  @  .  6  §  @  .  ,  ‘  [  .  .  •  @  .  â  ‘  [  .
+∞  ’  [  .  G  ÷  [  .  .  µ  [  .  •  µ  [  .  s  4  Å  .  Ÿ  0  Å  .  0  .  .  .  0  .  .  .
+B  L  @  .  f  ¶  @  .  ∂  ô  @  .  ï  ò  @  .  «  a  @  .  .  a  @  .  ˘  g  @  .  È  ´  [  .
+˘  g  @  .  W  a  @  .  Ú  .  ]  .  .  .  .  .  .  .  .  .  .  .  ‡  Ö  à  ‚  ä  .  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  ¯  ˇ  .  z  .  .  .  .  Y  m  ˜  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+Î  â  .  .  ï  L  @  .  6  §  @  .  .  •  @  .  ‡  º  [  .  ¨  ™  [  .  ¸  ™  [  .  ©  ƒ  [  .
+¨  ™  [  .  6  ÿ  [  .  !  ⁄  [  .  Ø  ÷  [  .  0  .  .  .  0  .  .  .  B  L  @  .  f  ¶  @  .
+
+--------------------------------2012/1/31 15:15:43--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+5 - 12 bytes: Unknown x 2
+21 - 36 bytes: TObjectList<dorm.Filters.TdormCriteriaItem> x 2, TObjectList<System.TObject> x 2, UnicodeString x 1
+37 - 52 bytes: TdormCriteriaItem x 2
+53 - 68 bytes: TdormCriteria x 2
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
+
+--------------------------------2012/1/31 15:18:57--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x3A0, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+64678E 
+409995 
+65C12C 
+659347 
+6453EB 
+65A2F9 
+40C204 
+40C219 
+
+The block is currently used for an object of class: TObjectList<System.TObject>
+
+The allocation number is: 221346
+
+Current memory dump of 256 bytes starting at pointer address 7E864340:
+94 4E 64 00 00 00 00 00 00 00 00 00 BC 86 88 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00
+00 00 00 00 FD 2C 66 7A 00 00 00 00 A1 49 86 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+29 5F 03 00 26 4C 40 00 F3 60 40 00 AE 67 40 00 6F C4 5B 00 5B 97 5C 00 AC AA 5B 00 36 D8 5B 00
+21 DA 5B 00 AF D6 5B 00 DA B3 5B 00 14 58 63 00 A0 03 00 00 A0 03 00 00 42 4C 40 00 11 61 40 00
+F9 67 40 00 89 52 5C 00 57 61 40 00 F2 12 5D 00 77 9E 5C 00 57 61 40 00 23 AA 5B 00 0A 6B 5C 00
+57 61 40 00 24 00 00 00 FC C2 5B 00 9A 6F DD 85 88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 65 90 22 7A 00 00 00 00 F1 48 86 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 2B 5F 03 00 95 4C 40 00 36 A4 40 00 12 A5 40 00
+î  N  d  .  .  .  .  .  .  .  .  .  º  Ü  à  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  ˝  ,  f  z  .  .  .  .  °  I  Ü  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+)  _  .  .  &  L  @  .  Û  `  @  .  Æ  g  @  .  o  ƒ  [  .  [  ó  \  .  ¨  ™  [  .  6  ÿ  [  .
+!  ⁄  [  .  Ø  ÷  [  .  ⁄  ≥  [  .  .  X  c  .  †  .  .  .  †  .  .  .  B  L  @  .  .  a  @  .
+˘  g  @  .  â  R  \  .  W  a  @  .  Ú  .  ]  .  w  û  \  .  W  a  @  .  #  ™  [  .  .  k  \  .
+W  a  @  .  $  .  .  .  ¸  ¬  [  .  ö  o  ›  Ö  à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  e  ê  "  z  .  .  .  .  Ò  H  Ü  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  +  _  .  .  ï  L  @  .  6  §  @  .  .  •  @  .
+
+--------------------------------2012/1/31 15:18:57--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x3A0, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+642E3E 
+4060FC 
+641F7D 
+64204C 
+6453EB 
+65A2E7 
+40C204 
+40C219 
+
+The block is currently used for an object of class: TObjectList<dorm.Filters.TdormCriteriaItem>
+
+The allocation number is: 221341
+
+Current memory dump of 256 bytes starting at pointer address 7E864CE0:
+14 1A 64 00 20 B5 F7 7E 01 00 00 00 BC 86 88 00 00 00 00 00 00 00 00 00 01 00 00 00 00 00 00 00
+00 00 00 00 34 AE D4 79 00 00 00 00 51 3F 86 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+9B 7F 03 00 95 4C 40 00 36 A4 40 00 12 A5 40 00 FD AF 59 00 22 C8 53 00 52 5E C7 00 C2 3F 41 00
+D1 3F 41 00 49 10 6B 72 52 5E C7 00 10 39 41 00 A0 03 00 00 A0 03 00 00 42 4C 40 00 66 A6 40 00
+69 A3 40 00 A0 A3 40 00 10 FA 52 00 12 A5 40 00 B9 B6 59 00 52 5E C7 00 10 39 41 00 2B BD 53 00
+22 C8 53 00 18 00 00 00 00 00 00 00 CA 13 56 F8 88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 35 EC A9 07 80 80 80 80 80 80 80 80 80 80 80 80 00 00 00 00 41 E5 85 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 52 5F 03 00 26 4C 40 00 C7 7D 40 00 D7 8F 40 00
+.  .  d  .     µ  ˜  ~  .  .  .  .  º  Ü  à  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  4  Æ  ‘  y  .  .  .  .  Q  ?  Ü  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+õ    .  .  ï  L  @  .  6  §  @  .  .  •  @  .  ˝  Ø  Y  .  "  »  S  .  R  ^  «  .  ¬  ?  A  .
+—  ?  A  .  I  .  k  r  R  ^  «  .  .  9  A  .  †  .  .  .  †  .  .  .  B  L  @  .  f  ¶  @  .
+i  £  @  .  †  £  @  .  .  ˙  R  .  .  •  @  .  π  ∂  Y  .  R  ^  «  .  .  9  A  .  +  Ω  S  .
+"  »  S  .  .  .  .  .  .  .  .  .     .  V  ¯  à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  5  Ï  ©  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  A  Â  Ö  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  R  _  .  .  &  L  @  .  «  }  @  .  ◊  è  @  .
+
+--------------------------------2012/1/31 15:18:57--------------------------------
+A memory block has been leaked. The size is: 52
+
+This block was allocated by thread 0x3A0, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+406128 
+409A01 
+641CD3 
+6453EB 
+64205F 
+6453EB 
+65A2E7 
+40C204 
+
+The block is currently used for an object of class: TdormCriteriaItem
+
+The allocation number is: 221342
+
+Current memory dump of 256 bytes starting at pointer address 7E879230:
+AC FD 63 00 00 00 00 00 8C 80 C7 7E 00 00 00 00 A0 10 40 00 28 3D 8A 00 F9 00 00 00 00 00 00 00
+EB 53 64 00 28 FB 18 00 00 00 00 00 00 00 00 00 00 00 00 00 52 C7 85 79 00 00 00 00 31 93 87 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 2A 5F 03 00 26 4C 40 00 F3 60 40 00 AE 67 40 00
+66 BC 5B 00 D1 9E 5C 00 AC AA 5B 00 FC AA 5B 00 A9 C4 5B 00 AC AA 5B 00 36 D8 5B 00 21 DA 5B 00
+A0 03 00 00 A0 03 00 00 42 4C 40 00 11 61 40 00 F9 67 40 00 89 52 5C 00 57 61 40 00 F2 12 5D 00
+77 9E 5C 00 57 61 40 00 23 AA 5B 00 0A 6B 5C 00 57 61 40 00 2C 00 00 00 6C B9 5B 00 34 EC D6 85
+88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 CB 13 29 7A 80 80 80 80 80 80 80 80 00 00 00 00 F1 93 87 7E
+¨  ˝  c  .  .  .  .  .  å  Ä  «  ~  .  .  .  .  †  .  @  .  (  =  ä  .  ˘  .  .  .  .  .  .  .
+Î  S  d  .  (  ˚  .  .  .  .  .  .  .  .  .  .  .  .  .  .  R  «  Ö  y  .  .  .  .  1  ì  á  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  *  _  .  .  &  L  @  .  Û  `  @  .  Æ  g  @  .
+f  º  [  .  —  û  \  .  ¨  ™  [  .  ¸  ™  [  .  ©  ƒ  [  .  ¨  ™  [  .  6  ÿ  [  .  !  ⁄  [  .
+†  .  .  .  †  .  .  .  B  L  @  .  .  a  @  .  ˘  g  @  .  â  R  \  .  W  a  @  .  Ú  .  ]  .
+w  û  \  .  W  a  @  .  #  ™  [  .  .  k  \  .  W  a  @  .  ,  .  .  .  l  π  [  .  4  Ï  ÷  Ö
+à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  À  .  )  z  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  Ò  ì  á  ~
+
+--------------------------------2012/1/31 15:18:57--------------------------------
+A memory block has been leaked. The size is: 68
+
+This block was allocated by thread 0x3A0, and the stack trace (return addresses) at the time was:
+404C26 
+4060F3 
+4067AE 
+641F62 
+409AC1 
+64204C 
+6453EB 
+65A2E7 
+40C204 
+40C219 
+5BB483 
+
+The block is currently used for an object of class: TdormCriteria
+
+The allocation number is: 221340
+
+Current memory dump of 256 bytes starting at pointer address 7E8807E0:
+98 00 64 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 E0 4C 86 7E 00 00 00 00 00 00 00 00 D9 A6 73 79
+80 80 80 80 80 80 80 80 00 00 00 00 01 09 88 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+19 78 03 00 26 4C 40 00 F3 60 40 00 AE 67 40 00 1A C4 57 00 FC 60 40 00 17 BE 57 00 62 BF 57 00
+3C 21 58 00 60 1E 58 00 3E EF 52 00 D6 AE 59 00 A0 03 00 00 A0 03 00 00 42 4C 40 00 11 61 40 00
+F9 67 40 00 75 C6 57 00 57 61 40 00 47 BE 57 00 57 61 40 00 A7 BF 57 00 57 61 40 00 7B 1F 58 00
+94 F0 52 00 44 00 00 00 88 A4 56 00 1E 4F 7C 85 88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80 80
+ò  .  d  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  ‡  L  Ü  ~  .  .  .  .  .  .  .  .  Ÿ  ¶  s  y
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  .  .  à  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+.  x  .  .  &  L  @  .  Û  `  @  .  Æ  g  @  .  .  ƒ  W  .  ¸  `  @  .  .  æ  W  .  b  ø  W  .
+<  !  X  .  `  .  X  .  >  Ô  R  .  ÷  Æ  Y  .  †  .  .  .  †  .  .  .  B  L  @  .  .  a  @  .
+˘  g  @  .  u  ∆  W  .  W  a  @  .  G  æ  W  .  W  a  @  .  ß  ø  W  .  W  a  @  .  {  .  X  .
+î    R  .  D  .  .  .  à  §  V  .  .  O  |  Ö  à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+
+--------------------------------2012/1/31 15:18:57--------------------------------
+A memory block has been leaked. The size is: 36
+
+This block was allocated by thread 0x3A0, and the stack trace (return addresses) at the time was:
+404C26 
+407DC7 
+408FD7 
+40902E 
+64C716 
+64C424 
+64B3F6 
+658AE1 
+8750A2 
+874F5D 
+598CBA 
+
+The block is currently used for an object of class: UnicodeString
+
+The allocation number is: 28917
+
+Current memory dump of 256 bytes starting at pointer address 7EC78080:
+B0 04 02 00 01 00 00 00 08 00 00 00 4C 00 61 00 70 00 74 00 6F 00 70 00 49 00 44 00 00 00 EC DB
+F8 7C 80 80 80 80 80 80 00 00 00 00 21 84 C7 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+5C 85 00 00 26 4C 40 00 C7 7D 40 00 D7 8F 40 00 12 C1 66 00 98 F5 66 00 D7 93 67 00 C8 C2 40 00
+A9 7F 40 00 A9 5F 67 00 A9 66 67 00 0C 62 67 00 A0 03 00 00 A0 03 00 00 42 4C 40 00 81 7E 40 00
+4D 99 40 00 95 98 40 00 C7 61 40 00 0A 61 40 00 F9 67 40 00 91 DD 86 00 57 61 40 00 36 65 87 00
+55 61 87 00 1C 00 00 00 B0 04 02 00 0E 4E 11 86 88 E2 8A 00 80 80 80 80 80 80 80 80 80 80 80 80
+80 80 80 80 80 80 80 80 80 80 80 80 F1 B1 EE 79 80 80 80 80 80 80 80 80 00 00 00 00 B1 80 C7 7E
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 3A 85 00 00 26 4C 40 00 F3 60 40 00 AE 67 40 00
+∞  .  .  .  .  .  .  .  .  .  .  .  L  .  a  .  p  .  t  .  o  .  p  .  I  .  D  .  .  .  Ï  €
+¯  |  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  !  Ñ  «  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+\  Ö  .  .  &  L  @  .  «  }  @  .  ◊  è  @  .  .  ¡  f  .  ò  ı  f  .  ◊  ì  g  .  »  ¬  @  .
+©    @  .  ©  _  g  .  ©  f  g  .  .  b  g  .  †  .  .  .  †  .  .  .  B  L  @  .  Å  ~  @  .
+M  ô  @  .  ï  ò  @  .  «  a  @  .  .  a  @  .  ˘  g  @  .  ë  ›  Ü  .  W  a  @  .  6  e  á  .
+U  a  á  .  .  .  .  .  ∞  .  .  .  .  N  .  Ü  à  ‚  ä  .  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ò  ±  Ó  y  Ä  Ä  Ä  Ä  Ä  Ä  Ä  Ä  .  .  .  .  ±  Ä  «  ~
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  :  Ö  .  .  &  L  @  .  Û  `  @  .  Æ  g  @  .
+
+--------------------------------2012/1/31 15:18:57--------------------------------
+A memory block has been leaked. The size is: 12
+
+This block was allocated by thread 0x3A0, and the stack trace (return addresses) at the time was:
+404C95 
+40A436 
+40A512 
+6422C0 
+6423C1 
+6423E3 
+642672 
+641D08 
+6453EB 
+64205F 
+6453EB 
+
+The block is currently used for an object of class: Unknown
+
+The allocation number is: 221344
+
+Current memory dump of 256 bytes starting at pointer address 7EF7B518:
+01 00 00 00 01 00 00 00 30 92 87 7E 53 F1 E3 78 00 00 00 00 11 C1 F7 7E 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 95 9F 00 00 95 4C 40 00 36 A4 40 00 94 4F 41 00 12 A5 40 00 2A 0B 5B 00
+AA 0A 5B 00 A0 0E 5B 00 7A 65 7A 00 B3 60 7A 00 CD 64 7A 00 5A 64 7A 00 A0 03 00 00 A0 03 00 00
+42 4C 40 00 66 A6 40 00 B6 99 40 00 95 98 40 00 C7 61 40 00 0A 61 40 00 F9 67 40 00 E9 0B 5B 00
+F3 BD 40 00 A5 99 40 00 95 98 40 00 0C 00 00 00 00 00 00 00 1D 41 D6 85 88 E2 8A 00 80 80 80 80
+80 80 80 80 E2 BE 29 7A 00 00 00 00 31 B5 F7 7E 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+98 9F 00 00 95 4C 40 00 36 A4 40 00 94 4F 41 00 12 A5 40 00 2A 0B 5B 00 AA 0A 5B 00 A0 0E 5B 00
+6F 64 7A 00 B5 5F 7A 00 13 6B 7A 00 17 56 7A 00 A0 03 00 00 A0 03 00 00 42 4C 40 00 66 A6 40 00
+.  .  .  .  .  .  .  .  0  í  á  ~  S  Ò  „  x  .  .  .  .  .  ¡  ˜  ~  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  ï  ü  .  .  ï  L  @  .  6  §  @  .  î  O  A  .  .  •  @  .  *  .  [  .
+™  .  [  .  †  .  [  .  z  e  z  .  ≥  `  z  .  Õ  d  z  .  Z  d  z  .  †  .  .  .  †  .  .  .
+B  L  @  .  f  ¶  @  .  ∂  ô  @  .  ï  ò  @  .  «  a  @  .  .  a  @  .  ˘  g  @  .  È  .  [  .
+Û  Ω  @  .  •  ô  @  .  ï  ò  @  .  .  .  .  .  .  .  .  .  .  A  ÷  Ö  à  ‚  ä  .  Ä  Ä  Ä  Ä
+Ä  Ä  Ä  Ä  ‚  æ  )  z  .  .  .  .  1  µ  ˜  ~  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+ò  ü  .  .  ï  L  @  .  6  §  @  .  î  O  A  .  .  •  @  .  *  .  [  .  ™  .  [  .  †  .  [  .
+o  d  z  .  µ  _  z  .  .  k  z  .  .  V  z  .  †  .  .  .  †  .  .  .  B  L  @  .  f  ¶  @  .
+
+--------------------------------2012/1/31 15:18:57--------------------------------
+This application has leaked memory. The small block leaks are (excluding expected leaks registered by pointer):
+
+5 - 12 bytes: Unknown x 1
+21 - 36 bytes: TObjectList<dorm.Filters.TdormCriteriaItem> x 1, TObjectList<System.TObject> x 1, UnicodeString x 1
+37 - 52 bytes: TdormCriteriaItem x 1
+53 - 68 bytes: TdormCriteria x 1
+
+Note: Memory leak detail is logged to a text file in the same folder as this application. To disable this memory leak check, undefine "EnableMemoryLeakReporting".
