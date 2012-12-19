@@ -78,7 +78,11 @@ uses
   ioutils,
   strutils,
   TimeSpan,
+  {$IF CompilerVersion > 22}
   System.SyncObjs;
+  {$ELSE}
+  SyncObjs;
+  {$IFEND}
 
 var
   FLoggerThread: TdormFileLog.TdormLoggerThread;

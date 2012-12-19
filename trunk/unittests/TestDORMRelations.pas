@@ -108,6 +108,7 @@ begin
     p := Car.Owner;
     Car.Free;
     Car := nil;
+    p.Car:=nil;
     p.Free;
   end;
 end;
