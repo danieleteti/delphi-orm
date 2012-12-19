@@ -787,7 +787,11 @@ begin
     for _attrib in _attributes do
       if _attrib is Entity then
       begin
+        {$IF CompilerVersion > 22}
         Result.Add(_Type.QualifiedClassName);
+        {$ELSE}
+        Result.Add(_Type.QualifiedName);
+        {$IFEND}
         Break;
       end;
   end;
