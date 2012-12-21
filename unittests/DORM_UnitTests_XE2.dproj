@@ -1,7 +1,7 @@
 ﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
 			<ProjectGuid>{6E22397B-AA4C-4AD3-AA92-7D61C3E8FBD4}</ProjectGuid>
-			<ProjectVersion>13.4</ProjectVersion>
+			<ProjectVersion>14.4</ProjectVersion>
 			<Config Condition="'$(Config)'==''">SQLITE3_STRATEGY</Config>
 			<DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
 			<MainSource>DORM_UnitTests_XE2.dpr</MainSource>
@@ -29,6 +29,12 @@
 			<CfgParent>Base</CfgParent>
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
+			<Cfg_1_Win64>true</Cfg_1_Win64>
+			<CfgParent>Cfg_1</CfgParent>
+			<Cfg_1>true</Cfg_1>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
 			<Cfg_1_Win32>true</Cfg_1_Win32>
 			<CfgParent>Cfg_1</CfgParent>
@@ -38,6 +44,12 @@
 		<PropertyGroup Condition="'$(Config)'=='SQLSERVER_STRATEGY' or '$(Cfg_5)'!=''">
 			<Cfg_5>true</Cfg_5>
 			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_5)'=='true') or '$(Cfg_5_Win64)'!=''">
+			<Cfg_5_Win64>true</Cfg_5_Win64>
+			<CfgParent>Cfg_5</CfgParent>
+			<Cfg_5>true</Cfg_5>
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_5)'=='true') or '$(Cfg_5_Win32)'!=''">
@@ -51,6 +63,12 @@
 			<CfgParent>Base</CfgParent>
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_6)'=='true') or '$(Cfg_6_Win64)'!=''">
+			<Cfg_6_Win64>true</Cfg_6_Win64>
+			<CfgParent>Cfg_6</CfgParent>
+			<Cfg_6>true</Cfg_6>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_6)'=='true') or '$(Cfg_6_Win32)'!=''">
 			<Cfg_6_Win32>true</Cfg_6_Win32>
 			<CfgParent>Cfg_6</CfgParent>
@@ -60,6 +78,12 @@
 		<PropertyGroup Condition="'$(Config)'=='FIREBIRD_UIB_STRATEGY' or '$(Cfg_2)'!=''">
 			<Cfg_2>true</Cfg_2>
 			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
+			<Cfg_2_Win64>true</Cfg_2_Win64>
+			<CfgParent>Cfg_2</CfgParent>
+			<Cfg_2>true</Cfg_2>
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
@@ -74,6 +98,13 @@
 			<Cfg_2>true</Cfg_2>
 			<Base>true</Base>
 		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_8)'=='true') or '$(Cfg_8_Win64)'!=''">
+			<Cfg_8_Win64>true</Cfg_8_Win64>
+			<CfgParent>Cfg_8</CfgParent>
+			<Cfg_8>true</Cfg_8>
+			<Cfg_2>true</Cfg_2>
+			<Base>true</Base>
+		</PropertyGroup>
 		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_8)'=='true') or '$(Cfg_8_Win32)'!=''">
 			<Cfg_8_Win32>true</Cfg_8_Win32>
 			<CfgParent>Cfg_8</CfgParent>
@@ -84,6 +115,12 @@
 		<PropertyGroup Condition="'$(Config)'=='INTERBASE_UIB_STRATEGY' or '$(Cfg_7)'!=''">
 			<Cfg_7>true</Cfg_7>
 			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_7)'=='true') or '$(Cfg_7_Win64)'!=''">
+			<Cfg_7_Win64>true</Cfg_7_Win64>
+			<CfgParent>Cfg_7</CfgParent>
+			<Cfg_7>true</Cfg_7>
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_7)'=='true') or '$(Cfg_7_Win32)'!=''">
@@ -127,12 +164,18 @@
 		<PropertyGroup Condition="'$(Cfg_1)'!=''">
 			<DCC_Define>SQLITE3_STRATEGY;$(DCC_Define)</DCC_Define>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
 			<DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
 			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
 			<VerInfo_Locale>1033</VerInfo_Locale>
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_5_Win64)'!=''">
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_5_Win32)'!=''">
@@ -142,10 +185,16 @@
 			<VerInfo_Locale>1033</VerInfo_Locale>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_6_Win64)'!=''">
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_6_Win32)'!=''">
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<DCC_Define>DEBUG;SQLSERVER_DEVART_STRATEGY;$(DCC_Define)</DCC_Define>
 			<VerInfo_Locale>1033</VerInfo_Locale>
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
@@ -160,11 +209,17 @@
 			<VerInfo_Locale>1033</VerInfo_Locale>
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_8_Win64)'!=''">
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_8_Win32)'!=''">
 			<DCC_UnitSearchPath>$(BDS)\Source\DUnit\Contrib\XMLReporting\;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
 			<DCC_Define>CONSOLE_TESTRUNNER;$(DCC_Define)</DCC_Define>
 			<VerInfo_Locale>1033</VerInfo_Locale>
+			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_7_Win64)'!=''">
 			<Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Cfg_7_Win32)'!=''">
@@ -254,6 +309,78 @@
 			<None Include="ModelSupport_DORM_UnitTests_XE2\TestDORMMapping\Merge\default.txvpck"/>
 			<None Include="ModelSupport_DORM_UnitTests_XE2\DORM_UnitTests_XE2\default.txvpck"/>
 			<None Include="ModelSupport_DORM_UnitTests_XE2\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\BaseTestCase\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\FindersTests\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapter\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapter\Base\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapters\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Finders\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\utils\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\utils\Sequences\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\InterposedObject\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\CodeGenerator\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\CodeGenerator\Delphi\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\UOW\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Filters\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\loggers\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\loggers\FileLog\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Commons\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\tests\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\tests\bo\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Collections\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Core\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Core\IdentityMap\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Mappings\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Mappings\Strategies\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORM\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMSearchCriteria\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMSpeed\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMRelations\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\DORM_UnitTests_XE3\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\FileJSON\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\Merge\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\Attributes\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\CoC\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\FrameworkTests\default.txvpck"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\loggers\FileLog\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\Attributes\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\FileJSON\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\CodeGenerator\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORM\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\BaseTestCase\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\FindersTests\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\CoC\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\DORM_UnitTests_XE3\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Commons\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\UOW\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapters\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\tests\bo\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Filters\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMSearchCriteria\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Core\IdentityMap\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\CodeGenerator\Delphi\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Mappings\Strategies\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapter\Base\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMSpeed\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\utils\Sequences\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\tests\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\InterposedObject\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Collections\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Finders\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Mappings\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMRelations\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\FrameworkTests\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\loggers\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Utils\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Core\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\Merge\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\default.txaPackage"/>
+			<None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapter\default.txaPackage"/>
 			<BuildConfiguration Include="SQLSERVER_STRATEGY">
 				<Key>Cfg_5</Key>
 				<CfgParent>Base</CfgParent>

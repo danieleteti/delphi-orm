@@ -15,6 +15,15 @@ type
   end;
 
   TUIBFirebirdTableSequence = class(TUIBBaseTableSequence)
+  protected
+    function GetSequenceFormatTemplate: String; override;
+  public
+    class procedure register;
+  end;
+
+  TUIBFirebirdTableGenerator = class(TUIBBaseTableSequence)
+  protected
+    function GetSequenceFormatTemplate: String; override;
   public
     class procedure register;
   end;
@@ -42,15 +51,33 @@ begin
     Conf.S['password'], Conf.S['database_connection_string']);
 end;
 
+function TUIBFirebirdTableSequence.GetSequenceFormatTemplate: String;
+begin
+  Result := 'SEQ_%s_ID';
+end;
+
 class procedure TUIBFirebirdTableSequence.register;
 begin
-  //
+  // do nothing
+end;
+
+{ TUIBFirebirdTableGenerator }
+
+function TUIBFirebirdTableGenerator.GetSequenceFormatTemplate: String;
+begin
+  Result := 'GEN_%s_ID';
+end;
+
+class procedure TUIBFirebirdTableGenerator.register;
+begin
+  // do nothing
 end;
 
 initialization
 
 TUIBFirebirdPersistStrategy.register;
 TUIBFirebirdTableSequence.register;
+TUIBFirebirdTableGenerator.register;
 
 finalization
 

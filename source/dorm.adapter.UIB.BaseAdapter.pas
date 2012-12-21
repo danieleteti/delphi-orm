@@ -49,7 +49,6 @@ type
     procedure SetUIBParameterValue(AFieldType: string;
       AStatement: TUIBStatement; ParameterIndex: Integer; AValue: TValue);
   public
-
     function GenerateAndFillPrimaryKeyParam(Query: TUIBStatement;
       ParamIndex: Integer; const Entity: string): TValue; overload;
     function FillPrimaryKeyParam(Query: TUIBStatement; ParamIndex: Integer;
@@ -69,7 +68,6 @@ type
       AObject: TObject): Boolean; overload;
     function Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
       const Value: TValue; AObject: TObject): Boolean; overload;
-
     function List(ARttiType: TRttiType; AMappingTable: TMappingTable;
       ACriteria: ICriteria): TObjectList<TObject>;
     procedure LoadList(AList: TObject; ARttiType: TRttiType;
@@ -92,9 +90,11 @@ type
       AMappings: ICacheMappingStrategy): IDataBaseBuilder;
   end;
 
-  TUIBBaseTableSequence = class(TdormInterfacedObject, IdormKeysGenerator)
-  private
+  TUIBBaseTableSequence = class abstract(TdormInterfacedObject,
+    IdormKeysGenerator)
+  protected
     FPersistStrategy: IdormPersistStrategy;
+    function GetSequenceFormatTemplate: String; virtual; abstract;
   public
     function NewStringKey(const Entity: string): string;
     function NewIntegerKey(const Entity: string): UInt64;
@@ -133,15 +133,12 @@ begin
     if not field.IsPK then
       sql_fields_names := sql_fields_names + ',"' + field.FieldName + '" = ?';
   System.Delete(sql_fields_names, 1, 1);
-
   pk_field := AMappingTable.Fields[GetPKMappingIndex(AMappingTable.Fields)
     ].FieldName;
   SQL := Format('UPDATE %S SET %S WHERE %S = ?', [AMappingTable.TableName,
     sql_fields_names, pk_field]);
-
   GetLogger.Debug(AMappingTable.Fields[GetPKMappingIndex(AMappingTable.Fields)
     ].FieldName);
-
   GetLogger.Debug('PREPARING: ' + SQL);
   Query := FB.Prepare(SQL);
   try
@@ -158,7 +155,6 @@ begin
       inc(I);
     end;
     pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-
     v := ARttiType.GetProperty(AMappingTable.Fields[pk_idx].name)
       .GetValue(AObject);
     FillPrimaryKeyParam(Query, I, v);
@@ -192,7 +188,6 @@ begin
       ' doesn''t implements ''IdormKeysGenerator''');
   FKeysGenerator.SetPersistStrategy(self);
   self._Release;
-
   if (SameText(ConfigurationInfo.S['key_type'], 'integer')) then
   begin
     FKeyType := ktInteger;
@@ -246,7 +241,7 @@ begin
   GetLogger.Debug('PREPARING: ' + SQL);
   cmd := FB.Prepare(SQL);
   try
-    FillPrimaryKeyParam(cmd, pk_idx, pk_value);
+    FillPrimaryKeyParam(cmd, 0, pk_value);
     GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
     cmd.Execute;
   finally
@@ -379,14 +374,11 @@ begin
     sql_fields_names := sql_fields_names + ',"' +
       ansistring(field.FieldName) + '"';
   end;
-
   System.Delete(sql_fields_names, 1, 1);
-
   sql_fields_values := '';
   for field in AMappingTable.Fields do
     sql_fields_values := sql_fields_values + ',?';
   System.Delete(sql_fields_values, 1, 1);
-
   SQL := Format('INSERT INTO %s (%S) VALUES (%S)', [AMappingTable.TableName,
     sql_fields_names, sql_fields_values]);
   GetLogger.Debug('PREPARING :' + string(SQL));
@@ -432,8 +424,8 @@ begin
       Result := Value.AsInt64 = FNullKeyValue.AsInt64;
     ktString:
       Result := Value.AsString = FNullKeyValue.AsString;
-    else
-      raise EdormException.Create('Unknown key type');
+  else
+    raise EdormException.Create('Unknown key type');
   end;
 end;
 
@@ -508,7 +500,7 @@ begin
   end;
   GetLogger.Debug('PREPARING: ' + SQL);
   Result := FB.Prepare(SQL);
-  FillPrimaryKeyParam(Result, pk_idx, Value);
+  FillPrimaryKeyParam(Result, 0, Value);
 end;
 
 function TUIBBaseAdapter.Load(ARttiType: TRttiType;
@@ -524,10 +516,11 @@ begin
     Result := not reader.Eof;
     if Result then
       LoadObjectFromDBXReader(AObject, ARttiType, reader, AMappingTable.Fields);
-
     reader.Next;
-    if not reader.Eof then // there is some problem.... here I should have only one record
-      raise EdormException.Create('Singleton select returns more than 1 record');
+    if not reader.Eof then
+      // there is some problem.... here I should have only one record
+      raise EdormException.Create
+        ('Singleton select returns more than 1 record');
   finally
     reader.Free;
   end;
@@ -545,9 +538,7 @@ begin
     SQL := CustomCriteria.GetSQL
   else
     SQL := self.GetSelectSQL(ACriteria, AMappingTable);
-
   GetLogger.Debug('EXECUTING: ' + SQL);
-
   reader := FB.Prepare(SQL);
   reader.Open();
   try
@@ -711,7 +702,6 @@ begin
       except
         on E: Exception do
         begin
-
           raise EdormException.Create(E.Message + sLineBreak +
             '. Probably cannot write ' + ARttiType.ToString + '.' + S);
         end;
@@ -720,7 +710,6 @@ begin
   except
     on E: Exception do
     begin
-
       raise;
     end;
   end;
@@ -751,17 +740,20 @@ begin
   else if CompareText(AFieldType, 'decimal') = 0 then
   begin
     AStatement.Params.AsDouble[ParameterIndex] := AValue.AsExtended;
-    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' + FloatToStr(AValue.AsExtended));
+    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' +
+      FloatToStr(AValue.AsExtended));
   end
   else if CompareText(AFieldType, 'integer') = 0 then
   begin
     AStatement.Params.AsInt64[ParameterIndex] := AValue.AsInt64;
-    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' + inttostr(AValue.AsInt64));
+    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' +
+      inttostr(AValue.AsInt64));
   end
   else if CompareText(AFieldType, 'boolean') = 0 then
   begin
     AStatement.Params.AsBoolean[ParameterIndex] := AValue.AsBoolean;
-    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' + BoolToStr(AValue.AsBoolean, true));
+    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' +
+      BoolToStr(AValue.AsBoolean, true));
   end
   else if CompareText(AFieldType, 'date') = 0 then
   begin
@@ -791,8 +783,8 @@ begin
         str.CopyFrom(sourceStream, 0);
         str.Position := 0;
         AStatement.ParamsSetBlob(ParameterIndex, str);
-        GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = <blob ' + inttostr(str.Size) +
-          ' bytes>');
+        GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = <blob ' +
+          inttostr(str.Size) + ' bytes>');
       finally
         str.Free;
       end;
@@ -802,66 +794,6 @@ begin
     raise EdormException.CreateFmt('Parameter type not supported: [%s]',
       [AFieldType]);
 end;
-
-// procedure TUIBBaseAdapter.SetDBXValue(AFieldType: string;
-// aDBXValue: TDBXWritableValue; AValue: TValue);
-//
-// var
-// str: TBytesStream;
-// sourceStream: TStream;
-// begin
-// if CompareText(AFieldType, 'string') = 0 then
-// begin
-// aDBXValue.AsString := AValue.AsString;
-// end
-// else if CompareText(AFieldType, 'integer') = 0 then
-// begin
-// aDBXValue.AsBcd := IntegerToBcd(AValue.AsInt64);
-// end
-// else if CompareText(AFieldType, 'date') = 0 then
-// begin
-// aDBXValue.AsDate := DateTimeToTimeStamp(AValue.AsExtended).Date;
-// end
-// else if CompareText(AFieldType, 'datetime') = 0 then
-// begin
-// aDBXValue.AsDateTime := FloatToDateTime(AValue.AsExtended);
-// end
-// else if CompareText(AFieldType, 'blob') = 0 then
-// begin
-// sourceStream := TStream(AValue.AsObject);
-// if sourceStream = nil then
-// aDBXValue.SetNull
-// else
-// begin
-// str := TBytesStream.Create;
-// try
-// sourceStream.Position := 0;
-// str.CopyFrom(sourceStream, sourceStream.Size);
-// str.Position := 0;
-// aDBXValue.SetStream(str, true);
-// aDBXValue.ValueType.ValueTypeFlags :=
-// aDBXValue.ValueType.ValueTypeFlags or TDBXValueTypeFlags.ExtendedType;
-// except
-// str.Free;
-// raise;
-// end;
-// end;
-// end
-// else if CompareText(AFieldType, 'decimal') = 0 then
-// begin
-// aDBXValue.AsDouble := AValue.AsExtended;
-// end
-// else if CompareText(AFieldType, 'boolean') = 0 then
-// begin
-// if AValue.AsBoolean then
-// aDBXValue.AsInt16 := 1
-// else
-// aDBXValue.AsInt16 := 0;
-// end
-// else
-// raise Exception.Create('Unsupported type ' + inttostr(ord(AValue.Kind)));
-//
-// end;
 
 procedure TUIBBaseAdapter.SetLogger(ALogger: IdormLogger);
 begin
@@ -873,30 +805,21 @@ begin
   FB.GetConnection; // ensure database connected
   FB.StartTransaction;
 end;
-
 { TFirebirdUIBBaseTableSequence }
 
 function TUIBBaseTableSequence.NewIntegerKey(const Entity: string): UInt64;
+var
+  SequenceName: String;
 begin
-  Result := FPersistStrategy.ExecuteAndGetFirst('SELECT GEN_ID(SEQ_' + Entity +
-    '_ID, 1) FROM RDB$DATABASE');
+  SequenceName := Format(GetSequenceFormatTemplate, [Entity]);
+  Result := FPersistStrategy.ExecuteAndGetFirst('SELECT GEN_ID(' + SequenceName
+    + ',1) FROM RDB$DATABASE');
 end;
 
 function TUIBBaseTableSequence.NewStringKey(const Entity: string): string;
 begin
   raise EdormException.Create('String keys not supported');
 end;
-
-// class procedure TUIBBaseTableSequence.RegisterClass;
-// begin
-// // do nothing
-// end;
-
-// procedure TFirebirdUIBBaseTableSequence.SetFirebirdConnection
-// (const Value: TDBXFactory);
-// begin
-// FFirebirdConnection := Value;
-// end;
 
 procedure TUIBBaseTableSequence.SetPersistStrategy(const PersistentStrategy
   : IdormPersistStrategy);

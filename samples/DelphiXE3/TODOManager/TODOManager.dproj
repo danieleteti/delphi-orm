@@ -1,9 +1,9 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{66BE19E9-CC67-45A4-B6ED-A30692572EE1}</ProjectGuid>
+        <ProjectGuid>{BB7763F4-D51E-45F0-93FD-400A61CA2AD0}</ProjectGuid>
         <ProjectVersion>14.4</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
-        <MainSource>persistencecreator.dpr</MainSource>
+        <MainSource>TODOManager.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -13,13 +13,13 @@
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
-        <Base_Win64>true</Base_Win64>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
-        <Base_Win32>true</Base_Win32>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
@@ -40,31 +40,23 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_UnitSearchPath>..\..\source;..\..\lib\superobject;..\..\lib\uib\source;..\..\lib\sqlitewrap\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
-        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
-        <Manifest_File>None</Manifest_File>
-        <VerInfo_Locale>1040</VerInfo_Locale>
-        <DCC_UsePackage>bindcompfmx;fmx;rtl;dbrtl;IndySystem;DbxClientDriver;bindcomp;inetdb;DBXInterBaseDriver;DataSnapCommon;DataSnapClient;DataSnapServer;DataSnapProviderClient;xmlrtl;DbxCommonDriver;IndyProtocols;DBXMySQLDriver;dbxcds;soaprtl;bindengine;DBXOracleDriver;dsnap;DBXInformixDriver;IndyCore;fmxase;DBXFirebirdDriver;inet;fmxobj;inetdbxpress;DBXSybaseASADriver;fmxdae;dbexpress;DataSnapIndy10ServerTransport;IPIndyImpl;$(DCC_UsePackage)</DCC_UsePackage>
-        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
+        <VCL_Custom_Styles>&quot;Light|VCLSTYLE|$(PUBLIC)\Documents\RAD Studio\10.0\Styles\Light.vsf&quot;</VCL_Custom_Styles>
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
+        <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
+        <DCC_UsePackage>fmx;IndySystem;DBXInterBaseDriver;DataSnapCommon;DataSnapClient;DataSnapServer;DataSnapProviderClient;DbxCommonDriver;dbxcds;DBXOracleDriver;CustomIPTransport;AureliusXE2;dsnap;IndyCore;fmxase;inetdbxpress;IPIndyImpl;bindcompfmx;rtl;dbrtl;DbxClientDriver;bindcomp;inetdb;xmlrtl;ibxpress;IndyProtocols;DBXMySQLDriver;bindengine;soaprtl;DBXInformixDriver;DBXFirebirdDriver;inet;fmxobj;LKSL;DBXSybaseASADriver;fmxdae;dbexpress;DataSnapIndy10ServerTransport;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_DcuOutput>.\$(Platform)\$(Config)</DCC_DcuOutput>
         <DCC_ExeOutput>.\$(Platform)\$(Config)</DCC_ExeOutput>
-        <DCC_E>false</DCC_E>
-        <DCC_N>false</DCC_N>
-        <DCC_S>false</DCC_S>
-        <DCC_F>false</DCC_F>
-        <DCC_K>false</DCC_K>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <DCC_UsePackage>DBXOdbcDriver;DBXSybaseASEDriver;vclimg;vclactnband;vcldb;bindcompvcl;vcldsnap;vclie;vcltouch;DBXDb2Driver;websnap;VclSmp;vcl;DBXMSSQLDriver;dsnapcon;vclx;webdsnap;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
-        <DCC_UsePackage>vcldbx;frx16;TeeDB;Rave100VCL;vclib;Tee;inetdbbde;DBXOdbcDriver;DBXSybaseASEDriver;ibxpress;vclimg;frxDB16;intrawebdb_120_160;fmi;fs16;vclactnband;FMXTee;TeeUI;vcldb;bindcompvcl;vcldsnap;vclie;vcltouch;Intraweb_120_160;DBXDb2Driver;websnap;vclribbon;frxe16;VclSmp;fsDB16;vcl;DataSnapConnectors;CloudService;DBXMSSQLDriver;CodeSiteExpressPkg;FmxTeeUI;dsnapcon;vclx;webdsnap;bdertl;adortl;$(DCC_UsePackage)</DCC_UsePackage>
+        <DCC_UsePackage>JvGlobus;JvMM;JvDlgs;JvCrypt;TeeDB;Rave100VCL;vclib;inetdbbde;DBXSybaseASEDriver;vclimg;DataBindingsVCL160;fmi;vcldb;vcldsnap;dac160;unidacvcl160;DBXDb2Driver;Intraweb_120_160;dwsLibRuntime;JvCore;vclribbon;frxe16;vcl;CloudService;DBXMSSQLDriver;CodeSiteExpressPkg;unidac160;FmxTeeUI;JvAppFrm;JvRuntimeDesign;webdsnap;JclDeveloperTools;adortl;JvWizards;SimpleGraphPackage;NewAC;OpenWirePkgD16;vcldbx;frx16;DotNet4Delphi_XE2;crcontrols160;JclContainers;Tee;DataBindings;DBXOdbcDriver;JvCmp;JvSystem;svnui;adgrmxe2;JvControls;frxDB16;intrawebdb_120_160;fs16;vclactnband;FMXTee;TeeUI;bindcompvcl;JvStdCtrls;JvCustom;Jcl;vclie;vcltouch;dacvcl160;websnap;VclSmp;fsDB16;DataSnapConnectors;RlxPackage;dsnapcon;JclVcl;JvPascalInterpreter;vclx;Lua4Delphi;svn;bdertl;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_UsePackage>vclib;DBXSybaseASEDriver;vclimg;vcldb;vcldsnap;DBXDb2Driver;vcl;DBXMSSQLDriver;webdsnap;adortl;DBXOdbcDriver;adgrmxe2;vclactnband;bindcompvcl;vclie;vcltouch;websnap;VclSmp;DataSnapConnectors;dsnapcon;vclx;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
@@ -74,13 +66,9 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
-        <DCC_DebugDCUs>true</DCC_DebugDCUs>
-        <DCC_MapFile>3</DCC_MapFile>
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <DCC_ExeOutput>..\..\bin</DCC_ExeOutput>
+        <DCC_UnitSearchPath>..\..\..\source;..\..\..\lib\superobject;..\..\..\lib\uib\source;..\..\..\lib\sqlitewrap\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Locale>1033</VerInfo_Locale>
-        <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -93,15 +81,46 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="PersistenceCreatorView.pas">
-            <Form>frmPersistenceCreatorView</Form>
+        <DCCReference Include="EditTodoForm.pas">
+            <Form>frmEditTodo</Form>
             <FormType>dfm</FormType>
         </DCCReference>
-        <DCCReference Include="lib\dorm.PersistenceCreator.PersistenceJsonFile.pas"/>
-        <DCCReference Include="lib\dorm.PersistenceCreator.Presenter.pas"/>
-        <DCCReference Include="lib\dorm.PersistenceCreator.pas"/>
-        <DCCReference Include="lib\dorm.PersistenceCreator.Intf.pas"/>
-        <None Include="..\..\source\dorm.INC"/>
+        <DCCReference Include="bo.pas"/>
+        <DCCReference Include="MainForm.pas">
+            <Form>frmMain</Form>
+            <FormType>dfm</FormType>
+        </DCCReference>
+        <DCCReference Include="DORMModule.pas">
+            <Form>MainDORM</Form>
+            <FormType>dfm</FormType>
+            <DesignClass>TDataModule</DesignClass>
+        </DCCReference>
+        <DCCReference Include="PresentationLogicU.pas"/>
+        <None Include="ModelSupport_TODOManager\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\Unit1\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\Unit1\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\SimpleApp2\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\SimpleApp2\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\SimpleApp1\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\SimpleApp1\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\SimpleApp\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\SimpleApp\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\MainForm\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\MainForm\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\EditTodoForm\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\EditTodoForm\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\DORMModule\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\DORMModule\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\dorm\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\dorm\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\dorm\Mappings\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\dorm\Mappings\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\dorm\Mappings\Strategies\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\dorm\Mappings\Strategies\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\bo\default.txaPackage"/>
+        <None Include="ModelSupport_TODOManager\bo\default.txvpck"/>
+        <None Include="ModelSupport_TODOManager\TODOManager\default.txaPackage"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -119,9 +138,6 @@
         <Borland.ProjectType/>
         <BorlandProject>
             <Delphi.Personality>
-                <Source>
-                    <Source Name="MainSource">persistencecreator.dpr</Source>
-                </Source>
                 <VersionInfo>
                     <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
                     <VersionInfo Name="AutoIncBuild">False</VersionInfo>
@@ -150,18 +166,21 @@
                     <VersionInfoKeys Name="Comments"/>
                 </VersionInfoKeys>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k160.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp160.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k170.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp170.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k170.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp170.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
+                <Source>
+                    <Source Name="MainSource">TODOManager.dpr</Source>
+                </Source>
             </Delphi.Personality>
             <Deployment/>
             <Platforms>
                 <Platform value="Win32">True</Platform>
                 <Platform value="Win64">False</Platform>
             </Platforms>
-            <ModelSupport>False</ModelSupport>
+            <ModelSupport>True</ModelSupport>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>

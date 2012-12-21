@@ -54,6 +54,16 @@ type
     constructor Create; virtual;
   end;
 
+  TdormBaseObject = class(TObject)
+  strict protected
+    FObjStatus: TdormObjectStatus;
+    procedure SetObjStatus(const Value: TdormObjectStatus);
+  public
+    function ObjStatusAsString: String;
+    [Transient]
+    property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
+  end;
+
   IdormLogger = interface
     ['{3501FE53-3781-4F6F-BE6C-80A2309D8D94}']
     procedure EnterLevel(const Value: string);
@@ -334,6 +344,27 @@ end;
 function WrapAsList(const AObject: TObject): IWrappedList;
 begin
   Result := TDuckTypedList.Create(AObject);
+end;
+
+{ TdormBaseObject }
+
+function TdormBaseObject.ObjStatusAsString: String;
+begin
+  case FObjStatus of
+    osDirty:
+      Result := 'dirty';
+    osClean:
+      Result := 'clean';
+    osUnknown:
+      Result := 'unknown';
+    osDeleted:
+      Result := 'deleted';
+  end;
+end;
+
+procedure TdormBaseObject.SetObjStatus(const Value: TdormObjectStatus);
+begin
+  FObjStatus := Value;
 end;
 
 end.

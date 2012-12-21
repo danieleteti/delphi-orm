@@ -1,0 +1,479 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{6E22397B-AA4C-4AD3-AA92-7D61C3E8FBD4}</ProjectGuid>
+        <ProjectVersion>14.4</ProjectVersion>
+        <Config Condition="'$(Config)'==''">SQLITE3_STRATEGY</Config>
+        <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
+        <MainSource>DORM_UnitTests_XE3.dpr</MainSource>
+        <Base>True</Base>
+        <AppType>Application</AppType>
+        <FrameworkType>VCL</FrameworkType>
+        <Platform Condition="'$(Platform)'==''">Win32</Platform>
+        <TargetedPlatforms>3</TargetedPlatforms>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='SQLITE3_STRATEGY' or '$(Cfg_1)'!=''">
+        <Cfg_1>true</Cfg_1>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+        <Cfg_1_Win32>true</Cfg_1_Win32>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win64)'!=''">
+        <Cfg_1_Win64>true</Cfg_1_Win64>
+        <CfgParent>Cfg_1</CfgParent>
+        <Cfg_1>true</Cfg_1>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='SQLSERVER_STRATEGY' or '$(Cfg_5)'!=''">
+        <Cfg_5>true</Cfg_5>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_5)'=='true') or '$(Cfg_5_Win32)'!=''">
+        <Cfg_5_Win32>true</Cfg_5_Win32>
+        <CfgParent>Cfg_5</CfgParent>
+        <Cfg_5>true</Cfg_5>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_5)'=='true') or '$(Cfg_5_Win64)'!=''">
+        <Cfg_5_Win64>true</Cfg_5_Win64>
+        <CfgParent>Cfg_5</CfgParent>
+        <Cfg_5>true</Cfg_5>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='SQLSERVER_DEVART_STRATEGY' or '$(Cfg_6)'!=''">
+        <Cfg_6>true</Cfg_6>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_6)'=='true') or '$(Cfg_6_Win32)'!=''">
+        <Cfg_6_Win32>true</Cfg_6_Win32>
+        <CfgParent>Cfg_6</CfgParent>
+        <Cfg_6>true</Cfg_6>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_6)'=='true') or '$(Cfg_6_Win64)'!=''">
+        <Cfg_6_Win64>true</Cfg_6_Win64>
+        <CfgParent>Cfg_6</CfgParent>
+        <Cfg_6>true</Cfg_6>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='FIREBIRD_UIB_STRATEGY' or '$(Cfg_2)'!=''">
+        <Cfg_2>true</Cfg_2>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+        <Cfg_2_Win32>true</Cfg_2_Win32>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win64)'!=''">
+        <Cfg_2_Win64>true</Cfg_2_Win64>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='CI' or '$(Cfg_8)'!=''">
+        <Cfg_8>true</Cfg_8>
+        <CfgParent>Cfg_2</CfgParent>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_8)'=='true') or '$(Cfg_8_Win32)'!=''">
+        <Cfg_8_Win32>true</Cfg_8_Win32>
+        <CfgParent>Cfg_8</CfgParent>
+        <Cfg_8>true</Cfg_8>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_8)'=='true') or '$(Cfg_8_Win64)'!=''">
+        <Cfg_8_Win64>true</Cfg_8_Win64>
+        <CfgParent>Cfg_8</CfgParent>
+        <Cfg_8>true</Cfg_8>
+        <Cfg_2>true</Cfg_2>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='INTERBASE_UIB_STRATEGY' or '$(Cfg_7)'!=''">
+        <Cfg_7>true</Cfg_7>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_7)'=='true') or '$(Cfg_7_Win32)'!=''">
+        <Cfg_7_Win32>true</Cfg_7_Win32>
+        <CfgParent>Cfg_7</CfgParent>
+        <Cfg_7>true</Cfg_7>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_7)'=='true') or '$(Cfg_7_Win64)'!=''">
+        <Cfg_7_Win64>true</Cfg_7_Win64>
+        <CfgParent>Cfg_7</CfgParent>
+        <Cfg_7>true</Cfg_7>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base)'!=''">
+        <Manifest_File>None</Manifest_File>
+        <VerInfo_Locale>1040</VerInfo_Locale>
+        <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_DebugDCUs>true</DCC_DebugDCUs>
+        <DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\lib\fastmm;..\lib\superobject;..\lib\sqlitewrap\source;..\lib\uib\source;..\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_DependencyCheckOutputName>DORM_UnitTests.exe</DCC_DependencyCheckOutputName>
+        <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_Optimize>false</DCC_Optimize>
+        <DCC_Platform>x86</DCC_Platform>
+        <DCC_Define>_CONSOLE_TESTRUNNER;$(DCC_Define)</DCC_Define>
+        <DCC_K>false</DCC_K>
+        <DCC_N>false</DCC_N>
+        <DCC_S>false</DCC_S>
+        <DCC_F>false</DCC_F>
+        <DCC_MapFile>3</DCC_MapFile>
+        <DCC_DcuOutput>.\dcu</DCC_DcuOutput>
+        <DCC_E>false</DCC_E>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;$(DCC_Namespace)</DCC_Namespace>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1)'!=''">
+        <DCC_Define>SQLITE3_STRATEGY;$(DCC_Define)</DCC_Define>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_Define>DEBUG;$(DCC_Define)</DCC_Define>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_5_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_Define>DEBUG;SQLSERVER_STRATEGY;$(DCC_Define)</DCC_Define>
+        <DCC_DebugDCUs>false</DCC_DebugDCUs>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_5_Win64)'!=''">
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_6_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_Define>DEBUG;SQLSERVER_DEVART_STRATEGY;$(DCC_Define)</DCC_Define>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_6_Win64)'!=''">
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+        <DCC_DebugDCUs>false</DCC_DebugDCUs>
+        <ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
+        <BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
+        <BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
+        <DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+        <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_Define>FIREBIRD_UIB_STRATEGY;$(DCC_Define)</DCC_Define>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_8_Win32)'!=''">
+        <DCC_UnitSearchPath>$(BDS)\Source\DUnit\Contrib\XMLReporting\;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_Define>CONSOLE_TESTRUNNER;$(DCC_Define)</DCC_Define>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_8_Win64)'!=''">
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_7_Win32)'!=''">
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_Define>INTERBASE_UIB_STRATEGY;$(DCC_Define)</DCC_Define>
+        <VerInfo_Locale>1033</VerInfo_Locale>
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_7_Win64)'!=''">
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <ItemGroup>
+        <DelphiCompile Include="$(MainSource)">
+            <MainSource>MainSource</MainSource>
+        </DelphiCompile>
+        <DCCReference Include="TestDORM.pas"/>
+        <DCCReference Include="TestDORMSearchCriteria.pas"/>
+        <DCCReference Include="TestDORMSpeed.pas"/>
+        <DCCReference Include="TestDORMRelations.pas"/>
+        <DCCReference Include="..\source\dorm.Collections.pas"/>
+        <DCCReference Include="..\source\dorm.Commons.pas"/>
+        <DCCReference Include="..\source\dorm.Core.IdentityMap.pas"/>
+        <DCCReference Include="..\source\dorm.InterposedObject.pas"/>
+        <DCCReference Include="..\source\dorm.pas"/>
+        <DCCReference Include="..\source\dorm.UOW.pas"/>
+        <DCCReference Include="..\source\dorm.Utils.pas"/>
+        <DCCReference Include="..\source\dorm.utils.Sequences.pas"/>
+        <DCCReference Include="dorm.tests.bo.pas"/>
+        <DCCReference Include="BaseTestCase.pas"/>
+        <DCCReference Include="FindersTests.pas"/>
+        <DCCReference Include="FrameworkTests.pas"/>
+        <DCCReference Include="..\source\dorm.Finders.pas"/>
+        <DCCReference Include="..\source\dorm.Filters.pas"/>
+        <DCCReference Include="..\source\dorm.Mappings.pas"/>
+        <DCCReference Include="..\source\dorm.Mappings.Strategies.pas"/>
+        <DCCReference Include="..\tools\mappingcreator\lib\dorm.CodeGenerator.pas"/>
+        <DCCReference Include="..\tools\mappingcreator\lib\dorm.CodeGenerator.Delphi.pas"/>
+        <DCCReference Include="..\source\dorm.loggers.pas"/>
+        <DCCReference Include="..\source\dorm.loggers.FileLog.pas"/>
+        <DCCReference Include="..\source\dorm.adapters.pas"/>
+        <DCCReference Include="TestDORMMapping.Merge.pas"/>
+        <DCCReference Include="TestDORMMapping.Attributes.pas"/>
+        <DCCReference Include="TestDORMMapping.CoC.pas"/>
+        <DCCReference Include="TestDORMMapping.FileJSON.pas"/>
+        <DCCReference Include="..\source\dorm.adapter.Base.pas"/>
+        <DCCReference Include="..\source\dorm.adapter.UIB.BaseAdapter.pas"/>
+        <None Include="ModelSupport_DORM_UnitTests\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests\dorm\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests\DORM_UnitTests\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests\dorm\Metadata\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests\dorm\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests\dorm\Metadata\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests\dorm\Mappings\default.txvpck"/>
+        <None Include="..\source\dorm.INC"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\BaseTestCase\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\TestDORMSearchCriteria\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\TestDORMSpeed\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\FrameworkTests\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\Commons\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\InterposedObject\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\Filters\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\utils\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\utils\Sequences\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\Finders\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\Collections\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\adapters\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\CodeGenerator\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\CodeGenerator\Delphi\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\UOW\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\Core\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\Core\IdentityMap\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\loggers\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\loggers\FileLog\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\adapter\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\adapter\Base\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\tests\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\tests\bo\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\Mappings\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\dorm\Mappings\Strategies\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\TestToolsCore\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\FindersTests\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\TestDORM\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\TestDORMRelations\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\TestDORMMapping\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\TestDORMMapping\CoC\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\TestDORMMapping\Attributes\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\TestDORMMapping\FileJSON\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\TestDORMMapping\Merge\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\DORM_UnitTests_XE2\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE2\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\BaseTestCase\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\FindersTests\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapter\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapter\Base\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapters\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Finders\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\utils\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\utils\Sequences\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\InterposedObject\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\CodeGenerator\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\CodeGenerator\Delphi\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\UOW\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Filters\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\loggers\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\loggers\FileLog\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Commons\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\tests\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\tests\bo\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Collections\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Core\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Core\IdentityMap\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Mappings\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Mappings\Strategies\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORM\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMSearchCriteria\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMSpeed\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMRelations\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\FileJSON\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\Merge\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\Attributes\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\CoC\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\FrameworkTests\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\loggers\FileLog\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\Attributes\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\FileJSON\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\CodeGenerator\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORM\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\BaseTestCase\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\FindersTests\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\CoC\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Commons\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\UOW\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapters\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\tests\bo\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Filters\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMSearchCriteria\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Core\IdentityMap\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\CodeGenerator\Delphi\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Mappings\Strategies\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapter\Base\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMSpeed\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\utils\Sequences\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\tests\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\InterposedObject\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Collections\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Finders\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Mappings\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMRelations\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\FrameworkTests\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\loggers\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Utils\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\Core\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\TestDORMMapping\Merge\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapter\default.txaPackage"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\DORM_UnitTests_XE2\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\DORM_UnitTests_XE3\default.txvpck"/>
+        <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapter\UIB\Firebird\default.txvpck"/>
+        <BuildConfiguration Include="SQLSERVER_STRATEGY">
+            <Key>Cfg_5</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="SQLSERVER_DEVART_STRATEGY">
+            <Key>Cfg_6</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="INTERBASE_UIB_STRATEGY">
+            <Key>Cfg_7</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="FIREBIRD_UIB_STRATEGY">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="CI">
+            <Key>Cfg_8</Key>
+            <CfgParent>Cfg_2</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="SQLITE3_STRATEGY">
+            <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+    </ItemGroup>
+    <Import Condition="Exists('$(BDS)\Bin\CodeGear.Delphi.Targets')" Project="$(BDS)\Bin\CodeGear.Delphi.Targets"/>
+    <Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+    <ProjectExtensions>
+        <Borland.Personality>Delphi.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Delphi.Personality>
+                <Parameters/>
+                <VersionInfo>
+                    <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+                    <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+                    <VersionInfo Name="MajorVer">1</VersionInfo>
+                    <VersionInfo Name="MinorVer">0</VersionInfo>
+                    <VersionInfo Name="Release">0</VersionInfo>
+                    <VersionInfo Name="Build">0</VersionInfo>
+                    <VersionInfo Name="Debug">False</VersionInfo>
+                    <VersionInfo Name="PreRelease">False</VersionInfo>
+                    <VersionInfo Name="Special">False</VersionInfo>
+                    <VersionInfo Name="Private">False</VersionInfo>
+                    <VersionInfo Name="DLL">False</VersionInfo>
+                    <VersionInfo Name="Locale">1040</VersionInfo>
+                    <VersionInfo Name="CodePage">1252</VersionInfo>
+                </VersionInfo>
+                <VersionInfoKeys>
+                    <VersionInfoKeys Name="CompanyName"/>
+                    <VersionInfoKeys Name="FileDescription"/>
+                    <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="InternalName"/>
+                    <VersionInfoKeys Name="LegalCopyright"/>
+                    <VersionInfoKeys Name="LegalTrademarks"/>
+                    <VersionInfoKeys Name="OriginalFilename"/>
+                    <VersionInfoKeys Name="ProductName"/>
+                    <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+                    <VersionInfoKeys Name="Comments"/>
+                </VersionInfoKeys>
+                <Source>
+                    <Source Name="MainSource">DORM_UnitTests_XE3.dpr</Source>
+                </Source>
+                <Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclFMXtee9160.bpl">TeeChart Standard FMX Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcltee9160.bpl">TeeChart Standard VCL Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\windows\system32\OpenWireDsnD16.bpl">OpenWire Project (Design Time)</Excluded_Packages>
+                    <Excluded_Packages Name="D:\DXE2lib\tmssoftware\aureliusxe2\source\aureliusxe2.bpl">TMS Aurelius - Core Package</Excluded_Packages>
+                    <Excluded_Packages Name="C:\windows\system32\OpenWireBindingDsnD16.bpl">(untitled)</Excluded_Packages>
+                    <Excluded_Packages Name="C:\windows\system32\OpenWireEditorDsnD16.bpl">(untitled)</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k160.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp160.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                </Excluded_Packages>
+            </Delphi.Personality>
+            <UnitTesting>
+                <TestFramework>DUnit / Delphi Win32</TestFramework>
+                <TestRunner>GUI</TestRunner>
+                <TestProjectName/>
+                <SourceProjectName/>
+            </UnitTesting>
+            <Platforms>
+                <Platform value="Win32">True</Platform>
+                <Platform value="Win64">True</Platform>
+            </Platforms>
+            <ModelSupport>True</ModelSupport>
+        </BorlandProject>
+        <ProjectFileVersion>12</ProjectFileVersion>
+    </ProjectExtensions>
+</Project>
