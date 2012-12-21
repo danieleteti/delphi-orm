@@ -13,7 +13,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   ******************************************************************************** }
-
 unit dorm;
 
 interface
@@ -58,11 +57,11 @@ type
     procedure ReadIDConfig(const AJsonPersistenceConfig: ISuperObject);
     /// this method load an object using a value and a specific mapping field. is used to load the
     // relations between objects
-    function LoadByMappingField(ATypeInfo: PTypeInfo; AMappingField: TMappingField;
-      const Value: TValue)
-      : TObject; overload;
-    function LoadByMappingField(ATypeInfo: PTypeInfo; AMappingField: TMappingField;
-      const Value: TValue; AObject: TObject): boolean; overload;
+    function LoadByMappingField(ATypeInfo: PTypeInfo;
+      AMappingField: TMappingField; const Value: TValue): TObject; overload;
+    function LoadByMappingField(ATypeInfo: PTypeInfo;
+      AMappingField: TMappingField; const Value: TValue; AObject: TObject)
+      : boolean; overload;
   strict protected
     CurrentObjectStatus: TdormObjectStatus;
   protected
@@ -106,26 +105,26 @@ type
       ARttiType: TRttiType; AClassName, APropertyName: string;
       var AObject: TObject);
     function Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject; overload;
-
     // Internal use
-    function Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject): boolean; overload;
+    function Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject)
+      : boolean; overload;
     procedure SetLazyLoadFor(ATypeInfo: PTypeInfo; const APropertyName: string;
       const Value: boolean);
-
     // function FindOne(AItemClassInfo: PTypeInfo; Criteria: ICriteria;
     // FillOptions: TdormFillOptions = []; FreeCriteria: Boolean = true)
     // : TObject; overload; deprecated;
     function IsNullKey(ATableMap: TMappingTable; const AValue: TValue): boolean;
-
     ///
-    procedure AddAsLoadedObject(AObject: TObject; AMappingField: TMappingField); overload;
-    procedure AddAsLoadedObject(ACollection: IWrappedList; AMappingField: TMappingField); overload;
+    procedure AddAsLoadedObject(AObject: TObject;
+      AMappingField: TMappingField); overload;
+    procedure AddAsLoadedObject(ACollection: IWrappedList;
+      AMappingField: TMappingField); overload;
     function IsAlreadyLoaded(ATypeInfo: PTypeInfo; AValue: TValue;
       out AOutObject: TObject): boolean;
-    function GetLoadedObjectHashCode(AObject: TObject; AMappingField: TMappingField)
+    function GetLoadedObjectHashCode(AObject: TObject;
+      AMappingField: TMappingField): String; overload;
+    function GetLoadedObjectHashCode(ATypeInfo: PTypeInfo; AValue: TValue)
       : String; overload;
-    function GetLoadedObjectHashCode(ATypeInfo: PTypeInfo;
-      AValue: TValue): String; overload;
     procedure InternalUpdate(AObject: TObject; AOnlyChild: boolean = false);
     function InternalInsert(AObject: TObject): TValue;
     procedure InternalDelete(AObject: TObject);
@@ -148,18 +147,24 @@ type
       AOwnPersistenceConfigurationReader: boolean = true;
       AOwnMappingConfigurationReader: boolean = true);
     class function CreateConfigured(APersistenceConfiguration: TTextReader;
-      AMappingConfiguration: TTextReader; AEnvironment: TdormEnvironment): TSession;
+      AMappingConfiguration: TTextReader; AEnvironment: TdormEnvironment)
+      : TSession; overload;
+    class function CreateConfigured(APersistenceConfiguration: TTextReader;
+      AEnvironment: TdormEnvironment): TSession; overload;
     // Persistence
     procedure Persist(AObject: TObject);
     procedure HandleDirtyPersist(AIdValue: TValue; AObject: TObject);
     function Insert(AObject: TObject): TValue; overload;
-    function Save(AObject: TObject): TValue; overload; deprecated 'Use Insert instead';
+    function Save(AObject: TObject): TValue; overload;
+      deprecated 'Use Insert instead';
     function InsertAndFree(AObject: TObject): TValue;
     procedure Update(AObject: TObject);
     procedure UpdateAndFree(AObject: TObject);
     procedure Save(dormUOW: TdormUOW); overload;
     procedure Delete(AObject: TObject);
     procedure DeleteAndFree(AObject: TObject);
+    procedure PersistCollection(ACollection: TObject); overload;
+    procedure PersistCollection(ACollection: IWrappedList); overload;
     procedure InsertCollection(ACollection: TObject);
     procedure UpdateCollection(ACollection: TObject);
     procedure DeleteCollection(ACollection: TObject);
@@ -171,24 +176,26 @@ type
     function IsClean(AObject: TObject): boolean;
     function IsUnknown(AObject: TObject): boolean;
     procedure LoadRelations(AObject: TObject;
-      ARelationsSet: TdormRelations = [drBelongsTo, drHasMany, drHasOne]); overload;
+      ARelationsSet: TdormRelations = [drBelongsTo, drHasMany, drHasOne]
+      ); overload;
     procedure LoadRelationsForEachElement(AList: TObject;
-      ARelationsSet: TdormRelations = [drBelongsTo, drHasMany, drHasOne]); overload;
-
+      ARelationsSet: TdormRelations = [drBelongsTo, drHasMany, drHasOne]
+      ); overload;
     { Load 0 or 1 object by OID (first parameter). The Session will create and returned object of type <T> }
     function Load<T: class>(const Value: TValue): T; overload;
     { Load 0 or 1 object by OID (first parameter). The Session doesn't create the object, just fill the instance passed on second parameter. This function return true if the OID was found in database. }
-    function Load<T: class>(const Value: TValue; AObject: TObject): boolean; overload;
+    function Load<T: class>(const Value: TValue; AObject: TObject)
+      : boolean; overload;
     { Load 0 or 1 object by Criteria. The Session will create and returned object of type <T> }
     function Load<T: class>(ACriteria: ICriteria): T; overload;
-
     { Load all the objects that satisfy the Criteria. The Session will fill the list (ducktype) passed on 2nd parameter with objects of type <T> }
     procedure LoadList<T: class>(Criteria: ICriteria; AObject: TObject;
       FillOptions: TdormFillOptions = []); overload;
     { Load all the objects that satisfy the Criteria. The Session will create and return a TObjectList with objects of type <T> }
-    function LoadList<T: class>(Criteria: ICriteria = nil; FillOptions: TdormFillOptions = []):
-{$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}; overload;
-
+    function LoadList<T: class>(Criteria: ICriteria = nil;
+      FillOptions: TdormFillOptions = []):
+{$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
+      overload;
     procedure EnableLazyLoad(AClass: TClass; const APropertyName: string);
     procedure DisableLazyLoad(AClass: TClass; const APropertyName: string);
     function Count(AClassType: TClass): Int64;
@@ -197,18 +204,17 @@ type
     // Find and List
     // function FindOne<T: class>(Criteria: TdormCriteria;
     // FillOptions: TdormFillOptions = []; FreeCriteria: Boolean = true): T; overload; deprecated;
-
     procedure FillList<T: class>(ACollection: TObject;
-      ACriteria: ICriteria = nil; FillOptions: TdormFillOptions = []); overload;
-
+      ACriteria: ICriteria = nil;
+      FillOptions: TdormFillOptions = [CallAfterLoadEvent]); overload;
     function ListAll<T: class>(FillOptions: TdormFillOptions = []):
-{$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}; deprecated;
-
+{$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
+      deprecated;
     // transaction
     procedure StartTransaction;
-    procedure Commit;
+    procedure Commit(RestartAfterCommit: boolean = false);
     procedure Rollback;
-
+    function IsInTransaction: boolean;
     // expose mapping
     function GetMapping: ICacheMappingStrategy;
     function GetEntitiesNames: TList<String>;
@@ -219,15 +225,16 @@ implementation
 uses
   SysUtils,
   dorm.Utils;
-
 { TSession }
 
-procedure TSession.AddAsLoadedObject(AObject: TObject; AMappingField: TMappingField);
+procedure TSession.AddAsLoadedObject(AObject: TObject;
+  AMappingField: TMappingField);
 begin
   LoadedObjects.Add(GetLoadedObjectHashCode(AObject, AMappingField), AObject);
 end;
 
-procedure TSession.AddAsLoadedObject(ACollection: IWrappedList; AMappingField: TMappingField);
+procedure TSession.AddAsLoadedObject(ACollection: IWrappedList;
+  AMappingField: TMappingField);
 var
   Obj: TObject;
 begin
@@ -247,6 +254,7 @@ begin
   rt := FCTX.GetType(AObject.ClassType);
   with FMappingStrategy.GetMapping(rt) do
     TdormUtils.SetField(AObject, Id.Name, FIdNullValue);
+  SetObjectStatus(AObject, osDirty, false);
 end;
 
 function TSession.Clone<T>(Obj: T): T;
@@ -254,10 +262,12 @@ begin
   Result := T(TdormUtils.Clone(Obj));
 end;
 
-procedure TSession.Commit;
+procedure TSession.Commit(RestartAfterCommit: boolean);
 begin
   GetStrategy.Commit;
   GetLogger.ExitLevel('TSession.Commit');
+  if RestartAfterCommit then
+    StartTransaction;
 end;
 
 procedure TSession.Configure(APersistenceConfiguration: TTextReader;
@@ -280,16 +290,13 @@ begin
     FConfig := TSuperObject.ParseString(PWideChar(_ConfigText), true);
     if not assigned(FConfig) then
       raise Exception.Create('Cannot parse persistence configuration');
-
     _JSonConfigEnv := FConfig.O['persistence'].O[GetEnv];
     FConfig.O['mapping'] := nil; // is needed to avoid embedded configuration
-
     // Check for the old persistence file version
     _MappingText := FConfig.O['config'].s['mapping_file'];
     if _MappingText <> '' then
       raise EdormException.Create
         ('WARNING! Is no more allowed to specify the mapping file inside the persistence file');
-
     if AMappingConfiguration <> nil then
     begin
       try
@@ -298,27 +305,22 @@ begin
         if AOwnMappingConfigurationReader then
           AMappingConfiguration.Free;
       end;
-      FConfig.O['mapping'] := TSuperObject.ParseString(PWideChar(_MappingText), true);
+      FConfig.O['mapping'] := TSuperObject.ParseString
+        (PWideChar(_MappingText), true);
       if FConfig.O['mapping'] = nil then
         raise Exception.Create('Cannot parse mapping configuration');
     end;
-
     ReadIDConfig(_JSonConfigEnv);
-
     FMappingStrategy := TCacheMappingStrategy.Create;
-
     if AMappingConfiguration <> nil then
     begin
       _MappingStrategy := TFileMappingStrategy.Create(FConfig.O['mapping']);
       FMappingStrategy.Add(_MappingStrategy);
     end;
-
     _MappingStrategy := TAttributesMappingStrategy.Create;
     FMappingStrategy.Add(_MappingStrategy);
-
     _MappingStrategy := TCoCMappingStrategy.Create;
     FMappingStrategy.Add(_MappingStrategy);
-
     FLogger := CreateLogger;
     FPersistStrategy := GetStrategy;
     FPersistStrategy.ConfigureStrategy(_JSonConfigEnv);
@@ -364,7 +366,8 @@ begin
       FIdNullValue := AJsonPersistenceConfig.s['null_key_value'];
     end
     else
-      raise EdormException.Create('Undefined configurations for IdType and IDNullValue');
+      raise EdormException.Create
+        ('Undefined configurations for IdType and IDNullValue');
   end;
 end;
 
@@ -375,7 +378,8 @@ end;
 
 function TSession.Count(AClassType: TClass): Int64;
 begin
-  Result := GetStrategy.Count(FMappingStrategy.GetMapping(FCTX.GetType(AClassType)));
+  Result := GetStrategy.Count
+    (FMappingStrategy.GetMapping(FCTX.GetType(AClassType)));
 end;
 
 constructor TSession.CreateSession(Environment: TdormEnvironment);
@@ -403,6 +407,12 @@ begin
   end;
 end;
 
+class function TSession.CreateConfigured(APersistenceConfiguration: TTextReader;
+  AEnvironment: TdormEnvironment): TSession;
+begin
+  Result := CreateConfigured(APersistenceConfiguration, nil, AEnvironment);
+end;
+
 function TSession.CreateLogger: IdormLogger;
 var
   LogClassName: string;
@@ -424,7 +434,8 @@ end;
 procedure TSession.Delete(AObject: TObject);
 begin
   if IsObjectStatusAvailable(AObject) then
-    raise EdormException.Create('Delete cannot be called if [ObjStatus] is enabled');
+    raise EdormException.Create
+      ('Delete cannot be called if [ObjStatus] is enabled');
   InternalDelete(AObject);
 end;
 
@@ -439,7 +450,8 @@ end;
 procedure TSession.DeleteAndFree(AObject: TObject);
 begin
   if IsObjectStatusAvailable(AObject) then
-    raise EdormException.Create('DeleteAndFree cannot be called if [ObjStatus] is enabled');
+    raise EdormException.Create
+      ('DeleteAndFree cannot be called if [ObjStatus] is enabled');
   InternalDelete(AObject);
   FreeAndNil(AObject);
 end;
@@ -454,7 +466,8 @@ var
   Obj: TObject;
 begin
   if CurrentObjectStatus <> osUnknown then
-    raise EdormException.Create('This method should not be called in a ObjectStatus <> osUnknown');
+    raise EdormException.Create
+      ('This method should not be called in a ObjectStatus <> osUnknown');
   GetLogger.EnterLevel('has_many ' + ARttiType.ToString);
   GetLogger.Debug('Deleting has_many for ' + ARttiType.ToString);
   for _has_many in AMappingTable.HasManyList do
@@ -508,7 +521,7 @@ begin
   if assigned(FPersistStrategy) then
   begin
     if FPersistStrategy.InTransaction then
-      Rollback;
+      Commit; // Default action "COMMIT"
     FPersistStrategy := nil;
   end;
   if assigned(FLogger) then
@@ -537,7 +550,8 @@ begin
   begin
     if not(TdormObject(AObject).Validate and TdormObject(AObject).InsertValidate)
     then
-      raise EdormValidationException.Create(TdormObject(AObject).ValidationErrors);
+      raise EdormValidationException.Create(TdormObject(AObject)
+        .ValidationErrors);
   end;
 end;
 
@@ -580,21 +594,9 @@ begin
   SetLazyLoadFor(AClass.ClassInfo, APropertyName, true);
 end;
 
-// procedure TSession.FillList<T>(ACollection: TObject; AItemClassInfo: PTypeInfo;
-// Criteria: ICriteria; FillOptions: TdormFillOptions);
-// var
-// SQL: string;
-// _table: TMappingTable;
-// begin
-// _table := FMappingStrategy.GetMapping(FCTX.GetType(AItemClassInfo));
-// SQL := GetStrategy.GetSelectSQL(Criteria, _table);
-// FillList<T>(ACollection, TdormSimpleSearchCriteria.Create(AItemClassInfo,
-// SQL), FillOptions);
-// end;
-
 // QUESTA RIMANE
-procedure TSession.FillList<T>(ACollection: TObject;
-  ACriteria: ICriteria; FillOptions: TdormFillOptions);
+procedure TSession.FillList<T>(ACollection: TObject; ACriteria: ICriteria;
+  FillOptions: TdormFillOptions);
 var
   rt: TRttiType;
   _table: TMappingTable;
@@ -615,10 +617,11 @@ begin
   GetLogger.EnterLevel(SearcherClassname);
   TdormUtils.MethodCall(ACollection, 'Clear', []);
   GetStrategy.LoadList(ACollection, rt, _table, ACriteria);
-  if CallAfterLoadEvent in FillOptions then
+  List := WrapAsList(ACollection);
+  for Obj in List do
   begin
-    List := WrapAsList(ACollection);
-    for Obj in List do
+    SetObjectStatus(Obj, osClean, false);
+    if CallAfterLoadEvent in FillOptions then
       DoOnAfterLoad(Obj);
   end;
   GetLogger.ExitLevel(SearcherClassname);
@@ -655,9 +658,11 @@ end;
 // {$IFEND}
 // end;
 
-function TSession.GetLoadedObjectHashCode(AObject: TObject; AMappingField: TMappingField): String;
+function TSession.GetLoadedObjectHashCode(AObject: TObject;
+  AMappingField: TMappingField): String;
 begin
-  Result := AObject.ClassName + '_' + inttostr(GetIdValue(AMappingField, AObject).AsInt64);
+  Result := AObject.ClassName + '_' +
+    inttostr(GetIdValue(AMappingField, AObject).AsInt64);
 end;
 
 function TSession.GetLoadedObjectHashCode(ATypeInfo: PTypeInfo;
@@ -747,7 +752,6 @@ begin
       end;
   end;
 end;
-
 { *** not used
   function TSession.GetPersistentClassesName(WithPackage: Boolean): TList<string>;
   var
@@ -787,11 +791,11 @@ begin
     for _attrib in _attributes do
       if _attrib is Entity then
       begin
-        {$IF CompilerVersion > 22}
+{$IF CompilerVersion > 22}
         Result.Add(_Type.QualifiedClassName);
-        {$ELSE}
+{$ELSE}
         Result.Add(_Type.QualifiedName);
-        {$IFEND}
+{$IFEND}
         Break;
       end;
   end;
@@ -802,8 +806,8 @@ begin
   Result := EnvironmentNames[ord(FEnvironment)];
 end;
 
-function TSession.LoadByMappingField(ATypeInfo: PTypeInfo; AMappingField: TMappingField;
-  const Value: TValue): TObject;
+function TSession.LoadByMappingField(ATypeInfo: PTypeInfo;
+  AMappingField: TMappingField; const Value: TValue): TObject;
 var
   rt: TRttiType;
   _table: TMappingTable;
@@ -811,18 +815,19 @@ var
 begin
   Obj := nil;
   LoadEnter;
-
   rt := FCTX.GetType(ATypeInfo);
   GetLogger.EnterLevel('Load ' + rt.ToString);
   _table := FMappingStrategy.GetMapping(rt);
-  if not IsAlreadyLoaded(ATypeInfo, Value, Result) then { todo: optimize... please }
+  if not IsAlreadyLoaded(ATypeInfo, Value, Result)
+  then { todo: optimize... please }
   begin
     Obj := TdormUtils.CreateObject(rt);
     try
       if FPersistStrategy.Load(rt, _table, AMappingField, Value, Obj) then
       begin
         Result := Obj;
-        AddAsLoadedObject(Result, _table.Id); // mark this object as already loaded
+        AddAsLoadedObject(Result, _table.Id);
+        // mark this object as already loaded
       end
       else
       begin
@@ -835,7 +840,6 @@ begin
     end;
 
     // Result := FPersistStrategy.Load(rt, _table.TableName, _fields, Value);
-
     if assigned(Result) then
     begin
       LoadBelongsToRelation(_table, Value, rt, Result);
@@ -874,7 +878,8 @@ begin
   Result := LoadList<T>(nil, FillOptions);
 end;
 
-function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject): boolean;
+function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue;
+  AObject: TObject): boolean;
 var
   rt: TRttiType;
   _table: TMappingTable;
@@ -884,9 +889,7 @@ begin
   rt := FCTX.GetType(ATypeInfo);
   GetLogger.EnterLevel('Load ' + rt.ToString);
   _table := FMappingStrategy.GetMapping(rt);
-
   Result := FPersistStrategy.Load(rt, _table, Value, AObject);
-
   if Result then
   begin
     _idValue := GetIdValue(_table.Id, AObject);
@@ -948,7 +951,8 @@ begin
       TdormCompareOperator.coEqual,
       GetIdValue(FMappingStrategy.GetMapping(ARttiType).Id, AObject));
     ChildTable := FMappingStrategy.GetMapping(_child_type);
-    GetStrategy.LoadList(Coll, _child_type, ChildTable, Criteria); { todo: callafterloadevent }
+    GetStrategy.LoadList(Coll, _child_type, ChildTable, Criteria);
+    { todo: callafterloadevent }
     AddAsLoadedObject(WrapAsList(Coll), ChildTable.Id);
     // LoadList<TObject>(Criteria, Coll, [CallAfterLoadEvent]);
     LoadRelationsForEachElement(Coll);
@@ -1010,9 +1014,7 @@ begin
       if _has_one.ChildFieldName = EmptyStr then
         raise Exception.Create('Empty child_field_name for ' +
           _has_one.ChildClassName);
-
       DestObj := TdormUtils.GetField(AObject, _has_one.Name).AsObject;
-
       // If the HasOne reference is not created, then Create It!
       if not assigned(DestObj) then
       begin
@@ -1020,11 +1022,9 @@ begin
           DestObj := Obj
         else
           // DestObj := TdormUtils.CreateObject(_child_type);
-          DestObj := LoadByMappingField(
-            _child_type.Handle,
-            FMappingStrategy.GetMapping(_child_type).FindByName(_has_one.ChildFieldName),
-            AIdValue);
-
+          DestObj := LoadByMappingField(_child_type.Handle,
+            FMappingStrategy.GetMapping(_child_type)
+            .FindByName(_has_one.ChildFieldName), AIdValue);
         // if GetStrategy.Load(_child_type, FMappingStrategy.GetMapping(_child_type),
         // FMappingStrategy.GetMapping(_child_type).FindByName(_has_one.ChildFieldName),
         // AIdValue, DestObj) then
@@ -1040,8 +1040,8 @@ begin
         else
         begin
           LoadByMappingField(_child_type.Handle,
-            FMappingStrategy.GetMapping(_child_type).FindByName(_has_one.ChildFieldName),
-            AIdValue, DestObj);
+            FMappingStrategy.GetMapping(_child_type)
+            .FindByName(_has_one.ChildFieldName), AIdValue, DestObj);
         end;
       end;
       SetObjectStatus(DestObj, osClean, false);
@@ -1053,11 +1053,11 @@ begin
     raise Exception.Create('Unknown property name ' + APropertyName);
 end;
 
-function TSession.LoadList<T>(Criteria: ICriteria; FillOptions: TdormFillOptions):
+function TSession.LoadList<T>(Criteria: ICriteria;
+  FillOptions: TdormFillOptions):
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
 begin
-  Result := {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}.Create
-    (true);
+  Result := {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}.Create(true);
   LoadList<T>(Criteria, Result, FillOptions);
 end;
 
@@ -1077,18 +1077,17 @@ begin
   ItemClassInfo := TypeInfo(T);
   rt := FCTX.GetType(ItemClassInfo);
   Table := FMappingStrategy.GetMapping(rt);
-
   if Supports(Criteria, ICustomCriteria, CustomCrit) then
   begin
     SQL := CustomCrit.GetSQL
   end
   else
     SQL := GetStrategy.GetSelectSQL(Criteria, Table);
-
   if assigned(Criteria) then
     SearcherClassname := TObject(Criteria).ClassName
   else
-    SearcherClassname := '<Criteria = nil, Full select automatically generated>';
+    SearcherClassname :=
+      '<Criteria = nil, Full select automatically generated>';
   GetLogger.EnterLevel(SearcherClassname);
   TdormUtils.MethodCall(AObject, 'Clear', []);
   GetStrategy.LoadList(AObject, rt, Table, Criteria);
@@ -1099,7 +1098,6 @@ begin
       DoOnAfterLoad(Obj);
   end;
   GetLogger.ExitLevel(SearcherClassname);
-
   // FillList<T>(AObject,
   // TdormSimpleSearchCriteria.Create(ItemClassInfo, SQL), FillOptions);
 end;
@@ -1149,7 +1147,8 @@ begin
         end;
       osUnknown:
         begin
-          raise EdormException.Create('Cannot call Persist is objects do not supports ObjStatus');
+          raise EdormException.Create
+            ('Cannot call Persist is objects do not supports ObjStatus');
         end;
       osDeleted:
         InternalDelete(AObject);
@@ -1176,8 +1175,26 @@ begin
   end;
 end;
 
-procedure TSession.PersistHasManyRelation(AMappingTable: TMappingTable; AIdValue: TValue;
-  ARttiType: TRttiType; AObject: TObject);
+procedure TSession.PersistCollection(ACollection: IWrappedList);
+var
+  Obj: TObject;
+begin
+  for Obj in ACollection do
+  begin
+    Persist(Obj);
+  end;
+end;
+
+procedure TSession.PersistCollection(ACollection: TObject);
+var
+  List: IWrappedList;
+begin
+  List := WrapAsList(ACollection);
+  PersistCollection(List);
+end;
+
+procedure TSession.PersistHasManyRelation(AMappingTable: TMappingTable;
+  AIdValue: TValue; ARttiType: TRttiType; AObject: TObject);
 var
   _has_many: TMappingRelation;
   _child_type: TRttiType;
@@ -1218,8 +1235,8 @@ begin
             end;
           osUnknown:
             begin
-              raise EdormException.CreateFmt(
-                '[%s] doesn''t support ObjStatus. You should not call Persist* methods if not all the objects supports ObjStatus',
+              raise EdormException.CreateFmt
+                ('[%s] doesn''t support ObjStatus. You should not call Persist* methods if not all the objects supports ObjStatus',
                 [Obj.ClassName]);
             end;
           osDeleted:
@@ -1233,8 +1250,8 @@ begin
   GetLogger.ExitLevel('persist has_many ' + ARttiType.ToString);
 end;
 
-procedure TSession.PersistHasOneRelation(AMappingTable: TMappingTable; AIdValue: TValue;
-  ARttiType: TRttiType; AObject: TObject);
+procedure TSession.PersistHasOneRelation(AMappingTable: TMappingTable;
+  AIdValue: TValue; ARttiType: TRttiType; AObject: TObject);
 var
   _has_one: TMappingRelation;
   _child_type: TRttiType;
@@ -1259,8 +1276,8 @@ begin
     if assigned(Obj) then
     begin
       if GetObjectStatus(Obj) = osUnknown then
-        raise EdormException.CreateFmt(
-          '[%s] doesn''t support ObjStatus. You should not call Persist* methods if not all the objects supports ObjStatus',
+        raise EdormException.CreateFmt
+          ('[%s] doesn''t support ObjStatus. You should not call Persist* methods if not all the objects supports ObjStatus',
           [Obj.ClassName]);
       GetLogger.Debug('-- Saving ' + _child_type.QualifiedName);
       GetLogger.Debug('----> Setting property ' + _has_one.ChildFieldName);
@@ -1317,15 +1334,12 @@ begin
       raise Exception.Create('Unknown type ' + _belongs_to.OwnerClassName);
     _belong_field_key_value := TdormUtils.GetProperty(AObject,
       _belongs_to.RefFieldName);
-
     parent_mapping := FMappingStrategy.GetMapping
       (FCTX.FindType(Qualified(_table, _belongs_to.OwnerClassName)));
 
     // parent_field_mapping := child_mapping.Id;
-
-    v := LoadByMappingField(
-      FCTX.FindType(Qualified(_table, _belongs_to.OwnerClassName)).Handle,
-      parent_mapping.Id,
+    v := LoadByMappingField(FCTX.FindType(Qualified(_table,
+      _belongs_to.OwnerClassName)).Handle, parent_mapping.Id,
       _belong_field_key_value);
     //
     // _belong_field_key_value);
@@ -1336,8 +1350,8 @@ begin
     raise Exception.Create('Unknown property name ' + APropertyName);
 end;
 
-function TSession.LoadByMappingField(ATypeInfo: PTypeInfo; AMappingField: TMappingField;
-  const Value: TValue; AObject: TObject): boolean;
+function TSession.LoadByMappingField(ATypeInfo: PTypeInfo;
+  AMappingField: TMappingField; const Value: TValue; AObject: TObject): boolean;
 var
   rt: TRttiType;
   _table: TMappingTable;
@@ -1387,7 +1401,8 @@ end;
 function TSession.Insert(AObject: TObject): TValue;
 begin
   if IsObjectStatusAvailable(AObject) then
-    raise EdormException.Create('Insert cannot be called if [ObjStatus] is enabled');
+    raise EdormException.Create
+      ('Insert cannot be called if [ObjStatus] is enabled');
   Result := InternalInsert(AObject);
 end;
 
@@ -1411,7 +1426,8 @@ end;
 function TSession.InsertAndFree(AObject: TObject): TValue;
 begin
   if IsObjectStatusAvailable(AObject) then
-    raise EdormException.Create('InsertAndFree cannot be called if [ObjStatus] is enabled');
+    raise EdormException.Create
+      ('InsertAndFree cannot be called if [ObjStatus] is enabled');
   Result := InternalInsert(AObject);
   FreeAndNil(AObject);
 end;
@@ -1426,7 +1442,6 @@ var
 begin
   _rttitype := FCTX.GetType(ATypeInfo);
   _table := FMappingStrategy.GetMapping(_rttitype);
-
   for _has_many in _table.HasManyList do
   begin
     if CompareText(_has_many.Name, APropertyName) = 0 then
@@ -1435,7 +1450,6 @@ begin
       Break;
     end;
   end;
-
   for _belongs_to in _table.BelongsToList do
   begin
     if CompareText(_belongs_to.Name, APropertyName) = 0 then
@@ -1444,7 +1458,6 @@ begin
       Break;
     end;
   end;
-
   for _has_one in _table.HasOneList do
   begin
     if CompareText(_has_one.Name, APropertyName) = 0 then
@@ -1460,11 +1473,9 @@ procedure TSession.SetObjectStatus(AObject: TObject; AStatus: TdormObjectStatus;
 var
   _Type: TRttiType;
   _objstatus: TRttiProperty;
-  v: TValue;
 begin
   if assigned(AObject) then
   begin
-
     _Type := FCTX.GetType(AObject.ClassInfo);
     _objstatus := _Type.GetProperty('ObjStatus');
     if (not assigned(_objstatus)) then
@@ -1499,7 +1510,8 @@ var
   Obj: TObject;
 begin
   if CurrentObjectStatus <> osUnknown then
-    raise EdormException.Create('This method should not be called in a ObjectStatus <> osUnknown');
+    raise EdormException.Create
+      ('This method should not be called in a ObjectStatus <> osUnknown');
   GetLogger.EnterLevel('has_many ' + ARttiType.ToString);
   GetLogger.Debug('Saving has_many for ' + ARttiType.ToString);
   for _has_many in AMappingTable.HasManyList do
@@ -1543,7 +1555,6 @@ begin
       _has_one.ChildClassName));
     if not assigned(_child_type) then
       raise Exception.Create('Unknown type ' + _has_one.ChildClassName);
-
     Obj := v.AsObject;
     if assigned(Obj) then
     begin
@@ -1596,10 +1607,8 @@ begin
   _Type := FCTX.GetType(AObject.ClassInfo);
   _table := FMappingStrategy.GetMapping(_Type);
   _idValue := GetIdValue(_table.Id, AObject);
-
   if GetObjectStatus(AObject) = osClean then
     Exit(_idValue);
-
   GetLogger.EnterLevel(AObject.ClassName);
   DoInsertValidation(AObject);
   DoOnBeforeInsert(AObject);
@@ -1609,7 +1618,6 @@ begin
     FixBelongsToRelation(_table, _idValue, _Type, AObject);
     Result := GetStrategy.Insert(_Type, AObject, _table);
     _idValue := GetIdValue(_table.Id, AObject);
-
     if CurrentObjectStatus <> osUnknown then
     begin
       PersistHasManyRelation(_table, _idValue, _Type, AObject);
@@ -1656,15 +1664,15 @@ begin
   else
     raise EdormException.CreateFmt('Cannot update object without an ID [%s]',
       [_class_name]);
+  SetObjectStatus(AObject, osClean, false);
   GetLogger.ExitLevel(_class_name);
-
 end;
 
 function TSession.IsAlreadyLoaded(ATypeInfo: PTypeInfo; AValue: TValue;
   out AOutObject: TObject): boolean;
 begin
-  Result := LoadedObjects.TryGetValue(GetLoadedObjectHashCode(ATypeInfo, AValue),
-    AOutObject);
+  Result := LoadedObjects.TryGetValue(GetLoadedObjectHashCode(ATypeInfo,
+    AValue), AOutObject);
 end;
 
 function TSession.IsClean(AObject: TObject): boolean;
@@ -1675,6 +1683,11 @@ end;
 function TSession.IsDirty(AObject: TObject): boolean;
 begin
   Result := GetObjectStatus(AObject) = osDirty;
+end;
+
+function TSession.IsInTransaction: boolean;
+begin
+  Result := FPersistStrategy.InTransaction;
 end;
 
 function TSession.IsNullKey(ATableMap: TMappingTable;
@@ -1734,14 +1747,16 @@ end;
 procedure TSession.Update(AObject: TObject);
 begin
   if IsObjectStatusAvailable(AObject) then
-    raise EdormException.Create('Update cannot be called if [ObjStatus] is enabled');
+    raise EdormException.Create
+      ('Update cannot be called if [ObjStatus] is enabled');
   InternalUpdate(AObject);
 end;
 
 procedure TSession.UpdateAndFree(AObject: TObject);
 begin
   if IsObjectStatusAvailable(AObject) then
-    raise EdormException.Create('UpdateAndFree cannot be called if [ObjStatus] is enabled');
+    raise EdormException.Create
+      ('UpdateAndFree cannot be called if [ObjStatus] is enabled');
   InternalUpdate(AObject);
   FreeAndNil(AObject);
 end;

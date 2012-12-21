@@ -39,11 +39,11 @@ type
     procedure AfterConstruction; override;
   end;
 
-  TdormFileLog = class(TdormCodeSiteBaseLog)
+  TCodeSiteFileLog = class(TdormCodeSiteBaseLog)
     procedure AfterConstruction; override;
   end;
 
-  TdormLiveLog = class(TdormCodeSiteBaseLog)
+  TCodeSiteLiveLog = class(TdormCodeSiteBaseLog)
     procedure AfterConstruction; override;
   end;
 
@@ -102,9 +102,9 @@ begin
   CodeSite.SendWarning(Value);
 end;
 
-{ TdormLiveLog }
+{ TCodeSiteLiveLog }
 
-procedure TdormLiveLog.AfterConstruction;
+procedure TCodeSiteLiveLog.AfterConstruction;
 begin
   inherited;
   dest := TCodeSiteDestination.Create(nil);
@@ -114,9 +114,9 @@ begin
   Info(ClassName + ' Logger initialized');
 end;
 
-{ TdormFileLog }
+{ TCodeSiteFileLog }
 
-procedure TdormFileLog.AfterConstruction;
+procedure TCodeSiteFileLog.AfterConstruction;
 begin
   inherited;
   dest := TCodeSiteDestination.Create(nil);
@@ -136,7 +136,7 @@ end;
 initialization
 
 
-TdormFileLog.register;
-TdormLiveLog.register;
+TCodeSiteFileLog.register;
+TCodeSiteLiveLog.register;
 
 end.

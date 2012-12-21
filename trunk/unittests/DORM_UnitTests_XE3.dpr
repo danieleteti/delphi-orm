@@ -1,4 +1,4 @@
-program DORM_UnitTests_XE2;
+program DORM_UnitTests_XE3;
 
 {$IFDEF CONSOLE_TESTRUNNER}
 {$APPTYPE CONSOLE}
@@ -39,7 +39,8 @@ uses
   TestDORMMapping.Attributes in 'TestDORMMapping.Attributes.pas',
   TestDORMMapping.CoC in 'TestDORMMapping.CoC.pas',
   TestDORMMapping.FileJSON in 'TestDORMMapping.FileJSON.pas',
-  dorm.adapter.Base in '..\source\dorm.adapter.Base.pas';
+  dorm.adapter.Base in '..\source\dorm.adapter.Base.pas',
+  dorm.adapter.UIB.BaseAdapter in '..\source\dorm.adapter.UIB.BaseAdapter.pas';
 
 {$R *.RES}
 

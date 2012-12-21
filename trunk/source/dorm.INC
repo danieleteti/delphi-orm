@@ -30,7 +30,7 @@
   then remove the period before the $ that makes the
   define a comment.
 }
-{ . $DEFINE LINK_CODESITE }
+{$DEFINE LINK_CODESITE }
 { .$DEFINE LINK_SMARTINSPECT }
 {$DEFINE LINK_FILELOG }
 { **************** end loggers section ************************* }
