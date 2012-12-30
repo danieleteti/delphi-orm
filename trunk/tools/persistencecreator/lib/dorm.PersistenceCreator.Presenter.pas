@@ -27,16 +27,19 @@ type
   public
     constructor Create(APersistenceView: IPersistenceCreatorView);
     destructor Destroy; override;
+    function Start: Integer;
     procedure NewPersistenceFileAction;
     procedure OpenPersistenceFileAction;
     procedure SavePersistenceFileAction;
     procedure ChangeEnvironmentAction(ANewEnvironment: String);
     procedure AddPersistentClassAction;
     procedure RemovePersistentClassAction(AClassName: String);
-    property Command: IPersistenceCreatorViewCommand read FPersistenceViewCommand write FPersistenceViewCommand;
+    property Command: IPersistenceCreatorViewCommand
+      read FPersistenceViewCommand write FPersistenceViewCommand;
   end;
 
-  TPersistenceViewCommand = class(TInterfacedObject, IPersistenceCreatorViewCommand)
+  TPersistenceViewCommand = class(TInterfacedObject,
+    IPersistenceCreatorViewCommand)
   strict private
     FReceiver: TPersistenceCreatorPresenter;
   public
@@ -49,9 +52,11 @@ type
     procedure RemovePersistentClassExecute(AClassName: String);
   end;
 
-const FORM_TITLE = 'dorm (the Delphi ORM), Persistence file creator Current File: %s';
-      STATUS_TEXT = 'Active Environment: [%s]';
-      CONF_FILTER = 'PersistenceJsonFile (*.conf)|*.conf|All Files (*.*)|*.*';
+const
+  FORM_TITLE =
+    'dorm (the Delphi ORM), Persistence file creator Current File: %s';
+  STATUS_TEXT = 'Active Environment: [%s]';
+  CONF_FILTER = 'DORM ConfigFile (*.conf)|*.conf|All Files (*.*)|*.*';
 
 implementation
 
@@ -62,14 +67,14 @@ begin
   FReceiver.AddPersistentClassAction;
 end;
 
-procedure TPersistenceViewCommand.ChangeEnvironmentExecute(
-  ANewEnvironment: string);
+procedure TPersistenceViewCommand.ChangeEnvironmentExecute
+  (ANewEnvironment: string);
 begin
   FReceiver.ChangeEnvironmentAction(ANewEnvironment);
 end;
 
-constructor TPersistenceViewCommand.Create(
-  AReceiver: TPersistenceCreatorPresenter);
+constructor TPersistenceViewCommand.Create
+  (AReceiver: TPersistenceCreatorPresenter);
 begin
   FReceiver := AReceiver;
 end;
@@ -84,7 +89,8 @@ begin
   FReceiver.OpenPersistenceFileAction;
 end;
 
-procedure TPersistenceViewCommand.RemovePersistentClassExecute(AClassName: String);
+procedure TPersistenceViewCommand.RemovePersistentClassExecute
+  (AClassName: String);
 begin
   FReceiver.RemovePersistentClassAction(AClassName);
 end;
@@ -93,43 +99,48 @@ procedure TPersistenceViewCommand.SavePersistenceFileExecute;
 begin
   FReceiver.SavePersistenceFileAction;
 end;
-
 { TPersistenceCreatorPresenter }
 
-procedure TPersistenceCreatorPresenter.ChangeEnvironmentAction(
-  ANewEnvironment: string);
+procedure TPersistenceCreatorPresenter.ChangeEnvironmentAction
+  (ANewEnvironment: string);
 var
   idx: Integer;
 begin
-  //*-----------------------*
-  //* Save values in memory *
-  //*-----------------------*
-  Idx := InternalGetEnvironmentIndex(FActiveEnvironment);
-
-  //FPersistenceCreatorGetEnvironments[Idx].EnvironmentName := FActiveEnviroment;
-  FPersistenceCreator.GetEnvironments[Idx].DatabaseAdapter := FPersistenceView.GetDatabaseAdapter;
-  FPersistenceCreator.GetEnvironments[Idx].DatabaseConnectionString := FPersistenceView.GetDatabaseConnectionString;
-  FPersistenceCreator.GetEnvironments[Idx].KeysGenerator := FPersistenceView.GetKeysGenerator;
-  FPersistenceCreator.GetEnvironments[Idx].KeyType := FPersistenceView.GetKeyType;
-  FPersistenceCreator.GetEnvironments[Idx].NullKeyValue := FPersistenceView.GetNullKeyValue;
-  FPersistenceCreator.GetEnvironments[Idx].CustomAdapterParameter.Assign(FPersistenceView.GetCustomAdapterConfig);
-  //*------------------------*
-  //* Set environment values *
-  //*------------------------*
-  Idx := InternalGetEnvironmentIndex(ANewEnvironment);
-  if Assigned(FPersistenceCreator.GetEnvironments[Idx]) then
+  // *-----------------------*
+  // * Save values in memory *
+  // *-----------------------*
+  idx := InternalGetEnvironmentIndex(FActiveEnvironment);
+  // FPersistenceCreatorGetEnvironments[Idx].EnvironmentName := FActiveEnviroment;
+  FPersistenceCreator.GetEnvironments[idx].DatabaseAdapter :=
+    FPersistenceView.GetDatabaseAdapter;
+  FPersistenceCreator.GetEnvironments[idx].DatabaseConnectionString :=
+    FPersistenceView.GetDatabaseConnectionString;
+  FPersistenceCreator.GetEnvironments[idx].KeysGenerator :=
+    FPersistenceView.GetKeysGenerator;
+  FPersistenceCreator.GetEnvironments[idx].KeyType :=
+    FPersistenceView.GetKeyType;
+  FPersistenceCreator.GetEnvironments[idx].NullKeyValue :=
+    FPersistenceView.GetNullKeyValue;
+  FPersistenceCreator.GetEnvironments[idx].CustomAdapterParameter.Assign
+    (FPersistenceView.GetCustomAdapterConfig);
+  // *------------------------*
+  // * Set environment values *
+  // *------------------------*
+  idx := InternalGetEnvironmentIndex(ANewEnvironment);
+  if Assigned(FPersistenceCreator.GetEnvironments[idx]) then
   begin
-    //*------------------------*
-    //* Set active environment *
-    //*------------------------*
+    // *------------------------*
+    // * Set active environment *
+    // *------------------------*
     with FPersistenceView do
     begin
-      InternalSetEnvironmentCreatorView(Idx);
+      InternalSetEnvironmentCreatorView(idx);
     end;
   end;
 end;
 
-constructor TPersistenceCreatorPresenter.Create(APersistenceView: IPersistenceCreatorView);
+constructor TPersistenceCreatorPresenter.Create(APersistenceView
+  : IPersistenceCreatorView);
 begin
   FPersistenceView := APersistenceView;
   FPersistenceViewCommand := TPersistenceViewCommand.Create(Self);
@@ -142,15 +153,16 @@ begin
   inherited;
 end;
 
-function TPersistenceCreatorPresenter.InternalGetEnvironmentIndex(
-  AEnvironmentName: String): Integer;
+function TPersistenceCreatorPresenter.InternalGetEnvironmentIndex
+  (AEnvironmentName: String): Integer;
 var
   i: Integer;
 begin
   Result := -1;
-  for i := 0 to FPersistenceCreator.GetEnvironments.Count-1 do
+  for i := 0 to FPersistenceCreator.GetEnvironments.Count - 1 do
   begin
-    if FPersistenceCreator.GetEnvironments.Items[i].EnvironmentName = AEnvironmentName then
+    if FPersistenceCreator.GetEnvironments.Items[i].EnvironmentName = AEnvironmentName
+    then
     begin
       Result := i;
       Break;
@@ -158,21 +170,27 @@ begin
   end;
 end;
 
-procedure TPersistenceCreatorPresenter.InternalSetEnvironmentCreatorView(AIndex: Integer);
+procedure TPersistenceCreatorPresenter.InternalSetEnvironmentCreatorView
+  (AIndex: Integer);
 begin
   with FPersistenceView do
   begin
-    SetStatusBarSimpleText(Format(STATUS_TEXT, [FPersistenceCreator.GetEnvironments[AIndex].EnvironmentName]));
-    //*------------------------*
-    //* Set active environment *
-    //*------------------------*
-    FActiveEnvironment := FPersistenceCreator.GetEnvironments[AIndex].EnvironmentName;
-    SetDatabaseConnectionString(FPersistenceCreator.GetEnvironments[AIndex].DatabaseConnectionString);
-    SetDatabaseAdapter(FPersistenceCreator.GetEnvironments[AIndex].DatabaseAdapter);
+    SetStatusBarSimpleText(Format(STATUS_TEXT,
+      [FPersistenceCreator.GetEnvironments[AIndex].EnvironmentName]));
+    // *------------------------*
+    // * Set active environment *
+    // *------------------------*
+    FActiveEnvironment := FPersistenceCreator.GetEnvironments[AIndex]
+      .EnvironmentName;
+    SetDatabaseConnectionString(FPersistenceCreator.GetEnvironments[AIndex]
+      .DatabaseConnectionString);
+    SetDatabaseAdapter(FPersistenceCreator.GetEnvironments[AIndex]
+      .DatabaseAdapter);
     SetKeysGenerator(FPersistenceCreator.GetEnvironments[AIndex].KeysGenerator);
     SetKeyType(FPersistenceCreator.GetEnvironments[AIndex].KeyType);
     SetNullKeyValue(FPersistenceCreator.GetEnvironments[AIndex].NullKeyValue);
-    SetCustomAdapterConfig(FPersistenceCreator.GetEnvironments[AIndex].CustomAdapterParameter);
+    SetCustomAdapterConfig(FPersistenceCreator.GetEnvironments[AIndex]
+      .CustomAdapterParameter);
   end;
 end;
 
@@ -181,14 +199,14 @@ begin
   FPersistenceCreator.Initialize;
   with FPersistenceView do
   begin
-    //*-----------------*
-    //* Set view values *
-    //*-----------------*
-    SetTitleCaption(Format(FORM_TITLE,['Creating New File']));
+    // *-----------------*
+    // * Set view values *
+    // *-----------------*
+    SetTitleCaption(Format(FORM_TITLE, ['Creating New File']));
     SetEnvironments(FPersistenceCreator.GetEnvironmentsList);
-    //*--------------------------------------*
-    //* Set first default environment values *
-    //*--------------------------------------*
+    // *--------------------------------------*
+    // * Set first default environment values *
+    // *--------------------------------------*
     if Assigned(FPersistenceCreator.GetEnvironments[0]) then
     begin
       InternalSetEnvironmentCreatorView(0);
@@ -212,19 +230,18 @@ begin
       FPersistenceCreator.Load(FileName);
       with FPersistenceView do
       begin
-        //*-----------------*
-        //* Set view values *
-        //*-----------------*
-        SetTitleCaption(Format(FORM_TITLE,[FileName]));
+        // *-----------------*
+        // * Set view values *
+        // *-----------------*
+        SetTitleCaption(Format(FORM_TITLE, [FileName]));
         SetEnvironments(FPersistenceCreator.GetEnvironmentsList);
-        //*------------------------------*
-        //* Set first environment values *
-        //*------------------------------*
+        // *------------------------------*
+        // * Set first environment values *
+        // *------------------------------*
         if Assigned(FPersistenceCreator.GetEnvironments[0]) then
         begin
           InternalSetEnvironmentCreatorView(0);
         end;
-
         SetPersistentClass(FPersistenceCreator.GetPersistenceClassesList);
         SetLoggerClassName(FPersistenceCreator.GetConfig.LoggerClassName);
       end;
@@ -239,38 +256,44 @@ var
   PersClass: string;
   i: Integer;
 begin
-  if FActiveEnvironment<>'' then
+  if FActiveEnvironment <> '' then
   begin
-    PersClass := InputBox('Persistent Classes','Insert New Persistent Class','');
-
-    if PersClass<>'' then
+    PersClass := InputBox('Persistent Classes',
+      'Insert New Persistent Class', '');
+    if PersClass <> '' then
     begin
-      for i := 0 to FPersistenceCreator.GetPersistenceClasses.Count-1 do
+      for i := 0 to FPersistenceCreator.GetPersistenceClasses.Count - 1 do
       begin
-        if FPersistenceCreator.GetPersistenceClasses.Items[i].PersistenceClassName = PersClass then
+        if FPersistenceCreator.GetPersistenceClasses.Items[i]
+          .PersistenceClassName = PersClass then
         begin
           raise Exception.Create('Persistent Class already insert');
         end;
       end;
-      FPersistenceCreator.GetPersistenceClasses.Add(TPersistenceClass.Create(PersClass));
-      FPersistenceView.SetPersistentClass(FPersistenceCreator.GetPersistenceClassesList);
+      FPersistenceCreator.GetPersistenceClasses.Add
+        (TPersistenceClass.Create(PersClass));
+      FPersistenceView.SetPersistentClass
+        (FPersistenceCreator.GetPersistenceClassesList);
     end;
   end;
 end;
 
-procedure TPersistenceCreatorPresenter.RemovePersistentClassAction(AClassName: string);
+procedure TPersistenceCreatorPresenter.RemovePersistentClassAction
+  (AClassName: string);
 var
   i: Integer;
 begin
-  for i := 0 to FPersistenceCreator.GetPersistenceClasses.Count-1 do
+  for i := 0 to FPersistenceCreator.GetPersistenceClasses.Count - 1 do
   begin
-    if FPersistenceCreator.GetPersistenceClasses.Items[i].PersistenceClassName = AClassName then
+    if FPersistenceCreator.GetPersistenceClasses.Items[i].PersistenceClassName = AClassName
+    then
     begin
       FPersistenceCreator.GetPersistenceClasses.Delete(i);
       Break;
     end;
   end;
-  FPersistenceView.SetPersistentClass(FPersistenceCreator.GetPersistenceClassesList);
+  FPersistenceView.SetPersistentClass
+    (FPersistenceCreator.GetPersistenceClassesList);
 end;
 
 procedure TPersistenceCreatorPresenter.SavePersistenceFileAction;
@@ -278,32 +301,38 @@ var
   FileName: TFileName;
   Odl: TSaveDialog;
 begin
-  if FActiveEnvironment='' then raise Exception.Create('No file was loaded');
-
+  if FActiveEnvironment = '' then
+    raise Exception.Create('No file was loaded');
   ChangeEnvironmentAction(FActiveEnvironment);
-
   Odl := TSaveDialog.Create(nil);
   Odl.Filter := CONF_FILTER;
   try
     if Odl.Execute then
     begin
-      if Assigned(FPersistenceCreator) and (FPersistenceCreator.GetEnvironments.Count>0) then
+      if Assigned(FPersistenceCreator) and
+        (FPersistenceCreator.GetEnvironments.Count > 0) then
       begin
         FileName := Odl.FileName;
-
         if FileExists(FileName) then
         begin
-         if MessageDlg('File already exists. Do you want to overwrite?',mtConfirmation,[mbYes, mbNo],0) = mrYes then
-         begin
-           FPersistenceCreator.Save(FileName);
-         end;
+          if MessageDlg('File already exists. Do you want to overwrite?',
+            mtConfirmation, [mbYes, mbNo], 0) = mrYes then
+          begin
+            FPersistenceCreator.Save(FileName);
+          end;
         end
-        else FPersistenceCreator.Save(FileName);
+        else
+          FPersistenceCreator.Save(FileName);
       end;
     end;
   finally
     Odl.Free;
   end;
+end;
+
+function TPersistenceCreatorPresenter.Start: Integer;
+begin
+  Result := FPersistenceView.StartView;
 end;
 
 end.

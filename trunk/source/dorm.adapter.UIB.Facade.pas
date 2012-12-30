@@ -119,9 +119,10 @@ destructor TUIBFacade.Destroy;
 begin
   if assigned(FUIBDatabase) then
   begin
-    FUIBDatabase.Connected := False;
-    if FCurrentTransaction.InTransaction then
+    if Assigned(FCurrentTransaction) and (FCurrentTransaction.InTransaction) then
       FCurrentTransaction.RollBack;
+
+    FUIBDatabase.Connected := False;
     FCurrentTransaction.Free;
     FUIBDatabase.Free;
   end;

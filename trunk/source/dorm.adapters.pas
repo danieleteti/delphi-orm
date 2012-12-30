@@ -7,9 +7,7 @@ interface
   If you want to use an adapter, do not include statically the unit but enable it
   in the dorm.inc file, then include only THIS file
 }
-
 {$I DORM.INC}
-
 
 uses
   SysUtils
@@ -34,11 +32,11 @@ uses
   dorm.adapter.sqlite3
 {$ENDIF}
 {$IFDEF LINK_SQLSERVER_ADAPTER}
-    ,
+  SQLServer is not supported in this version of dorm,
   dorm.adapter.sqlserver9
 {$ENDIF}
 {$IFDEF LINK_SQLSERVERDEVART_ADAPTER}
-    ,
+  SQLServer is not supported in this version of dorm,
   dorm.adapter.sqlserverdevart
 {$ENDIF}
     ;

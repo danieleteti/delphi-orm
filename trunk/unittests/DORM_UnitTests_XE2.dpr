@@ -17,7 +17,6 @@ uses
   dorm.Collections in '..\source\dorm.Collections.pas',
   dorm.Commons in '..\source\dorm.Commons.pas',
   dorm.Core.IdentityMap in '..\source\dorm.Core.IdentityMap.pas',
-  dorm.InterposedObject in '..\source\dorm.InterposedObject.pas',
   dorm in '..\source\dorm.pas',
   dorm.UOW in '..\source\dorm.UOW.pas',
   dorm.Utils in '..\source\dorm.Utils.pas',

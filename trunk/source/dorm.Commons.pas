@@ -47,7 +47,7 @@ type
   TdormEnvironment = (deDevelopment, deTest, deRelease);
   TdormObjectOwner = (ooItself, ooParent);
   TdormSaveType = (stAllGraph, stSingleObject);
-  TdormRelations = set of (drBelongsTo, drHasMany, drHasOne);
+  TdormRelations = set of (drBelongsTo, drHasMany, drHasOne, drAll);
   TdormFillOptions = set of (CallAfterLoadEvent);
 
   TdormInterfacedObject = class(TInterfacedObject)

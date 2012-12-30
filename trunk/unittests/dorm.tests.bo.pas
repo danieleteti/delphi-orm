@@ -24,11 +24,11 @@ unit dorm.tests.bo;
 interface
 
 uses
+  dorm,
   dorm.Commons,
   Classes,
   Generics.Collections,
-  dorm.Mappings,
-  dorm.InterposedObject;
+  dorm.Mappings;
 
 type
   TPerson = class;
