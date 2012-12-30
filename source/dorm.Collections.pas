@@ -23,8 +23,7 @@ uses
   Generics.Collections,
   RTTI,
   SysUtils,
-  Classes,
-  dorm.InterposedObject;
+  Classes;
 
 type
   TdormComparer<T: class> = class(TComparer<T>)

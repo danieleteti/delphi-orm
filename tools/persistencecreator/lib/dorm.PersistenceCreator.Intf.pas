@@ -48,6 +48,7 @@ type
     function  GetCustomAdapterConfig: TStrings;
     function  GetDatabaseConnectionString: String;
     function  GetNullKeyValue: String;
+    function StartView: Integer;
   end;
 
 implementation

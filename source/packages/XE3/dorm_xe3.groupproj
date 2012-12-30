@@ -1,0 +1,60 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{6CA5235C-D25F-484C-AFF9-D84E25C850ED}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="dorm_runtime_xe3.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="dorm_designtime_xe3.dproj">
+            <Dependencies>dorm_runtime_xe3.dproj</Dependencies>
+        </Projects>
+        <Projects Include="..\..\..\samples\DelphiXE3\TdormSessionComponent\dormSessionComponentSample.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="dorm_runtime_xe3">
+        <MSBuild Projects="dorm_runtime_xe3.dproj"/>
+    </Target>
+    <Target Name="dorm_runtime_xe3:Clean">
+        <MSBuild Projects="dorm_runtime_xe3.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dorm_runtime_xe3:Make">
+        <MSBuild Projects="dorm_runtime_xe3.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dorm_designtime_xe3" DependsOnTargets="dorm_runtime_xe3">
+        <MSBuild Projects="dorm_designtime_xe3.dproj"/>
+    </Target>
+    <Target Name="dorm_designtime_xe3:Clean" DependsOnTargets="dorm_runtime_xe3:Clean">
+        <MSBuild Projects="dorm_designtime_xe3.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dorm_designtime_xe3:Make" DependsOnTargets="dorm_runtime_xe3:Make">
+        <MSBuild Projects="dorm_designtime_xe3.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="dormSessionComponentSample">
+        <MSBuild Projects="..\..\..\samples\DelphiXE3\TdormSessionComponent\dormSessionComponentSample.dproj"/>
+    </Target>
+    <Target Name="dormSessionComponentSample:Clean">
+        <MSBuild Projects="..\..\..\samples\DelphiXE3\TdormSessionComponent\dormSessionComponentSample.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="dormSessionComponentSample:Make">
+        <MSBuild Projects="..\..\..\samples\DelphiXE3\TdormSessionComponent\dormSessionComponentSample.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="dorm_runtime_xe3;dorm_designtime_xe3;dormSessionComponentSample"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="dorm_runtime_xe3:Clean;dorm_designtime_xe3:Clean;dormSessionComponentSample:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="dorm_runtime_xe3:Make;dorm_designtime_xe3:Make;dormSessionComponentSample:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

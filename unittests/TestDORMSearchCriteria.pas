@@ -43,8 +43,7 @@ uses
   Rtti,
   dorm.tests.bo,
   dorm.Collections,
-  SysUtils,
-  dorm.InterposedObject;
+  SysUtils;
 
 { TTestDORMSearchCriteria }
 

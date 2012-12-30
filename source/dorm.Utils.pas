@@ -21,8 +21,7 @@ interface
 uses
   RTTI,
   DB,
-  Generics.Collections,
-  dorm.InterposedObject;
+  Generics.Collections;
 
 type
   TdormUtils = class sealed

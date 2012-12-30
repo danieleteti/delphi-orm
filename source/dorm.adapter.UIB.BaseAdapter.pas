@@ -403,7 +403,7 @@ begin
     Query.Free;
   end;
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-  TdormUtils.SetProperty(AObject, AMappingTable.Fields[pk_idx].name, pk_value);
+  TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].name, pk_value);
   Result := pk_value;
 end;
 

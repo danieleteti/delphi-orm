@@ -41,40 +41,6 @@
         <Cfg_1>true</Cfg_1>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='SQLSERVER_STRATEGY' or '$(Cfg_5)'!=''">
-        <Cfg_5>true</Cfg_5>
-        <CfgParent>Base</CfgParent>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_5)'=='true') or '$(Cfg_5_Win32)'!=''">
-        <Cfg_5_Win32>true</Cfg_5_Win32>
-        <CfgParent>Cfg_5</CfgParent>
-        <Cfg_5>true</Cfg_5>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_5)'=='true') or '$(Cfg_5_Win64)'!=''">
-        <Cfg_5_Win64>true</Cfg_5_Win64>
-        <CfgParent>Cfg_5</CfgParent>
-        <Cfg_5>true</Cfg_5>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Config)'=='SQLSERVER_DEVART_STRATEGY' or '$(Cfg_6)'!=''">
-        <Cfg_6>true</Cfg_6>
-        <CfgParent>Base</CfgParent>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_6)'=='true') or '$(Cfg_6_Win32)'!=''">
-        <Cfg_6_Win32>true</Cfg_6_Win32>
-        <CfgParent>Cfg_6</CfgParent>
-        <Cfg_6>true</Cfg_6>
-        <Base>true</Base>
-    </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Cfg_6)'=='true') or '$(Cfg_6_Win64)'!=''">
-        <Cfg_6_Win64>true</Cfg_6_Win64>
-        <CfgParent>Cfg_6</CfgParent>
-        <Cfg_6>true</Cfg_6>
-        <Base>true</Base>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='FIREBIRD_UIB_STRATEGY' or '$(Cfg_2)'!=''">
         <Cfg_2>true</Cfg_2>
         <CfgParent>Base</CfgParent>
@@ -135,7 +101,7 @@
         <DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
-        <DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\lib\fastmm;..\lib\superobject;..\lib\sqlitewrap\source;..\lib\uib\source;..\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>$(BDS)\Source\DUnit\src;..\lib\fastmm;..\lib\sqlitewrap\source;..\lib\uib\source;..\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_DependencyCheckOutputName>DORM_UnitTests.exe</DCC_DependencyCheckOutputName>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_Optimize>false</DCC_Optimize>
@@ -173,25 +139,6 @@
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_5_Win32)'!=''">
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <DCC_Define>DEBUG;SQLSERVER_STRATEGY;$(DCC_Define)</DCC_Define>
-        <DCC_DebugDCUs>false</DCC_DebugDCUs>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_5_Win64)'!=''">
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_6_Win32)'!=''">
-        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
-        <DCC_Define>DEBUG;SQLSERVER_DEVART_STRATEGY;$(DCC_Define)</DCC_Define>
-        <VerInfo_Locale>1033</VerInfo_Locale>
-        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(Cfg_6_Win64)'!=''">
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
@@ -239,7 +186,6 @@
         <DCCReference Include="..\source\dorm.Collections.pas"/>
         <DCCReference Include="..\source\dorm.Commons.pas"/>
         <DCCReference Include="..\source\dorm.Core.IdentityMap.pas"/>
-        <DCCReference Include="..\source\dorm.InterposedObject.pas"/>
         <DCCReference Include="..\source\dorm.pas"/>
         <DCCReference Include="..\source\dorm.UOW.pas"/>
         <DCCReference Include="..\source\dorm.Utils.pas"/>
@@ -262,7 +208,6 @@
         <DCCReference Include="TestDORMMapping.CoC.pas"/>
         <DCCReference Include="TestDORMMapping.FileJSON.pas"/>
         <DCCReference Include="..\source\dorm.adapter.Base.pas"/>
-        <DCCReference Include="..\source\dorm.adapter.UIB.BaseAdapter.pas"/>
         <None Include="ModelSupport_DORM_UnitTests\default.txaPackage"/>
         <None Include="ModelSupport_DORM_UnitTests\default.txvpck"/>
         <None Include="ModelSupport_DORM_UnitTests\dorm\default.txvpck"/>
@@ -383,21 +328,6 @@
         <None Include="ModelSupport_DORM_UnitTests_XE3\DORM_UnitTests_XE2\default.txvpck"/>
         <None Include="ModelSupport_DORM_UnitTests_XE3\DORM_UnitTests_XE3\default.txvpck"/>
         <None Include="ModelSupport_DORM_UnitTests_XE3\dorm\adapter\UIB\Firebird\default.txvpck"/>
-        <BuildConfiguration Include="SQLSERVER_STRATEGY">
-            <Key>Cfg_5</Key>
-            <CfgParent>Base</CfgParent>
-        </BuildConfiguration>
-        <BuildConfiguration Include="SQLSERVER_DEVART_STRATEGY">
-            <Key>Cfg_6</Key>
-            <CfgParent>Base</CfgParent>
-        </BuildConfiguration>
-        <BuildConfiguration Include="INTERBASE_UIB_STRATEGY">
-            <Key>Cfg_7</Key>
-            <CfgParent>Base</CfgParent>
-        </BuildConfiguration>
-        <BuildConfiguration Include="Base">
-            <Key>Base</Key>
-        </BuildConfiguration>
         <BuildConfiguration Include="FIREBIRD_UIB_STRATEGY">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -405,6 +335,13 @@
         <BuildConfiguration Include="CI">
             <Key>Cfg_8</Key>
             <CfgParent>Cfg_2</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="INTERBASE_UIB_STRATEGY">
+            <Key>Cfg_7</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Base">
+            <Key>Base</Key>
         </BuildConfiguration>
         <BuildConfiguration Include="SQLITE3_STRATEGY">
             <Key>Cfg_1</Key>
@@ -450,16 +387,11 @@
                     <Source Name="MainSource">DORM_UnitTests_XE3.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclFMXtee9160.bpl">TeeChart Standard FMX Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcltee9160.bpl">TeeChart Standard VCL Components</Excluded_Packages>
-                    <Excluded_Packages Name="C:\windows\system32\OpenWireDsnD16.bpl">OpenWire Project (Design Time)</Excluded_Packages>
-                    <Excluded_Packages Name="D:\DXE2lib\tmssoftware\aureliusxe2\source\aureliusxe2.bpl">TMS Aurelius - Core Package</Excluded_Packages>
-                    <Excluded_Packages Name="C:\windows\system32\OpenWireBindingDsnD16.bpl">(untitled)</Excluded_Packages>
-                    <Excluded_Packages Name="C:\windows\system32\OpenWireEditorDsnD16.bpl">(untitled)</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k160.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp160.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\10.0\Bpl\dorm_runtime_xe3.bpl">(untitled)</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k170.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp170.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k170.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp170.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <UnitTesting>

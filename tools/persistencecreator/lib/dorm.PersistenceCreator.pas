@@ -34,16 +34,17 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-
     procedure Initialize;
     procedure Load(APersistenceFileName: string); virtual;
     procedure Save(APersistenceFileName: string); virtual;
+    procedure InitializeFile(APersistenceFileName: String); virtual;
 
     procedure SetConfig(const Value: TPersistenceConfig);
-    procedure SetEnvironments(const Value: TObjectList<TPersistenceEnvironment>);
-    procedure SetPersistenceClasses(const Value: TObjectList<TPersistenceClass>);
+    procedure SetEnvironments(const Value
+      : TObjectList<TPersistenceEnvironment>);
+    procedure SetPersistenceClasses(const Value
+      : TObjectList<TPersistenceClass>);
     procedure SetPersistenceClassesList(const Value: TStrings);
-
     function GetConfig: TPersistenceConfig;
     function GetEnvironments: TObjectList<TPersistenceEnvironment>;
     function GetPersistenceClasses: TObjectList<TPersistenceClass>;
@@ -71,12 +72,15 @@ type
     constructor Create(AEnvironmentName: string);
     destructor Destroy; override;
     property EnvironmentName: string read FEnvironmentName;
-    property DatabaseAdapter: string read FDatabaseAdapter write SetDatabaseAdapter;
-    property DatabaseConnectionString: string read FDatabaseConnectionString write SetDatabaseConnectionString;
+    property DatabaseAdapter: string read FDatabaseAdapter
+      write SetDatabaseAdapter;
+    property DatabaseConnectionString: string read FDatabaseConnectionString
+      write SetDatabaseConnectionString;
     property KeysGenerator: string read FKeysGenerator write SetKeysGenerator;
     property KeyType: string read FKeyType write SetKeyType;
     property NullKeyValue: string read FNullKeyValue write SetNullKeyValue;
-    property CustomAdapterParameter: TStrings read FCustomAdapterParameter write SetCustomAdapterParameter;
+    property CustomAdapterParameter: TStrings read FCustomAdapterParameter
+      write SetCustomAdapterParameter;
   end;
 
   TPersistenceClass = class(TObject)
@@ -94,7 +98,8 @@ type
     procedure SetLoggerClassName(const Value: string);
   protected
   public
-    property LoggerClassName: string read FLoggerClassName write SetLoggerClassName;
+    property LoggerClassName: string read FLoggerClassName
+      write SetLoggerClassName;
   end;
 
 implementation
@@ -105,7 +110,6 @@ procedure TPersistenceConfig.SetLoggerClassName(const Value: string);
 begin
   FLoggerClassName := Value;
 end;
-
 { TPersistenceCreator }
 
 constructor TPersistenceCreator.Create;
@@ -114,17 +118,20 @@ begin
   FEnvironments.OwnsObjects := True;
   FPersistenceClasses := TObjectList<TPersistenceClass>.Create;
   FPersistenceClasses.OwnsObjects := True;
-
   FPersistenceClassesList := TStringList.Create;
   FEnvironmentsList := TStringList.Create;
 end;
 
 destructor TPersistenceCreator.Destroy;
 begin
-  if Assigned(FEnvironments) then FEnvironments.Free;
-  if Assigned(FPersistenceClasses) then FPersistenceClasses.Free;
-  if Assigned(FPersistenceClassesList) then FPersistenceClassesList.Free;
-  if Assigned(FEnvironmentsList) then FEnvironmentsList.Free;
+  if Assigned(FEnvironments) then
+    FEnvironments.Free;
+  if Assigned(FPersistenceClasses) then
+    FPersistenceClasses.Free;
+  if Assigned(FPersistenceClassesList) then
+    FPersistenceClassesList.Free;
+  if Assigned(FEnvironmentsList) then
+    FEnvironmentsList.Free;
   inherited;
 end;
 
@@ -133,7 +140,8 @@ begin
   Result := FConfig;
 end;
 
-function TPersistenceCreator.GetEnvironments: TObjectList<TPersistenceEnvironment>;
+function TPersistenceCreator.GetEnvironments
+  : TObjectList<TPersistenceEnvironment>;
 begin
   Result := FEnvironments;
 end;
@@ -143,7 +151,7 @@ var
   i: Integer;
 begin
   Result := nil;
-  if Assigned(FEnvironments) and (FEnvironments.Count>0) then
+  if Assigned(FEnvironments) and (FEnvironments.Count > 0) then
   begin
     FEnvironmentsList.Clear;
     for i := 0 to FEnvironments.Count - 1 do
@@ -154,7 +162,8 @@ begin
   end;
 end;
 
-function TPersistenceCreator.GetPersistenceClasses: TObjectList<TPersistenceClass>;
+function TPersistenceCreator.GetPersistenceClasses
+  : TObjectList<TPersistenceClass>;
 begin
   Result := FPersistenceClasses;
 end;
@@ -163,7 +172,7 @@ function TPersistenceCreator.GetPersistenceClassesList: TStrings;
 var
   i: Integer;
 begin
-  if Assigned(FPersistenceClasses) and (FPersistenceClasses.Count>0) then
+  if Assigned(FPersistenceClasses) and (FPersistenceClasses.Count > 0) then
   begin
     FPersistenceClassesList.Clear;
     for i := 0 to FPersistenceClasses.Count - 1 do
@@ -212,7 +221,13 @@ begin
   InitConfig;
 end;
 
-procedure TPersistenceCreator.SetDefaultProperty(var Env: TPersistenceEnvironment);
+procedure TPersistenceCreator.InitializeFile(APersistenceFileName: String);
+begin
+  //do nothing
+end;
+
+procedure TPersistenceCreator.SetDefaultProperty
+  (var Env: TPersistenceEnvironment);
 begin
   Env.DatabaseAdapter := 'Select DatabaseAdapter';
   Env.DatabaseConnectionString := 'Set DatabaseConnectionString';
@@ -225,35 +240,30 @@ procedure TPersistenceCreator.InitPersistenceClasses;
 begin
   inherited;
   FPersistenceClasses.Clear;
-  FPersistenceClasses.Add(TPersistenceClass.Create('TPerson'));
-  FPersistenceClasses.Add(TPersistenceClass.Create('TPhone'));
-  FPersistenceClasses.Add(TPersistenceClass.Create('TCar'));
-  FPersistenceClasses.Add(TPersistenceClass.Create('TEmail'));
+  // FPersistenceClasses.Add(TPersistenceClass.Create('TPerson'));
+  // FPersistenceClasses.Add(TPersistenceClass.Create('TPhone'));
+  // FPersistenceClasses.Add(TPersistenceClass.Create('TCar'));
+  // FPersistenceClasses.Add(TPersistenceClass.Create('TEmail'));
 end;
 
 procedure TPersistenceCreator.Load(APersistenceFileName: string);
 begin
-
 end;
 
 procedure TPersistenceCreator.LoadConfig;
 begin
-
 end;
 
 procedure TPersistenceCreator.LoadEnvironments;
 begin
-
 end;
 
 procedure TPersistenceCreator.LoadPersistenceClasses;
 begin
-
 end;
 
 procedure TPersistenceCreator.Save(APersistenceFileName: string);
 begin
-
 end;
 
 procedure TPersistenceCreator.SetConfig(const Value: TPersistenceConfig);
@@ -261,14 +271,14 @@ begin
   FConfig := Value;
 end;
 
-procedure TPersistenceCreator.SetEnvironments(
-  const Value: TObjectList<TPersistenceEnvironment>);
+procedure TPersistenceCreator.SetEnvironments(const Value
+  : TObjectList<TPersistenceEnvironment>);
 begin
   FEnvironments := Value;
 end;
 
-procedure TPersistenceCreator.SeTPersistenceClasses(
-  const Value: TObjectList<TPersistenceClass>);
+procedure TPersistenceCreator.SetPersistenceClasses
+  (const Value: TObjectList<TPersistenceClass>);
 begin
   FPersistenceClasses := Value;
 end;
@@ -278,10 +288,9 @@ var
   i: Integer;
   PersClasses: TPersistenceClass;
 begin
-  if Assigned(Value) and (Value.Count>0) then
+  if Assigned(Value) and (Value.Count > 0) then
   begin
     FPersistenceClasses.Clear;
-
     for i := 0 to Value.Count - 1 do
     begin
       PersClasses := TPersistenceClass.Create(Value.Strings[i]);
@@ -289,7 +298,6 @@ begin
     end;
   end;
 end;
-
 { TPersistenceEnvironment }
 
 constructor TPersistenceEnvironment.Create(AEnvironmentName: string);
@@ -304,26 +312,24 @@ begin
   inherited;
 end;
 
-procedure TPersistenceEnvironment.SetCustomAdapterParameter(
-  const Value: TStrings);
+procedure TPersistenceEnvironment.SetCustomAdapterParameter
+  (const Value: TStrings);
 begin
   FCustomAdapterParameter := Value;
 end;
 
-procedure TPersistenceEnvironment.SetDatabaseAdapter(
-  const Value: string);
+procedure TPersistenceEnvironment.SetDatabaseAdapter(const Value: string);
 begin
   FDatabaseAdapter := Value;
 end;
 
-procedure TPersistenceEnvironment.SetDatabaseConnectionString(
-  const Value: string);
+procedure TPersistenceEnvironment.SetDatabaseConnectionString
+  (const Value: string);
 begin
   FDatabaseConnectionString := Value;
 end;
 
-procedure TPersistenceEnvironment.SetKeysGenerator(
-  const Value: string);
+procedure TPersistenceEnvironment.SetKeysGenerator(const Value: string);
 begin
   FKeysGenerator := Value;
 end;
@@ -337,7 +343,6 @@ procedure TPersistenceEnvironment.SetNullKeyValue(const Value: string);
 begin
   FNullKeyValue := Value;
 end;
-
 { TPersistenceClass }
 
 constructor TPersistenceClass.Create(APersistenceClassName: string);

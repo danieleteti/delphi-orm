@@ -13,7 +13,6 @@
   See the License for the specific language governing permissions and
   limitations under the License.
   ******************************************************************************** }
-
 unit BaseTestCase;
 
 interface
@@ -23,8 +22,7 @@ uses
   Generics.Collections,
   dorm,
   dorm.Collections,
-  dorm.tests.bo,
-  dorm.InterposedObject;
+  dorm.tests.bo;
 
 type
   TBaseTestCase = class(TTestCase)
@@ -131,10 +129,9 @@ end;
 procedure TBaseTestCase.SetUp;
 begin
   inherited;
-  Session := TSession.CreateSession(deTest);
-  Session.Configure(
-    TStreamReader.Create(GetDORMConfigFileName),
-    TStreamReader.Create(GetDORMMappingFileName));
+  Session := TSession.CreateConfigured
+    (TStreamReader.Create(GetDORMConfigFileName),
+    TStreamReader.Create(GetDORMMappingFileName), deTest);
   Session.StartTransaction;
   Session.DeleteAll(TPerson);
   Session.DeleteAll(TPhone);

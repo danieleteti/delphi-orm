@@ -17,7 +17,6 @@ uses
   dorm.Collections in '..\source\dorm.Collections.pas',
   dorm.Commons in '..\source\dorm.Commons.pas',
   dorm.Core.IdentityMap in '..\source\dorm.Core.IdentityMap.pas',
-  dorm.InterposedObject in '..\source\dorm.InterposedObject.pas',
   dorm in '..\source\dorm.pas',
   dorm.UOW in '..\source\dorm.UOW.pas',
   dorm.Utils in '..\source\dorm.Utils.pas',
@@ -39,8 +38,7 @@ uses
   TestDORMMapping.Attributes in 'TestDORMMapping.Attributes.pas',
   TestDORMMapping.CoC in 'TestDORMMapping.CoC.pas',
   TestDORMMapping.FileJSON in 'TestDORMMapping.FileJSON.pas',
-  dorm.adapter.Base in '..\source\dorm.adapter.Base.pas',
-  dorm.adapter.UIB.BaseAdapter in '..\source\dorm.adapter.UIB.BaseAdapter.pas';
+  dorm.adapter.Base in '..\source\dorm.adapter.Base.pas';
 
 {$R *.RES}
 

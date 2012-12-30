@@ -27,11 +27,9 @@ uses
   dorm.Filters,
   dorm.Collections,
   dorm.Commons,
-  dorm.InterposedObject,
   Generics.Defaults;
 
 type
-{$RTTI EXPLICIT FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished]) METHODS([vcPrivate, vcProtected, vcPublic, vcPublished]) PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
   TPeople = class({$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND})
   protected
     function GetElement(const index: Integer): TPerson;

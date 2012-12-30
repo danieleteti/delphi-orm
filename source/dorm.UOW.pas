@@ -22,8 +22,7 @@ uses
   rtti,
   dorm.Commons,
   dorm.Collections,
-  Generics.Collections,
-  dorm.InterposedObject;
+  Generics.Collections;
 
 type
   TdormUOW = class

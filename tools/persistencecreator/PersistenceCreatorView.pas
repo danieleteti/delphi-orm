@@ -85,30 +85,29 @@ type
     procedure SetNullKeyValue(AText: String);
     procedure SetCustomAdapterConfig(AList: TStrings);
     procedure SetDatabaseConnectionString(AText: String);
-
     procedure SetTitleCaption(AText: String);
     procedure SetStatusBarSimpleText(AText: String);
-
-    function  GetEnvironments: TStrings;
-    function  GetPersistentClass: TStrings;
-    function  GetDatabaseAdapter: String;
-    function  GetKeysGenerator: String;
-    function  GetLoggerClassName: String;
-    function  GetKeyType: String;
-    function  GetCustomAdapterConfig: TStrings;
-    function  GetDatabaseConnectionString: String;
-    function  GetNullKeyValue: String;
-
+    function GetEnvironments: TStrings;
+    function GetPersistentClass: TStrings;
+    function GetDatabaseAdapter: String;
+    function GetKeysGenerator: String;
+    function GetLoggerClassName: String;
+    function GetKeyType: String;
+    function GetCustomAdapterConfig: TStrings;
+    function GetDatabaseConnectionString: String;
+    function GetNullKeyValue: String;
     procedure SetViewCommand(AViewCommand: IPersistenceCreatorViewCommand);
+    function StartView: Integer;
   end;
 
-const FORM_TITLE = 'dorm (the Delphi ORM), Persistence file creator Current File: %s';
+const
+  FORM_TITLE =
+    'dorm (the Delphi ORM), Persistence file creator Current File: %s';
 
 implementation
 
 uses
   System.ioutils;
-
 {$R *.dfm}
 
 procedure TfrmPersistenceCreatorView.btnNewPersistentFileClick(Sender: TObject);
@@ -117,15 +116,15 @@ begin
   FViewCommand.NewPersistenceFileExecute;
 end;
 
-procedure TfrmPersistenceCreatorView.btnOpenPersistenceFileClick(
-  Sender: TObject);
+procedure TfrmPersistenceCreatorView.btnOpenPersistenceFileClick
+  (Sender: TObject);
 begin
   FViewStatus := vsEdit;
   FViewCommand.OpenPersistenceFileExecute;
 end;
 
-procedure TfrmPersistenceCreatorView.btnSavePersistenceFileClick(
-  Sender: TObject);
+procedure TfrmPersistenceCreatorView.btnSavePersistenceFileClick
+  (Sender: TObject);
 begin
   FViewCommand.SavePersistenceFileExecute;
 end;
@@ -137,15 +136,16 @@ end;
 
 procedure TfrmPersistenceCreatorView.mnuRemoveClassClick(Sender: TObject);
 begin
-  if lbxPersistentClasses.ItemIndex<>-1 then
+  if lbxPersistentClasses.ItemIndex <> -1 then
   begin
-    FViewCommand.RemovePersistentClassExecute(lbxPersistentClasses.Items[lbxPersistentClasses.ItemIndex]);
+    FViewCommand.RemovePersistentClassExecute
+      (lbxPersistentClasses.Items[lbxPersistentClasses.ItemIndex]);
   end;
 end;
 
 procedure TfrmPersistenceCreatorView.FormCreate(Sender: TObject);
 begin
-  Self.Caption := Format(FORM_TITLE,['']);
+  Self.Caption := Format(FORM_TITLE, ['']);
   LoadComboDatabaseAdapter;
   LoadComboKeysGenerator;
   LoadComboKeyType;
@@ -199,7 +199,8 @@ end;
 
 procedure TfrmPersistenceCreatorView.lbxEnvironmentsClick(Sender: TObject);
 begin
-  FViewCommand.ChangeEnvironmentExecute(lbxEnvironments.Items[lbxEnvironments.ItemIndex]);
+  FViewCommand.ChangeEnvironmentExecute
+    (lbxEnvironments.Items[lbxEnvironments.ItemIndex]);
 end;
 
 procedure TfrmPersistenceCreatorView.SetNullKeyValue(AText: String);
@@ -222,7 +223,8 @@ procedure TfrmPersistenceCreatorView.SetEnvironments(AList: TStrings);
 begin
   lbxEnvironments.Clear;
   lbxEnvironments.Items := AList;
-  if lbxEnvironments.Items.Count > 0 then lbxEnvironments.ItemIndex := 0;
+  if lbxEnvironments.Items.Count > 0 then
+    lbxEnvironments.ItemIndex := 0;
 end;
 
 procedure TfrmPersistenceCreatorView.SetDatabaseAdapter(AValue: String);
@@ -254,11 +256,10 @@ end;
 procedure TfrmPersistenceCreatorView.SetStatusBarSimpleText(AText: String);
 begin
   stbStatus.Panels[0].Text := AText;
-
   if FViewStatus = vsNew then
-    stbStatus.Panels[1].Text := Format('View status: %s',['Add new file'])
+    stbStatus.Panels[1].Text := Format('View status: %s', ['Add new file'])
   else
-    stbStatus.Panels[1].Text := Format('View status: %s',['Edit file']);
+    stbStatus.Panels[1].Text := Format('View status: %s', ['Edit file']);
 end;
 
 procedure TfrmPersistenceCreatorView.SetTitleCaption(AText: String);
@@ -266,10 +267,15 @@ begin
   Self.Caption := AText;
 end;
 
-procedure TfrmPersistenceCreatorView.SetViewCommand(
-  AViewCommand: IPersistenceCreatorViewCommand);
+procedure TfrmPersistenceCreatorView.SetViewCommand(AViewCommand
+  : IPersistenceCreatorViewCommand);
 begin
   FViewCommand := AViewCommand;
+end;
+
+function TfrmPersistenceCreatorView.StartView: Integer;
+begin
+  Result := ShowModal;
 end;
 
 procedure TfrmPersistenceCreatorView.LoadComboDatabaseAdapter;

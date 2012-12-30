@@ -53,8 +53,7 @@ uses
   SysUtils,
   dorm.Commons,
   dorm.tests.bo,
-  dorm.UOW,
-  dorm.InterposedObject;
+  dorm.UOW;
 
 { TTestDORM }
 

@@ -43,8 +43,7 @@ uses
   dorm.Commons,
   dorm.Collections,
   dorm.tests.bo,
-  DateUtils,
-  dorm.InterposedObject;
+  DateUtils;
 
 { TTestDORMSpeed }
 

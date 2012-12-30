@@ -1,0 +1,49 @@
+package dorm_designtime_xe3;
+
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESIGNONLY}
+{$IMPLICITBUILD ON}
+
+requires
+  rtl,
+  dorm_runtime_xe3,
+  designide,
+  vclimg,
+  DbxCommonDriver,
+  CodeSiteExpressPkg;
+
+contains
+  dorm.Component.Registrations in '..\..\dorm.Component.Registrations.pas',
+  dorm.Component.SessionComponentEditor in '..\..\dorm.Component.SessionComponentEditor.pas',
+  DORMSessionComponentEditorForm in '..\..\editors\DORMSessionComponentEditorForm.pas' {DORMSessionEditorForm},
+  PersistenceCreatorView in '..\..\..\tools\persistencecreator\PersistenceCreatorView.pas' {frmPersistenceCreatorView},
+  dorm.PersistenceCreator.Intf in '..\..\..\tools\persistencecreator\lib\dorm.PersistenceCreator.Intf.pas',
+  dorm.PersistenceCreator in '..\..\..\tools\persistencecreator\lib\dorm.PersistenceCreator.pas',
+  dorm.PersistenceCreator.PersistenceJsonFile in '..\..\..\tools\persistencecreator\lib\dorm.PersistenceCreator.PersistenceJsonFile.pas',
+  dorm.PersistenceCreator.Presenter in '..\..\..\tools\persistencecreator\lib\dorm.PersistenceCreator.Presenter.pas';
+
+end.

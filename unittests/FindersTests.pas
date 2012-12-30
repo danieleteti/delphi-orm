@@ -47,7 +47,6 @@ implementation
 uses
   Generics.Collections,
   dorm.tests.bo,
-  dorm.InterposedObject,
   SysUtils;
 
 { TFindersTests }

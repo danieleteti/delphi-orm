@@ -18,7 +18,8 @@ type
     FTableName: String;
     FPackage: String;
   public
-    constructor Create(const ATableName: String = ''; const APackageName: String = '');
+    constructor Create(const ATableName: String = '';
+      const APackageName: String = '');
     property TableName: String read FTableName;
     property Package: String read FPackage;
   end;
@@ -45,7 +46,6 @@ type
   end;
 
   NoAutomapping = class(TCustomAttribute)
-
   end;
 
   Size = class(TCustomAttribute)
@@ -66,20 +66,22 @@ type
     property Value: String read FValue;
   end;
 
+  ListOf = class(DefaultValue)
+  end;
+
   TCustomRelationAttribute = class(TCustomAttribute)
   private
     FChildPropertyName: String;
     FLazyLoad: boolean;
   public
-    constructor Create(const AChildPropertyName: String; ALazyLoad: boolean = False);
+    constructor Create(const AChildPropertyName: String;
+      ALazyLoad: boolean = False);
     property ChildPropertyName: String read FChildPropertyName;
     property LazyLoad: boolean read FLazyLoad;
   end;
 
   Lazy = class(TCustomAttribute);
-
   HasOne = class(TCustomRelationAttribute);
-
   HasMany = class(TCustomRelationAttribute);
 
   BelongsTo = class(TCustomAttribute)
@@ -87,7 +89,8 @@ type
     FRefPropertyName: String;
     FLazyLoad: boolean;
   public
-    constructor Create(const ARefPropertyName: String; ALazyLoad: boolean = False);
+    constructor Create(const ARefPropertyName: String;
+      ALazyLoad: boolean = False);
     property RefPropertyName: String read FRefPropertyName;
     property LazyLoad: boolean read FLazyLoad;
   end;
@@ -96,10 +99,8 @@ type
   Transient = class(TCustomAttribute);
 
   // Mapping classes
-
   TdormIndexType = (itNone, itIndex, itUnique);
   TdormKeyType = (ktInteger, ktString);
-
   TMappingTable = class;
 
   TMappingField = class
@@ -196,15 +197,14 @@ uses
   StrUtils,
   dorm.Utils,
   dorm.Commons;
-
 { Entity }
 
-constructor Entity.Create(const ATableName: String = ''; const APackageName: String = '');
+constructor Entity.Create(const ATableName: String = '';
+  const APackageName: String = '');
 begin
   FTableName := ATableName;
   FPackage := APackageName;
 end;
-
 { Column }
 
 constructor Column.Create;
@@ -228,13 +228,11 @@ begin
 end;
 
 constructor Column.Create(const AColumnName: string; AFieldType: String;
-  ASize: Cardinal = 0; APrecision: Cardinal = 0;
-  ADefaultValue: String = '');
+  ASize: Cardinal = 0; APrecision: Cardinal = 0; ADefaultValue: String = '');
 begin
   Create(AColumnName, ASize, APrecision, ADefaultValue);
   FFieldType := AFieldType;
 end;
-
 { Size }
 
 constructor Size.Create(const ASize: Cardinal; const APrecision: Cardinal = 0);
@@ -243,7 +241,6 @@ begin
   FColumnSize := ASize;
   FColumnPrecision := APrecision;
 end;
-
 { DefaultValue }
 
 constructor DefaultValue.Create(const ADefaultValue: String);
@@ -251,7 +248,6 @@ begin
   inherited Create;
   FValue := ADefaultValue;
 end;
-
 { TCustomRelationAttribute }
 
 constructor TCustomRelationAttribute.Create(const AChildPropertyName: String;
@@ -261,16 +257,15 @@ begin
   FChildPropertyName := AChildPropertyName;
   FLazyLoad := ALazyLoad;
 end;
-
 { BelongsTo }
 
-constructor BelongsTo.Create(const ARefPropertyName: String; ALazyLoad: boolean = False);
+constructor BelongsTo.Create(const ARefPropertyName: String;
+  ALazyLoad: boolean = False);
 begin
   inherited Create;
   FRefPropertyName := ARefPropertyName;
   FLazyLoad := ALazyLoad;
 end;
-
 { TMappingTable }
 
 constructor TMappingTable.Create;
@@ -292,7 +287,8 @@ begin
   inherited;
 end;
 
-function TMappingTable.FindBelongsToByName(const AName: string): TMappingBelongsTo;
+function TMappingTable.FindBelongsToByName(const AName: string)
+  : TMappingBelongsTo;
 var
   _Rel: TMappingBelongsTo;
 begin
@@ -347,7 +343,6 @@ var
   F: TMappingField;
 begin
   Result := Nil;
-
   for F in Fields do
     if F.IsPK then
       Exit(F);
@@ -381,7 +376,6 @@ function TMappingTable.ToString: string;
 begin
   Result := Format('Package: %s,  Table: %s', [Package, TableName]);
 end;
-
 { TMappingField }
 
 procedure TMappingField.Assign(Source: TMappingField);
@@ -413,7 +407,6 @@ begin
   Result := Format('PK: %s, name: %s, field: %s, field type: %s',
     [BoolToStr(IsPK, True), name, FieldName, FieldType]);
 end;
-
 { TMappingRelation }
 
 procedure TMappingRelation.Assign(Source: TMappingRelation);
@@ -423,7 +416,6 @@ begin
   FChildFieldName := Source.ChildFieldName;
   FLazyLoad := Source.LazyLoad;
 end;
-
 { TMappingBelongsTo }
 
 procedure TMappingBelongsTo.Assign(Source: TMappingBelongsTo);
