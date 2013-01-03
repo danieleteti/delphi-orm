@@ -4,11 +4,12 @@ object frmClientMain: TfrmClientMain
   Caption = 'DORM With Livebindings'
   ClientHeight = 433
   ClientWidth = 793
-  Visible = False
+  StyleBook = StyleBook1
+  FormFactor.Width = 1600
+  FormFactor.Height = 900
+  FormFactor.Devices = [dkDesktop]
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  StyleBook = StyleBook1
-  StyleLookup = 'backgroundstyle'
   object StyleBook1: TStyleBook
     Resource.Strings = (
       'object _1: TLayout'
@@ -527,183 +528,192 @@ object frmClientMain: TfrmClientMain
   end
   object ScaledLayout1: TScaledLayout
     Align = alClient
-    Width = 793.000000000000000000
     Height = 433.000000000000000000
     OriginalWidth = 793.000000000000000000
     OriginalHeight = 433.000000000000000000
+    Width = 793.000000000000000000
     object Rectangle1: TRectangle
-      Position.Point = '(472,80)'
-      Width = 305.000000000000000000
-      Height = 217.000000000000000000
       Fill.Kind = bkGradient
       Fill.Gradient.Points = <
         item
           Color = xFFE0E0E0
+          Offset = 0.000000000000000000
         end
         item
           Color = claWhite
           Offset = 1.000000000000000000
         end>
+      Height = 217.000000000000000000
+      Position.X = 472.000000000000000000
+      Position.Y = 80.000000000000000000
+      Width = 305.000000000000000000
     end
     object Button1: TButton
-      Position.Point = '(120,8)'
-      Width = 89.000000000000000000
+      DisableFocusEffect = False
       Height = 25.000000000000000000
-      OnClick = Button1Click
-      TabOrder = 1
+      Position.X = 120.000000000000000000
+      Position.Y = 8.000000000000000000
       Text = 'Refresh List'
+      Width = 89.000000000000000000
       WordWrap = True
+      OnClick = Button1Click
     end
     object Button2: TButton
-      Position.Point = '(16,8)'
-      Width = 97.000000000000000000
+      DisableFocusEffect = False
       Height = 25.000000000000000000
-      OnClick = Button2Click
-      TabOrder = 2
+      Position.X = 16.000000000000000000
+      Position.Y = 8.000000000000000000
       Text = 'New'
+      Width = 97.000000000000000000
+      OnClick = Button2Click
     end
     object Button3: TButton
-      Position.Point = '(680,256)'
-      Width = 80.000000000000000000
+      DisableFocusEffect = False
       Height = 22.000000000000000000
-      OnClick = Button3Click
-      TabOrder = 3
+      Position.X = 680.000000000000000000
+      Position.Y = 256.000000000000000000
       Text = 'Save'
+      Width = 80.000000000000000000
+      OnClick = Button3Click
     end
     object Button4: TButton
-      Position.Point = '(150,400)'
-      Width = 65.000000000000000000
+      DisableFocusEffect = False
       Height = 22.000000000000000000
-      OnClick = Button4Click
-      TabOrder = 4
+      Position.X = 150.000000000000000000
+      Position.Y = 400.000000000000000000
       Text = 'Search'
+      Width = 65.000000000000000000
+      OnClick = Button4Click
     end
     object Button5: TButton
-      Position.Point = '(592,256)'
-      Width = 80.000000000000000000
+      DisableFocusEffect = False
       Height = 22.000000000000000000
-      OnClick = Button5Click
-      TabOrder = 5
+      Position.X = 592.000000000000000000
+      Position.Y = 256.000000000000000000
       Text = 'Delete'
+      Width = 80.000000000000000000
+      OnClick = Button5Click
     end
     object CheckBox1: TCheckBox
-      Position.Point = '(608,209)'
-      Width = 120.000000000000000000
+      DisableFocusEffect = False
       Height = 19.000000000000000000
-      TabOrder = 6
+      Position.X = 608.000000000000000000
+      Position.Y = 209.000000000000000000
       Text = 'Adult'
+      Width = 120.000000000000000000
     end
     object Edit1: TEdit
-      Position.Point = '(496,112)'
+      DisableFocusEffect = False
+      KeyboardType = vktDefault
+      Password = False
+      Position.X = 496.000000000000000000
+      Position.Y = 112.000000000000000000
       Width = 217.000000000000000000
       Height = 22.000000000000000000
       OnExit = Edit1Exit
-      TabOrder = 7
-      KeyboardType = vktDefault
-      Password = False
       object Label1: TLabel
-        Position.Point = '(1,-17)'
-        Width = 120.000000000000000000
         Height = 15.000000000000000000
-        TabOrder = 0
+        Position.X = 1.000000000000000000
+        Position.Y = -17.000000000000000000
         Text = 'First name'
+        Width = 120.000000000000000000
       end
     end
     object Edit2: TEdit
-      Position.Point = '(496,160)'
+      DisableFocusEffect = False
+      KeyboardType = vktDefault
+      Password = False
+      Position.X = 496.000000000000000000
+      Position.Y = 160.000000000000000000
       Width = 217.000000000000000000
       Height = 22.000000000000000000
       OnExit = Edit1Exit
-      TabOrder = 8
-      KeyboardType = vktDefault
-      Password = False
       object Label2: TLabel
-        Position.Point = '(0,-16)'
-        Width = 120.000000000000000000
         Height = 15.000000000000000000
-        TabOrder = 0
+        Position.Y = -16.000000000000000000
         Text = 'Last name'
+        Width = 120.000000000000000000
       end
     end
     object Edit3: TEdit
-      Position.Point = '(22,400)'
-      Width = 121.000000000000000000
-      Height = 22.000000000000000000
-      TabOrder = 9
+      DisableFocusEffect = False
       KeyboardType = vktDefault
       Password = False
+      Position.X = 22.000000000000000000
+      Position.Y = 400.000000000000000000
+      Width = 121.000000000000000000
+      Height = 22.000000000000000000
     end
     object Label4: TLabel
-      Position.Point = '(22,372)'
-      Width = 153.000000000000000000
       Height = 25.000000000000000000
-      TabOrder = 10
+      Position.X = 22.000000000000000000
+      Position.Y = 372.000000000000000000
       Text = 'Search for First or Last name (Case Sensitive search)'
+      Width = 153.000000000000000000
     end
     object ListBox1: TListBox
-      Position.Point = '(24,80)'
-      Width = 193.000000000000000000
+      Touch.InteractiveGestures = [igPan]
       Height = 281.000000000000000000
-      CanClip = False
-      OnClick = ListBox1Click
+      Position.X = 24.000000000000000000
+      Position.Y = 80.000000000000000000
       StyleLookup = 'ListBox1Style1'
-      TabOrder = 11
+      Width = 193.000000000000000000
+      OnClick = ListBox1Click
       object TListBoxItem
-        Width = 191.000000000000000000
-        Height = 57.000000000000000000
-        HitTest = False
-        StyleLookup = 'Style1'
-        TabOrder = 0
         Font.Size = 22.000000000000000000
+        Height = 57.000000000000000000
+        StyleLookup = 'Style1'
         Text = 'Item'
+        Width = 191.000000000000000000
       end
     end
     object SpinBox1: TSpinBox
-      Position.Point = '(496,208)'
+      Cursor = crIBeam
+      Min = 1.000000000000000000
+      Value = 1.000000000000000000
+      DisableFocusEffect = False
+      KeyboardType = vktDefault
+      Position.X = 496.000000000000000000
+      Position.Y = 208.000000000000000000
       Width = 100.000000000000000000
       Height = 22.000000000000000000
-      TabOrder = 12
-      KeyboardType = vktDefault
       OnChange = SpinBox1Change
-      Min = 1.000000000000000000
-      Max = 100.000000000000000000
-      Value = 1.000000000000000000
-      Increment = 1.000000000000000000
       object Label3: TLabel
-        Position.Point = '(0,-16)'
-        Width = 120.000000000000000000
         Height = 15.000000000000000000
-        TabOrder = 0
+        Position.Y = -16.000000000000000000
         Text = 'Age'
+        Width = 120.000000000000000000
       end
     end
     object ListBox2: TListBox
-      Position.Point = '(240,80)'
-      Width = 201.000000000000000000
+      Touch.InteractiveGestures = [igPan]
       Height = 281.000000000000000000
-      TabOrder = 13
+      Position.X = 240.000000000000000000
+      Position.Y = 80.000000000000000000
+      Width = 201.000000000000000000
     end
     object Label5: TLabel
-      Position.Point = '(24,64)'
-      Width = 120.000000000000000000
       Height = 15.000000000000000000
-      TabOrder = 14
+      Position.X = 24.000000000000000000
+      Position.Y = 64.000000000000000000
       Text = 'People'
+      Width = 120.000000000000000000
     end
     object Label6: TLabel
-      Position.Point = '(240,64)'
-      Width = 120.000000000000000000
       Height = 15.000000000000000000
-      TabOrder = 15
+      Position.X = 240.000000000000000000
+      Position.Y = 64.000000000000000000
       Text = 'Laptops'
+      Width = 120.000000000000000000
     end
     object Button6: TButton
-      Position.Point = '(360,56)'
-      Width = 80.000000000000000000
+      DisableFocusEffect = False
       Height = 22.000000000000000000
-      OnClick = Button6Click
-      TabOrder = 16
+      Position.X = 360.000000000000000000
+      Position.Y = 56.000000000000000000
       Text = 'New Laptop'
+      Width = 80.000000000000000000
+      OnClick = Button6Click
     end
   end
   object BindingsList1: TBindingsList
@@ -797,16 +807,19 @@ object frmClientMain: TfrmClientMain
     end
   end
   object BindScopePeople: TBindScope
+    ScopeMappings = <>
     Left = 104
     Top = 256
   end
   object BindScopePerson: TBindScope
     AutoActivate = False
+    ScopeMappings = <>
     Left = 712
     Top = 168
   end
   object BindScopeLaptops: TBindScope
     AutoActivate = False
+    ScopeMappings = <>
     Left = 320
     Top = 152
   end

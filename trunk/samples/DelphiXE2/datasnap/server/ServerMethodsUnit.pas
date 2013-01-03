@@ -69,6 +69,7 @@ begin
     TStreamReader.Create('samples.mapping'),
 
     deDevelopment);
+  Session.StartTransaction;
 end;
 
 procedure TdormServerSample.DataModuleDestroy(Sender: TObject);
@@ -79,6 +80,7 @@ end;
 procedure TdormServerSample.Delete(AObject: TObject);
 begin
   Session.Delete(AObject);
+  Session.Commit(true);
 end;
 
 function TdormServerSample.EchoString(Value: string): string;
@@ -90,22 +92,26 @@ function TdormServerSample.GetPeople: TObjectList<TPerson>;
 begin
   Result := TObjectList<TPerson>.Create;
   Session.FillList<TPerson>(Result);
+  Session.Commit(true);
 end;
 
 function TdormServerSample.LoadPersonByOID(OID: Integer): TPerson;
 begin
   Result := Session.Load<TPerson>(OID);
+  Session.Commit(true);
 end;
 
 procedure TdormServerSample.LoadRelations(var APerson: TPerson);
 begin
   Session.LoadRelations(APerson, [drHasMany, drHasOne]);
+  Session.Commit(true);
 end;
 
 function TdormServerSample.Persist(AObject: TObject): Integer;
 begin
   Session.Persist(AObject);
   Result := TdormUtils.GetProperty(AObject, 'ID').AsInteger;
+  Session.Commit(true);
 end;
 
 function TdormServerSample.ReverseString(Value: string): string;
@@ -123,6 +129,7 @@ begin
     Criteria := TdormCriteria.
       NewCriteria('FirstName', coEqual, AName)._Or('LastName', coEqual, AName);
   Session.FillList<TPerson>(Result, Criteria);
+  Session.Commit(true);
 end;
 
 end.

@@ -76,6 +76,7 @@ begin
     TStreamReader.Create('dorm.conf'),
     TStreamReader.Create('dorm.mapping'),
     deDevelopment);
+  Session.StartTransaction;
 end;
 
 { TButtonWrapper }

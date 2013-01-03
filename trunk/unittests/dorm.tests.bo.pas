@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2012 Daniele Teti
+  Copyright 2010-2013 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -36,11 +36,17 @@ type
   TEmployee = class;
 
   TPhones = class(
+
 {$IF CompilerVersion >= 23}
+
     TObjectList<TPhone>
+
 {$ELSE}
+
     TdormObjectList<TPhone>
+
 {$IFEND}
+
     )
   end;
 
@@ -58,6 +64,7 @@ type
     procedure SetOwner(const Value: TPerson);
     // Private!!!
     property PersonID: Integer read FPersonID write SetPersonID;
+
   public
     class function NewCar: TCar;
     property ID: Integer read FID write SetID;
@@ -66,7 +73,7 @@ type
     property Owner: TPerson read FOwner write SetOwner;
   end;
 
-  TEmail = class(TdormObject)
+  TEmail = class
   private
     FValue: string;
     FPersonID: Integer;
@@ -77,10 +84,11 @@ type
     procedure SetID(const Value: Integer);
     // Private!!!
     property PersonID: Integer read FPersonID write SetPersonID;
+
   public
     class function NewEmail: TEmail;
-    function Validate: Boolean; override;
-    procedure OnAfterLoad; override;
+    procedure Validate;
+    procedure OnAfterLoad;
     property ID: Integer read FID write SetID;
     property Value: string read FValue write SetValue;
     [Transient]
@@ -111,6 +119,7 @@ type
     procedure SetPhoto(const Value: TStream);
     function GetFullName: string;
     procedure SetIsMale(const Value: Boolean);
+
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -145,6 +154,7 @@ type
     function GetIsItalianNumber: Boolean;
     // Private!!!
     property PersonID: Integer read FPersonID write SetPersonID;
+
   public
     class constructor Create;
     class procedure register;
@@ -167,6 +177,7 @@ type
     procedure setDepartmentName(const Value: string);
     procedure setEmployees(const Value: TEmployees);
     procedure SetID(const Value: string);
+
   public
     constructor Create(); virtual;
     destructor Destroy; override;
@@ -191,6 +202,7 @@ type
     procedure SetFirstName(const Value: string);
     procedure SetLastName(const Value: string);
     property DepartmentID: string read FDepartmentID write FDepartmentID;
+
   public
     class function NewEmployee(): TEmployee;
     property EmployeeID: string read FEmployeeID write setEmployeeID;
@@ -204,16 +216,39 @@ type
   TPersonDirty = class(TPerson)
   private
     FObjStatus: TdormObjectStatus;
+    FHistory: TStringList;
     procedure SetObjStatus(const Value: TdormObjectStatus);
+
   public
+    class function NewPersonDirty: TPersonDirty;
+    constructor Create; override;
+    destructor Destroy; override;
+    function GetEventAndValidationHistory: TStringList;
     [Transient]
     property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
+    /// /// VALIDATIONS ///////
+    procedure Validate;
+    procedure InsertValidate;
+    procedure UpdateValidate;
+    procedure DeleteValidate;
+    /// EVENTS ////
+    procedure OnAfterLoad;
+    procedure OnBeforeLoad;
+    procedure OnBeforePersist;
+    procedure OnAfterPersist;
+    procedure OnBeforeInsert;
+    procedure OnAfterInsert;
+    procedure OnBeforeUpdate;
+    procedure OnAfterUpdate;
+    procedure OnBeforeDelete;
+    procedure OnAfterDelete;
   end;
 
   TPhoneDirty = class(TPhone)
   private
     FObjStatus: TdormObjectStatus;
     procedure SetObjStatus(const Value: TdormObjectStatus);
+
   public
     [Transient]
     property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
@@ -223,6 +258,7 @@ type
   private
     FObjStatus: TdormObjectStatus;
     procedure SetObjStatus(const Value: TdormObjectStatus);
+
   public
     [Transient]
     property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
@@ -232,6 +268,7 @@ type
   private
     FObjStatus: TdormObjectStatus;
     procedure SetObjStatus(const Value: TdormObjectStatus);
+
   public
     [Transient]
     property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
@@ -478,11 +515,10 @@ begin
   FValue := Value;
 end;
 
-function TEmail.Validate: Boolean;
+procedure TEmail.Validate;
 begin
-  Result := IsValidEmail(Value);
-  if not Result then
-    AddError('Invalid email');
+  if not IsValidEmail(Value) then
+    raise EdormValidationException.Create('Invalid email');
 end;
 
 { TDepartment }
@@ -557,9 +593,106 @@ end;
 
 { TPersonDirty }
 
+constructor TPersonDirty.Create;
+begin
+  inherited;
+  FHistory := TStringList.Create;
+end;
+
+procedure TPersonDirty.DeleteValidate;
+begin
+  FHistory.Add('DeleteValidate')
+end;
+
+destructor TPersonDirty.Destroy;
+begin
+  FHistory.Free;
+  inherited;
+end;
+
+function TPersonDirty.GetEventAndValidationHistory: TStringList;
+begin
+  Result := FHistory;
+end;
+
+procedure TPersonDirty.InsertValidate;
+begin
+  FHistory.Add('InsertValidate')
+end;
+
+class function TPersonDirty.NewPersonDirty: TPersonDirty;
+begin
+  Result := TPersonDirty.Create;
+  Result.FirstName := 'Daniele';
+  Result.LastName := 'Teti';
+  Result.Age := 32;
+  Result.BornDate := EncodeDate(1979, 11, 4);
+  Result.BornTimeStamp := EncodeDateTime(1979, 11, 4, 16, 10, 00, 0);
+end;
+
+procedure TPersonDirty.OnAfterDelete;
+begin
+  FHistory.Add('OnAfterDelete')
+end;
+
+procedure TPersonDirty.OnAfterInsert;
+begin
+  FHistory.Add('OnAfterInsert')
+end;
+
+procedure TPersonDirty.OnAfterLoad;
+begin
+  FHistory.Add('OnAfterLoad')
+end;
+
+procedure TPersonDirty.OnAfterPersist;
+begin
+  FHistory.Add('OnAfterPersist')
+end;
+
+procedure TPersonDirty.OnAfterUpdate;
+begin
+  FHistory.Add('OnAfterUpdate')
+end;
+
+procedure TPersonDirty.OnBeforeDelete;
+begin
+  FHistory.Add('OnBeforeDelete')
+end;
+
+procedure TPersonDirty.OnBeforeInsert;
+begin
+  FHistory.Add('OnBeforeInsert')
+end;
+
+procedure TPersonDirty.OnBeforeLoad;
+begin
+  FHistory.Add('OnBeforeLoad')
+end;
+
+procedure TPersonDirty.OnBeforePersist;
+begin
+  FHistory.Add('OnBeforePersist')
+end;
+
+procedure TPersonDirty.OnBeforeUpdate;
+begin
+  FHistory.Add('OnBeforeUpdate')
+end;
+
 procedure TPersonDirty.SetObjStatus(const Value: TdormObjectStatus);
 begin
   FObjStatus := Value;
+end;
+
+procedure TPersonDirty.UpdateValidate;
+begin
+  FHistory.Add('UpdateValidate')
+end;
+
+procedure TPersonDirty.Validate;
+begin
+  FHistory.Add('Validate')
 end;
 
 { TPhoneDirty }

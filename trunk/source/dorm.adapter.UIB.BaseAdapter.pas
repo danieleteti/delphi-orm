@@ -26,10 +26,12 @@ type
   strict private
     function Load(ARttiType: TRttiType; ATableName: string;
       AMappingTable: TMappingTable; const Value: TValue): TObject; overload;
+
   private
     function GetUIBReaderFor(ARttiType: TRttiType; AMappingTable: TMappingTable;
       const Value: TValue; AMappingRelationField: TMappingField = nil)
       : TUIBQuery;
+
   protected
     FFormatSettings: TFormatSettings;
     FB: TUIBFacade;
@@ -48,6 +50,7 @@ type
     function GetLogger: IdormLogger;
     procedure SetUIBParameterValue(AFieldType: string;
       AStatement: TUIBStatement; ParameterIndex: Integer; AValue: TValue);
+
   public
     function GenerateAndFillPrimaryKeyParam(Query: TUIBStatement;
       ParamIndex: Integer; const Entity: string): TValue; overload;
@@ -95,6 +98,7 @@ type
   protected
     FPersistStrategy: IdormPersistStrategy;
     function GetSequenceFormatTemplate: String; virtual; abstract;
+
   public
     function NewStringKey(const Entity: string): string;
     function NewIntegerKey(const Entity: string): UInt64;
@@ -269,15 +273,19 @@ function TUIBBaseAdapter.ExecuteAndGetFirst(SQL: string): Int64;
 var
   cmd: TUIBQuery;
 begin
+  GetLogger.EnterLevel('ExecuteAndGetFirst');
   Result := 0;
+  GetLogger.Info('PREPARING: ' + SQL);
   cmd := FB.Prepare(SQL);
   try
+    GetLogger.Info('EXECUTING: ' + SQL);
     cmd.Open;
     if not cmd.Eof then
       Result := Int64(cmd.Fields.AsInt64[0])
     else
       raise EdormException.Create('ExecuteAndGetFirst returns o rows');
   finally
+    GetLogger.ExitLevel('ExecuteAndGetFirst');
     cmd.Free;
   end;
 end;

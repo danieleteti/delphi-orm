@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2012 Daniele Teti
+  Copyright 2010-2013 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -239,12 +239,6 @@ begin
   try
     Session.LoadList<TEmail>(TdormCriteria.NewCriteria('ID',
       coEqual, id), emails);
-    CheckEquals(1, emails.Count);
-    CheckNotEquals(UpperCase(emails[0].Value), emails[0].CopiedValue,
-      'OnAfterLoad has been called but it shouldn''t');
-
-    Session.LoadList<TEmail>(TdormCriteria.NewCriteria('ID',
-      coEqual, id), emails, [CallAfterLoadEvent]);
     CheckEquals(1, emails.Count);
     CheckEquals(UpperCase(emails[0].Value), emails[0].CopiedValue,
       'OnAfterLoad has not been called');

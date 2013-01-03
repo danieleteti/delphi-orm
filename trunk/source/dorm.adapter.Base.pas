@@ -22,10 +22,13 @@ type
 
     //
     function GetBooleanValueAsString(Value: Boolean): String; virtual;
+
   public
     function GetSelectSQL(Criteria: ICriteria; AMappingTable: TMappingTable)
       : string; overload; virtual;
     function GetSelectSQL(Criteria: ICustomCriteria): string; overload;
+    function GetCountSQL(ACriteria: ICriteria;
+      AMappingTable: TMappingTable): string;
   end;
 
 implementation
@@ -114,6 +117,22 @@ end;
 function TBaseAdapter.GetBooleanValueAsString(Value: Boolean): String;
 begin
   Result := BoolToStr(Value, true);
+end;
+
+function TBaseAdapter.GetCountSQL(ACriteria: ICriteria;
+  AMappingTable: TMappingTable): string;
+var
+  SQL: string;
+  _fields: TMappingFieldList;
+  select_fields: string;
+  WhereSQL: string;
+begin
+  Assert(ACriteria <> nil);
+  SQL := 'SELECT COUNT(*) FROM ' + AMappingTable.TableName;
+  WhereSQL := GetWhereSQL(ACriteria, AMappingTable);
+  if WhereSQL <> EmptyStr then
+    SQL := SQL + ' WHERE ' + WhereSQL;
+  Result := SQL;
 end;
 
 function TBaseAdapter.GetSelectSQL(Criteria: ICustomCriteria): string;
