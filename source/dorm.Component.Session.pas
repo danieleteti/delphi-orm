@@ -17,9 +17,11 @@ type
     procedure SetMappingFileName(const Value: TFileName);
     procedure SetEnvironment(const Value: TdormEnvironment);
     procedure SetUseMappingFile(const Value: boolean);
+
   protected
     FSession: TSession;
     procedure Loaded; override;
+
   public
     constructor Create(Aowner: TComponent); override;
     procedure Open;
@@ -53,17 +55,18 @@ type
     { Load 0 or 1 object by Criteria. The Session will create and returned object of type <T> }
     function Load<T: class>(ACriteria: ICriteria): T; overload;
     { Load all the objects that satisfy the Criteria. The Session will fill the list (ducktype) passed on 2nd parameter with objects of type <T> }
-    procedure LoadList<T: class>(Criteria: ICriteria; AObject: TObject;
-      FillOptions: TdormFillOptions = []); overload;
+    procedure LoadList<T: class>(Criteria: ICriteria;
+      AObject: TObject); overload;
     { Load all the objects that satisfy the Criteria. The Session will create and return a TObjectList with objects of type <T> }
-    function LoadList<T: class>(Criteria: ICriteria = nil;
-      FillOptions: TdormFillOptions = []):
+    function LoadList<T: class>(Criteria: ICriteria = nil):
+
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
       overload;
     procedure EnableLazyLoad(AClass: TClass; const APropertyName: string);
     procedure DisableLazyLoad(AClass: TClass; const APropertyName: string);
     function Count(AClassType: TClass): Int64;
     procedure DeleteAll(AClassType: TClass);
+
   published
     property UseMappingFile: boolean read FUseMappingFile
       write SetUseMappingFile;
@@ -181,16 +184,16 @@ begin
   inherited;
 end;
 
-procedure TdormSession.LoadList<T>(Criteria: ICriteria; AObject: TObject;
-  FillOptions: TdormFillOptions);
+procedure TdormSession.LoadList<T>(Criteria: ICriteria; AObject: TObject);
 begin
+  GetInternalSession.LoadList<T>(Criteria, AObject);
 end;
 
-function TdormSession.LoadList<T>(Criteria: ICriteria;
-  FillOptions: TdormFillOptions):
+function TdormSession.LoadList<T>(Criteria: ICriteria):
+
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
 begin
-  Result := GetInternalSession.LoadList<T>(Criteria, FillOptions);
+  Result := GetInternalSession.LoadList<T>(Criteria);
 end;
 
 procedure TdormSession.LoadRelations(AObject: TObject;

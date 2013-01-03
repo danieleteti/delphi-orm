@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2012 Daniele Teti
+  Copyright 2010-2013 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -32,30 +32,7 @@ uses
   dorm.Commons;
 
 type
-  TdormObject = class(TObject)
-  private
-    FValidationErrors: string;
-  protected
-    procedure AddError(const Error: string);
-    procedure ClearErrors;
-  public
-    // Called at every validation. NEED TO BE INHERITED IN CHILD CLASSES
-    function Validate: boolean; virtual;
-    // Called after "Validate" only while inserting
-    function InsertValidate: boolean; virtual;
-    // Called after "Validate" only while Updating
-    function UpdateValidate: boolean; virtual;
-    // Called after "Validate" only while Deleting
-    function DeleteValidate: boolean; virtual;
-    // Retuns all the errors related to the last validation
-    function ValidationErrors: string;
-    procedure OnAfterLoad; virtual;
-    procedure OnBeforeInsert; virtual;
-    procedure OnBeforeUpdate; virtual;
-    procedure OnBeforeDelete; virtual;
-  private
-    class procedure RegisterClass;
-  end;
+
 {$IF CompilerVersion = 22}
 
   // In DelphiXE you cannot use directly TObjectList<T> because
@@ -71,6 +48,7 @@ type
   public
     function GetElement(Index: Integer): T;
   end;
+
 {$IFEND}
 
   TSession = class(TdormInterfacedObject)
@@ -88,10 +66,6 @@ type
     LoadedObjects: TObjectDictionary<string, TObject>;
     procedure LoadEnter;
     procedure LoadExit;
-    procedure DoOnAfterLoad(AObject: TObject);
-    procedure DoOnBeforeDelete(AObject: TObject);
-    procedure DoOnBeforeUpdate(AObject: TObject);
-    procedure DoOnBeforeInsert(AObject: TObject);
     function GetIdValue(AIdMappingField: TMappingField;
       AObject: TObject): TValue;
     procedure ReadIDConfig(const AJsonPersistenceConfig: ISuperObject);
@@ -102,14 +76,16 @@ type
     function LoadByMappingField(ATypeInfo: PTypeInfo;
       AMappingField: TMappingField; const Value: TValue; AObject: TObject)
       : boolean; overload;
+
   strict protected
     CurrentObjectStatus: TdormObjectStatus;
+    FValidatingDuck: TDuckTypedObject;
+    procedure UpdateChildTypeWithRealListInnerType(AMappingTable: TMappingTable;
+      var AChildType: TRttiType);
+
   protected
     constructor CreateSession(Environment: TdormEnvironment); virtual;
     // Validations
-    procedure DoUpdateValidation(AObject: TObject);
-    procedure DoInsertValidation(AObject: TObject);
-    procedure DoDeleteValidation(AObject: TObject);
     function CreateLogger: IdormLogger;
     function Qualified(AMappingTable: TMappingTable;
       const AClassName: string): string;
@@ -169,9 +145,13 @@ type
       AMappingField: TMappingField): String; overload;
     function GetLoadedObjectHashCode(ATypeInfo: PTypeInfo; AValue: TValue)
       : String; overload;
-    procedure InternalUpdate(AObject: TObject; AOnlyChild: boolean = false);
-    function InternalInsert(AObject: TObject): TValue;
-    procedure InternalDelete(AObject: TObject);
+    procedure InternalUpdate(AObject: TObject;
+      AValidaetable: TdormValidateable; AOnlyChild: boolean = false);
+    function InternalInsert(AObject: TObject;
+      AValidaetable: TdormValidateable): TValue;
+    procedure InternalDelete(AObject: TObject;
+      AValidaetable: TdormValidateable);
+
   public
     destructor Destroy; override;
     // Environments
@@ -198,7 +178,8 @@ type
       AEnvironment: TdormEnvironment): TSession; overload;
     // Persistence
     procedure Persist(AObject: TObject);
-    procedure HandleDirtyPersist(AIdValue: TValue; AObject: TObject);
+    procedure HandleDirtyPersist(AIdValue: TValue; AObject: TObject;
+      AValidateable: TdormValidateable);
     function Insert(AObject: TObject): TValue; overload;
     function Save(AObject: TObject): TValue; overload;
       deprecated 'Use Insert instead';
@@ -234,24 +215,24 @@ type
     { Load 0 or 1 object by Criteria. The Session will create and returned object of type <T> }
     function Load<T: class>(ACriteria: ICriteria): T; overload;
     { Load all the objects that satisfy the Criteria. The Session will fill the list (ducktype) passed on 2nd parameter with objects of type <T> }
-    procedure LoadList<T: class>(Criteria: ICriteria; AObject: TObject;
-      FillOptions: TdormFillOptions = []); overload;
+    procedure LoadList<T: class>(Criteria: ICriteria;
+      AObject: TObject); overload;
     { Load all the objects that satisfy the Criteria. The Session will create and return a TObjectList with objects of type <T> }
-    function LoadList<T: class>(Criteria: ICriteria = nil;
-      FillOptions: TdormFillOptions = []):
+    function LoadList<T: class>(Criteria: ICriteria = nil):
+
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
       overload;
     procedure EnableLazyLoad(AClass: TClass; const APropertyName: string);
     procedure DisableLazyLoad(AClass: TClass; const APropertyName: string);
-    function Count(AClassType: TClass): Int64;
+    function Count(AClassType: TClass; ACriteria: ICriteria = nil): Int64;
     procedure DeleteAll(AClassType: TClass);
     // Find and List
     // function FindOne<T: class>(Criteria: TdormCriteria;
     // FillOptions: TdormFillOptions = []; FreeCriteria: Boolean = true): T; overload; deprecated;
     procedure FillList<T: class>(ACollection: TObject;
-      ACriteria: ICriteria = nil;
-      FillOptions: TdormFillOptions = [CallAfterLoadEvent]); overload;
-    function ListAll<T: class>(FillOptions: TdormFillOptions = []):
+      ACriteria: ICriteria = nil); overload;
+    function ListAll<T: class>():
+
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
       deprecated;
     // transaction
@@ -383,6 +364,10 @@ begin
       raise;
     end;
   end;
+
+  // DuckSupport
+  FValidatingDuck := TDuckTypedObject.Create;
+
 end;
 
 procedure TSession.ReadIDConfig(const AJsonPersistenceConfig: ISuperObject);
@@ -423,10 +408,20 @@ begin
   TdormUtils.CopyObject(SourceObject, TargetObject);
 end;
 
-function TSession.Count(AClassType: TClass): Int64;
+function TSession.Count(AClassType: TClass; ACriteria: ICriteria): Int64;
+var
+  TableMapping: TMappingTable;
 begin
-  Result := GetStrategy.Count
-    (FMappingStrategy.GetMapping(FCTX.GetType(AClassType)));
+  TableMapping := FMappingStrategy.GetMapping(FCTX.GetType(AClassType));
+  if ACriteria = nil then
+  begin
+    Result := GetStrategy.Count(TableMapping);
+  end
+  else
+  begin
+    Result := GetStrategy.ExecuteAndGetFirst(GetStrategy.GetCountSQL(ACriteria,
+      TableMapping));
+  end;
 end;
 
 constructor TSession.CreateSession(Environment: TdormEnvironment);
@@ -493,11 +488,18 @@ begin
 end;
 
 procedure TSession.Delete(AObject: TObject);
+var
+  _v: TdormValidateable;
 begin
   if IsObjectStatusAvailable(AObject) then
     raise EdormException.Create
       ('Delete cannot be called if [ObjStatus] is enabled');
-  InternalDelete(AObject);
+  _v := WrapAsValidateableObject(AObject);
+  try
+    InternalDelete(AObject, _v);
+  finally
+    _v.Free;
+  end;
 end;
 
 procedure TSession.DeleteAll(AClassType: TClass);
@@ -509,11 +511,20 @@ begin
 end;
 
 procedure TSession.DeleteAndFree(AObject: TObject);
+var
+  _v: TdormValidateable;
 begin
   if IsObjectStatusAvailable(AObject) then
     raise EdormException.Create
       ('DeleteAndFree cannot be called if [ObjStatus] is enabled');
-  InternalDelete(AObject);
+
+  _v := WrapAsValidateableObject(AObject);
+  try
+    InternalDelete(AObject, _v);
+  finally
+    _v.Free;
+  end;
+
   FreeAndNil(AObject);
 end;
 
@@ -589,6 +600,8 @@ begin
   end;
   if assigned(FLogger) then
     FLogger := nil;
+  FValidatingDuck.Free;
+  FValidatingDuck := nil;
   inherited;
 end;
 
@@ -597,69 +610,13 @@ begin
   SetLazyLoadFor(AClass.ClassInfo, APropertyName, false);
 end;
 
-procedure TSession.DoDeleteValidation(AObject: TObject);
-begin
-  if AObject is TdormObject then
-  begin
-    if not(TdormObject(AObject).Validate and TdormObject(AObject).DeleteValidate)
-    then
-      raise EdormException.Create(TdormObject(AObject).ValidationErrors);
-  end;
-end;
-
-procedure TSession.DoInsertValidation(AObject: TObject);
-begin
-  if AObject is TdormObject then
-  begin
-    if not(TdormObject(AObject).Validate and TdormObject(AObject).InsertValidate)
-    then
-      raise EdormValidationException.Create(TdormObject(AObject)
-        .ValidationErrors);
-  end;
-end;
-
-procedure TSession.DoOnBeforeInsert(AObject: TObject);
-begin
-  if AObject is TdormObject then
-    TdormObject(AObject).OnBeforeInsert;
-end;
-
-procedure TSession.DoOnBeforeUpdate(AObject: TObject);
-begin
-  if AObject is TdormObject then
-    TdormObject(AObject).OnBeforeUpdate;
-end;
-
-procedure TSession.DoOnBeforeDelete(AObject: TObject);
-begin
-  if AObject is TdormObject then
-    TdormObject(AObject).OnBeforeDelete;
-end;
-
-procedure TSession.DoOnAfterLoad(AObject: TObject);
-begin
-  if AObject is TdormObject then
-    TdormObject(AObject).OnAfterLoad;
-end;
-
-procedure TSession.DoUpdateValidation(AObject: TObject);
-begin
-  if AObject is TdormObject then
-  begin
-    if not(TdormObject(AObject).Validate and TdormObject(AObject).UpdateValidate)
-    then
-      raise EdormException.Create(TdormObject(AObject).ValidationErrors);
-  end;
-end;
-
 procedure TSession.EnableLazyLoad(AClass: TClass; const APropertyName: string);
 begin
   SetLazyLoadFor(AClass.ClassInfo, APropertyName, true);
 end;
 
 // QUESTA RIMANE
-procedure TSession.FillList<T>(ACollection: TObject; ACriteria: ICriteria;
-  FillOptions: TdormFillOptions);
+procedure TSession.FillList<T>(ACollection: TObject; ACriteria: ICriteria);
 var
   rt: TRttiType;
   _table: TMappingTable;
@@ -668,6 +625,7 @@ var
   SearcherClassname: string;
   List: IWrappedList;
   Obj: TObject;
+  _validateable: TdormValidateable;
 begin
   _type_info := TypeInfo(T);
   rt := FCTX.GetType(_type_info);
@@ -684,8 +642,8 @@ begin
   for Obj in List do
   begin
     SetObjectStatus(Obj, osClean, false);
-    if CallAfterLoadEvent in FillOptions then
-      DoOnAfterLoad(Obj);
+    _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
+    _validateable.OnAfterLoad;
   end;
   GetLogger.ExitLevel(SearcherClassname);
 end;
@@ -764,22 +722,23 @@ begin
     Result := FPersistStrategy;
 end;
 
-procedure TSession.HandleDirtyPersist(AIdValue: TValue; AObject: TObject);
+procedure TSession.HandleDirtyPersist(AIdValue: TValue; AObject: TObject;
+  AValidateable: TdormValidateable);
 begin
   case FIdType of
     ktInteger:
       begin
         if AIdValue.AsInteger = FIdNullValue.AsInteger then
-          InternalInsert(AObject)
+          InternalInsert(AObject, AValidateable)
         else
-          InternalUpdate(AObject);
+          InternalUpdate(AObject, AValidateable);
       end;
     ktString:
       begin
         if AIdValue.AsString = FIdNullValue.AsString then
-          InternalInsert(AObject)
+          InternalInsert(AObject, AValidateable)
         else
-          InternalUpdate(AObject);
+          InternalUpdate(AObject, AValidateable);
       end;
   end;
 end;
@@ -823,11 +782,17 @@ begin
     for _attrib in _attributes do
       if _attrib is Entity then
       begin
+
 {$IF CompilerVersion > 22}
+
         Result.Add(_Type.QualifiedClassName);
+
 {$ELSE}
+
         Result.Add(_Type.QualifiedName);
+
 {$IFEND}
+
         Break;
       end;
   end;
@@ -844,6 +809,8 @@ var
   rt: TRttiType;
   _table: TMappingTable;
   Obj: TObject;
+  _validateable: TdormValidateable;
+  _validable: TdormValidateable;
 begin
   Obj := nil;
   LoadEnter;
@@ -870,14 +837,19 @@ begin
       Obj.Free;
       raise;
     end;
-    // Result := FPersistStrategy.Load(rt, _table.TableName, _fields, Value);
+
     if assigned(Result) then
     begin
       LoadBelongsToRelation(_table, Value, rt, Result);
       LoadHasManyRelation(_table, Value, rt, Result);
       LoadHasOneRelation(_table, Value, rt, Result);
     end;
-    DoOnAfterLoad(Result);
+
+    if assigned(Obj) then
+    begin
+      _validable := WrapAsValidateableObject(Obj, FValidatingDuck);
+      _validable.OnAfterLoad;
+    end;
   end;
   LoadExit;
   GetLogger.ExitLevel('Load ' + rt.ToString);
@@ -903,10 +875,11 @@ begin
   Result := T(Load(TypeInfo(T), Value));
 end;
 
-function TSession.ListAll<T>(FillOptions: TdormFillOptions):
+function TSession.ListAll<T>:
+
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
 begin
-  Result := LoadList<T>(nil, FillOptions);
+  Result := LoadList<T>(nil);
 end;
 
 function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue;
@@ -915,11 +888,14 @@ var
   rt: TRttiType;
   _table: TMappingTable;
   _idValue: TValue;
+  _validateable: TdormValidateable;
 begin
   LoadEnter;
   rt := FCTX.GetType(ATypeInfo);
   GetLogger.EnterLevel('Load ' + rt.ToString);
   _table := FMappingStrategy.GetMapping(rt);
+  _validateable := WrapAsValidateableObject(AObject, FValidatingDuck);
+  _validateable.OnBeforeLoad;
   Result := FPersistStrategy.Load(rt, _table, Value, AObject);
   if Result then
   begin
@@ -927,8 +903,9 @@ begin
     LoadBelongsToRelation(_table, _idValue, rt, AObject);
     LoadHasManyRelation(_table, _idValue, rt, AObject);
     LoadHasOneRelation(_table, _idValue, rt, AObject);
+    _validateable.OnAfterLoad;
   end;
-  DoOnAfterLoad(AObject);
+
   GetLogger.ExitLevel('Load ' + rt.ToString);
   LoadExit;
 end;
@@ -974,6 +951,7 @@ begin
   begin
     AttributeNameInTheParentObject := _has_many.Name;
     _child_type := FCTX.FindType(Qualified(Table, _has_many.ChildClassName));
+    UpdateChildTypeWithRealListInnerType(Table, _child_type);
     if not assigned(_child_type) then
       raise Exception.Create('Unknown type ' + _has_many.ChildClassName);
     v := TdormUtils.GetProperty(AObject, AttributeNameInTheParentObject);
@@ -991,6 +969,10 @@ begin
       // LoadList<TObject>(Criteria, Coll, [CallAfterLoadEvent]);
       LoadRelationsForEachElement(Coll);
     end;
+    // else
+    // raise EdormException.CreateFmt
+    // ('DORM is trying to fill the HasMany list for %s but it is nil',
+    // [AClassName + '.' + APropertyName]);
   end
   else
     raise Exception.Create('Unknown property name ' + APropertyName);
@@ -1036,6 +1018,7 @@ var
   _has_one: TMappingRelation;
   _child_type: TRttiType;
   DestObj, Obj: TObject;
+  _validable: TdormValidateable;
 begin
   GetLogger.Debug('Loading HAS_ONE for ' + AClassName + '.' + APropertyName);
   _table := FMappingStrategy.GetMapping(ARttiType);
@@ -1058,13 +1041,9 @@ begin
         if IsAlreadyLoaded(_child_type.Handle, AIdValue, Obj) then
           DestObj := Obj
         else
-          // DestObj := TdormUtils.CreateObject(_child_type);
           DestObj := LoadByMappingField(_child_type.Handle,
             FMappingStrategy.GetMapping(_child_type)
             .FindByName(_has_one.ChildFieldName), AIdValue);
-        // if GetStrategy.Load(_child_type, FMappingStrategy.GetMapping(_child_type),
-        // FMappingStrategy.GetMapping(_child_type).FindByName(_has_one.ChildFieldName),
-        // AIdValue, DestObj) then
         TdormUtils.SetProperty(AObject, _has_one.Name, DestObj);
       end
       else
@@ -1082,24 +1061,21 @@ begin
         end;
       end;
       SetObjectStatus(DestObj, osClean, false);
-      if assigned(DestObj) then
-        DoOnAfterLoad(DestObj);
     end;
   end
   else
     raise Exception.Create('Unknown property name ' + APropertyName);
 end;
 
-function TSession.LoadList<T>(Criteria: ICriteria;
-  FillOptions: TdormFillOptions):
+function TSession.LoadList<T>(Criteria: ICriteria):
+
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
 begin
   Result := {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}.Create(true);
-  LoadList<T>(Criteria, Result, FillOptions);
+  LoadList<T>(Criteria, Result);
 end;
 
-procedure TSession.LoadList<T>(Criteria: ICriteria; AObject: TObject;
-  FillOptions: TdormFillOptions);
+procedure TSession.LoadList<T>(Criteria: ICriteria; AObject: TObject);
 var
   SQL: string;
   Table: TMappingTable;
@@ -1110,6 +1086,7 @@ var
   List: IWrappedList;
   Obj: TObject;
   CustomCrit: ICustomCriteria;
+  _validateable: TdormValidateable;
 begin
   ItemClassInfo := TypeInfo(T);
   rt := FCTX.GetType(ItemClassInfo);
@@ -1127,16 +1104,16 @@ begin
       '<Criteria = nil, Full select automatically generated>';
   GetLogger.EnterLevel(SearcherClassname);
   TdormUtils.MethodCall(AObject, 'Clear', []);
+
+  { TODO -oDaniele -cLoadList : Event "OnBeforeLoad" cannot be called here. Changes to the strategies is required }
   GetStrategy.LoadList(AObject, rt, Table, Criteria);
-  if CallAfterLoadEvent in FillOptions then
+  List := WrapAsList(AObject);
+  for Obj in List do
   begin
-    List := WrapAsList(AObject);
-    for Obj in List do
-      DoOnAfterLoad(Obj);
+    _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
+    _validateable.OnAfterLoad;
   end;
   GetLogger.ExitLevel(SearcherClassname);
-  // FillList<T>(AObject,
-  // TdormSimpleSearchCriteria.Create(ItemClassInfo, SQL), FillOptions);
 end;
 
 procedure TSession.LoadRelationsForEachElement(AList: TObject;
@@ -1165,6 +1142,7 @@ var
   _idValue: TValue;
   _table: TMappingTable;
   _Type: TRttiType;
+  _v: TdormValidateable;
 begin
   _Type := FCTX.GetType(AObject.ClassInfo);
   _table := FMappingStrategy.GetMapping(_Type);
@@ -1173,23 +1151,36 @@ begin
   _idValue := GetIdValue(_table.Id, AObject);
   if IsObjectStatusAvailable(AObject) then
   begin
-    CurrentObjectStatus := self.GetObjectStatus(AObject);
-    case CurrentObjectStatus of
-      osDirty:
-        begin
-          HandleDirtyPersist(_idValue, AObject);
-        end;
-      osClean:
-        begin
-          InternalUpdate(AObject, true);
-        end;
-      osUnknown:
-        begin
-          raise EdormException.Create
-            ('Cannot call Persist is objects do not supports ObjStatus');
-        end;
-      osDeleted:
-        InternalDelete(AObject);
+    _v := WrapAsValidateableObject(AObject);
+    try
+      CurrentObjectStatus := self.GetObjectStatus(AObject);
+      case CurrentObjectStatus of
+        osDirty:
+          begin
+            _v.OnBeforePersist;
+            HandleDirtyPersist(_idValue, AObject, _v);
+            _v.OnAfterPersist;
+          end;
+        osClean: // update the only the child
+          begin
+            _v.OnBeforePersist;
+            InternalUpdate(AObject, _v, true);
+            _v.OnAfterPersist;
+          end;
+        osUnknown:
+          begin
+            raise EdormException.Create
+              ('Cannot call Persist is objects do not supports ObjStatus');
+          end;
+        osDeleted:
+          begin
+            _v.OnBeforePersist;
+            InternalDelete(AObject, _v);
+            _v.OnAfterPersist;
+          end;
+      end;
+    finally
+      _v.Free;
     end;
   end
   else
@@ -1254,21 +1245,7 @@ begin
     _child_type := FCTX.FindType(_type_name);
     if not assigned(_child_type) then
       raise Exception.Create('Unknown type ' + _has_many.ChildClassName);
-    /// START ///
-    // Now there is a little trick...
-    // When you have an HasMany relations declared as "TPhones = class(TObjectLlist<TPhone>)" dorm
-    // needs to know the mapping of the internal object and not of the list object itself. So now we're
-    // searching for an attribute named "ListOf" that explain to the RTTI engine what is internal object type
-    attr := TdormUtils.GetAttribute<ListOf>(_child_type);
-    if assigned(attr) then
-    begin
-      _type_name := Qualified(AMappingTable, attr.Value);
-      _child_type := FCTX.FindType(_type_name);
-      if not assigned(_child_type) then
-        raise Exception.Create('Unknown type ' + _has_many.ChildClassName +
-          ' (ListOf ' + attr.Value + ')');
-    end;
-    /// END ///
+    UpdateChildTypeWithRealListInnerType(AMappingTable, _child_type);
     _table := FMappingStrategy.GetMapping(_child_type);
     Obj := v.AsObject;
     if assigned(Obj) then
@@ -1279,28 +1256,31 @@ begin
         GetLogger.Debug('-- Saving ' + _child_type.QualifiedName);
         GetLogger.Debug('----> Setting property ' + _has_many.ChildFieldName);
         TdormUtils.SetField(Obj, _has_many.ChildFieldName, AIdValue);
-        case GetObjectStatus(Obj) of
+        Persist(Obj); // help me!!!
+        {
+          case GetObjectStatus(Obj) of
           osDirty:
-            begin
-              _idValue := GetIdValue(_table.Id, Obj);
-              HandleDirtyPersist(_idValue, Obj);
-              SetObjectStatus(Obj, osClean);
-            end;
+          begin
+          _idValue := GetIdValue(_table.Id, Obj);
+          HandleDirtyPersist(_idValue, Obj);
+          SetObjectStatus(Obj, osClean);
+          end;
           osClean:
-            begin
-              InternalUpdate(Obj, true);
-            end;
+          begin
+          InternalUpdate(Obj, true);
+          end;
           osUnknown:
-            begin
-              raise EdormException.CreateFmt
-                ('[%s] doesn''t support ObjStatus. You should not call Persist* methods if not all the objects supports ObjStatus',
-                [Obj.ClassName]);
-            end;
+          begin
+          raise EdormException.CreateFmt
+          ('[%s] doesn''t support ObjStatus. You should not call Persist* methods if not all the objects supports ObjStatus',
+          [Obj.ClassName]);
+          end;
           osDeleted:
-            begin
-              InternalDelete(Obj);
-            end;
-        end;
+          begin
+          InternalDelete(Obj);
+          end;
+          end;
+        }
       end;
     end;
   end;
@@ -1323,8 +1303,6 @@ begin
   begin
     v := TdormUtils.GetField(AObject, _has_one.Name);
     GetLogger.Debug('-- Inspecting for ' + _has_one.ChildClassName);
-    // _child_type := FCTX.FindType(Qualified(AMappingTable,
-    // _has_one.ChildClassName));
     _child_type := FCTX.FindType(Qualified(AMappingTable,
       v.AsObject.ClassName));
     if not assigned(_child_type) then
@@ -1341,7 +1319,8 @@ begin
       TdormUtils.SetField(Obj, _has_one.ChildFieldName, AIdValue);
       _child_mapping := FMappingStrategy.GetMapping(_child_type);
       _CurrentChildIDValue := GetIdValue(_child_mapping.Id, Obj);
-      HandleDirtyPersist(_CurrentChildIDValue, Obj);
+      Persist(Obj);
+      // HandleDirtyPersist(_CurrentChildIDValue, Obj);
     end;
   end;
   GetLogger.ExitLevel('persist has_one ' + ARttiType.ToString);
@@ -1364,7 +1343,7 @@ begin
         AConsiderLazyLoading);
     if [drAll, drHasMany] * ARelationsSet <> [] then
       LoadHasManyRelation(_table, _idValue, rt, AObject, AConsiderLazyLoading);
-    if [drHasOne, drBelongsTo] * ARelationsSet <> [] then
+    if [drAll, drHasOne] * ARelationsSet <> [] then
       LoadHasOneRelation(_table, _idValue, rt, AObject, AConsiderLazyLoading);
   end;
 end;
@@ -1413,11 +1392,14 @@ var
   rt: TRttiType;
   _table: TMappingTable;
   _idValue: TValue;
+  _validateable: TdormValidateable;
 begin
   LoadEnter;
   rt := FCTX.GetType(ATypeInfo);
   GetLogger.EnterLevel('Load ' + rt.ToString);
   _table := FMappingStrategy.GetMapping(rt);
+  _validateable := WrapAsValidateableObject(AObject, FValidatingDuck);
+  _validateable.OnBeforeLoad;
   Result := FPersistStrategy.Load(rt, _table, AMappingField, Value, AObject);
   if Result then
   begin
@@ -1425,7 +1407,7 @@ begin
     LoadBelongsToRelation(_table, _idValue, rt, AObject);
     LoadHasManyRelation(_table, _idValue, rt, AObject);
     LoadHasOneRelation(_table, _idValue, rt, AObject);
-    DoOnAfterLoad(AObject);
+    _validateable.OnAfterLoad;
   end;
   GetLogger.ExitLevel('Load ' + rt.ToString);
   LoadExit;
@@ -1467,11 +1449,19 @@ begin
 end;
 
 function TSession.Insert(AObject: TObject): TValue;
+var
+  _v: TdormValidateable;
 begin
   if IsObjectStatusAvailable(AObject) then
     raise EdormException.Create
       ('Insert cannot be called if [ObjStatus] is enabled');
-  Result := InternalInsert(AObject);
+
+  _v := WrapAsValidateableObject(AObject);
+  try
+    Result := InternalInsert(AObject, _v);
+  finally
+    _v.Free;
+  end;
 end;
 
 procedure TSession.Save(dormUOW: TdormUOW);
@@ -1496,7 +1486,7 @@ begin
   if IsObjectStatusAvailable(AObject) then
     raise EdormException.Create
       ('InsertAndFree cannot be called if [ObjStatus] is enabled');
-  Result := InternalInsert(AObject);
+  Result := InternalInsert(AObject, nil);
   FreeAndNil(AObject);
 end;
 
@@ -1635,16 +1625,22 @@ begin
   GetLogger.ExitLevel('has_one ' + ARttiType.ToString);
 end;
 
-procedure TSession.InternalDelete(AObject: TObject);
+procedure TSession.InternalDelete(AObject: TObject;
+  AValidaetable: TdormValidateable);
 var
   _rttitype: TRttiType;
   _table: TMappingTable;
   _class_name: string;
   _idValue: TValue;
+  _validateable: TdormValidateable;
 begin
   GetLogger.EnterLevel('Delete');
-  DoDeleteValidation(AObject);
-  DoOnBeforeDelete(AObject);
+
+  _validateable := WrapAsValidateableObject(AObject, FValidatingDuck);
+
+  _validateable.DeleteValidate;
+  _validateable.OnBeforeDelete;
+
   _rttitype := FCTX.GetType(AObject.ClassInfo);
   _class_name := _rttitype.ToString;
   _table := FMappingStrategy.GetMapping(_rttitype);
@@ -1663,14 +1659,17 @@ begin
   end;
   ClearOID(AObject);
   SetObjectStatus(AObject, osDeleted, false);
+  _validateable.OnAfterDelete;
   GetLogger.ExitLevel('Delete');
 end;
 
-function TSession.InternalInsert(AObject: TObject): TValue;
+function TSession.InternalInsert(AObject: TObject;
+  AValidaetable: TdormValidateable): TValue;
 var
   _Type: TRttiType;
   _table: TMappingTable;
   _idValue: TValue;
+  _validateable: TdormValidateable;
 begin
   _Type := FCTX.GetType(AObject.ClassInfo);
   _table := FMappingStrategy.GetMapping(_Type);
@@ -1678,33 +1677,42 @@ begin
   if GetObjectStatus(AObject) = osClean then
     Exit(_idValue);
   GetLogger.EnterLevel('INSERT ' + AObject.ClassName);
-  DoInsertValidation(AObject);
-  DoOnBeforeInsert(AObject);
-  if IsNullKey(_table, _idValue) then
-  begin
-    FLogger.Info('Inserting ' + AObject.ClassName);
-    FixBelongsToRelation(_table, _idValue, _Type, AObject);
-    Result := GetStrategy.Insert(_Type, AObject, _table);
-    _idValue := GetIdValue(_table.Id, AObject);
-    if CurrentObjectStatus <> osUnknown then
+  _validateable := WrapAsValidateableObject(AObject);
+  try
+    _validateable.Validate;
+    _validateable.InsertValidate;
+    _validateable.OnBeforeInsert;
+    if IsNullKey(_table, _idValue) then
     begin
-      PersistHasManyRelation(_table, _idValue, _Type, AObject);
-      PersistHasOneRelation(_table, _idValue, _Type, AObject);
+      FLogger.Info('Inserting ' + AObject.ClassName);
+      FixBelongsToRelation(_table, _idValue, _Type, AObject);
+      Result := GetStrategy.Insert(_Type, AObject, _table);
+      _idValue := GetIdValue(_table.Id, AObject);
+      if CurrentObjectStatus <> osUnknown then
+      begin
+        PersistHasManyRelation(_table, _idValue, _Type, AObject);
+        PersistHasOneRelation(_table, _idValue, _Type, AObject);
+      end
+      else
+      begin
+        InsertHasManyRelation(_table, _idValue, _Type, AObject);
+        InsertHasOneRelation(_table, _idValue, _Type, AObject);
+      end;
+
     end
     else
-    begin
-      InsertHasManyRelation(_table, _idValue, _Type, AObject);
-      InsertHasOneRelation(_table, _idValue, _Type, AObject);
-    end;
-  end
-  else
-    raise EdormException.CreateFmt('Cannot insert [%s] because OI is not null',
-      [AObject.ClassName]);
-  SetObjectStatus(AObject, osClean, false);
+      raise EdormException.CreateFmt('Cannot insert [%s] because OI is not null',
+        [AObject.ClassName]);
+    SetObjectStatus(AObject, osClean, false);
+    _validateable.OnAfterInsert;
+  finally
+    _validateable.Free;
+  end;
   GetLogger.ExitLevel('INSERT ' + AObject.ClassName);
 end;
 
-procedure TSession.InternalUpdate(AObject: TObject; AOnlyChild: boolean);
+procedure TSession.InternalUpdate(AObject: TObject;
+  AValidaetable: TdormValidateable; AOnlyChild: boolean);
 var
   _Type: TRttiType;
   _class_name: string;
@@ -1715,8 +1723,8 @@ begin
   _table := FMappingStrategy.GetMapping(_Type);
   _idValue := GetIdValue(_table.Id, AObject);
   GetLogger.EnterLevel('UPDATE ' + AObject.ClassName);
-  DoUpdateValidation(AObject);
-  DoOnBeforeUpdate(AObject);
+  AValidaetable.UpdateValidate;
+  AValidaetable.OnBeforeUpdate;
   _class_name := _Type.ToString;
   if not IsNullKey(_table, _idValue) then
   begin
@@ -1733,6 +1741,7 @@ begin
     raise EdormException.CreateFmt('Cannot update object without an ID [%s]',
       [_class_name]);
   SetObjectStatus(AObject, osClean, false);
+  AValidaetable.OnAfterUpdate;
   GetLogger.ExitLevel('UPDATE ' + AObject.ClassName);
 end;
 
@@ -1812,11 +1821,18 @@ begin
 end;
 
 procedure TSession.Update(AObject: TObject);
+var
+  _v: TdormValidateable;
 begin
   if IsObjectStatusAvailable(AObject) then
     raise EdormException.Create
       ('Update cannot be called if [ObjStatus] is enabled');
-  InternalUpdate(AObject);
+  _v := WrapAsValidateableObject(AObject);
+  try
+    InternalUpdate(AObject, _v);
+  finally
+    _v.Free;
+  end;
 end;
 
 procedure TSession.UpdateAndFree(AObject: TObject);
@@ -1824,8 +1840,29 @@ begin
   if IsObjectStatusAvailable(AObject) then
     raise EdormException.Create
       ('UpdateAndFree cannot be called if [ObjStatus] is enabled');
-  InternalUpdate(AObject);
+  Update(AObject);
   FreeAndNil(AObject);
+end;
+
+procedure TSession.UpdateChildTypeWithRealListInnerType
+  (AMappingTable: TMappingTable;
+  var AChildType: TRttiType);
+var
+  attr: ListOf;
+  _type_name: string;
+begin
+  // When you have an HasMany relations declared as "TPhones = class(TObjectLlist<TPhone>)" dorm
+  // needs to know the mapping of the internal object and not of the list object itself. So now we're
+  // searching for an attribute named "ListOf" that explain to the RTTI engine what is internal object type
+  attr := TdormUtils.GetAttribute<ListOf>(AChildType);
+  if assigned(attr) then
+  begin
+    _type_name := Qualified(AMappingTable, attr.Value);
+    AChildType := FCTX.FindType(_type_name);
+    if not assigned(AChildType) then
+      raise Exception.Create('Unknown type ' + _type_name +
+        ' (ListOf ' + attr.Value + ')');
+  end;
 end;
 
 procedure TSession.UpdateCollection(ACollection: TObject);
@@ -1867,73 +1904,17 @@ begin
 end;
 { TdormObject }
 
-procedure TdormObject.AddError(const Error: string);
-begin
-  FValidationErrors := FValidationErrors + sLineBreak + Error;
-end;
-
-procedure TdormObject.ClearErrors;
-begin
-  FValidationErrors := '';
-end;
-
-function TdormObject.DeleteValidate: boolean;
-begin
-  Result := true;
-end;
-
-function TdormObject.InsertValidate: boolean;
-begin
-  Result := true;
-end;
-
-procedure TdormObject.OnAfterLoad;
-begin
-end;
-
-procedure TdormObject.OnBeforeDelete;
-begin
-end;
-
-procedure TdormObject.OnBeforeInsert;
-begin
-end;
-
-procedure TdormObject.OnBeforeUpdate;
-begin
-end;
-
-class procedure TdormObject.RegisterClass;
-begin
-  //
-end;
-
-function TdormObject.UpdateValidate: boolean;
-begin
-  Result := true;
-end;
-
-function TdormObject.Validate: boolean;
-begin
-  ClearErrors;
-  Result := true;
-end;
-
-function TdormObject.ValidationErrors: string;
-begin
-  Result := FValidationErrors;
-end;
 { TdormObjectList<T> }
+
 {$IF CompilerVersion = 22}
+
 
 function TdormObjectList<T>.GetElement(Index: Integer): T;
 begin
   Result := Items[index];
 end;
+
 {$IFEND}
 
-initialization
-
-TdormObject.RegisterClass;
 
 end.

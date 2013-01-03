@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{9B1E608D-1D7A-4229-A50C-DA26D32A9EFF}</ProjectGuid>
-        <ProjectVersion>14.3</ProjectVersion>
+        <ProjectVersion>14.4</ProjectVersion>
         <FrameworkType>VCL</FrameworkType>
         <MainSource>dsserver.dpr</MainSource>
         <Base>True</Base>
@@ -13,13 +13,13 @@
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
-        <Base_Win64>true</Base_Win64>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
-        <Base_Win32>true</Base_Win32>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
@@ -59,15 +59,15 @@
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <DCC_UsePackage>DBXOdbcDriver;DBXSybaseASEDriver;vclimg;vclactnband;vcldb;bindcompvcl;vcldsnap;vclie;vcltouch;DBXDb2Driver;websnap;VclSmp;vcl;DBXMSSQLDriver;dsnapcon;vclx;webdsnap;$(DCC_UsePackage)</DCC_UsePackage>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>vcldbx;TeeDB;Rave100VCL;vclib;Tee;inetdbbde;DBXOdbcDriver;svnui;ibxpress;DBXSybaseASEDriver;vclimg;intrawebdb_120_160;fmi;vclactnband;FMXTee;vcldb;TeeUI;bindcompvcl;vcldsnap;vclie;vcltouch;Intraweb_120_160;DBXDb2Driver;websnap;dwsLibRuntime;vclribbon;VclSmp;vcl;DataSnapConnectors;CodeSiteExpressPkg;CloudService;DBXMSSQLDriver;FmxTeeUI;dsnapcon;RlxPackage;vclx;webdsnap;svn;bdertl;adortl;$(DCC_UsePackage)</DCC_UsePackage>
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_UsePackage>DBXOdbcDriver;DBXSybaseASEDriver;vclimg;vclactnband;vcldb;bindcompvcl;vcldsnap;vclie;vcltouch;DBXDb2Driver;websnap;VclSmp;vcl;DBXMSSQLDriver;dsnapcon;vclx;webdsnap;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_4_Win32)'!=''">
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>

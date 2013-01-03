@@ -1,0 +1,14 @@
+{
+ "outputfilepath": "D:\\DEV\\dorm\\samples\\DelphiXE2\\simpleapp\\mapping.conf",
+ "creation_date": "2012-12-11 21:53:36",
+ "version": "0.1",
+ "persistence_strategy": "dorm.MappingCreator.Strategy.Firebird.TInterbaseMappingCreatorStrategy",
+ "generate_delphi_classes": true,
+ "persistence_strategy_name": "Interbase",
+ "userproperties": {
+  "username": "sysdba",
+  "package": "BusinessObjects",
+  "connection_string": "host:alias or host:full_file_path",
+  "password": "masterkey"
+ }
+}

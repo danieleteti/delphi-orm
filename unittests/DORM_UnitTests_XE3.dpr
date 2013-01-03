@@ -38,7 +38,10 @@ uses
   TestDORMMapping.Attributes in 'TestDORMMapping.Attributes.pas',
   TestDORMMapping.CoC in 'TestDORMMapping.CoC.pas',
   TestDORMMapping.FileJSON in 'TestDORMMapping.FileJSON.pas',
-  dorm.adapter.Base in '..\source\dorm.adapter.Base.pas';
+  dorm.adapter.Base in '..\source\dorm.adapter.Base.pas',
+  TestDORMDuckTyping in 'TestDORMDuckTyping.pas',
+  dorm.tests.objstatus.bo in 'dorm.tests.objstatus.bo.pas',
+  TestDORMObjStatus in 'TestDORMObjStatus.pas';
 
 {$R *.RES}
 

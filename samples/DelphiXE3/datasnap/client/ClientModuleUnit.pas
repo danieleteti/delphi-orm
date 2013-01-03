@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, ClientClassesUnit, Data.DBXDataSnap,
-  IndyPeerImpl, Data.DBXCommon, Data.DB, Data.SqlExpr;
+  IndyPeerImpl, Data.DBXCommon, Data.DB, Data.SqlExpr, IPPeerClient;
 
 type
   TClientProxy = class(TDataModule)

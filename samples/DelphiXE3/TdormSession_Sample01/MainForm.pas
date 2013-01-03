@@ -58,6 +58,7 @@ begin
   dormSession1.Open;
   dormSession1.DeleteAll(TPerson);
   dormSession1.Close;
+  ListBox1.Clear;
 end;
 
 end.

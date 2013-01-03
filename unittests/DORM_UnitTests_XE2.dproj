@@ -208,6 +208,9 @@
 			<DCCReference Include="TestDORMMapping.CoC.pas"/>
 			<DCCReference Include="TestDORMMapping.FileJSON.pas"/>
 			<DCCReference Include="..\source\dorm.adapter.Base.pas"/>
+			<DCCReference Include="TestDORMObjStatus.pas"/>
+			<DCCReference Include="dorm.tests.objstatus.bo.pas"/>
+			<DCCReference Include="TestDORMDuckTyping.pas"/>
 			<None Include="ModelSupport_DORM_UnitTests\default.txaPackage"/>
 			<None Include="ModelSupport_DORM_UnitTests\default.txvpck"/>
 			<None Include="ModelSupport_DORM_UnitTests\dorm\default.txvpck"/>

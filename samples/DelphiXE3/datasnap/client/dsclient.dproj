@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{42957A60-29E3-44BC-9401-E47F8B60144F}</ProjectGuid>
-        <ProjectVersion>14.3</ProjectVersion>
+        <ProjectVersion>14.4</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <MainSource>dsclient.dpr</MainSource>
         <Base>True</Base>
@@ -13,13 +13,13 @@
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
-        <Base_Win64>true</Base_Win64>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+        <Base_Win32>true</Base_Win32>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
-    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
-        <Base_Win32>true</Base_Win32>
+    <PropertyGroup Condition="('$(Platform)'=='Win64' and '$(Base)'=='true') or '$(Base_Win64)'!=''">
+        <Base_Win64>true</Base_Win64>
         <CfgParent>Base</CfgParent>
         <Base>true</Base>
     </PropertyGroup>
@@ -46,7 +46,7 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_UnitSearchPath>..\..\..\..\source;..\..\..\..\lib\fastmm;..\..\..\..\lib\superobject;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\..\..\source;..\..\..\..\lib\fastmm;..\..\..\..\lib\uib\source;..\..\..\..\lib\sqlitewrap\source;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0</VerInfo_Keys>
         <Manifest_File>None</Manifest_File>
         <VerInfo_Locale>1040</VerInfo_Locale>
@@ -61,9 +61,6 @@
         <DCC_F>false</DCC_F>
         <DCC_K>false</DCC_K>
     </PropertyGroup>
-    <PropertyGroup Condition="'$(Base_Win64)'!=''">
-        <DCC_UsePackage>DBXOdbcDriver;DBXSybaseASEDriver;vclimg;vclactnband;vcldb;bindcompvcl;vcldsnap;vclie;vcltouch;DBXDb2Driver;websnap;VclSmp;vcl;DBXMSSQLDriver;dsnapcon;vclx;webdsnap;$(DCC_UsePackage)</DCC_UsePackage>
-    </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>vcldbx;TeeDB;Rave100VCL;vclib;Tee;inetdbbde;DBXOdbcDriver;svnui;ibxpress;DBXSybaseASEDriver;vclimg;intrawebdb_120_160;fmi;vclactnband;FMXTee;vcldb;TeeUI;bindcompvcl;vcldsnap;vclie;vcltouch;Intraweb_120_160;DBXDb2Driver;websnap;vclribbon;VclSmp;vcl;DataSnapConnectors;CodeSiteExpressPkg;CloudService;DBXMSSQLDriver;FmxTeeUI;dsnapcon;vclx;webdsnap;svn;bdertl;adortl;$(DCC_UsePackage)</DCC_UsePackage>
         <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
@@ -71,6 +68,9 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Base_Win64)'!=''">
+        <DCC_UsePackage>DBXOdbcDriver;DBXSybaseASEDriver;vclimg;vclactnband;vcldb;bindcompvcl;vcldsnap;vclie;vcltouch;DBXDb2Driver;websnap;VclSmp;vcl;DBXMSSQLDriver;dsnapcon;vclx;webdsnap;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0</VerInfo_Keys>
@@ -162,8 +162,11 @@
                     <Source Name="MainSource">dsclient.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k160.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp160.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\10.0\Bpl\dorm_runtime_xe3.bpl">(untitled)</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k170.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp170.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k170.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp170.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Deployment/>
