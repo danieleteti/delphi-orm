@@ -30,7 +30,10 @@ package dorm_runtime_xe3;
 
 requires
   rtl,
-  dbrtl;
+  dbrtl,
+  vclimg,
+  vcl,
+  CodeSiteExpressPkg;
 
 contains
   dorm.Component.Session in '..\..\dorm.Component.Session.pas';

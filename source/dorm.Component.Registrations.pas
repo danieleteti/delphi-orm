@@ -9,7 +9,7 @@ procedure Register;
 
 implementation
 
-uses dorm.Component.SessionComponentEditor;
+//uses dorm.Component.SessionComponentEditor;
 
 procedure Register;
 begin

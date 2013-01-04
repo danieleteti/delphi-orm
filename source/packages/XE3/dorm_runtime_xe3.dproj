@@ -82,6 +82,9 @@
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="dbrtl.dcp"/>
+        <DCCReference Include="vclimg.dcp"/>
+        <DCCReference Include="vcl.dcp"/>
+        <DCCReference Include="CodeSiteExpressPkg.dcp"/>
         <DCCReference Include="..\..\dorm.Component.Session.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
