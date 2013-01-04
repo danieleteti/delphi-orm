@@ -33,17 +33,9 @@ requires
   dorm_runtime_xe3,
   designide,
   vclimg,
-  DbxCommonDriver,
-  CodeSiteExpressPkg;
+  DbxCommonDriver;
 
 contains
-  dorm.Component.Registrations in '..\..\dorm.Component.Registrations.pas',
-  dorm.Component.SessionComponentEditor in '..\..\dorm.Component.SessionComponentEditor.pas',
-  DORMSessionComponentEditorForm in '..\..\editors\DORMSessionComponentEditorForm.pas' {DORMSessionEditorForm},
-  PersistenceCreatorView in '..\..\..\tools\persistencecreator\PersistenceCreatorView.pas' {frmPersistenceCreatorView},
-  dorm.PersistenceCreator.Intf in '..\..\..\tools\persistencecreator\lib\dorm.PersistenceCreator.Intf.pas',
-  dorm.PersistenceCreator in '..\..\..\tools\persistencecreator\lib\dorm.PersistenceCreator.pas',
-  dorm.PersistenceCreator.PersistenceJsonFile in '..\..\..\tools\persistencecreator\lib\dorm.PersistenceCreator.PersistenceJsonFile.pas',
-  dorm.PersistenceCreator.Presenter in '..\..\..\tools\persistencecreator\lib\dorm.PersistenceCreator.Presenter.pas';
+  dorm.Component.Registrations in '..\..\dorm.Component.Registrations.pas';
 
 end.

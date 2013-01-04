@@ -43,13 +43,15 @@ type
   // - procedure Clear
   // - property Count: Integer
   // - function GetItem(Index: Integer): TObject
-type
   TdormObjectList<T: class> = class(TObjectList<T>)
   public
     function GetElement(Index: Integer): T;
   end;
 
 {$IFEND}
+
+  TdormSessionPersistEvent = procedure(Sender: TObject; AObject: TObject)
+    of object;
 
   TSession = class(TdormInterfacedObject)
   private
@@ -64,6 +66,8 @@ type
     EnvironmentNames: TArray<string>;
     FLoadEnterExitCounter: Integer;
     LoadedObjects: TObjectDictionary<string, TObject>;
+    FOnAfterPersistObject: TdormSessionPersistEvent;
+    FOnBeforePersistObject: TdormSessionPersistEvent;
     procedure LoadEnter;
     procedure LoadExit;
     function GetIdValue(AIdMappingField: TMappingField;
@@ -84,6 +88,10 @@ type
       var AChildType: TRttiType);
 
   protected
+    // events
+    procedure DoSessionOnBeforePersistObject(AObject: TObject);
+    procedure DoSessionOnAfterPersistObject(AObject: TObject);
+    //
     constructor CreateSession(Environment: TdormEnvironment); virtual;
     // Validations
     function CreateLogger: IdormLogger;
@@ -243,6 +251,11 @@ type
     // expose mapping
     function GetMapping: ICacheMappingStrategy;
     function GetEntitiesNames: TList<String>;
+    // session events
+    property OnBeforePersistObject: TdormSessionPersistEvent
+      read FOnBeforePersistObject write FOnBeforePersistObject;
+    property OnAfterPersistObject: TdormSessionPersistEvent
+      read FOnAfterPersistObject write FOnAfterPersistObject;
   end;
 
 implementation
@@ -608,6 +621,18 @@ end;
 procedure TSession.DisableLazyLoad(AClass: TClass; const APropertyName: string);
 begin
   SetLazyLoadFor(AClass.ClassInfo, APropertyName, false);
+end;
+
+procedure TSession.DoSessionOnAfterPersistObject(AObject: TObject);
+begin
+  if assigned(FOnAfterPersistObject) then
+    FOnAfterPersistObject(self, AObject);
+end;
+
+procedure TSession.DoSessionOnBeforePersistObject(AObject: TObject);
+begin
+  if assigned(FOnBeforePersistObject) then
+    FOnBeforePersistObject(self, AObject);
 end;
 
 procedure TSession.EnableLazyLoad(AClass: TClass; const APropertyName: string);
@@ -1110,6 +1135,7 @@ begin
   List := WrapAsList(AObject);
   for Obj in List do
   begin
+    SetObjectStatus(Obj, osClean, false);
     _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
     _validateable.OnAfterLoad;
   end;
@@ -1144,6 +1170,7 @@ var
   _Type: TRttiType;
   _v: TdormValidateable;
 begin
+  DoSessionOnBeforePersistObject(AObject);
   _Type := FCTX.GetType(AObject.ClassInfo);
   _table := FMappingStrategy.GetMapping(_Type);
   if not assigned(_table.Id) then
@@ -1202,6 +1229,7 @@ begin
         end;
     end;
   end;
+  DoSessionOnAfterPersistObject(AObject);
 end;
 
 procedure TSession.PersistCollection(ACollection: IWrappedList);
@@ -1812,7 +1840,15 @@ end;
 procedure TSession.StartTransaction;
 begin
   GetLogger.EnterLevel('TSession.StartTransaction');
-  GetStrategy.StartTransaction;
+  try
+    GetStrategy.StartTransaction;
+  except
+    on E: Exception do
+    begin
+      GetLogger.Error(E.ClassName + ': ' + E.Message);
+      raise;
+    end;
+  end;
 end;
 
 function TSession.Strategy: IdormPersistStrategy;

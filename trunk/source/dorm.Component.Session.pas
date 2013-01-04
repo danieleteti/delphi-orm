@@ -13,6 +13,8 @@ type
     FMappingFileName: TFileName;
     FEnvironment: TdormEnvironment;
     FUseMappingFile: boolean;
+    FOnAfterPersistObject: TdormSessionPersistEvent;
+    FOnBeforePersistObject: TdormSessionPersistEvent;
     procedure SetConfigFileName(const Value: TFileName);
     procedure SetMappingFileName(const Value: TFileName);
     procedure SetEnvironment(const Value: TdormEnvironment);
@@ -76,6 +78,11 @@ type
       write SetConfigFileName;
     property MappingFileName: TFileName read FMappingFileName
       write SetMappingFileName;
+    // events
+    property OnBeforePersistObject: TdormSessionPersistEvent
+      read FOnBeforePersistObject write FOnBeforePersistObject;
+    property OnAfterPersistObject: TdormSessionPersistEvent
+      read FOnAfterPersistObject write FOnAfterPersistObject;
   end;
 
 implementation
@@ -217,6 +224,8 @@ begin
   else
     FSession := TSession.CreateConfigured
       (TStreamReader.Create(self.FConfigFileName), FEnvironment);
+  FSession.OnBeforePersistObject := FOnBeforePersistObject;
+  FSession.OnAfterPersistObject := FOnAfterPersistObject;
   FSession.StartTransaction;
 end;
 

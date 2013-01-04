@@ -9,9 +9,6 @@
         <Projects Include="dorm_designtime_xe3.dproj">
             <Dependencies>dorm_runtime_xe3.dproj</Dependencies>
         </Projects>
-        <Projects Include="..\..\..\samples\DelphiXE3\TdormSessionComponent\dormSessionComponentSample.dproj">
-            <Dependencies/>
-        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -38,23 +35,14 @@
     <Target Name="dorm_designtime_xe3:Make" DependsOnTargets="dorm_runtime_xe3:Make">
         <MSBuild Projects="dorm_designtime_xe3.dproj" Targets="Make"/>
     </Target>
-    <Target Name="dormSessionComponentSample">
-        <MSBuild Projects="..\..\..\samples\DelphiXE3\TdormSessionComponent\dormSessionComponentSample.dproj"/>
-    </Target>
-    <Target Name="dormSessionComponentSample:Clean">
-        <MSBuild Projects="..\..\..\samples\DelphiXE3\TdormSessionComponent\dormSessionComponentSample.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="dormSessionComponentSample:Make">
-        <MSBuild Projects="..\..\..\samples\DelphiXE3\TdormSessionComponent\dormSessionComponentSample.dproj" Targets="Make"/>
-    </Target>
     <Target Name="Build">
-        <CallTarget Targets="dorm_runtime_xe3;dorm_designtime_xe3;dormSessionComponentSample"/>
+        <CallTarget Targets="dorm_runtime_xe3;dorm_designtime_xe3"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="dorm_runtime_xe3:Clean;dorm_designtime_xe3:Clean;dormSessionComponentSample:Clean"/>
+        <CallTarget Targets="dorm_runtime_xe3:Clean;dorm_designtime_xe3:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="dorm_runtime_xe3:Make;dorm_designtime_xe3:Make;dormSessionComponentSample:Make"/>
+        <CallTarget Targets="dorm_runtime_xe3:Make;dorm_designtime_xe3:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
