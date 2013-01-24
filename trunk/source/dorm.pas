@@ -29,7 +29,8 @@ uses
   dorm.UOW,
   dorm.Mappings.Strategies,
   dorm.Mappings,
-  dorm.Commons;
+  dorm.Commons,
+  dorm.Query, dorm.ObjectStatus;
 
 type
 
@@ -239,6 +240,8 @@ type
     // FillOptions: TdormFillOptions = []; FreeCriteria: Boolean = true): T; overload; deprecated;
     procedure FillList<T: class>(ACollection: TObject;
       ACriteria: ICriteria = nil); overload;
+    procedure FillListSQL<T: class>(ACollection: TObject;
+      ASQLable: ISQLable); overload;
     function ListAll<T: class>():
 
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
@@ -1809,6 +1812,34 @@ end;
 function TSession.IsUnknown(AObject: TObject): boolean;
 begin
   Result := GetObjectStatus(AObject) = osUnknown;
+end;
+
+procedure TSession.FillListSQL<T>(ACollection: TObject; ASQLable: ISQLable);
+var
+  rt: TRttiType;
+  _table: TMappingTable;
+  _fields: TMappingFieldList;
+  _type_info: PTypeInfo;
+  SearcherClassname: string;
+  List: IWrappedList;
+  Obj: TObject;
+  _validateable: TdormValidateable;
+begin
+  _type_info := TypeInfo(T);
+  rt := FCTX.GetType(_type_info);
+  _table := FMappingStrategy.GetMapping(rt);
+  _fields := _table.Fields;
+  GetLogger.EnterLevel('FillListSQL');
+  TdormUtils.MethodCall(ACollection, 'Clear', []);
+  GetStrategy.LoadList(ACollection, rt, _table, ASQLable.ToSQL(self.GetMapping, self.GetStrategy));
+  List := WrapAsList(ACollection);
+  for Obj in List do
+  begin
+    SetObjectStatus(Obj, osClean, false);
+    _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
+    _validateable.OnAfterLoad;
+  end;
+  GetLogger.ExitLevel('FillListSQL');
 end;
 
 procedure TSession.FixBelongsToRelation(AMappingTable: TMappingTable;

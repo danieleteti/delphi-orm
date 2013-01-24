@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{31559DB3-B424-45CE-822C-DCF0CC962D36}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="unittests\DORM_UnitTests_XE3.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="tools\persistencecreator\persistencecreator.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="DORM_UnitTests_XE3">
+        <MSBuild Projects="unittests\DORM_UnitTests_XE3.dproj"/>
+    </Target>
+    <Target Name="DORM_UnitTests_XE3:Clean">
+        <MSBuild Projects="unittests\DORM_UnitTests_XE3.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DORM_UnitTests_XE3:Make">
+        <MSBuild Projects="unittests\DORM_UnitTests_XE3.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="persistencecreator">
+        <MSBuild Projects="tools\persistencecreator\persistencecreator.dproj"/>
+    </Target>
+    <Target Name="persistencecreator:Clean">
+        <MSBuild Projects="tools\persistencecreator\persistencecreator.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="persistencecreator:Make">
+        <MSBuild Projects="tools\persistencecreator\persistencecreator.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="DORM_UnitTests_XE3;persistencecreator"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="DORM_UnitTests_XE3:Clean;persistencecreator:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="DORM_UnitTests_XE3:Make;persistencecreator:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

@@ -29,12 +29,11 @@ uses
   dorm.Filters,
   dorm.Collections,
   dorm.Utils,
-  dorm.Mappings.Strategies;
+  dorm.Mappings.Strategies,
+  dorm.ObjectStatus;
 
 type
   TDuckTypedList = class;
-
-  TdormObjectStatus = (osDirty = 0, osClean, osUnknown, osDeleted);
 
   EdormException = class(Exception)
 

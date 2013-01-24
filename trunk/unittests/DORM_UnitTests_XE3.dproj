@@ -211,6 +211,7 @@
         <DCCReference Include="TestDORMDuckTyping.pas"/>
         <DCCReference Include="dorm.tests.objstatus.bo.pas"/>
         <DCCReference Include="TestDORMObjStatus.pas"/>
+        <DCCReference Include="..\source\dorm.Query.pas"/>
         <None Include="ModelSupport_DORM_UnitTests\default.txaPackage"/>
         <None Include="ModelSupport_DORM_UnitTests\default.txvpck"/>
         <None Include="ModelSupport_DORM_UnitTests\dorm\default.txvpck"/>

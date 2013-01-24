@@ -92,6 +92,9 @@ var
 
 implementation
 
+uses
+  dorm.ObjectStatus;
+
 {$R *.fmx}
 
 procedure TForm11.FormClose(Sender: TObject; var Action: TCloseAction);

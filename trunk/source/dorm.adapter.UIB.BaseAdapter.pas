@@ -548,6 +548,8 @@ begin
     SQL := self.GetSelectSQL(ACriteria, AMappingTable);
   GetLogger.Debug('EXECUTING: ' + SQL);
   reader := FB.Prepare(SQL);
+  if reader.Params.ParamCount <> 0 then
+    raise EdormException.Create('Parameters not replaced');
   reader.Open();
   try
     while not reader.Eof do

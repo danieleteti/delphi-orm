@@ -80,7 +80,7 @@ uses DORMModule,
   Vcl.GraphUtil,
   EditTodoForm,
   dorm.Commons,
-  dorm.Filters, PresentationLogicU;
+  dorm.Filters, PresentationLogicU, dorm.ObjectStatus;
 
 procedure TfrmMain.acCreateRandomDataExecute(Sender: TObject);
 begin
