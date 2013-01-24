@@ -46,15 +46,6 @@ type
     function GetItemClassInfo: PTypeInfo;
   end;
 
-  TdormParam = class
-  public
-    Value: TValue;
-  end;
-
-  TdormParameters = class(TObjectList<TdormParam>)
-
-  end;
-
   TdormCriteria = class(TInterfacedObject, ICriteria)
   private
     FAttribute: String;

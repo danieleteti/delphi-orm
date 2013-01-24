@@ -41,7 +41,8 @@ uses
   dorm.adapter.Base in '..\source\dorm.adapter.Base.pas',
   TestDORMDuckTyping in 'TestDORMDuckTyping.pas',
   dorm.tests.objstatus.bo in 'dorm.tests.objstatus.bo.pas',
-  TestDORMObjStatus in 'TestDORMObjStatus.pas';
+  TestDORMObjStatus in 'TestDORMObjStatus.pas',
+  dorm.Query in '..\source\dorm.Query.pas';
 
 {$R *.RES}
 
@@ -56,3 +57,6 @@ begin
     GUITestRunner.RunRegisteredTests;
 
 end.
+
+
+

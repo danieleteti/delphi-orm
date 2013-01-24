@@ -5,7 +5,9 @@ interface
 uses
   Generics.Collections,
   dorm.Mappings,
-  dorm.Collections, dorm.Commons;
+  dorm.Collections,
+  dorm.Commons,
+  dorm.ObjectStatus;
 
 type
   TPerson = class;
@@ -26,8 +28,10 @@ type
     procedure SetOwner(const Value: TPerson);
     procedure SetObjStatus(const Value: TdormObjectStatus);
     property PersonID: Integer read FPersonID write FPersonID;
+
   protected
     class procedure Register;
+
   public
     constructor Create(AModel: String; ARAM: Integer; ACores: Integer);
       overload;
@@ -54,6 +58,7 @@ type
     function GetIsAdult: Boolean;
     procedure Init;
     procedure SetObjStatus(const Value: TdormObjectStatus);
+
   public
     constructor Create; overload;
     constructor Create(FirstName, LastName: String; Age: Integer); overload;

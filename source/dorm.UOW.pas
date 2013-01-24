@@ -20,7 +20,6 @@ interface
 
 uses
   rtti,
-  dorm.Commons,
   dorm.Collections,
   Generics.Collections;
 
@@ -51,7 +50,7 @@ implementation
 
 uses
   dorm.Utils,
-  SysUtils;
+  SysUtils, dorm.Commons;
 
 { TdormUOW }
 

@@ -183,6 +183,10 @@ type
 
   end;
 
+  [ListOf('TPersonOS')]
+  TPeopleOS = class(TObjectList<TPersonOS>)
+  end;
+
   [Entity('phones')]
   TPhoneOS = class(TObjStatusSupport)
   private
