@@ -7,6 +7,5 @@
   * You want "down to the metal" access for tweaking sake 
   * You want to persist PODOs 
   * You want to avoid SQL quirks
-
-
+  * You need commercial support if needed
 
