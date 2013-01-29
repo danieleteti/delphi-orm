@@ -23,7 +23,8 @@ uses
   dorm.Commons,
   Classes,
   Generics.Collections,
-  dorm.Mappings;
+  dorm.Mappings,
+  dorm.ObjectStatus;
 
 type
   TObjStatusSupport = class
