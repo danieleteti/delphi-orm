@@ -19,7 +19,7 @@ implementation
 
 uses
   dorm.Utils, System.Rtti, System.SysUtils, System.Classes,
-  dorm.tests.objstatus.bo, System.DateUtils;
+  dorm.tests.objstatus.bo, System.DateUtils, dorm.ObjectStatus;
 
 { TTestDuckTyping }
 

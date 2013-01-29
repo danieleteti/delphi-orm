@@ -165,12 +165,14 @@ end;
 function TUIBFacade.NewStatement: TUIBStatement;
 begin
   Result := TUIBStatement.Create(nil);
+  Result.DataBase:=GetConnection;
   Result.Transaction := FCurrentTransaction;
 end;
 
 function TUIBFacade.NewQuery: TUIBQuery;
 begin
   Result := TUIBQuery.Create(nil);
+  Result.DataBase:=GetConnection;
   Result.Transaction := FCurrentTransaction;
 end;
 
