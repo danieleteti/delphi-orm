@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{6E22397B-AA4C-4AD3-AA92-7D61C3E8FBD4}</ProjectGuid>
         <ProjectVersion>14.4</ProjectVersion>
-        <Config Condition="'$(Config)'==''">SQLITE3_STRATEGY</Config>
+        <Config Condition="'$(Config)'==''">CI_SQLITE3</Config>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
         <MainSource>DORM_UnitTests_XE3.dpr</MainSource>
         <Base>True</Base>
