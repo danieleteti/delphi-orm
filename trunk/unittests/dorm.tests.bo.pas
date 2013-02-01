@@ -28,8 +28,7 @@ uses
   dorm.Commons,
   Classes,
   Generics.Collections,
-  dorm.Mappings,
-  dorm.ObjectStatus;
+  dorm.Mappings, dorm.ObjectStatus;
 
 type
   TPerson = class;
