@@ -27,13 +27,13 @@
       <env key="BDSCOMMONDIR" value="${BDSCOMMONDIR}"/>               	      
       <arg value="/nologo"/>
       <arg value="/target:Build"/>
-      <arg value="/property:config=CI"/>
+      <arg value="/property:config=CI_SQLITE3"/>
       <arg value="${unittestbuild}\DORM_UnitTests_XE3.dproj"/>
     </exec>
   </target>
 
   <target name="dist" depends="compile" description="RUN UNIT TESTS" >    
-    
+		
   </target>
 
   <target name="clean" description="clean up" >
