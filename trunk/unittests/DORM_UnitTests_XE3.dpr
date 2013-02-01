@@ -58,7 +58,7 @@ begin
 
   Application.Initialize;
   if IsConsole then
-    with TextTestRunner.RunRegisteredTests do
+    with TextTestRunner.RunRegisteredTests(rxbHaltOnFailures) do
       Free
   else
     GUITestRunner.RunRegisteredTests;
