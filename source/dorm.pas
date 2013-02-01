@@ -996,7 +996,10 @@ begin
       AddAsLoadedObject(WrapAsList(Coll), ChildTable.Id);
       // LoadList<TObject>(Criteria, Coll, [CallAfterLoadEvent]);
       LoadRelationsForEachElement(Coll);
-    end;
+    end
+    else
+      GetLogger.Warning('HasMany relation ' + AClassName + '.' + APropertyName +
+        ' not loaded because list is nil');
     // else
     // raise EdormException.CreateFmt
     // ('DORM is trying to fill the HasMany list for %s but it is nil',
@@ -1831,7 +1834,8 @@ begin
   _fields := _table.Fields;
   GetLogger.EnterLevel('FillListSQL');
   TdormUtils.MethodCall(ACollection, 'Clear', []);
-  GetStrategy.LoadList(ACollection, rt, _table, ASQLable.ToSQL(self.GetMapping, self.GetStrategy));
+  GetStrategy.LoadList(ACollection, rt, _table, ASQLable.ToSQL(self.GetMapping,
+    self.GetStrategy));
   List := WrapAsList(ACollection);
   for Obj in List do
   begin

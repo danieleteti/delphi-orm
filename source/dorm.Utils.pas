@@ -27,6 +27,7 @@ type
   TdormUtils = class sealed
   public
     class var ctx: TRttiContext;
+
   public
     class function MethodCall(AObject: TObject; AMethodName: string;
       AParameters: array of TValue): TValue;
@@ -44,9 +45,12 @@ type
     class function Clone(Obj: TObject): TObject; static;
     class procedure CopyObject(SourceObj, TargetObj: TObject); static;
     class function CreateObject(ARttiType: TRttiType): TObject; static;
-    class function GetAttribute<T: TCustomAttribute>(const Obj: TRttiObject): T; overload;
-    class function GetAttribute<T: TCustomAttribute>(const Obj: TRttiType): T; overload;
-    class function HasAttribute<T: TCustomAttribute>(const Obj: TRttiObject): Boolean;
+    class function GetAttribute<T: TCustomAttribute>(const Obj: TRttiObject)
+      : T; overload;
+    class function GetAttribute<T: TCustomAttribute>(const Obj: TRttiType)
+      : T; overload;
+    class function HasAttribute<T: TCustomAttribute>
+      (const Obj: TRttiObject): Boolean;
     class function EqualValues(source, destination: TValue): Boolean;
   end;
 
@@ -171,9 +175,13 @@ begin
   begin
     Prop := ARttiType.GetProperty(PropertyName);
     if Assigned(Prop) then
-      Prop.SetValue(Obj, Value)
+    begin
+      if Prop.IsWritable then
+        Prop.SetValue(Obj, Value)
+    end
     else
-      raise Exception.CreateFmt('Cannot get RTTI for field or property [%s.%s]',
+      raise Exception.CreateFmt
+        ('Cannot get RTTI for field or property [%s.%s]',
         [ARttiType.ToString, PropertyName]);
   end;
 end;
@@ -204,7 +212,8 @@ var
   _PropInfo: PTypeInfo;
 begin
   _PropInfo := AProp.PropertyType.Handle;
-  if _PropInfo.Kind in [tkString, tkWString, tkChar, tkWChar, tkLString, tkUString] then
+  if _PropInfo.Kind in [tkString, tkWString, tkChar, tkWChar, tkLString,
+    tkUString] then
     Result := 'string'
   else if _PropInfo.Kind in [tkInteger, tkInt64] then
     Result := 'integer'
@@ -218,7 +227,8 @@ begin
     Result := 'float'
   else if (_PropInfo.Kind = tkEnumeration) and (_PropInfo.Name = 'Boolean') then
     Result := 'boolean'
-  else if AProp.PropertyType.IsInstance and AProp.PropertyType.AsInstance.MetaclassType.InheritsFrom
+  else if AProp.PropertyType.IsInstance and
+    AProp.PropertyType.AsInstance.MetaclassType.InheritsFrom
     (TStream) then
     Result := 'blob'
   else
