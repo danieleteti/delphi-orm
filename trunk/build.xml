@@ -7,18 +7,18 @@
   <property name="unittestbuild" location="unittests"/>
   <property name="dist"  location="dist"/>
 	
-	<!-- Compile with DELPHIXE2 -->  
-  <property name="BDS" value="C:\Program Files (x86)\Embarcadero\RAD Studio\9.0"/>
-  <property name="BDSCOMMONDIR" value="C:\Users\Public\Documents\RAD Studio\9.0"/>
+	<!-- Compile with DELPHIXE3 -->  
+  <property name="BDS" value="C:\Program Files (x86)\Embarcadero\RAD Studio\10.0"/>
+  <property name="BDSCOMMONDIR" value="C:\Users\Public\Documents\RAD Studio\10.0"/>
 	<property name="FrameworkDir" value="C:\Windows\Microsoft.NET\Framework\v3.5"/>
 
-	<!-- Compile with DELPHIXE -->  
-  <property name="BDS_XE" value="C:\Program Files (x86)\Embarcadero\RAD Studio\8.0"/>
-  <property name="BDSCOMMONDIR_XE" value="C:\Users\Public\Documents\RAD Studio\8.0"/>
+	<!-- Compile with DELPHIXE2 -->  
+  <property name="BDS_XE" value="C:\Program Files (x86)\Embarcadero\RAD Studio\9.0"/>
+  <property name="BDSCOMMONDIR_XE" value="C:\Users\Public\Documents\RAD Studio\9.0"/>
 	<property name="FrameworkDir_XE" value="C:\Windows\Microsoft.NET\Framework\v2.0"/>
 
 	<target name = "tests" depends="compile">
-	  <exec dir="${unittestbuild}" failonerror="true" searchpath="true" executable="${unittestbuild}\DORM_UnitTests_XE2.exe"/> 	  
+	  <exec dir="${unittestbuild}" failonerror="true" searchpath="true" executable="${unittestbuild}\DORM_UnitTests_XE3.exe"/> 	  
 	</target>
 
   <target name="compile" depends="clean" description="compile the source " >  
@@ -28,11 +28,11 @@
       <arg value="/nologo"/>
       <arg value="/target:Build"/>
       <arg value="/property:config=CI"/>
-      <arg value="${unittestbuild}\DORM_UnitTests_XE2.dproj"/>
+      <arg value="${unittestbuild}\DORM_UnitTests_XE3.dproj"/>
     </exec>
   </target>
 
-  <target name="dist" depends="compile" description="RUN UNITESTS" >    
+  <target name="dist" depends="compile" description="RUN UNIT TESTS" >    
     
   </target>
 
