@@ -585,7 +585,7 @@ begin
 
   p := Session.Load<TPerson>(p_id);
   try
-    CheckEquals(dt, p.BornTimeStamp);
+    CheckEquals(dt, p.BornTimeStamp, 'BornTimeStamp is not equals to the inserted one');
     Session.Delete(p);
   finally
     p.Free;
