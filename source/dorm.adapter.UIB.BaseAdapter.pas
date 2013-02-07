@@ -395,7 +395,8 @@ begin
     I := 0;
     for field in AMappingTable.Fields do
     begin
-      v := TdormUtils.GetField(AObject, field.name);
+     // v := TdormUtils.GetField(AObject, field.name);
+      v := TdormUtils.GetField(AObject, field.RTTICache);
       if field.IsPK then
         pk_value := GenerateAndFillPrimaryKeyParam(Query, I,
           AMappingTable.TableName)
@@ -411,7 +412,8 @@ begin
     Query.Free;
   end;
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-  TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].name, pk_value);
+  //TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].name, pk_value);
+  TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].RTTICache, pk_value);
   Result := pk_value;
 end;
 

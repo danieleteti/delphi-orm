@@ -45,6 +45,8 @@ var
 
 implementation
 
+uses dorm.ObjectStatus;
+
 {$R *.dfm}
 
 procedure TForm2.Button1Click(Sender: TObject);

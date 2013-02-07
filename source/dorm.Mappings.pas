@@ -102,6 +102,12 @@ type
   TdormIndexType = (itNone, itIndex, itUnique);
   TdormKeyType = (ktInteger, ktString);
   TMappingTable = class;
+  TMappingField = class;
+
+  TMappingCache = record
+    RTTIField: TRttiField;
+    RTTIProp: TRttiProperty;
+  end;
 
   TMappingField = class
   private
@@ -113,6 +119,7 @@ type
     FPrecision: Cardinal;
     FFieldName: string;
     FSize: Cardinal;
+    FRTTICache: TMappingCache;
   public
     constructor Create;
     procedure Assign(Source: TMappingField);
@@ -125,6 +132,7 @@ type
     property Precision: Cardinal read FPrecision write FPrecision;
     property IndexType: TdormIndexType read FIndexType write FIndexType;
     property IsPK: boolean read FPK write FPK;
+    property RTTICache: TMappingCache read FRTTICache write FRTTICache;
   end;
 
   TMappingRelation = class
@@ -133,11 +141,13 @@ type
     FChildClassName: string;
     FChildFieldName: string;
     FLazyLoad: boolean;
+    FRTTICache: TMappingCache;
   public
     property Name: string read FName write FName;
     property ChildClassName: string read FChildClassName write FChildClassName;
     property ChildFieldName: string read FChildFieldName write FChildFieldName;
     property LazyLoad: boolean read FLazyLoad write FLazyLoad;
+    property RTTICache: TMappingCache read FRTTICache write FRTTICache;
     procedure Assign(Source: TMappingRelation);
   end;
 
@@ -147,11 +157,13 @@ type
     FOwnerClassName: string;
     FRefFieldName: string;
     FLazyLoad: boolean;
+    FRTTICache: TMappingCache;
   public
     property Name: string read FName write FName;
     property OwnerClassName: string read FOwnerClassName write FOwnerClassName;
     property RefFieldName: string read FRefFieldName write FRefFieldName;
     property LazyLoad: boolean read FLazyLoad write FLazyLoad;
+    property RTTICache: TMappingCache read FRTTICache write FRTTICache;
     procedure Assign(Source: TMappingBelongsTo);
   end;
 
@@ -388,6 +400,7 @@ begin
   FPrecision := Source.Precision;
   FFieldName := Source.FieldName;
   FSize := Source.Size;
+  FRTTICache:=Source.RTTICache;
 end;
 
 constructor TMappingField.Create;
@@ -400,6 +413,8 @@ begin
   FSize := 0;
   FPrecision := 0;
   FIndexType := itNone;
+  FRTTICache.RTTIField:=nil;
+  FRTTICache.RTTIProp:=nil;
 end;
 
 function TMappingField.ToString: string;
@@ -415,6 +430,7 @@ begin
   FChildClassName := Source.ChildClassName;
   FChildFieldName := Source.ChildFieldName;
   FLazyLoad := Source.LazyLoad;
+  FRTTICache:=Source.RTTICache;
 end;
 { TMappingBelongsTo }
 
@@ -424,6 +440,7 @@ begin
   FOwnerClassName := Source.OwnerClassName;
   FRefFieldName := Source.RefFieldName;
   FLazyLoad := Source.LazyLoad;
+  FRTTICache:=Source.RTTICache;
 end;
 
 end.

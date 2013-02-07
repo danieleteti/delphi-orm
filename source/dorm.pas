@@ -979,9 +979,9 @@ begin
   begin
     AttributeNameInTheParentObject := _has_many.Name;
     _child_type := FCTX.FindType(Qualified(Table, _has_many.ChildClassName));
-    UpdateChildTypeWithRealListInnerType(Table, _child_type);
     if not assigned(_child_type) then
       raise Exception.Create('Unknown type ' + _has_many.ChildClassName);
+    UpdateChildTypeWithRealListInnerType(Table, _child_type);
     v := TdormUtils.GetProperty(AObject, AttributeNameInTheParentObject);
     Coll := v.AsObject;
     if assigned(Coll) then
@@ -1608,7 +1608,8 @@ begin
   GetLogger.Debug('Saving has_many for ' + ARttiType.ToString);
   for _has_many in AMappingTable.HasManyList do
   begin
-    v := TdormUtils.GetField(AObject, _has_many.Name);
+    //v := TdormUtils.GetField(AObject, _has_many.Name);
+    v := TdormUtils.GetField(AObject, _has_many.RTTICache);
     GetLogger.Debug('-- Inspecting for ' + _has_many.ChildClassName);
     _child_type := FCTX.FindType(Qualified(AMappingTable,
       _has_many.ChildClassName));
@@ -1641,7 +1642,7 @@ begin
   GetLogger.Debug('Saving _has_one for ' + ARttiType.ToString);
   for _has_one in AMappingTable.HasOneList do
   begin
-    v := TdormUtils.GetField(AObject, _has_one.Name);
+    v := TdormUtils.GetField(AObject, _has_one.RTTICache);
     GetLogger.Debug('-- Inspecting for ' + _has_one.ChildClassName);
     _child_type := FCTX.FindType(Qualified(AMappingTable,
       _has_one.ChildClassName));

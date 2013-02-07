@@ -132,7 +132,7 @@ begin
   GetLogger.Debug('PREPARING: ' + SQL);
   for field in AMappingTable.Fields do
   begin
-    v := TdormUtils.GetField(AObject, field.name);
+    v := TdormUtils.GetField(AObject, field.RTTICache);
     SetSqlite3ParameterValue(DB, field.FieldType, ':' + field.FieldName, v);
   end;
   GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
@@ -329,7 +329,7 @@ begin
   DB.ParamsClear;
   for field in AMappingTable.Fields do
   begin
-    v := TdormUtils.GetField(AObject, field.name);
+    v := TdormUtils.GetField(AObject, field.RTTICache);
     if not field.IsPK then
       SetSqlite3ParameterValue(DB, field.FieldType, ':' + field.FieldName, v);
   end;
@@ -337,7 +337,7 @@ begin
   DB.ExecSQL(string(SQL));
   pk_value := DB.LastInsertRowID;
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-  TdormUtils.SetProperty(AObject, AMappingTable.Fields[pk_idx].name, pk_value);
+  TdormUtils.SetProperty(AObject, AMappingTable.Fields[pk_idx].RTTICache, pk_value);
   Result := pk_value;
   FLastInsertOID := Result;
 end;
@@ -560,7 +560,7 @@ begin
       else
         raise Exception.Create('Unknown field type for ' + field.FieldName);
       try
-        TdormUtils.SetField(AObject, field.name, v);
+        TdormUtils.SetField(AObject, field.RTTICache, v);
       except
         on E: Exception do
         begin

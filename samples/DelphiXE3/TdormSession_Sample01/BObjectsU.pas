@@ -3,7 +3,7 @@ unit BObjectsU;
 interface
 
 uses
-  dorm, dorm.Commons, dorm.Mappings;
+  dorm, dorm.Commons, dorm.Mappings, dorm.ObjectStatus;
 
 type
   [Entity('PEOPLE')]
