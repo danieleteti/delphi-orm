@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.Classes, dorm, dorm.Commons, dorm.Filters,
-  System.Rtti, System.Generics.Collections;
+  System.Rtti, System.Generics.Collections, dorm.ObjectStatus;
 
 type
   TdormSession = class(TComponent)

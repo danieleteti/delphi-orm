@@ -52,14 +52,14 @@ type
     FMapping: ISuperObject;
     procedure GetMapping(const AType: TRttiType; ATable: TMappingTable);
     procedure ParseTable(ATable: TMappingTable; const AJsonTable: ISuperObject);
-    procedure ParseIdField(ATable: TMappingTable; const AJsonTable: ISuperObject);
-    procedure ParseField(const AField: TMappingField; const AJsonField: ISuperObject);
+    procedure ParseIdField(ATable: TMappingTable; const AJsonTable: ISuperObject; const AType: TRttiType);
+    procedure ParseField(const AField: TMappingField; const AJsonField: ISuperObject; const AType: TRttiType);
     procedure ParseHasMany(const AHasMany: TMappingRelation;
-      const AJsonRelation: ISuperObject);
+      const AJsonRelation: ISuperObject; const AType: TRttiType);
     procedure ParseHasOne(const AHasOne: TMappingRelation;
-      const AJsonRelation: ISuperObject);
+      const AJsonRelation: ISuperObject; const AType: TRttiType);
     procedure ParseBelongsTo(const ABelongsTo: TMappingBelongsTo;
-      const AJsonRelation: ISuperObject);
+      const AJsonRelation: ISuperObject; const AType: TRttiType);
   public
     constructor Create(const AJsonMapping: ISuperObject);
   end;
@@ -189,29 +189,29 @@ begin
 
   ParseTable(ATable, jsonTable);
 
-  ParseIdField(ATable, jsonTable);
+  ParseIdField(ATable, jsonTable, AType);
 
   jsonArray := jsonTable.O['fields'].AsArray;
   if Assigned(jsonArray) then
   begin
     for i := 0 to jsonArray.Length - 1 do
-      ParseField(ATable.AddField, jsonArray[i]);
+      ParseField(ATable.AddField, jsonArray[i], AType);
   end;
 
   jsonArray := jsonTable.A['has_one'];
   if Assigned(jsonArray) then
     for i := 0 to jsonArray.Length - 1 do
-      ParseHasOne(ATable.AddHasOne, jsonArray[i]);
+      ParseHasOne(ATable.AddHasOne, jsonArray[i], AType);
 
   jsonArray := jsonTable.A['has_many'];
   if Assigned(jsonArray) then
     for i := 0 to jsonArray.Length - 1 do
-      ParseHasMany(ATable.AddHasMany, jsonArray[i]);
+      ParseHasMany(ATable.AddHasMany, jsonArray[i], AType);
 
   jsonArray := jsonTable.A['belongs_to'];
   if Assigned(jsonArray) then
     for i := 0 to jsonArray.Length - 1 do
-      ParseBelongsTo(ATable.AddBelongsTo, jsonArray[i]);
+      ParseBelongsTo(ATable.AddBelongsTo, jsonArray[i], AType);
 end;
 
 procedure TFileMappingStrategy.ParseTable(ATable: TMappingTable;
@@ -222,7 +222,7 @@ begin
 end;
 
 procedure TFileMappingStrategy.ParseIdField(ATable: TMappingTable;
-  const AJsonTable: ISuperObject);
+  const AJsonTable: ISuperObject; const AType: TRttiType);
 var
   idField: TMappingField;
   jsonIDField: ISuperObject;
@@ -231,15 +231,16 @@ begin
   if Assigned(jsonIDField) then
   begin
     idField := ATable.AddField;
-    ParseField(idField, jsonIDField);
+    ParseField(idField, jsonIDField, AType);
     idField.IsPK := True;
   end;
 end;
 
 procedure TFileMappingStrategy.ParseField(const AField: TMappingField;
-  const AJsonField: ISuperObject);
+  const AJsonField: ISuperObject; const AType: TRttiType);
 var
   indexType: string;
+  RTTICache: TMappingCache;
 begin
   AField.Name := AJsonField.S['name'];
   AField.FieldName := AJsonField.S['field'];
@@ -254,33 +255,64 @@ begin
   else if SameText(indexType, 'unique') then
     AField.indexType := itUnique;
   AField.IsPK := false;
+
+  if not Assigned(AType) then
+    raise Exception.CreateFmt('Cannot get RTTI for type [%s]',
+      [AType.ToString]);
+
+  RTTICache.RTTIField := AType.GetField(FieldFor(AField.Name));
+  RTTICache.RTTIProp := AType.GetProperty(AField.Name);
+  AField.RTTICache:=RTTICache;
+
+  {if not Assigned(AField.RTTIField) then
+  begin
+    AField.RTTIProp := AType.GetProperty(AField.Name);
+    if not Assigned(AField.RTTIProp) then
+      raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
+        [AType.ToString, AField.Name]);
+  end;}
 end;
 
 procedure TFileMappingStrategy.ParseHasOne(const AHasOne: TMappingRelation;
-  const AJsonRelation: ISuperObject);
+  const AJsonRelation: ISuperObject; const AType: TRttiType);
+var RTTICache: TMappingCache;
 begin
   AHasOne.Name := AJsonRelation.S['name'];
   AHasOne.ChildClassName := AJsonRelation.S['class_name'];
   AHasOne.ChildFieldName := AJsonRelation.S['child_field_name'];
   AHasOne.LazyLoad := AJsonRelation.B['lazy_load'];
+
+  RTTICache.RTTIField := AType.GetField(FieldFor(AHasOne.Name));
+  RTTICache.RTTIProp := AType.GetProperty(AHasOne.Name);
+  AHasOne.RTTICache:=RTTICache;
 end;
 
 procedure TFileMappingStrategy.ParseHasMany(const AHasMany: TMappingRelation;
-  const AJsonRelation: ISuperObject);
+  const AJsonRelation: ISuperObject; const AType: TRttiType);
+var RTTICache: TMappingCache;
 begin
   AHasMany.Name := AJsonRelation.S['name'];
   AHasMany.ChildClassName := AJsonRelation.S['class_name'];
   AHasMany.ChildFieldName := AJsonRelation.S['child_field_name'];
   AHasMany.LazyLoad := AJsonRelation.B['lazy_load'];
+
+  RTTICache.RTTIField := AType.GetField(FieldFor(AHasMany.Name));
+  RTTICache.RTTIProp := AType.GetProperty(AHasMany.Name);
+  AHasMany.RTTICache:=RTTICache;
 end;
 
 procedure TFileMappingStrategy.ParseBelongsTo(const ABelongsTo: TMappingBelongsTo;
-  const AJsonRelation: ISuperObject);
+  const AJsonRelation: ISuperObject; const AType: TRttiType);
+var RTTICache: TMappingCache;
 begin
   ABelongsTo.Name := AJsonRelation.S['name'];
   ABelongsTo.OwnerClassName := AJsonRelation.S['class_name'];
   ABelongsTo.RefFieldName := AJsonRelation.S['ref_field_name'];
   ABelongsTo.LazyLoad := AJsonRelation.B['lazy_load'];
+
+  RTTICache.RTTIField := AType.GetField(FieldFor(ABelongsTo.Name));
+  RTTICache.RTTIProp := AType.GetProperty(ABelongsTo.Name);
+  ABelongsTo.RTTICache:=RTTICache;
 end;
 
 { TAttributesMappingStrategy }
@@ -368,6 +400,7 @@ var
   hasOneAttribute: TCustomAttribute;
   isLazy: Boolean;
   relation: TMappingRelation;
+  RTTICache: TMappingCache;
 begin
   isLazy := TdormUtils.HasAttribute<Lazy>(AProp);
   hasOneAttribute := TdormUtils.GetAttribute<HasOne>(AProp);
@@ -378,6 +411,8 @@ begin
     relation.ChildClassName := AProp.PropertyType.AsInstance.MetaclassType.ClassName;
     relation.ChildFieldName := HasOne(hasOneAttribute).ChildPropertyName;
     relation.LazyLoad := isLazy or HasMany(hasOneAttribute).LazyLoad;
+    RTTICache.RTTIProp := AProp;
+    relation.RTTICache:=RTTICache;
   end;
 end;
 
@@ -387,6 +422,7 @@ var
   hasManyAttribute: TCustomAttribute;
   relation: TMappingRelation;
   isLazy: Boolean;
+  RTTICache: TMappingCache;
 begin
   isLazy := TdormUtils.HasAttribute<Lazy>(AProp);
   hasManyAttribute := TdormUtils.GetAttribute<HasMany>(AProp);
@@ -397,6 +433,8 @@ begin
     relation.ChildClassName := AProp.PropertyType.AsInstance.MetaclassType.ClassName;
     relation.ChildFieldName := HasMany(hasManyAttribute).ChildPropertyName;
     relation.LazyLoad := isLazy or HasMany(hasManyAttribute).LazyLoad;
+    RTTICache.RTTIProp := AProp;
+    relation.RTTICache:=RTTICache;
   end;
 end;
 
@@ -406,6 +444,7 @@ var
   belongsToAttribute: TCustomAttribute;
   relation: TMappingBelongsTo;
   isLazy: Boolean;
+  RTTICache: TMappingCache;
 begin
   isLazy := TdormUtils.HasAttribute<Lazy>(AProp);
   belongsToAttribute := TdormUtils.GetAttribute<BelongsTo>(AProp);
@@ -416,6 +455,8 @@ begin
     relation.OwnerClassName := AProp.PropertyType.AsInstance.MetaclassType.ClassName;
     relation.RefFieldName := HasOne(belongsToAttribute).ChildPropertyName;
     relation.LazyLoad := isLazy or HasMany(belongsToAttribute).LazyLoad;
+    RTTICache.RTTIProp := AProp;
+    relation.RTTICache:=RTTICache;
   end;
 end;
 
@@ -483,6 +524,7 @@ procedure TCoCMappingStrategy.ParseField(ATable: TMappingTable; AProp: TRttiProp
 var
   field: TMappingField;
   FieldType: String;
+  RTTICache: TMappingCache;
 begin
   FieldType := TdormUtils.GetFieldType(AProp);
   field := ATable.AddField;
@@ -491,6 +533,10 @@ begin
   field.Name := AProp.Name;
   field.FieldName := AnsiUpperCase(AProp.Name);
   field.FieldType := FieldType;
+
+  RTTICache.RTTIField :=nil;
+  RTTICache.RTTIProp := AProp;
+  field.RTTICache:=RTTICache;
 end;
 
 procedure TCoCMappingStrategy.ParseHasOne(AType: TRttiType;
@@ -692,6 +738,10 @@ begin
 
     if not outPutField.IsPK and AField.IsPK then
       outPutField.IsPK := AField.IsPK;
+
+    if ((not Assigned(outPutField.RTTICache.RTTIField)) and (Assigned((AField.RTTICache.RTTIField)))) or
+       ((not Assigned(outPutField.RTTICache.RTTIProp)) and (Assigned((AField.RTTICache.RTTIProp)))) then
+      outPutField.RTTICache:= AField.RTTICache;
   end;
 end;
 
