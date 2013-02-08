@@ -391,7 +391,8 @@ var
 {$ELSE}
 
   ObjectList:
-  {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
+
+{$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
 
 {$IFEND}
 
@@ -585,7 +586,11 @@ begin
 
   p := Session.Load<TPerson>(p_id);
   try
-    CheckEquals(dt, p.BornTimeStamp, 'BornTimeStamp is not equals to the inserted one');
+
+    CheckEquals(
+      FormatDateTime('yyyy-mm-dd hh:nn:ss', dt),
+      FormatDateTime('yyyy-mm-dd hh:nn:ss', p.BornTimeStamp),
+      'BornTimeStamp is not equals to the inserted one');
     Session.Delete(p);
   finally
     p.Free;
