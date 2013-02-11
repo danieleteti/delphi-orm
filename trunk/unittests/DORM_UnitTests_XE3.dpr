@@ -6,7 +6,7 @@ program DORM_UnitTests_XE3;
 
 uses
 
-{$IFNDEF CONSOLE_TESTRUNNER}
+{$IFNDEF FIREBIRD_CI}
 
   FastMM4,
 
@@ -56,7 +56,7 @@ uses
 
 begin
 
-{$IFNDEF CONSOLE_TESTRUNNER}
+{$IFNDEF FIREBIRD_CI}
 
   ReportMemoryLeaksOnShutdown := True;
 
