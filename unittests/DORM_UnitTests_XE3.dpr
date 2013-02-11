@@ -5,7 +5,13 @@ program DORM_UnitTests_XE3;
 {$ENDIF}
 
 uses
+
+{$IFNDEF CONSOLE_TESTRUNNER}
+
   FastMM4,
+
+{$ENDIF}
+
   Forms,
   TestFramework,
   GUITestRunner,
