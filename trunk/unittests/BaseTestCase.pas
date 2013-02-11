@@ -87,7 +87,7 @@ begin
 {$IFDEF FIREBIRD_UIB_STRATEGY}
   Result := 'dorm_firebird_uib.conf';
 {$ENDIF}
-{$IFDEF CONSOLE_TESTRUNNER}
+{$IFDEF FIREBIRD_CI}
   Result := 'dorm_firebird_uib_ci.conf';
 {$ENDIF}
 {$IFDEF SQLSERVER_STRATEGY}
@@ -106,11 +106,13 @@ begin
 {$IFNDEF SQLITE3_STRATEGY}
 {$IFNDEF SQLSERVER_STRATEGY}
 {$IFNDEF SQLSERVER_DEVART_STRATEGY}
+{$IFNDEF FIREBIRD_CI}
 {$IFNDEF CONSOLE_TESTRUNNER}
 {$MESSAGE ERROR '**************************************************'}
 {$MESSAGE ERROR '**>>> There are not strategy conditionals defined '}
 {$MESSAGE ERROR '**>>> You should select a REAL BUILD configuration'}
 {$MESSAGE ERROR '**************************************************'}
+{$ENDIF}
 {$ENDIF}
 {$ENDIF}
 {$ENDIF}
