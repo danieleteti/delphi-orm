@@ -122,8 +122,10 @@ begin
     'Too slow: ' + inttostr(MilliSecondsBetween(now, start)));
 end;
 
+
+{$IFNDEF FIREBIRD_CI}
 initialization
 
 RegisterTest(TTestDORMSpeed.Suite);
-
+{$ENDIF}
 end.
