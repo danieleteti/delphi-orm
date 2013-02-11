@@ -395,7 +395,7 @@ var
   SQL: string;
   reader: TSqliteTable;
   CustomCriteria: ICustomCriteria;
-  obj: TObject;
+//  obj: TObject;
   v: TValue;
 begin
   if Assigned(ACriteria) and TInterfacedObject(ACriteria)

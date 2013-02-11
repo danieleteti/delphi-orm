@@ -30,7 +30,7 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, Data.DBXPlatform;
 
 { TDelphiCodeGenerator }
 

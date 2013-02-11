@@ -27,7 +27,7 @@
       <env key="BDSCOMMONDIR" value="${BDSCOMMONDIR}"/>               	      
       <arg value="/nologo"/>
       <arg value="/target:Build"/>
-      <arg value="/property:config=CI_SQLITE3"/>
+      <arg value="/property:config=FIREBIRD_CI"/>
       <arg value="${unittestbuild}\DORM_UnitTests_XE3.dproj"/>
     </exec>
   </target>

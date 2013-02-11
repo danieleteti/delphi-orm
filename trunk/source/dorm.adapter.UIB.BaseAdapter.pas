@@ -384,7 +384,8 @@ begin
   end;
   System.Delete(sql_fields_names, 1, 1);
   sql_fields_values := '';
-  for field in AMappingTable.Fields do
+  for I := 0 to AMappingTable.Fields.Count - 1 do
+    // for field in AMappingTable.Fields do
     sql_fields_values := sql_fields_values + ',?';
   System.Delete(sql_fields_values, 1, 1);
   SQL := Format('INSERT INTO %s (%S) VALUES (%S)', [AMappingTable.TableName,
@@ -395,7 +396,7 @@ begin
     I := 0;
     for field in AMappingTable.Fields do
     begin
-     // v := TdormUtils.GetField(AObject, field.name);
+      // v := TdormUtils.GetField(AObject, field.name);
       v := TdormUtils.GetField(AObject, field.RTTICache);
       if field.IsPK then
         pk_value := GenerateAndFillPrimaryKeyParam(Query, I,
@@ -412,8 +413,9 @@ begin
     Query.Free;
   end;
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-  //TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].name, pk_value);
-  TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].RTTICache, pk_value);
+  // TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].name, pk_value);
+  TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].RTTICache,
+    pk_value);
   Result := pk_value;
 end;
 

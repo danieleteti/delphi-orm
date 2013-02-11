@@ -14,7 +14,7 @@ type
     FDuckObject: TDuckTypedObject;
 
   public
-    procedure Setup; override;
+    procedure SetUp; override;
     procedure TearDown; override;
 
   published

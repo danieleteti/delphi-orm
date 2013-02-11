@@ -79,8 +79,10 @@ uses
   strutils,
   TimeSpan,
   {$IF CompilerVersion > 22}
+  Winapi.Windows,
   System.SyncObjs;
   {$ELSE}
+  Windows,
   SyncObjs;
   {$IFEND}
 
@@ -273,7 +275,7 @@ procedure TdormFileLog.TdormLoggerThread.ShiftFileNames;
 var
   i: Integer;
 begin
-  DeleteFile(GetLogFileName(MAX_FILES_NUMBER));
+  DeleteFile(PChar(GetLogFileName(MAX_FILES_NUMBER)));
   for i := MAX_FILES_NUMBER - 1 downto 0 do
   begin
     RenameFile(GetLogFileName(i), GetLogFileName(i + 1))

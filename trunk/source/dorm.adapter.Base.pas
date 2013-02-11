@@ -123,8 +123,8 @@ function TBaseAdapter.GetCountSQL(ACriteria: ICriteria;
   AMappingTable: TMappingTable): string;
 var
   SQL: string;
-  _fields: TMappingFieldList;
-  select_fields: string;
+//  _fields: TMappingFieldList;
+//  select_fields: string;
   WhereSQL: string;
 begin
   Assert(ACriteria <> nil);
