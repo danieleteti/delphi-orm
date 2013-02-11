@@ -235,9 +235,9 @@ end;
 
 procedure TTestDORMQueryable.TestCustomSearchCriteriaWithParams;
 var
-  intf: ICustomCriteria;
+//  intf: ICustomCriteria;
   mArguments: TObjectList<TdormParameter>;
-  cc: TSQLCustomCriteria;
+//  cc: TSQLCustomCriteria;
   SQL: string;
   mScope: TDictionary<string, TRttiType>;
 begin
@@ -253,7 +253,7 @@ begin
     mScope,
     mArguments);
   mArguments.Free;
-  cc.Free;
+//  cc.Free;
   mScope.Free;
   CheckEquals
     ('select * from tablename where ID = 1 and FIRST_NAME = ''daniele''', SQL);

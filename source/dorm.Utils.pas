@@ -116,10 +116,6 @@ end;
 
 class function TdormUtils.GetField(Obj: TObject;
   const MappingCache: TMappingCache): TValue;
-var
-  Field: TRttiField;
-  Prop: TRttiProperty;
-  ARttiType: TRttiType;
 begin
   if Assigned(MappingCache.RTTIField) then
     Result := MappingCache.RTTIField.GetValue(Obj)
@@ -249,7 +245,7 @@ class procedure TdormUtils.SetProperty(Obj: TObject; const MappingCache: TMappin
   const Value: TValue);
 var
   Prop: TRttiProperty;
-  ARttiType: TRttiType;
+//  ARttiType: TRttiType;
 begin
   Prop:=MappingCache.RTTIProp;
   if not Assigned(Prop) then

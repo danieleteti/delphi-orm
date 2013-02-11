@@ -43,7 +43,6 @@ type
 
   protected
     constructor Create; virtual;
-    destructor Destroy; override;
 
   public
     function ToSQL(AMappingStrategy: ICacheMappingStrategy;
@@ -51,6 +50,7 @@ type
     function All: TSelect;
     function Distinct: TSelect;
     function From(AEntity: TClass): TFrom;
+    destructor Destroy; override;
   end;
 
   TJoin = class(TInterfacedObject, ISQLable)
@@ -298,7 +298,8 @@ begin
 
       vtUnicodeString:
         begin
-          mArguments.Add(TdormParameter.Create(TypeString, PChar(v.VUnicodeString)));
+          mArguments.Add(TdormParameter.Create(TypeString,
+            PChar(v.VUnicodeString)));
         end;
 
       vtCurrency:

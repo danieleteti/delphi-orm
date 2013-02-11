@@ -837,10 +837,8 @@ var
   rt: TRttiType;
   _table: TMappingTable;
   Obj: TObject;
-  _validateable: TdormValidateable;
   _validable: TdormValidateable;
 begin
-  Obj := nil;
   LoadEnter;
   rt := FCTX.GetType(ATypeInfo);
   GetLogger.EnterLevel('Load ' + rt.ToString);
@@ -1049,7 +1047,6 @@ var
   _has_one: TMappingRelation;
   _child_type: TRttiType;
   DestObj, Obj: TObject;
-  _validable: TdormValidateable;
 begin
   GetLogger.Debug('Loading HAS_ONE for ' + AClassName + '.' + APropertyName);
   _table := FMappingStrategy.GetMapping(ARttiType);
@@ -1264,11 +1261,8 @@ var
   v: TValue;
   List: IWrappedList;
   Obj: TObject;
-  _table: TMappingTable;
-  _idValue: TValue;
+//  _table: TMappingTable;
   _type_name: string;
-  _p1, _p2: Integer;
-  attr: ListOf;
 begin
   GetLogger.EnterLevel('persist has_many ' + ARttiType.ToString);
   for _has_many in AMappingTable.HasManyList do
@@ -1280,7 +1274,7 @@ begin
     if not assigned(_child_type) then
       raise Exception.Create('Unknown type ' + _has_many.ChildClassName);
     UpdateChildTypeWithRealListInnerType(AMappingTable, _child_type);
-    _table := FMappingStrategy.GetMapping(_child_type);
+//    _table := FMappingStrategy.GetMapping(_child_type);
     Obj := v.AsObject;
     if assigned(Obj) then
     begin
@@ -1461,9 +1455,6 @@ end;
 
 function TSession.Qualified(AMappingTable: TMappingTable;
   const AClassName: string): string;
-var
-  _p1: Integer;
-  _p2: Integer;
 begin
   // if AClassName = 'TRates' then
   // Exit('ModelQuaestioU.TRate');

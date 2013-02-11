@@ -8,7 +8,7 @@ uses
 type
   TTestObjStatus = class(TBaseTestCase)
   public
-    procedure Setup; override;
+    procedure SetUp; override;
     procedure TearDown; override;
 
   published

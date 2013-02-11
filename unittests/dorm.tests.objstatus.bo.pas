@@ -154,7 +154,7 @@ type
     procedure SetIsMale(const Value: Boolean);
 
   public
-    constructor Create; virtual;
+    constructor Create; reintroduce; virtual;
     destructor Destroy; override;
     function ToString: string; override;
     class function NewPerson: TPersonOS;
@@ -206,7 +206,7 @@ type
   public
     class constructor Create;
     class procedure register;
-    constructor Create;
+    constructor Create; override;
     property Number: string read FNumber write SetNumber;
     property Model: string read FModel write SetModel;
     property ID: Integer read FID write SetID;
@@ -230,7 +230,7 @@ type
     procedure SetID(const Value: string);
 
   public
-    constructor Create(); virtual;
+    constructor Create; reintroduce; virtual;
     destructor Destroy; override;
     class function NewDepartment(DepName: string): TDepartmentOS;
     property ID: string read FID write SetID;

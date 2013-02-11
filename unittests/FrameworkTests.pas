@@ -586,7 +586,6 @@ begin
 
   p := Session.Load<TPerson>(p_id);
   try
-
     CheckEquals(
       FormatDateTime('yyyy-mm-dd hh:nn:ss', dt),
       FormatDateTime('yyyy-mm-dd hh:nn:ss', p.BornTimeStamp),
