@@ -786,6 +786,12 @@ begin
     GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' +
       EscapeDate(AValue.AsExtended));
   end
+  else if CompareText(AFieldType, 'time') = 0 then
+  begin
+    AStatement.Params.AsDateTime[ParameterIndex] := AValue.AsExtended;
+    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' +
+      EscapeDateTime(AValue.AsExtended));
+  end
   else if CompareText(AFieldType, 'blob') = 0 then
   begin
     sourceStream := TStream(AValue.AsObject);

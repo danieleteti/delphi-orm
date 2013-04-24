@@ -19,7 +19,7 @@ type
     function EscapeString(const Value: string): string;
     function EscapeDate(const Value: TDate): string;
     function EscapeDateTime(const Value: TDate): string;
-
+    function EscapeTime(const Value: TTime): string;
     //
     function GetBooleanValueAsString(Value: Boolean): String; virtual;
 
@@ -123,8 +123,8 @@ function TBaseAdapter.GetCountSQL(ACriteria: ICriteria;
   AMappingTable: TMappingTable): string;
 var
   SQL: string;
-//  _fields: TMappingFieldList;
-//  select_fields: string;
+  // _fields: TMappingFieldList;
+  // select_fields: string;
   WhereSQL: string;
 begin
   Assert(ACriteria <> nil);
@@ -207,6 +207,11 @@ end;
 function TBaseAdapter.EscapeString(const Value: string): string;
 begin
   Result := StringReplace(Value, '''', '''''', [rfReplaceAll]);
+end;
+
+function TBaseAdapter.EscapeTime(const Value: TTime): string;
+begin
+  Result := FormatDateTime('HH:NN:SS', Value);
 end;
 
 end.
