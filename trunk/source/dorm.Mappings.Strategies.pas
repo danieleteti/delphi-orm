@@ -371,6 +371,7 @@ begin
     field.Size := C.Size;
     field.Precision := C.Precision;
     field.DefaultValue := C.DefaultValue;
+    field.FieldType := C.FieldType; //daniele teti
   end;
 
   attribute := TdormUtils.GetAttribute<Size>(AProp);
