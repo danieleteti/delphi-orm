@@ -9,10 +9,12 @@ uses
   dorm.Mappings;
 
 type
+
 {$RTTI EXPLICIT
     FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
     METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
     PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
+
   IMappingStrategy = interface
     ['{F64D6AF3-C4C2-4098-A241-B3401CE3FB03}']
     procedure GetMapping(const AType: TRttiType; ATable: TMappingTable);
@@ -31,6 +33,7 @@ type
     function MergeHasOneTo(ARelation: TMappingRelation; AOutput: TMappingTable): Boolean;
     function MergeHasManyTo(ARelation: TMappingRelation; AOutput: TMappingTable): Boolean;
     function MergeBelongsTo(ARelation: TMappingBelongsTo; AOutput: TMappingTable): Boolean;
+
   public
     procedure Merge(AOutput: TMappingTable; AInput: array of TMappingTable);
   end;
@@ -42,6 +45,7 @@ type
     FMappings: TDictionary<TRttiType, TMappingTable>;
     function GetMapping(const AType: TRttiType): TMappingTable;
     procedure Add(const AMappingStrategy: IMappingStrategy);
+
   public
     constructor Create;
     destructor Destroy; override;
@@ -60,6 +64,7 @@ type
       const AJsonRelation: ISuperObject; const AType: TRttiType);
     procedure ParseBelongsTo(const ABelongsTo: TMappingBelongsTo;
       const AJsonRelation: ISuperObject; const AType: TRttiType);
+
   public
     constructor Create(const AJsonMapping: ISuperObject);
   end;
@@ -262,20 +267,21 @@ begin
 
   RTTICache.RTTIField := AType.GetField(FieldFor(AField.Name));
   RTTICache.RTTIProp := AType.GetProperty(AField.Name);
-  AField.RTTICache:=RTTICache;
+  AField.RTTICache := RTTICache;
 
-  {if not Assigned(AField.RTTIField) then
-  begin
+  { if not Assigned(AField.RTTIField) then
+    begin
     AField.RTTIProp := AType.GetProperty(AField.Name);
     if not Assigned(AField.RTTIProp) then
-      raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
-        [AType.ToString, AField.Name]);
-  end;}
+    raise Exception.CreateFmt('Cannot get RTTI for property [%s.%s]',
+    [AType.ToString, AField.Name]);
+    end; }
 end;
 
 procedure TFileMappingStrategy.ParseHasOne(const AHasOne: TMappingRelation;
   const AJsonRelation: ISuperObject; const AType: TRttiType);
-var RTTICache: TMappingCache;
+var
+  RTTICache: TMappingCache;
 begin
   AHasOne.Name := AJsonRelation.S['name'];
   AHasOne.ChildClassName := AJsonRelation.S['class_name'];
@@ -284,12 +290,13 @@ begin
 
   RTTICache.RTTIField := AType.GetField(FieldFor(AHasOne.Name));
   RTTICache.RTTIProp := AType.GetProperty(AHasOne.Name);
-  AHasOne.RTTICache:=RTTICache;
+  AHasOne.RTTICache := RTTICache;
 end;
 
 procedure TFileMappingStrategy.ParseHasMany(const AHasMany: TMappingRelation;
   const AJsonRelation: ISuperObject; const AType: TRttiType);
-var RTTICache: TMappingCache;
+var
+  RTTICache: TMappingCache;
 begin
   AHasMany.Name := AJsonRelation.S['name'];
   AHasMany.ChildClassName := AJsonRelation.S['class_name'];
@@ -298,12 +305,13 @@ begin
 
   RTTICache.RTTIField := AType.GetField(FieldFor(AHasMany.Name));
   RTTICache.RTTIProp := AType.GetProperty(AHasMany.Name);
-  AHasMany.RTTICache:=RTTICache;
+  AHasMany.RTTICache := RTTICache;
 end;
 
 procedure TFileMappingStrategy.ParseBelongsTo(const ABelongsTo: TMappingBelongsTo;
   const AJsonRelation: ISuperObject; const AType: TRttiType);
-var RTTICache: TMappingCache;
+var
+  RTTICache: TMappingCache;
 begin
   ABelongsTo.Name := AJsonRelation.S['name'];
   ABelongsTo.OwnerClassName := AJsonRelation.S['class_name'];
@@ -312,7 +320,7 @@ begin
 
   RTTICache.RTTIField := AType.GetField(FieldFor(ABelongsTo.Name));
   RTTICache.RTTIProp := AType.GetProperty(ABelongsTo.Name);
-  ABelongsTo.RTTICache:=RTTICache;
+  ABelongsTo.RTTICache := RTTICache;
 end;
 
 { TAttributesMappingStrategy }
@@ -371,7 +379,8 @@ begin
     field.Size := C.Size;
     field.Precision := C.Precision;
     field.DefaultValue := C.DefaultValue;
-    field.FieldType := C.FieldType; //daniele teti
+    if C.FieldType <> '' then // if attribute averride the inferred type...
+      field.FieldType := C.FieldType; // user the type defined in the attribute
   end;
 
   attribute := TdormUtils.GetAttribute<Size>(AProp);
@@ -413,7 +422,7 @@ begin
     relation.ChildFieldName := HasOne(hasOneAttribute).ChildPropertyName;
     relation.LazyLoad := isLazy or HasMany(hasOneAttribute).LazyLoad;
     RTTICache.RTTIProp := AProp;
-    relation.RTTICache:=RTTICache;
+    relation.RTTICache := RTTICache;
   end;
 end;
 
@@ -435,7 +444,7 @@ begin
     relation.ChildFieldName := HasMany(hasManyAttribute).ChildPropertyName;
     relation.LazyLoad := isLazy or HasMany(hasManyAttribute).LazyLoad;
     RTTICache.RTTIProp := AProp;
-    relation.RTTICache:=RTTICache;
+    relation.RTTICache := RTTICache;
   end;
 end;
 
@@ -457,7 +466,7 @@ begin
     relation.RefFieldName := HasOne(belongsToAttribute).ChildPropertyName;
     relation.LazyLoad := isLazy or HasMany(belongsToAttribute).LazyLoad;
     RTTICache.RTTIProp := AProp;
-    relation.RTTICache:=RTTICache;
+    relation.RTTICache := RTTICache;
   end;
 end;
 
@@ -535,9 +544,9 @@ begin
   field.FieldName := AnsiUpperCase(AProp.Name);
   field.FieldType := FieldType;
 
-  RTTICache.RTTIField :=nil;
+  RTTICache.RTTIField := nil;
   RTTICache.RTTIProp := AProp;
-  field.RTTICache:=RTTICache;
+  field.RTTICache := RTTICache;
 end;
 
 procedure TCoCMappingStrategy.ParseHasOne(AType: TRttiType;
@@ -741,8 +750,8 @@ begin
       outPutField.IsPK := AField.IsPK;
 
     if ((not Assigned(outPutField.RTTICache.RTTIField)) and (Assigned((AField.RTTICache.RTTIField)))) or
-       ((not Assigned(outPutField.RTTICache.RTTIProp)) and (Assigned((AField.RTTICache.RTTIProp)))) then
-      outPutField.RTTICache:= AField.RTTICache;
+      ((not Assigned(outPutField.RTTICache.RTTIProp)) and (Assigned((AField.RTTICache.RTTIProp)))) then
+      outPutField.RTTICache := AField.RTTICache;
   end;
 end;
 

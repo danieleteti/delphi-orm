@@ -242,6 +242,7 @@ type
       ACriteria: ICriteria = nil); overload;
     procedure FillListSQL<T: class>(ACollection: TObject;
       ASQLable: ISQLable); overload;
+    function Load<T: class>(ASQLable: ISQLable): T; overload;
     function ListAll<T: class>():
 
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
@@ -686,7 +687,7 @@ end;
 function TSession.GetLoadedObjectHashCode(ATypeInfo: PTypeInfo;
   AValue: TValue): String;
 begin
-  Result := ATypeInfo.Name + '_' + inttostr(AValue.AsInt64);
+  Result := String(ATypeInfo.Name) + '_' + inttostr(AValue.AsInt64);
 end;
 
 function TSession.GetLogger: IdormLogger;
@@ -934,6 +935,41 @@ begin
 
   GetLogger.ExitLevel('Load ' + rt.ToString);
   LoadExit;
+end;
+
+function TSession.Load<T>(ASQLable: ISQLable): T;
+var
+  rt: TRttiType;
+  _table: TMappingTable;
+  _fields: TMappingFieldList;
+  _type_info: PTypeInfo;
+  SearcherClassname: string;
+  List: IWrappedList;
+  Obj: T;
+  _validateable: TdormValidateable;
+  ACollection: TObjectList<T>;
+begin
+  _type_info := TypeInfo(T);
+  rt := FCTX.GetType(_type_info);
+  _table := FMappingStrategy.GetMapping(rt);
+  _fields := _table.Fields;
+  GetLogger.EnterLevel('Load<T>(SQL)');
+  ACollection := TObjectList<T>.Create(false);
+  try
+    GetStrategy.LoadList(ACollection, rt, _table, ASQLable.ToSQL(self.GetMapping,
+      self.GetStrategy));
+    if ACollection.Count > 1 then
+      raise EdormException.Create('Singleton query returned more than 1 row');
+
+    Obj := ACollection[0];
+    SetObjectStatus(Obj, osClean, false);
+    _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
+    _validateable.OnAfterLoad;
+    Result := Obj;
+  finally
+    ACollection.Free;
+  end;
+  GetLogger.ExitLevel('Load<T>(SQL)');
 end;
 
 function TSession.Load<T>(const Value: TValue; AObject: TObject): boolean;
@@ -1261,7 +1297,7 @@ var
   v: TValue;
   List: IWrappedList;
   Obj: TObject;
-//  _table: TMappingTable;
+  // _table: TMappingTable;
   _type_name: string;
 begin
   GetLogger.EnterLevel('persist has_many ' + ARttiType.ToString);
@@ -1274,7 +1310,7 @@ begin
     if not assigned(_child_type) then
       raise Exception.Create('Unknown type ' + _has_many.ChildClassName);
     UpdateChildTypeWithRealListInnerType(AMappingTable, _child_type);
-//    _table := FMappingStrategy.GetMapping(_child_type);
+    // _table := FMappingStrategy.GetMapping(_child_type);
     Obj := v.AsObject;
     if assigned(Obj) then
     begin
@@ -1599,7 +1635,7 @@ begin
   GetLogger.Debug('Saving has_many for ' + ARttiType.ToString);
   for _has_many in AMappingTable.HasManyList do
   begin
-    //v := TdormUtils.GetField(AObject, _has_many.Name);
+    // v := TdormUtils.GetField(AObject, _has_many.Name);
     v := TdormUtils.GetField(AObject, _has_many.RTTICache);
     GetLogger.Debug('-- Inspecting for ' + _has_many.ChildClassName);
     _child_type := FCTX.FindType(Qualified(AMappingTable,

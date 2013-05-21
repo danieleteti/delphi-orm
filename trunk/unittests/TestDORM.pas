@@ -53,7 +53,7 @@ uses
   SysUtils,
   dorm.Commons,
   dorm.tests.bo,
-  dorm.UOW;
+  dorm.UOW, dorm.Query;
 
 { TTestDORM }
 
@@ -277,7 +277,7 @@ end;
 
 procedure TTestDORM.LoadPersonaPassingNilAsReturnObject;
 begin
-  Session.Load<TPerson>(nil);
+  Session.Load<TPerson>(ISQLable(nil));
 end;
 
 procedure TTestDORM.SetUp;
