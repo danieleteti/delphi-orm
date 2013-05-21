@@ -3,7 +3,7 @@
         <ProjectGuid>{31559DB3-B424-45CE-822C-DCF0CC962D36}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="unittests\DORM_UnitTests_XE3.dproj">
+        <Projects Include="unittests\DORM_UnitTests_XE4.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="tools\persistencecreator\persistencecreator.dproj">
@@ -17,14 +17,14 @@
             <Default.Personality/>
         </BorlandProject>
     </ProjectExtensions>
-    <Target Name="DORM_UnitTests_XE3">
-        <MSBuild Projects="unittests\DORM_UnitTests_XE3.dproj"/>
+    <Target Name="DORM_UnitTests_XE4">
+        <MSBuild Projects="unittests\DORM_UnitTests_XE4.dproj"/>
     </Target>
-    <Target Name="DORM_UnitTests_XE3:Clean">
-        <MSBuild Projects="unittests\DORM_UnitTests_XE3.dproj" Targets="Clean"/>
+    <Target Name="DORM_UnitTests_XE4:Clean">
+        <MSBuild Projects="unittests\DORM_UnitTests_XE4.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="DORM_UnitTests_XE3:Make">
-        <MSBuild Projects="unittests\DORM_UnitTests_XE3.dproj" Targets="Make"/>
+    <Target Name="DORM_UnitTests_XE4:Make">
+        <MSBuild Projects="unittests\DORM_UnitTests_XE4.dproj" Targets="Make"/>
     </Target>
     <Target Name="persistencecreator">
         <MSBuild Projects="tools\persistencecreator\persistencecreator.dproj"/>
@@ -36,13 +36,13 @@
         <MSBuild Projects="tools\persistencecreator\persistencecreator.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="DORM_UnitTests_XE3;persistencecreator"/>
+        <CallTarget Targets="DORM_UnitTests_XE4;persistencecreator"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="DORM_UnitTests_XE3:Clean;persistencecreator:Clean"/>
+        <CallTarget Targets="DORM_UnitTests_XE4:Clean;persistencecreator:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="DORM_UnitTests_XE3:Make;persistencecreator:Make"/>
+        <CallTarget Targets="DORM_UnitTests_XE4:Make;persistencecreator:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

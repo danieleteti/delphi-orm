@@ -86,15 +86,15 @@
 {.$DEFINE DEBUG} // track memory leack
 
 
-{$if defined(FPC) or defined(VER170) or defined(VER180) or defined(VER190) or defined(VER200) or defined(VER210) or defined(VER220) or defined(VER230)}
+{$if defined(FPC) or defined(VER170) or defined(VER180) or defined(VER190) or defined(VER200) or defined(VER210) or defined(VER220) or defined(VER230) or defined(VER240) or defined(VER250)}
   {$DEFINE HAVE_INLINE}
 {$ifend}
 
-{$if defined(VER210) or defined(VER220) or defined(VER230) or defined(VER240)}
+{$if defined(VER210) or defined(VER220) or defined(VER230) or defined(VER240) or defined(VER250)}
   {$define HAVE_RTTI}
 {$ifend}
 
-{$if defined(VER220) or defined(VER230) or defined(VER240)}
+{$if defined(VER220) or defined(VER230) or defined(VER240) or defined(VER250)}
   {$define NEED_FORMATSETTINGS}
 {$ifend}
 
