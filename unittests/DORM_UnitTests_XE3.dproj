@@ -154,7 +154,6 @@
         <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
-        <DCC_DebugDCUs>false</DCC_DebugDCUs>
         <ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
         <BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
         <BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
@@ -404,6 +403,7 @@
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\10.0\Bpl\dorm_runtime_xe3.bpl">(untitled)</Excluded_Packages>
+                    <Excluded_Packages Name="D:\DXE3Lib\DeveloperExpressVCL\Library\RS17\dclcxPivotGridOLAPRS17.bpl">ExpressPivotGrid OLAP by Developer Express Inc.</Excluded_Packages>
                     <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\10.0\Bpl\dclTreeViewPresenter170.bpl">DSharp treeview presenter designtime package</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcboffice2k170.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
                     <Excluded_Packages Name="$(BDSBIN)\bcbofficexp170.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>

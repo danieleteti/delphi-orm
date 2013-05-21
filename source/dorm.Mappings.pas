@@ -243,7 +243,7 @@ constructor Column.Create(const AColumnName: string; AFieldType: String;
   ASize: Cardinal = 0; APrecision: Cardinal = 0; ADefaultValue: String = '');
 begin
   Create(AColumnName, ASize, APrecision, ADefaultValue);
-  FFieldType := AFieldType;
+  FFieldType := LowerCase(AFieldType);
 end;
 { Size }
 

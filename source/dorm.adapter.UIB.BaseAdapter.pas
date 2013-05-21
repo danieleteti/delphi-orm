@@ -628,6 +628,11 @@ begin
         v := AReader.Fields.ByNameAsDateTime[field.FieldName];
         S := field.FieldName + ' as datetime';
       end
+      else if CompareText(field.FieldType, 'time') = 0 then
+      begin
+        v := AReader.Fields.ByNameAsDateTime[field.FieldName];
+        S := field.FieldName + ' as time';
+      end
       else
         raise Exception.Create('Unknown field type for ' + field.FieldName);
       try
