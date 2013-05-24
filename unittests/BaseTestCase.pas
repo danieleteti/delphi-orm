@@ -28,6 +28,7 @@ type
   TBaseTestCase = class(TTestCase)
   protected
     Session: dorm.TSession;
+    function CreateSession: dorm.TSession;
     function GetDORMConfigFileName: string;
     function GetDORMMappingFileName: string;
     function CreateRandomPeople:
@@ -71,6 +72,14 @@ begin
   p.LastName := 'Richards';
   p.Age := 35;
   Result.Add(p);
+end;
+
+function TBaseTestCase.CreateSession: dorm.TSession;
+begin
+  Result := TSession.CreateConfigured
+    (TStreamReader.Create(GetDORMConfigFileName),
+    TStreamReader.Create(GetDORMMappingFileName), deTest);
+  Result.StartTransaction;
 end;
 
 function TBaseTestCase.GetDORMConfigFileName: string;
@@ -131,14 +140,12 @@ end;
 procedure TBaseTestCase.SetUp;
 begin
   inherited;
-  Session := TSession.CreateConfigured
-    (TStreamReader.Create(GetDORMConfigFileName),
-    TStreamReader.Create(GetDORMMappingFileName), deTest);
-  Session.StartTransaction;
+  Session := CreateSession;
   Session.DeleteAll(TPerson);
   Session.DeleteAll(TPhone);
   Session.DeleteAll(TEmail);
   Session.DeleteAll(TCar);
+  Session.DeleteAll(TToDo);
   Session.Commit;
   Session.StartTransaction;
 end;

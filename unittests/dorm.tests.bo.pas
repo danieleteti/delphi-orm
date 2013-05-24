@@ -38,15 +38,12 @@ type
   TPhones = class(
 
 {$IF CompilerVersion >= 23}
-
     TObjectList<TPhone>
 
 {$ELSE}
-
     TdormObjectList<TPhone>
 
 {$IFEND}
-
     )
   end;
 
@@ -270,6 +267,37 @@ type
     procedure SetObjStatus(const Value: TdormObjectStatus);
 
   public
+    [Transient]
+    property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
+  end;
+
+  // versioned objects
+  [Entity('TODOS')]
+  TToDo = class
+  private
+    FDone: Boolean;
+    FObjVersion: Int64;
+    FDueTime: TTime;
+    FID: Integer;
+    FDescription: String;
+    FDueDate: TDate;
+    FObjStatus: TdormObjectStatus;
+    procedure SetDescription(const Value: String);
+    procedure SetDone(const Value: Boolean);
+    procedure SetDueDate(const Value: TDate);
+    procedure SetDueTime(const Value: TTime);
+    procedure SetID(const Value: Integer);
+    procedure SetObjVersion(const Value: Int64);
+    procedure SetObjStatus(const Value: TdormObjectStatus);
+  public
+    property ID: Integer read FID write SetID;
+    property Description: String read FDescription write SetDescription;
+    [Column('DUE_DATE')]
+    property DueDate: TDate read FDueDate write SetDueDate;
+    [Column('DUE_TIME')]
+    property DueTime: TTime read FDueTime write SetDueTime;
+    property Done: Boolean read FDone write SetDone;
+    property ObjVersion: Int64 read FObjVersion write SetObjVersion;
     [Transient]
     property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
   end;
@@ -714,6 +742,43 @@ end;
 procedure TEmailDirty.SetObjStatus(const Value: TdormObjectStatus);
 begin
   FObjStatus := Value;
+end;
+
+{ TToDo }
+
+procedure TToDo.SetDescription(const Value: String);
+begin
+  FDescription := Value;
+end;
+
+procedure TToDo.SetDone(const Value: Boolean);
+begin
+  FDone := Value;
+end;
+
+procedure TToDo.SetDueDate(const Value: TDate);
+begin
+  FDueDate := Value;
+end;
+
+procedure TToDo.SetDueTime(const Value: TTime);
+begin
+  FDueTime := Value;
+end;
+
+procedure TToDo.SetID(const Value: Integer);
+begin
+  FID := Value;
+end;
+
+procedure TToDo.SetObjStatus(const Value: TdormObjectStatus);
+begin
+  FObjStatus := Value;
+end;
+
+procedure TToDo.SetObjVersion(const Value: Int64);
+begin
+  FObjVersion := Value;
 end;
 
 end.

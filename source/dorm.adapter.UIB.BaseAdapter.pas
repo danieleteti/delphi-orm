@@ -61,9 +61,9 @@ type
     function Insert(ARttiType: TRttiType; AObject: TObject;
       AMappingTable: TMappingTable): TValue;
     function Update(ARttiType: TRttiType; AObject: TObject;
-      AMappingTable: TMappingTable): TValue;
+      AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
     function Delete(ARttiType: TRttiType; AObject: TObject;
-      AMappingTable: TMappingTable): TObject;
+      AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
     procedure DeleteAll(AMappingTable: TMappingTable);
     function Count(AMappingTable: TMappingTable): Int64;
     function Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
@@ -122,7 +122,7 @@ begin
 end;
 
 function TUIBBaseAdapter.Update(ARttiType: TRttiType; AObject: TObject;
-  AMappingTable: TMappingTable): TValue;
+  AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
 var
   field: TMappingField;
   SQL: string;
@@ -141,6 +141,10 @@ begin
     ].FieldName;
   SQL := Format('UPDATE %S SET %S WHERE %S = ?', [AMappingTable.TableName,
     sql_fields_names, pk_field]);
+  if ACurrentVersion > 0 then // optlock
+  begin
+    SQL := SQL + ' AND OBJVERSION = ' + IntToStr(ACurrentVersion);
+  end;
   GetLogger.Debug(AMappingTable.Fields[GetPKMappingIndex(AMappingTable.Fields)
     ].FieldName);
   GetLogger.Debug('PREPARING: ' + SQL);
@@ -163,7 +167,7 @@ begin
       .GetValue(AObject);
     FillPrimaryKeyParam(Query, I, v);
     GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
-    FB.Execute(Query);
+    Result := FB.Execute(Query);
   finally
     Query.Free;
   end;
@@ -226,12 +230,16 @@ begin
 end;
 
 function TUIBBaseAdapter.Delete(ARttiType: TRttiType; AObject: TObject;
-  AMappingTable: TMappingTable): TObject;
+  AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
 var
   pk_idx: Integer;
   pk_value: TValue;
   pk_attribute_name, pk_field_name, SQL: string;
   cmd: TUIBStatement;
+  S: Cardinal;
+  I: Cardinal;
+  u: Cardinal;
+  d: Cardinal;
 begin
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
   if pk_idx = -1 then
@@ -242,16 +250,19 @@ begin
   pk_value := ARttiType.GetProperty(pk_attribute_name).GetValue(AObject);
   SQL := 'DELETE FROM ' + AMappingTable.TableName + ' WHERE ' +
     pk_field_name + ' = ?';
+  if ACurrentVersion > 0 then
+    SQL := SQL + ' AND OBJVERSION = ' + IntToStr(ACurrentVersion);
   GetLogger.Debug('PREPARING: ' + SQL);
   cmd := FB.Prepare(SQL);
   try
     FillPrimaryKeyParam(cmd, 0, pk_value);
     GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
     cmd.Execute;
+    cmd.AffectedRows(S, I, u, d);
+    Result := d;
   finally
     cmd.Free;
   end;
-  Result := nil;
 end;
 
 procedure TUIBBaseAdapter.DeleteAll(AMappingTable: TMappingTable);
@@ -325,7 +336,7 @@ begin
         begin
           Query.Params.AsInt64[ParamIndex] := Value.AsInteger;
           Result := Query.Params.AsInt64[ParamIndex];
-          GetLogger.Debug('ParPK = ' + inttostr(Value.AsInteger));
+          GetLogger.Debug('ParPK = ' + IntToStr(Value.AsInteger));
         end;
     end;
   except
@@ -759,42 +770,42 @@ begin
   if CompareText(AFieldType, 'string') = 0 then
   begin
     AStatement.Params.AsString[ParameterIndex] := AValue.AsString;
-    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' + AValue.AsString);
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + AValue.AsString);
   end
   else if CompareText(AFieldType, 'decimal') = 0 then
   begin
     AStatement.Params.AsDouble[ParameterIndex] := AValue.AsExtended;
-    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' +
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' +
       FloatToStr(AValue.AsExtended));
   end
   else if CompareText(AFieldType, 'integer') = 0 then
   begin
     AStatement.Params.AsInt64[ParameterIndex] := AValue.AsInt64;
-    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' +
-      inttostr(AValue.AsInt64));
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' +
+      IntToStr(AValue.AsInt64));
   end
   else if CompareText(AFieldType, 'boolean') = 0 then
   begin
     AStatement.Params.AsBoolean[ParameterIndex] := AValue.AsBoolean;
-    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' +
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' +
       BoolToStr(AValue.AsBoolean, true));
   end
   else if CompareText(AFieldType, 'date') = 0 then
   begin
     AStatement.Params.AsDateTime[ParameterIndex] := trunc(AValue.AsExtended);
-    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' +
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' +
       EscapeDate(trunc(AValue.AsExtended)));
   end
   else if CompareText(AFieldType, 'datetime') = 0 then
   begin
     AStatement.Params.AsDateTime[ParameterIndex] := AValue.AsExtended;
-    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' +
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' +
       EscapeDate(AValue.AsExtended));
   end
   else if CompareText(AFieldType, 'time') = 0 then
   begin
     AStatement.Params.AsDateTime[ParameterIndex] := AValue.AsExtended;
-    GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = ' +
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' +
       EscapeDateTime(AValue.AsExtended));
   end
   else if CompareText(AFieldType, 'blob') = 0 then
@@ -803,7 +814,7 @@ begin
     if sourceStream = nil then
     begin
       AStatement.Params.IsNull[ParameterIndex] := true;
-      GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = nil');
+      GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = nil');
     end
     else
     begin
@@ -813,8 +824,8 @@ begin
         str.CopyFrom(sourceStream, 0);
         str.Position := 0;
         AStatement.ParamsSetBlob(ParameterIndex, str);
-        GetLogger.Debug('Par' + inttostr(ParameterIndex) + ' = <blob ' +
-          inttostr(str.Size) + ' bytes>');
+        GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = <blob ' +
+          IntToStr(str.Size) + ' bytes>');
       finally
         str.Free;
       end;

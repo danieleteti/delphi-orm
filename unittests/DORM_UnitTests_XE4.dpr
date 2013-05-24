@@ -44,7 +44,8 @@ uses
   TestDORMDuckTyping in 'TestDORMDuckTyping.pas',
   dorm.tests.objstatus.bo in 'dorm.tests.objstatus.bo.pas',
   TestDORMObjStatus in 'TestDORMObjStatus.pas',
-  dorm.Query in '..\source\dorm.Query.pas';
+  dorm.Query in '..\source\dorm.Query.pas',
+  TestDORMObjVersion in 'TestDORMObjVersion.pas';
 
 {$R *.RES}
 

@@ -23,6 +23,15 @@ type
     //
     function GetBooleanValueAsString(Value: Boolean): String; virtual;
 
+    // iso related functions
+    class function ISODateTimeToString(ADateTime: TDateTime): string;
+    class function ISODateToString(ADate: TDateTime): string;
+    class function ISOTimeToString(ATime: TTime): string;
+
+    class function ISOStrToDateTime(DateTimeAsString: string): TDateTime;
+    class function ISOStrToDate(DateAsString: string): TDate;
+    class function ISOStrToTime(TimeAsString: string): TTime;
+
   public
     function GetSelectSQL(Criteria: ICriteria; AMappingTable: TMappingTable)
       : string; overload; virtual;
@@ -34,20 +43,52 @@ type
 implementation
 
 uses
-  SysUtils;
+  SysUtils, System.DateUtils;
 
 { TBaseAdapter }
 
-// function TBaseAdapter.GetFieldMappingByAttribute(AttributeName: string;
-// AMappingTable: TMappingTable): TMappingField;
-// var
-// fm: TMappingField;
-// begin
-// for fm in AMappingTable.Fields do
-// if fm.name = AttributeName then
-// Exit(fm);
-// raise EdormException.CreateFmt('Unknown field attribute %s', [AttributeName]);
-// end;
+class function TBaseAdapter.ISOTimeToString(ATime: TTime): string;
+var
+  fs: TFormatSettings;
+begin
+  fs.TimeSeparator := ':';
+  Result := FormatDateTime('hh:nn:ss', ATime, fs);
+end;
+
+class function TBaseAdapter.ISODateToString(ADate: TDateTime): string;
+begin
+  Result := FormatDateTime('YYYY-MM-DD', ADate);
+end;
+
+class function TBaseAdapter.ISODateTimeToString(ADateTime: TDateTime): string;
+var
+  fs: TFormatSettings;
+begin
+  fs.TimeSeparator := ':';
+  Result := FormatDateTime('yyyy-mm-dd hh:nn:ss', ADateTime, fs);
+end;
+
+class function TBaseAdapter.ISOStrToDateTime(DateTimeAsString: string): TDateTime;
+begin
+  Result := EncodeDateTime(StrToInt(Copy(DateTimeAsString, 1, 4)),
+    StrToInt(Copy(DateTimeAsString, 6, 2)),
+    StrToInt(Copy(DateTimeAsString, 9, 2)),
+    StrToInt(Copy(DateTimeAsString, 12, 2)),
+    StrToInt(Copy(DateTimeAsString, 15, 2)),
+    StrToInt(Copy(DateTimeAsString, 18, 2)), 0);
+end;
+
+class function TBaseAdapter.ISOStrToTime(TimeAsString: string): TTime;
+begin
+  Result := EncodeTime(StrToInt(Copy(TimeAsString, 1, 2)),
+    StrToInt(Copy(TimeAsString, 4, 2)), StrToInt(Copy(TimeAsString, 7, 2)), 0);
+end;
+
+class function TBaseAdapter.ISOStrToDate(DateAsString: string): TDate;
+begin
+  Result := EncodeDate(StrToInt(Copy(DateAsString, 1, 4)),
+    StrToInt(Copy(DateAsString, 6, 2)), StrToInt(Copy(DateAsString, 9, 2)));
+end;
 
 function TBaseAdapter.GetWhereSQL(ACriteria: ICriteria;
   AMappingTable: TMappingTable): string;

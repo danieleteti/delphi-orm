@@ -5,13 +5,9 @@ program DORM_UnitTests_XE3;
 {$ENDIF}
 
 uses
-
-{$IFNDEF FIREBIRD_CI}
-
+  {$IFNDEF FIREBIRD_CI}
   FastMM4,
-
-{$ENDIF}
-
+  {$ENDIF}
   Forms,
   TestFramework,
   GUITestRunner,
@@ -26,7 +22,7 @@ uses
   dorm in '..\source\dorm.pas',
   dorm.UOW in '..\source\dorm.UOW.pas',
   dorm.Utils in '..\source\dorm.Utils.pas',
-  dorm.Utils.Sequences in '..\source\dorm.utils.Sequences.pas',
+  dorm.utils.Sequences in '..\source\dorm.utils.Sequences.pas',
   dorm.tests.bo in 'dorm.tests.bo.pas',
   BaseTestCase in 'BaseTestCase.pas',
   FindersTests in 'FindersTests.pas',
@@ -36,8 +32,7 @@ uses
   dorm.Mappings in '..\source\dorm.Mappings.pas',
   dorm.Mappings.Strategies in '..\source\dorm.Mappings.Strategies.pas',
   dorm.CodeGenerator in '..\tools\mappingcreator\lib\dorm.CodeGenerator.pas',
-  dorm.CodeGenerator.Delphi
-    in '..\tools\mappingcreator\lib\dorm.CodeGenerator.Delphi.pas',
+  dorm.CodeGenerator.Delphi in '..\tools\mappingcreator\lib\dorm.CodeGenerator.Delphi.pas',
   dorm.loggers in '..\source\dorm.loggers.pas',
   dorm.loggers.FileLog in '..\source\dorm.loggers.FileLog.pas',
   dorm.adapters in '..\source\dorm.adapters.pas',
@@ -49,7 +44,8 @@ uses
   TestDORMDuckTyping in 'TestDORMDuckTyping.pas',
   dorm.tests.objstatus.bo in 'dorm.tests.objstatus.bo.pas',
   TestDORMObjStatus in 'TestDORMObjStatus.pas',
-  dorm.Query in '..\source\dorm.Query.pas';
+  dorm.Query in '..\source\dorm.Query.pas',
+  TestDORMObjVersion in 'TestDORMObjVersion.pas';
 
 {$R *.RES}
 
