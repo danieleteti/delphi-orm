@@ -50,6 +50,9 @@ type
 
 {$IFEND}
 
+  TdormStrategyConfigEvent = procedure(Sender: TObject;
+    AAdapterConfiguration: ISuperObject) of object;
+
   TdormSessionPersistEvent = procedure(Sender: TObject; AObject: TObject)
     of object;
 
@@ -68,6 +71,7 @@ type
     LoadedObjects: TObjectDictionary<string, TObject>;
     FOnAfterPersistObject: TdormSessionPersistEvent;
     FOnBeforePersistObject: TdormSessionPersistEvent;
+    FOnBeforeConfigureStrategy: TdormStrategyConfigEvent;
     procedure LoadEnter;
     procedure LoadExit;
     function GetIdValue(AIdMappingField: TMappingField;
@@ -92,7 +96,7 @@ type
     procedure DoSessionOnBeforePersistObject(AObject: TObject);
     procedure DoSessionOnAfterPersistObject(AObject: TObject);
     //
-    constructor CreateSession(Environment: TdormEnvironment); virtual;
+    constructor CreateSession(Environment: TdormEnvironment); overload; virtual;
     // Validations
     function CreateLogger: IdormLogger;
     function Qualified(AMappingTable: TMappingTable;
@@ -161,6 +165,7 @@ type
       AValidaetable: TdormValidateable);
     procedure CheckChangedRows(const HowManyChangedRows: Integer);
   public
+    constructor Create(Environment: TdormEnvironment); overload; virtual;
     destructor Destroy; override;
     // Environments
     function GetEnv: string;
@@ -264,6 +269,10 @@ type
       read FOnBeforePersistObject write FOnBeforePersistObject;
     property OnAfterPersistObject: TdormSessionPersistEvent
       read FOnAfterPersistObject write FOnAfterPersistObject;
+
+    // strategy events
+    property OnBeforeConfigureStrategy: TdormStrategyConfigEvent
+      read FOnBeforeConfigureStrategy write FOnBeforeConfigureStrategy;
   end;
 
 implementation
@@ -379,6 +388,8 @@ begin
     FMappingStrategy.Add(_MappingStrategy);
     FLogger := CreateLogger;
     FPersistStrategy := GetStrategy;
+    if assigned(FOnBeforeConfigureStrategy) then
+      FOnBeforeConfigureStrategy(self, _JSonConfigEnv);
     FPersistStrategy.ConfigureStrategy(_JSonConfigEnv);
     FPersistStrategy.InitStrategy;
   except
@@ -481,6 +492,11 @@ class function TSession.CreateConfigured(APersistenceConfiguration: TTextReader;
   AEnvironment: TdormEnvironment): TSession;
 begin
   Result := CreateConfigured(APersistenceConfiguration, nil, AEnvironment);
+end;
+
+constructor TSession.Create(Environment: TdormEnvironment);
+begin
+  CreateSession(Environment);
 end;
 
 class function TSession.CreateConfigured(APersistenceConfigurationFile: String;
