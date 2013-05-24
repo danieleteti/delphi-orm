@@ -22,7 +22,7 @@ uses
   Generics.Collections,
   dorm,
   dorm.Collections,
-  dorm.tests.bo;
+  dorm.tests.bo, superobject;
 
 type
   TBaseTestCase = class(TTestCase)
@@ -34,6 +34,8 @@ type
     function CreateRandomPeople:
 {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
   public
+    procedure OnBeforeConfigureStrategy(Sender: TObject;
+      AAdapterConfiguration: ISuperObject);
     procedure SetUp; override;
     procedure TearDown; override;
   end;
@@ -43,7 +45,7 @@ implementation
 uses
   ioutils,
   classes,
-  dorm.Commons;
+  dorm.Commons, System.SysUtils;
 
 function TBaseTestCase.CreateRandomPeople:
 {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
@@ -76,9 +78,10 @@ end;
 
 function TBaseTestCase.CreateSession: dorm.TSession;
 begin
-  Result := TSession.CreateConfigured
-    (TStreamReader.Create(GetDORMConfigFileName),
-    TStreamReader.Create(GetDORMMappingFileName), deTest);
+  Result := TSession.Create(deTest);
+  Result.OnBeforeConfigureStrategy := OnBeforeConfigureStrategy;
+  Result.Configure(TStreamReader.Create(GetDORMConfigFileName),
+    TStreamReader.Create(GetDORMMappingFileName));
   Result.StartTransaction;
 end;
 
@@ -135,6 +138,15 @@ end;
 function TBaseTestCase.GetDORMMappingFileName: string;
 begin
   Result := 'dorm_tests.mapping';
+end;
+
+procedure TBaseTestCase.OnBeforeConfigureStrategy(Sender: TObject;
+  AAdapterConfiguration: ISuperObject);
+begin
+{$IFDEF FIREBIRD_CI}
+  AAdapterConfiguration.S['database_connection_string'] := 'localhost:' +
+    ExtractFilePath(ParamStr(0)) + '..\Samples\Data\DORM_TEST.FDB';
+{$ENDIF}
 end;
 
 procedure TBaseTestCase.SetUp;
