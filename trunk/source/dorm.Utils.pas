@@ -33,21 +33,23 @@ type
     class function MethodCall(AObject: TObject; AMethodName: string;
       AParameters: array of TValue): TValue;
     class procedure SetProperty(Obj: TObject; const PropertyName: string;
-      const Value: TValue);  overload; static;
+      const Value: TValue); overload; static;
     class procedure SetProperty(Obj: TObject; const MappingCache: TMappingCache;
-  const Value: TValue);  overload; static;
+      const Value: TValue); overload; static;
     class function GetFieldType(AProp: TRttiProperty): string;
     class procedure ObjectToDataSet(Obj: TObject; Field: TField;
       var Value: Variant);
     class procedure DatasetToObject(Dataset: TDataset; Obj: TObject);
     class function GetProperty(Obj: TObject;
       const PropertyName: string): TValue;
-    class function GetField(Obj: TObject; const PropertyName: string): TValue; overload;
-    class function GetField(Obj: TObject; const MappingCache: TMappingCache): TValue; overload;
+    class function GetField(Obj: TObject; const PropertyName: string)
+      : TValue; overload;
+    class function GetField(Obj: TObject; const MappingCache: TMappingCache)
+      : TValue; overload;
     class procedure SetField(Obj: TObject; const PropertyName: string;
       const Value: TValue); overload;
     class procedure SetField(Obj: TObject; const MappingCache: TMappingCache;
-      const Value: TValue);  overload;
+      const Value: TValue); overload;
     class function Clone(Obj: TObject): TObject; static;
     class procedure CopyObject(SourceObj, TargetObj: TObject); static;
     class function CreateObject(ARttiType: TRttiType): TObject; static;
@@ -112,7 +114,6 @@ begin
       Exit(T(Attr));
   end;
 end;
-
 
 class function TdormUtils.GetField(Obj: TObject;
   const MappingCache: TMappingCache): TValue;
@@ -200,14 +201,13 @@ begin
         Prop.SetValue(Obj, Value)
     end
     else
-      raise Exception.CreateFmt
-        ('Cannot get RTTI for field or property [%s.%s]',
+      raise Exception.CreateFmt('Cannot get RTTI for field or property [%s.%s]',
         [ARttiType.ToString, PropertyName]);
   end;
 end;
 
-class procedure TdormUtils.SetField(Obj: TObject; const MappingCache: TMappingCache;
-  const Value: TValue);
+class procedure TdormUtils.SetField(Obj: TObject;
+  const MappingCache: TMappingCache; const Value: TValue);
 begin
   if Assigned(MappingCache.RTTIField) then
     MappingCache.RTTIField.SetValue(Obj, Value)
@@ -241,13 +241,13 @@ begin
       [ARttiType.ToString, PropertyName]);
 end;
 
-class procedure TdormUtils.SetProperty(Obj: TObject; const MappingCache: TMappingCache;
-  const Value: TValue);
+class procedure TdormUtils.SetProperty(Obj: TObject;
+  const MappingCache: TMappingCache; const Value: TValue);
 var
   Prop: TRttiProperty;
-//  ARttiType: TRttiType;
+  // ARttiType: TRttiType;
 begin
-  Prop:=MappingCache.RTTIProp;
+  Prop := MappingCache.RTTIProp;
   if not Assigned(Prop) then
     raise Exception.Create('Cannot get RTTI for property');
   if Prop.IsWritable then
@@ -272,13 +272,18 @@ begin
     Result := 'datetime'
   else if _PropInfo = TypeInfo(Currency) then
     Result := 'decimal'
+  else if _PropInfo = TypeInfo(TTime) then
+  begin
+    Result := 'time'
+  end
   else if _PropInfo.Kind = tkFloat then
+  begin
     Result := 'float'
+  end
   else if (_PropInfo.Kind = tkEnumeration) and (_PropInfo.Name = 'Boolean') then
     Result := 'boolean'
   else if AProp.PropertyType.IsInstance and
-    AProp.PropertyType.AsInstance.MetaclassType.InheritsFrom
-    (TStream) then
+    AProp.PropertyType.AsInstance.MetaclassType.InheritsFrom(TStream) then
     Result := 'blob'
   else
     Result := EmptyStr;

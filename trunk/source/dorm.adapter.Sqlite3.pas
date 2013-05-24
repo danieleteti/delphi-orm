@@ -69,9 +69,9 @@ type
     function Insert(ARttiType: TRttiType; AObject: TObject;
       AMappingTable: TMappingTable): TValue;
     function Update(ARttiType: TRttiType; AObject: TObject;
-      AMappingTable: TMappingTable): TValue;
+      AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
     function Delete(ARttiType: TRttiType; AObject: TObject;
-      AMappingTable: TMappingTable): TObject;
+      AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
     procedure DeleteAll(AMappingTable: TMappingTable);
     function Count(AMappingTable: TMappingTable): Int64;
     function Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
@@ -107,7 +107,7 @@ uses
   dorm.Utils;
 
 function TSqlite3PersistStrategy.Update(ARttiType: TRttiType; AObject: TObject;
-  AMappingTable: TMappingTable): TValue;
+  AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
 var
   field: TMappingField;
   SQL: string;
@@ -129,6 +129,8 @@ begin
   GetLogger.Debug(AMappingTable.Fields[GetPKMappingIndex(AMappingTable.Fields)
     ].FieldName);
   DB.ParamsClear;
+  if ACurrentVersion > 0 then
+    SQL := SQL + ' AND OBJVERSION = ' + IntToStr(ACurrentVersion);
   GetLogger.Debug('PREPARING: ' + SQL);
   for field in AMappingTable.Fields do
   begin
@@ -137,6 +139,7 @@ begin
   end;
   GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
   DB.ExecSQL(SQL);
+  Result := DB.LastChangedRows;
   DB.ParamsClear;
 end;
 
@@ -202,7 +205,7 @@ begin
 end;
 
 function TSqlite3PersistStrategy.Delete(ARttiType: TRttiType; AObject: TObject;
-  AMappingTable: TMappingTable): TObject;
+  AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
 var
   pk_idx: Integer;
   pk_value: TValue;
@@ -217,13 +220,15 @@ begin
   pk_value := ARttiType.GetProperty(pk_attribute_name).GetValue(AObject);
   SQL := 'DELETE FROM ' + AnsiQuotedStr(AMappingTable.TableName, '"') +
     ' WHERE ' + AnsiQuotedStr(pk_field_name, '"') + ' = :' + pk_field_name;
+  if ACurrentVersion > 0 then // optlock
+    SQL := SQL + ' AND OBJVERSION = ' + IntToStr(ACurrentVersion);
   GetLogger.Debug('PREPARING: ' + SQL);
   DB.ParamsClear;
   FillPrimaryKeyParam(DB, ':' + pk_field_name, pk_value);
   GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
   DB.ExecSQL(SQL);
+  Result := DB.LastChangedRows;
   DB.ParamsClear;
-  Result := nil;
 end;
 
 procedure TSqlite3PersistStrategy.DeleteAll(AMappingTable: TMappingTable);
@@ -337,7 +342,8 @@ begin
   DB.ExecSQL(string(SQL));
   pk_value := DB.LastInsertRowID;
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-  TdormUtils.SetProperty(AObject, AMappingTable.Fields[pk_idx].RTTICache, pk_value);
+  TdormUtils.SetProperty(AObject, AMappingTable.Fields[pk_idx].RTTICache,
+    pk_value);
   Result := pk_value;
   FLastInsertOID := Result;
 end;
@@ -395,7 +401,7 @@ var
   SQL: string;
   reader: TSqliteTable;
   CustomCriteria: ICustomCriteria;
-//  obj: TObject;
+  // obj: TObject;
   v: TValue;
 begin
   if Assigned(ACriteria) and TInterfacedObject(ACriteria)
@@ -518,12 +524,6 @@ begin
         v := AReader.FieldAsInteger(AReader.FieldIndex[field.FieldName]);
         S := field.FieldName + ' as integer';
       end
-      else if CompareText(field.FieldType, 'date') = 0 then
-      begin
-        v := AReader.FieldAsString(AReader.FieldIndex[field.FieldName]);
-        v := StrToDate(v.AsString, FFormatSettings);
-        S := field.FieldName + ' as date';
-      end
       else if CompareText(field.FieldType, 'blob') = 0 then
       begin
         // targetStream := nil;
@@ -554,8 +554,20 @@ begin
       else if CompareText(field.FieldType, 'datetime') = 0 then
       begin
         v := AReader.FieldAsString(AReader.FieldIndex[field.FieldName]);
-        v := StrToDateTime(v.AsString, FFormatSettings);
+        v := ISOStrToDateTime(v.AsString);
         S := field.FieldName + ' as datetime';
+      end
+      else if CompareText(field.FieldType, 'time') = 0 then
+      begin
+        v := AReader.FieldAsString(AReader.FieldIndex[field.FieldName]);
+        v := ISOStrToTime(v.AsString);
+        S := field.FieldName + ' as time';
+      end
+      else if CompareText(field.FieldType, 'date') = 0 then
+      begin
+        v := AReader.FieldAsString(AReader.FieldIndex[field.FieldName]);
+        v := ISOStrToDate(v.AsString);
+        S := field.FieldName + ' as date';
       end
       else
         raise Exception.Create('Unknown field type for ' + field.FieldName);
@@ -649,7 +661,7 @@ begin
   else if CompareText(aFieldType, 'integer') = 0 then
   begin
     ADB.AddParamInt(aParameterName, aValue.AsInteger);
-    GetLogger.Debug(aParameterName + ' = ' + inttostr(aValue.AsInteger));
+    GetLogger.Debug(aParameterName + ' = ' + IntToStr(aValue.AsInteger));
   end
   else if CompareText(aFieldType, 'decimal') = 0 then
   begin
@@ -671,16 +683,25 @@ begin
   end
   else if CompareText(aFieldType, 'date') = 0 then
   begin
-    ADB.AddParamText(aParameterName, EscapeDate(aValue.AsExtended));
+    ADB.AddParamText(aParameterName, ISODateToString(aValue.AsExtended));
+    // EscapeDate(aValue.AsExtended));
     GetLogger.Debug(aParameterName + ' = ' +
       EscapeDate(DateTimeToTimeStamp(aValue.AsExtended).Date));
   end
   else if CompareText(aFieldType, 'datetime') = 0 then
   begin
-    ADB.AddParamText(aParameterName,
-      EscapeDateTime(FloatToDateTime(aValue.AsExtended)));
+    ADB.AddParamText(aParameterName, ISODateTimeToString(aValue.AsExtended));
+    // EscapeDateTime(FloatToDateTime(aValue.AsExtended)));
     GetLogger.Debug(aParameterName + ' = ' +
       EscapeDateTime(FloatToDateTime(aValue.AsExtended)));
+  end
+  else if CompareText(aFieldType, 'time') = 0 then
+  begin
+    ADB.AddParamText(aParameterName,
+      ISOTimeToString(Frac(FloatToDateTime(aValue.AsExtended))));
+    // EscapeDateTime(Frac(FloatToDateTime(aValue.AsExtended))));
+    GetLogger.Debug(aParameterName + ' = ' +
+      EscapeDateTime(Frac(FloatToDateTime(aValue.AsExtended))));
   end
   else if CompareText(aFieldType, 'blob') = 0 then
   begin
@@ -698,7 +719,7 @@ begin
         str.CopyFrom(sourceStream, sourceStream.Size);
         str.Position := 0;
         ADB.AddParamBlobPtr(aParameterName, str.Memory, str.Size);
-        GetLogger.Debug(aParameterName + ' = <' + inttostr(str.Size) +
+        GetLogger.Debug(aParameterName + ' = <' + IntToStr(str.Size) +
           ' bytes>');
       finally
         str.Free;

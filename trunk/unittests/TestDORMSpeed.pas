@@ -129,3 +129,7 @@ initialization
 RegisterTest(TTestDORMSpeed.Suite);
 {$ENDIF}
 end.
+
+
+
+

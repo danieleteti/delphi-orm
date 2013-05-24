@@ -35,7 +35,6 @@ uses
 type
 
 {$IF CompilerVersion = 22}
-
   // In DelphiXE you cannot use directly TObjectList<T> because
   // GetItem method is private. SO you have to use a specific typed list
   // as this sample show. However, you can avoid default delphi collections
@@ -154,13 +153,13 @@ type
       AMappingField: TMappingField): String; overload;
     function GetLoadedObjectHashCode(ATypeInfo: PTypeInfo; AValue: TValue)
       : String; overload;
-    procedure InternalUpdate(AObject: TObject;
-      AValidaetable: TdormValidateable; AOnlyChild: boolean = false);
+    procedure InternalUpdate(AObject: TObject; AValidaetable: TdormValidateable;
+      AOnlyChild: boolean = false);
     function InternalInsert(AObject: TObject;
       AValidaetable: TdormValidateable): TValue;
     procedure InternalDelete(AObject: TObject;
       AValidaetable: TdormValidateable);
-
+    procedure CheckChangedRows(const HowManyChangedRows: Integer);
   public
     destructor Destroy; override;
     // Environments
@@ -207,6 +206,11 @@ type
     function IsObjectStatusAvailable(AObject: TObject): boolean;
     procedure SetObjectStatus(AObject: TObject; AStatus: TdormObjectStatus;
       ARaiseExceptionIfNotExists: boolean = true);
+    procedure SetObjectVersion(AObject: TObject; AVersion: Int64;
+      ARaiseExceptionIfNotExists: boolean = true);
+    function GetCurrentAndIncrementObjectVersion(AObject: TObject;
+      out ACurrentVersion: Int64;
+      ARaiseExceptionIfNotExists: boolean = true): boolean;
     function IsDirty(AObject: TObject): boolean;
     function IsClean(AObject: TObject): boolean;
     function IsUnknown(AObject: TObject): boolean;
@@ -288,6 +292,13 @@ end;
 procedure TSession.BuildDatabase;
 begin
   FPersistStrategy.GetDatabaseBuilder(GetEntitiesNames, GetMapping).Execute;
+end;
+
+procedure TSession.CheckChangedRows(const HowManyChangedRows: Integer);
+begin
+  if HowManyChangedRows <> 1 then
+    raise EdormLockingException.Create
+      ('Object has been changed on database. Refresh your data and retry.');
 end;
 
 procedure TSession.ClearOID(AObject: TObject);
@@ -754,21 +765,29 @@ end;
 procedure TSession.HandleDirtyPersist(AIdValue: TValue; AObject: TObject;
   AValidateable: TdormValidateable);
 begin
-  case FIdType of
-    ktInteger:
-      begin
-        if AIdValue.AsInteger = FIdNullValue.AsInteger then
-          InternalInsert(AObject, AValidateable)
-        else
-          InternalUpdate(AObject, AValidateable);
-      end;
-    ktString:
-      begin
-        if AIdValue.AsString = FIdNullValue.AsString then
-          InternalInsert(AObject, AValidateable)
-        else
-          InternalUpdate(AObject, AValidateable);
-      end;
+  try
+    case FIdType of
+      ktInteger:
+        begin
+          if AIdValue.AsInteger = FIdNullValue.AsInteger then
+            InternalInsert(AObject, AValidateable)
+          else
+            InternalUpdate(AObject, AValidateable);
+        end;
+      ktString:
+        begin
+          if AIdValue.AsString = FIdNullValue.AsString then
+            InternalInsert(AObject, AValidateable)
+          else
+            InternalUpdate(AObject, AValidateable);
+        end;
+    end;
+  except
+    on E: Exception do
+    begin
+      GetLogger.Error(E.ClassName + sLineBreak + E.Message);
+      raise;
+    end;
   end;
 end;
 { *** not used
@@ -813,15 +832,12 @@ begin
       begin
 
 {$IF CompilerVersion > 22}
-
         Result.Add(_Type.QualifiedClassName);
 
 {$ELSE}
-
         Result.Add(_Type.QualifiedName);
 
 {$IFEND}
-
         Break;
       end;
   end;
@@ -956,8 +972,8 @@ begin
   GetLogger.EnterLevel('Load<T>(SQL)');
   ACollection := TObjectList<T>.Create(false);
   try
-    GetStrategy.LoadList(ACollection, rt, _table, ASQLable.ToSQL(self.GetMapping,
-      self.GetStrategy));
+    GetStrategy.LoadList(ACollection, rt, _table,
+      ASQLable.ToSQL(self.GetMapping, self.GetStrategy));
     if ACollection.Count > 1 then
       raise EdormException.Create('Singleton query returned more than 1 row');
 
@@ -1227,7 +1243,7 @@ begin
             HandleDirtyPersist(_idValue, AObject, _v);
             _v.OnAfterPersist;
           end;
-        osClean: // update the only the child
+        osClean: // update only the child objects
           begin
             _v.OnBeforePersist;
             InternalUpdate(AObject, _v, true);
@@ -1509,6 +1525,31 @@ begin
   GetLogger.ExitLevel('TSession.Rollback');
 end;
 
+function TSession.GetCurrentAndIncrementObjectVersion(AObject: TObject;
+  out ACurrentVersion: Int64; ARaiseExceptionIfNotExists: boolean): boolean;
+var
+  _Type: TRttiType;
+  _objversion: TRttiProperty;
+begin
+  Result := false;
+  if assigned(AObject) then
+  begin
+    _Type := FCTX.GetType(AObject.ClassInfo);
+    _objversion := _Type.GetProperty('ObjVersion');
+    if (not assigned(_objversion)) then
+    begin
+      if ARaiseExceptionIfNotExists then
+        raise EdormException.Create('Cannot find [ObjVersion] property');
+    end
+    else
+    begin
+      ACurrentVersion := _objversion.GetValue(AObject).AsInt64;
+      _objversion.SetValue(AObject, ACurrentVersion + 1);
+      Result := true;
+    end;
+  end;
+end;
+
 function TSession.Insert(AObject: TObject): TValue;
 var
   _v: TdormValidateable;
@@ -1607,6 +1648,26 @@ begin
   end;
 end;
 
+procedure TSession.SetObjectVersion(AObject: TObject; AVersion: Int64;
+  ARaiseExceptionIfNotExists: boolean);
+var
+  _Type: TRttiType;
+  _objversion: TRttiProperty;
+begin
+  if assigned(AObject) then
+  begin
+    _Type := FCTX.GetType(AObject.ClassInfo);
+    _objversion := _Type.GetProperty('ObjVersion');
+    if (not assigned(_objversion)) then
+    begin
+      if ARaiseExceptionIfNotExists then
+        raise EdormException.Create('Cannot find [ObjVersion] property');
+    end
+    else
+      _objversion.SetValue(AObject, AVersion);
+  end;
+end;
+
 procedure TSession.InsertCollection(ACollection: TObject);
 var
   Obj: TObject;
@@ -1695,34 +1756,49 @@ var
   _class_name: string;
   _idValue: TValue;
   _validateable: TdormValidateable;
+  CurrentVersion: Int64;
 begin
   GetLogger.EnterLevel('Delete');
+  try
+    try
+      _validateable := WrapAsValidateableObject(AObject, FValidatingDuck);
 
-  _validateable := WrapAsValidateableObject(AObject, FValidatingDuck);
+      _validateable.DeleteValidate;
+      _validateable.OnBeforeDelete;
 
-  _validateable.DeleteValidate;
-  _validateable.OnBeforeDelete;
-
-  _rttitype := FCTX.GetType(AObject.ClassInfo);
-  _class_name := _rttitype.ToString;
-  _table := FMappingStrategy.GetMapping(_rttitype);
-  _idValue := GetIdValue(_table.Id, AObject);
-  if CurrentObjectStatus = osUnknown then
-  begin
-    DeleteHasManyRelation(_table, _idValue, _rttitype, AObject);
-    DeleteHasOneRelation(_table, _idValue, _rttitype, AObject);
-    GetStrategy.Delete(_rttitype, AObject, _table);
-  end
-  else
-  begin
-    PersistHasManyRelation(_table, _idValue, _rttitype, AObject);
-    PersistHasOneRelation(_table, _idValue, _rttitype, AObject);
-    GetStrategy.Delete(_rttitype, AObject, _table);
+      _rttitype := FCTX.GetType(AObject.ClassInfo);
+      _class_name := _rttitype.ToString;
+      _table := FMappingStrategy.GetMapping(_rttitype);
+      _idValue := GetIdValue(_table.Id, AObject);
+      if CurrentObjectStatus = osUnknown then
+      begin
+        DeleteHasManyRelation(_table, _idValue, _rttitype, AObject);
+        DeleteHasOneRelation(_table, _idValue, _rttitype, AObject);
+      end
+      else
+      begin
+        PersistHasManyRelation(_table, _idValue, _rttitype, AObject);
+        PersistHasOneRelation(_table, _idValue, _rttitype, AObject);
+      end;
+      if GetCurrentAndIncrementObjectVersion(AObject, CurrentVersion, false)
+      then
+        CheckChangedRows(GetStrategy.Delete(_rttitype, AObject, _table,
+          CurrentVersion))
+      else
+        GetStrategy.Delete(_rttitype, AObject, _table, 0);
+      ClearOID(AObject);
+      SetObjectStatus(AObject, osDirty, false);
+      _validateable.OnAfterDelete;
+    except
+      on E: Exception do
+      begin
+        GetLogger.Error(E.ClassName + sLineBreak + E.Message);
+        raise;
+      end;
+    end;
+  finally
+    GetLogger.ExitLevel('Delete');
   end;
-  ClearOID(AObject);
-  SetObjectStatus(AObject, osDeleted, false);
-  _validateable.OnAfterDelete;
-  GetLogger.ExitLevel('Delete');
 end;
 
 function TSession.InternalInsert(AObject: TObject;
@@ -1739,36 +1815,46 @@ begin
   if GetObjectStatus(AObject) = osClean then
     Exit(_idValue);
   GetLogger.EnterLevel('INSERT ' + AObject.ClassName);
-  _validateable := WrapAsValidateableObject(AObject);
   try
-    _validateable.Validate;
-    _validateable.InsertValidate;
-    _validateable.OnBeforeInsert;
-    if IsNullKey(_table, _idValue) then
-    begin
-      FLogger.Info('Inserting ' + AObject.ClassName);
-      FixBelongsToRelation(_table, _idValue, _Type, AObject);
-      Result := GetStrategy.Insert(_Type, AObject, _table);
-      _idValue := GetIdValue(_table.Id, AObject);
-      if CurrentObjectStatus <> osUnknown then
+    _validateable := WrapAsValidateableObject(AObject);
+    try
+      _validateable.Validate;
+      _validateable.InsertValidate;
+      _validateable.OnBeforeInsert;
+      if IsNullKey(_table, _idValue) then
       begin
-        PersistHasManyRelation(_table, _idValue, _Type, AObject);
-        PersistHasOneRelation(_table, _idValue, _Type, AObject);
+        FLogger.Info('Inserting ' + AObject.ClassName);
+        FixBelongsToRelation(_table, _idValue, _Type, AObject);
+        SetObjectVersion(AObject, 1, false); // optlock
+        Result := GetStrategy.Insert(_Type, AObject, _table);
+        _idValue := GetIdValue(_table.Id, AObject);
+        if CurrentObjectStatus <> osUnknown then
+        begin
+          PersistHasManyRelation(_table, _idValue, _Type, AObject);
+          PersistHasOneRelation(_table, _idValue, _Type, AObject);
+        end
+        else
+        begin
+          InsertHasManyRelation(_table, _idValue, _Type, AObject);
+          InsertHasOneRelation(_table, _idValue, _Type, AObject);
+        end;
+
       end
       else
-      begin
-        InsertHasManyRelation(_table, _idValue, _Type, AObject);
-        InsertHasOneRelation(_table, _idValue, _Type, AObject);
-      end;
-
-    end
-    else
-      raise EdormException.CreateFmt('Cannot insert [%s] because OI is not null',
-        [AObject.ClassName]);
-    SetObjectStatus(AObject, osClean, false);
-    _validateable.OnAfterInsert;
-  finally
-    _validateable.Free;
+        raise EdormException.CreateFmt
+          ('Cannot insert [%s] because OI is not null', [AObject.ClassName]);
+      SetObjectStatus(AObject, osClean, false);
+      _validateable.OnAfterInsert;
+    finally
+      _validateable.Free;
+    end;
+  except
+    on E: Exception do
+    begin
+      GetLogger.Error(E.ClassName + sLineBreak + E.Message);
+      GetLogger.ExitLevel('INSERT ' + AObject.ClassName);
+      raise;
+    end;
   end;
   GetLogger.ExitLevel('INSERT ' + AObject.ClassName);
 end;
@@ -1780,31 +1866,53 @@ var
   _class_name: string;
   _table: TMappingTable;
   _idValue: TValue;
+  CurrentVersion: Int64;
 begin
-  _Type := FCTX.GetType(AObject.ClassInfo);
-  _table := FMappingStrategy.GetMapping(_Type);
-  _idValue := GetIdValue(_table.Id, AObject);
   GetLogger.EnterLevel('UPDATE ' + AObject.ClassName);
-  AValidaetable.UpdateValidate;
-  AValidaetable.OnBeforeUpdate;
-  _class_name := _Type.ToString;
-  if not IsNullKey(_table, _idValue) then
-  begin
-    FLogger.Info('Updating ' + AObject.ClassName);
-    if not AOnlyChild then
-      GetStrategy.Update(_Type, AObject, _table);
-    if CurrentObjectStatus <> osUnknown then
-    begin
-      PersistHasManyRelation(_table, _idValue, _Type, AObject);
-      PersistHasOneRelation(_table, _idValue, _Type, AObject);
+  try
+    try
+      _Type := FCTX.GetType(AObject.ClassInfo);
+      _table := FMappingStrategy.GetMapping(_Type);
+      _idValue := GetIdValue(_table.Id, AObject);
+      GetLogger.EnterLevel('UPDATE ' + AObject.ClassName);
+      AValidaetable.UpdateValidate;
+      AValidaetable.OnBeforeUpdate;
+      _class_name := _Type.ToString;
+      if not IsNullKey(_table, _idValue) then
+      begin
+        FLogger.Info('Updating ' + AObject.ClassName);
+        if not AOnlyChild then
+        begin
+          if GetCurrentAndIncrementObjectVersion(AObject, CurrentVersion, false)
+          // optlock
+          then
+            CheckChangedRows(GetStrategy.Update(_Type, AObject, _table,
+              CurrentVersion))
+          else
+            GetStrategy.Update(_Type, AObject, _table, 0)
+        end;
+        if CurrentObjectStatus <> osUnknown then
+        begin
+          PersistHasManyRelation(_table, _idValue, _Type, AObject);
+          PersistHasOneRelation(_table, _idValue, _Type, AObject);
+        end;
+      end
+      else
+        raise EdormException.CreateFmt
+          ('Cannot update object without an ID [%s]', [_class_name]);
+      SetObjectStatus(AObject, osClean, false);
+      AValidaetable.OnAfterUpdate;
+    except
+      on E: Exception do
+      begin
+        GetLogger.Error(E.ClassName + sLineBreak + E.Message);
+        raise;
+      end;
+
     end;
-  end
-  else
-    raise EdormException.CreateFmt('Cannot update object without an ID [%s]',
-      [_class_name]);
-  SetObjectStatus(AObject, osClean, false);
-  AValidaetable.OnAfterUpdate;
-  GetLogger.ExitLevel('UPDATE ' + AObject.ClassName);
+  finally
+    GetLogger.ExitLevel('UPDATE ' + AObject.ClassName);
+  end;
 end;
 
 function TSession.IsAlreadyLoaded(ATypeInfo: PTypeInfo; AValue: TValue;
@@ -1943,9 +2051,8 @@ begin
   FreeAndNil(AObject);
 end;
 
-procedure TSession.UpdateChildTypeWithRealListInnerType
-  (AMappingTable: TMappingTable;
-  var AChildType: TRttiType);
+procedure TSession.UpdateChildTypeWithRealListInnerType(AMappingTable
+  : TMappingTable; var AChildType: TRttiType);
 var
   attr: ListOf;
   _type_name: string;
@@ -1959,8 +2066,8 @@ begin
     _type_name := Qualified(AMappingTable, attr.Value);
     AChildType := FCTX.FindType(_type_name);
     if not assigned(AChildType) then
-      raise Exception.Create('Unknown type ' + _type_name +
-        ' (ListOf ' + attr.Value + ')');
+      raise Exception.Create('Unknown type ' + _type_name + ' (ListOf ' +
+        attr.Value + ')');
   end;
 end;
 
@@ -2007,13 +2114,11 @@ end;
 
 {$IF CompilerVersion = 22}
 
-
 function TdormObjectList<T>.GetElement(Index: Integer): T;
 begin
   Result := Items[index];
 end;
 
 {$IFEND}
-
 
 end.

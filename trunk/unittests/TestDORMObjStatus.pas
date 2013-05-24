@@ -23,7 +23,7 @@ uses
 
 { TTestDuckTyping }
 
-procedure TTestObjStatus.Setup;
+procedure TTestObjStatus.SetUp;
 begin
   inherited;
 
@@ -139,6 +139,8 @@ begin
 
     p.objstatus := osDeleted;
     Session.Persist(p); // delete person and related objects
+    CheckTrue(TdormObjectStatus.osDirty = p.objstatus);
+    CheckFalse(Session.OIDIsSet(p), 'OID is set for a deleted object');
     p1 := Session.Load<TPersonOS>(ID);
     CheckNull(p1, 'Person is not deleted');
     Session.Commit;

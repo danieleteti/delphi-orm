@@ -43,6 +43,10 @@ type
 
   end;
 
+  EdormLockingException = class(EdormException)
+
+  end;
+
   TdormEnvironment = (deDevelopment, deTest, deRelease);
   TdormObjectOwner = (ooItself, ooParent);
   TdormSaveType = (stAllGraph, stSingleObject);
@@ -91,17 +95,14 @@ type
     function Insert(ARttiType: TRttiType; AObject: TObject;
       AMappingTable: TMappingTable): TValue;
     function Update(ARttiType: TRttiType; AObject: TObject;
-      AMappingTable: TMappingTable): TValue;
+      AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
     function Delete(ARttiType: TRttiType; AObject: TObject;
-      AMappingTable: TMappingTable): TObject;
+      AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
     function Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
-      const Value: TValue;
-      AObject: TObject): boolean;
-      overload;
+      const Value: TValue; AObject: TObject): boolean; overload;
     function Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
       AMappingRelationField: TMappingField; const Value: TValue;
-      AObject: TObject)
-      : boolean; overload;
+      AObject: TObject): boolean; overload;
     procedure DeleteAll(AMappingTable: TMappingTable);
     function Count(AMappingTable: TMappingTable): Int64;
 
@@ -131,8 +132,7 @@ type
     function GetCountSQL(ACriteria: ICriteria;
       AMappingTable: TMappingTable): string;
     function GetDatabaseBuilder(AEntities: TList<String>;
-      AMappings: ICacheMappingStrategy)
-      : IDataBaseBuilder;
+      AMappings: ICacheMappingStrategy): IDataBaseBuilder;
 
   end;
 
@@ -428,12 +428,10 @@ begin
   FGetItemMethod := nil;
 
 {$IF CompilerVersion >= 23}
-
   FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
     .GetIndexedProperty('Items').ReadMethod;
 
 {$IFEND}
-
   if not Assigned(FGetItemMethod) then
     FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
       .GetMethod('GetItem');
