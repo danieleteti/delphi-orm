@@ -127,7 +127,6 @@ type
       AClassName, APropertyName: string; var AObject: TObject);
     function Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject; overload;
     // Internal use
-    function Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject): boolean; overload;
     procedure SetLazyLoadFor(ATypeInfo: PTypeInfo; const APropertyName: string;
       const Value: boolean);
     // function FindOne(AItemClassInfo: PTypeInfo; Criteria: ICriteria;
@@ -204,6 +203,8 @@ type
     procedure LoadRelationsForEachElement(AList: TObject;
       ARelationsSet: TdormRelations = [drBelongsTo, drHasMany, drHasOne];
       AConsiderLazyLoading: boolean = true); overload;
+    { Non generic version of  Load<> }
+    function Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject): boolean; overload;
     { Load 0 or 1 object by OID (first parameter). The Session will create and returned object of type <T> }
     function Load<T: class>(const Value: TValue): T; overload;
     { Load 0 or 1 object by OID (first parameter). The Session doesn't create the object, just fill the instance passed on second parameter. This function return true if the OID was found in database. }
