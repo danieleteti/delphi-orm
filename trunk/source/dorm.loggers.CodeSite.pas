@@ -47,6 +47,12 @@ type
     procedure AfterConstruction; override;
   end;
 
+  TCodeSiteDefaultLog = class(TdormCodeSiteBaseLog)
+
+  end;
+
+
+
 implementation
 
 uses
@@ -135,7 +141,7 @@ end;
 
 initialization
 
-
+TCodeSiteDefaultLog.register;
 TCodeSiteFileLog.register;
 TCodeSiteLiveLog.register;
 
