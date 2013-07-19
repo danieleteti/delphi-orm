@@ -192,6 +192,9 @@ type
       ARaiseExceptionIfNotExists: boolean = true);
     procedure SetObjectVersion(AObject: TObject; AVersion: Int64;
       ARaiseExceptionIfNotExists: boolean = true);
+    procedure SetObjectsStatus(ACollection: TObject; AStatus: TdormObjectStatus;
+      ARaiseExceptionIfNotExists: boolean = true);
+
     function GetCurrentAndIncrementObjectVersion(AObject: TObject; out ACurrentVersion: Int64;
       ARaiseExceptionIfNotExists: boolean = true): boolean;
     function IsDirty(AObject: TObject): boolean;
@@ -1572,6 +1575,19 @@ begin
       _has_one.LazyLoad := Value;
       Break;
     end;
+  end;
+end;
+
+procedure TSession.SetObjectsStatus(ACollection: TObject; AStatus: TdormObjectStatus;
+  ARaiseExceptionIfNotExists: boolean);
+var
+  Obj: TObject;
+  Coll: IWrappedList;
+begin
+  Coll := WrapAsList(ACollection);
+  for Obj in Coll do
+  begin
+    SetObjectStatus(Obj, AStatus, ARaiseExceptionIfNotExists);
   end;
 end;
 
