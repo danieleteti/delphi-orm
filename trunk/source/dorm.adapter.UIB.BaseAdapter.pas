@@ -32,14 +32,14 @@ type
       const Value: TValue; AMappingRelationField: TMappingField = nil): TUIBQuery;
 
   protected
-    FFormatSettings: TFormatSettings;
-    FB: TUIBFacade;
-    FLogger: IdormLogger;
+    FFormatSettings        : TFormatSettings;
+    FB                     : TUIBFacade;
+    FLogger                : IdormLogger;
     FKeysGeneratorClassName: string;
-    FKeysGenerator: IdormKeysGenerator;
-    FKeyType: TdormKeyType;
-    FNullKeyValue: TValue;
-    FLastInsertOID: TValue;
+    FKeysGenerator         : IdormKeysGenerator;
+    FKeyType               : TdormKeyType;
+    FNullKeyValue          : TValue;
+    FLastInsertOID         : TValue;
     procedure InitFormatSettings;
     function CreateUIBFacade(Conf: ISuperObject): TUIBFacade; virtual; abstract;
     function CreateObjectFromUIBQuery(ARttiType: TRttiType; AReader: TUIBQuery;
@@ -87,7 +87,7 @@ type
     function GetKeyType: TdormKeyType;
     function RawExecute(SQL: string): Int64;
     function ExecuteAndGetFirst(SQL: string): Int64;
-    function GetDatabaseBuilder(AEntities: TList<String>; AMappings: ICacheMappingStrategy)
+    function GetDatabaseBuilder(AEntities: TList<string>; AMappings: ICacheMappingStrategy)
       : IDataBaseBuilder;
     function ExecuteCommand(ACommand: IdormCommand): Int64;
   end;
@@ -95,7 +95,7 @@ type
   TUIBBaseTableSequence = class abstract(TdormInterfacedObject, IdormKeysGenerator)
   protected
     FPersistStrategy: IdormPersistStrategy;
-    function GetSequenceFormatTemplate: String; virtual; abstract;
+    function GetSequenceFormatTemplate: string; virtual; abstract;
 
   public
     function NewStringKey(const Entity: string): string;
@@ -121,13 +121,13 @@ end;
 function TUIBBaseAdapter.Update(ARttiType: TRttiType; AObject: TObject;
   AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
 var
-  field: TMappingField;
-  SQL: string;
-  Query: TUIBStatement;
-  I, pk_idx: Integer;
-  v: TValue;
+  field           : TMappingField;
+  SQL             : string;
+  Query           : TUIBStatement;
+  I, pk_idx       : Integer;
+  v               : TValue;
   sql_fields_names: string;
-  pk_field: string;
+  pk_field        : string;
 begin
   sql_fields_names := '';
   for field in AMappingTable.Fields do
@@ -177,7 +177,7 @@ end;
 procedure TUIBBaseAdapter.ConfigureStrategy(ConfigurationInfo: ISuperObject);
 var
   ctx: TRttiContext;
-  t: TRttiType;
+  t  : TRttiType;
   obj: TObject;
 begin
   FB := CreateUIBFacade(ConfigurationInfo);
@@ -211,7 +211,7 @@ var
   cmd: TUIBQuery;
   SQL: string;
 begin
-  Result := -1;
+  Result := - 1;
   SQL := 'SELECT COUNT(*) FROM ' + AMappingTable.TableName;
   GetLogger.Debug('PREPARING: ' + SQL);
   cmd := FB.Prepare(SQL);
@@ -227,17 +227,17 @@ end;
 function TUIBBaseAdapter.Delete(ARttiType: TRttiType; AObject: TObject;
   AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
 var
-  pk_idx: Integer;
-  pk_value: TValue;
+  pk_idx                               : Integer;
+  pk_value                             : TValue;
   pk_attribute_name, pk_field_name, SQL: string;
-  cmd: TUIBStatement;
-  S: Cardinal;
-  I: Cardinal;
-  u: Cardinal;
-  d: Cardinal;
+  cmd                                  : TUIBStatement;
+  S                                    : Cardinal;
+  I                                    : Cardinal;
+  u                                    : Cardinal;
+  d                                    : Cardinal;
 begin
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-  if pk_idx = -1 then
+  if pk_idx = - 1 then
     raise Exception.Create('Invalid primary key for table ' + AMappingTable.TableName);
   pk_attribute_name := AMappingTable.Fields[pk_idx].name;
   pk_field_name := AMappingTable.Fields[pk_idx].FieldName;
@@ -298,22 +298,26 @@ end;
 
 function TUIBBaseAdapter.ExecuteCommand(ACommand: IdormCommand): Int64;
 var
-  SQL: string;
-  reader: TUIBQuery;
+  SQL           : string;
+  reader        : TUIBQuery;
   CustomCriteria: ICustomCriteria;
-  sr: Cardinal;
-  ir: Cardinal;
-  ur: Cardinal;
-  dr: Cardinal;
+  sr            : Cardinal;
+  ir            : Cardinal;
+  ur            : Cardinal;
+  dr            : Cardinal;
 begin
   SQL := ACommand.GetSQL;
   GetLogger.Debug('EXECUTING: ' + SQL);
   reader := FB.Prepare(SQL);
-  if reader.Params.ParamCount <> 0 then
-    raise EdormException.Create('Parameters not replaced');
-  reader.Execute;
-  reader.AffectedRows(sr, ir, ur, dr);
-  Result := ir + ur + dr;
+  try
+    if reader.Params.ParamCount <> 0 then
+      raise EdormException.Create('Parameters not replaced');
+    reader.Execute;
+    reader.AffectedRows(sr, ir, ur, dr);
+    Result := ir + ur + dr;
+  finally
+    reader.Free;
+  end;
 end;
 
 function TUIBBaseAdapter.GenerateAndFillPrimaryKeyParam(Query: TUIBStatement; ParamIndex: Integer;
@@ -360,7 +364,7 @@ begin
   end;
 end;
 
-function TUIBBaseAdapter.GetDatabaseBuilder(AEntities: TList<String>;
+function TUIBBaseAdapter.GetDatabaseBuilder(AEntities: TList<string>;
   AMappings: ICacheMappingStrategy): IDataBaseBuilder;
 begin
   AEntities.Free; // just to hide the memory leak
@@ -395,11 +399,11 @@ end;
 function TUIBBaseAdapter.Insert(ARttiType: TRttiType; AObject: TObject;
   AMappingTable: TMappingTable): TValue;
 var
-  field: TMappingField;
+  field                                   : TMappingField;
   sql_fields_names, sql_fields_values, SQL: ansistring;
-  Query: TUIBStatement;
-  I, pk_idx: Integer;
-  v, pk_value: TValue;
+  Query                                   : TUIBStatement;
+  I, pk_idx                               : Integer;
+  v, pk_value                             : TValue;
 begin
   sql_fields_names := '';
   for field in AMappingTable.Fields do
@@ -458,8 +462,8 @@ begin
       Result := Value.AsInt64 = FNullKeyValue.AsInt64;
     ktString:
       Result := Value.AsString = FNullKeyValue.AsString;
-  else
-    raise EdormException.Create('Unknown key type');
+    else
+      raise EdormException.Create('Unknown key type');
   end;
 end;
 
@@ -478,13 +482,13 @@ end;
 function TUIBBaseAdapter.Load(ARttiType: TRttiType; ATableName: string;
   AMappingTable: TMappingTable; const Value: TValue): TObject;
 var
-  pk_idx: Integer;
+  pk_idx                               : Integer;
   pk_attribute_name, pk_field_name, SQL: string;
-  cmd: TUIBQuery;
+  cmd                                  : TUIBQuery;
 begin
   Result := nil;
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-  if pk_idx = -1 then
+  if pk_idx = - 1 then
     raise Exception.Create('Invalid primary key for table ' + ATableName);
   pk_attribute_name := AMappingTable.Fields[pk_idx].name;
   pk_field_name := AMappingTable.Fields[pk_idx].FieldName;
@@ -506,13 +510,13 @@ end;
 function TUIBBaseAdapter.GetUIBReaderFor(ARttiType: TRttiType; AMappingTable: TMappingTable;
   const Value: TValue; AMappingRelationField: TMappingField): TUIBQuery;
 var
-  pk_idx: Integer;
+  pk_idx            : Integer;
   pk_field_name, SQL: string;
 begin
   if AMappingRelationField = nil then
   begin
     pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-    if pk_idx = -1 then
+    if pk_idx = - 1 then
       raise Exception.Create('Invalid primary key for table ' + AMappingTable.TableName);
     pk_field_name := AMappingTable.Fields[pk_idx].FieldName;
     SQL := 'SELECT ' + GetSelectFieldsList(AMappingTable.Fields, true) + ' FROM ' +
@@ -521,7 +525,7 @@ begin
   else
   begin
     pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-    if pk_idx = -1 then
+    if pk_idx = - 1 then
       raise Exception.Create('Invalid primary key for table ' + AMappingTable.TableName);
     pk_field_name := AMappingTable.Fields[pk_idx].FieldName;
     SQL := 'SELECT ' + GetSelectFieldsList(AMappingTable.Fields, true) + ' FROM ' +
@@ -556,8 +560,8 @@ end;
 procedure TUIBBaseAdapter.LoadList(AList: TObject; ARttiType: TRttiType;
   AMappingTable: TMappingTable; ACriteria: ICriteria);
 var
-  SQL: string;
-  reader: TUIBQuery;
+  SQL           : string;
+  reader        : TUIBQuery;
   CustomCriteria: ICustomCriteria;
 begin
   if assigned(ACriteria) and TInterfacedObject(ACriteria).GetInterface(ICustomCriteria,
@@ -585,9 +589,9 @@ end;
 procedure TUIBBaseAdapter.LoadObjectFromDBXReader(AObject: TObject; ARttiType: TRttiType;
   AReader: TUIBQuery; AFieldsMapping: TMappingFieldList);
 var
-  field: TMappingField;
-  v: TValue;
-  S: string;
+  field       : TMappingField;
+  v           : TValue;
+  S           : string;
   sourceStream: TStream;
 begin
   try
@@ -676,10 +680,10 @@ end;
 function TUIBBaseAdapter.CreateObjectFromUIBQuery(ARttiType: TRttiType; AReader: TUIBQuery;
   AMappingTable: TMappingTable): TObject;
 var
-  obj: TObject;
-  field: TMappingField;
-  v: TValue;
-  S: string;
+  obj         : TObject;
+  field       : TMappingField;
+  v           : TValue;
+  S           : string;
   targetStream: TMemoryStream;
 begin
   try
@@ -768,7 +772,7 @@ procedure TUIBBaseAdapter.SetUIBParameterValue(AFieldType: string; AStatement: T
   ParameterIndex: Integer; AValue: TValue);
 var
   sourceStream: TStream;
-  str: TBytesStream;
+  str         : TBytesStream;
 begin
   if CompareText(AFieldType, 'string') = 0 then
   begin
@@ -847,7 +851,7 @@ end;
 
 function TUIBBaseTableSequence.NewIntegerKey(const Entity: string): UInt64;
 var
-  SequenceName: String;
+  SequenceName: string;
 begin
   SequenceName := Format(GetSequenceFormatTemplate, [Entity]);
   Result := FPersistStrategy.ExecuteAndGetFirst('SELECT GEN_ID(' + SequenceName +
