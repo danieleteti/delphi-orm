@@ -18,8 +18,7 @@ type
     FTableName: String;
     FPackage: String;
   public
-    constructor Create(const ATableName: String = '';
-      const APackageName: String = '');
+    constructor Create(const ATableName: String = ''; const APackageName: String = '');
     property TableName: String read FTableName;
     property Package: String read FPackage;
   end;
@@ -33,11 +32,10 @@ type
     FDefaultValue: string;
   public
     constructor Create; overload;
-    constructor Create(const AColumnName: String; ASize: Cardinal = 0;
-      APrecision: Cardinal = 0; ADefaultValue: String = ''); overload;
-    constructor Create(const AColumnName: string; AFieldType: String;
-      ASize: Cardinal = 0; APrecision: Cardinal = 0;
+    constructor Create(const AColumnName: String; ASize: Cardinal = 0; APrecision: Cardinal = 0;
       ADefaultValue: String = ''); overload;
+    constructor Create(const AColumnName: string; AFieldType: String; ASize: Cardinal = 0;
+      APrecision: Cardinal = 0; ADefaultValue: String = ''); overload;
     property FieldName: string read FFieldName write FFieldName;
     property FieldType: string read FFieldType write FFieldType;
     property Size: Cardinal read FSize write FSize;
@@ -74,8 +72,7 @@ type
     FChildPropertyName: String;
     FLazyLoad: boolean;
   public
-    constructor Create(const AChildPropertyName: String;
-      ALazyLoad: boolean = False);
+    constructor Create(const AChildPropertyName: String; ALazyLoad: boolean = False);
     property ChildPropertyName: String read FChildPropertyName;
     property LazyLoad: boolean read FLazyLoad;
   end;
@@ -89,8 +86,7 @@ type
     FRefPropertyName: String;
     FLazyLoad: boolean;
   public
-    constructor Create(const ARefPropertyName: String;
-      ALazyLoad: boolean = False);
+    constructor Create(const ARefPropertyName: String; ALazyLoad: boolean = False);
     property RefPropertyName: String read FRefPropertyName;
     property LazyLoad: boolean read FLazyLoad;
   end;
@@ -211,8 +207,7 @@ uses
   dorm.Commons;
 { Entity }
 
-constructor Entity.Create(const ATableName: String = '';
-  const APackageName: String = '');
+constructor Entity.Create(const ATableName: String = ''; const APackageName: String = '');
 begin
   FTableName := ATableName;
   FPackage := APackageName;
@@ -229,8 +224,8 @@ begin
   FPrecision := 0;
 end;
 
-constructor Column.Create(const AColumnName: String; ASize: Cardinal = 0;
-  APrecision: Cardinal = 0; ADefaultValue: String = '');
+constructor Column.Create(const AColumnName: String; ASize: Cardinal = 0; APrecision: Cardinal = 0;
+  ADefaultValue: String = '');
 begin
   Create;
   FSize := ASize;
@@ -239,8 +234,8 @@ begin
   FDefaultValue := ADefaultValue;
 end;
 
-constructor Column.Create(const AColumnName: string; AFieldType: String;
-  ASize: Cardinal = 0; APrecision: Cardinal = 0; ADefaultValue: String = '');
+constructor Column.Create(const AColumnName: string; AFieldType: String; ASize: Cardinal = 0;
+  APrecision: Cardinal = 0; ADefaultValue: String = '');
 begin
   Create(AColumnName, ASize, APrecision, ADefaultValue);
   FFieldType := LowerCase(AFieldType);
@@ -271,8 +266,7 @@ begin
 end;
 { BelongsTo }
 
-constructor BelongsTo.Create(const ARefPropertyName: String;
-  ALazyLoad: boolean = False);
+constructor BelongsTo.Create(const ARefPropertyName: String; ALazyLoad: boolean = False);
 begin
   inherited Create;
   FRefPropertyName := ARefPropertyName;
@@ -299,8 +293,7 @@ begin
   inherited;
 end;
 
-function TMappingTable.FindBelongsToByName(const AName: string)
-  : TMappingBelongsTo;
+function TMappingTable.FindBelongsToByName(const AName: string): TMappingBelongsTo;
 var
   _Rel: TMappingBelongsTo;
 begin
@@ -400,7 +393,7 @@ begin
   FPrecision := Source.Precision;
   FFieldName := Source.FieldName;
   FSize := Source.Size;
-  FRTTICache:=Source.RTTICache;
+  FRTTICache := Source.RTTICache;
 end;
 
 constructor TMappingField.Create;
@@ -413,8 +406,8 @@ begin
   FSize := 0;
   FPrecision := 0;
   FIndexType := itNone;
-  FRTTICache.RTTIField:=nil;
-  FRTTICache.RTTIProp:=nil;
+  FRTTICache.RTTIField := nil;
+  FRTTICache.RTTIProp := nil;
 end;
 
 function TMappingField.ToString: string;
@@ -430,7 +423,7 @@ begin
   FChildClassName := Source.ChildClassName;
   FChildFieldName := Source.ChildFieldName;
   FLazyLoad := Source.LazyLoad;
-  FRTTICache:=Source.RTTICache;
+  FRTTICache := Source.RTTICache;
 end;
 { TMappingBelongsTo }
 
@@ -440,7 +433,7 @@ begin
   FOwnerClassName := Source.OwnerClassName;
   FRefFieldName := Source.RefFieldName;
   FLazyLoad := Source.LazyLoad;
-  FRTTICache:=Source.RTTICache;
+  FRTTICache := Source.RTTICache;
 end;
 
 end.

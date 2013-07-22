@@ -218,8 +218,10 @@ type
     procedure LoadList<T: class>(Criteria: ICriteria; AObject: TObject); overload;
     { Load all the objects that satisfy the Criteria. The Session will create and return a TObjectList with objects of type <T> }
     function LoadList<T: class>(Criteria: ICriteria = nil):
-
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}; overload;
+    // COMMANDERS
+    function ExecuteCommand(ACommand: IdormCommand): Int64;
+    // utilities
     procedure EnableLazyLoad(AClass: TClass; const APropertyName: string);
     procedure DisableLazyLoad(AClass: TClass; const APropertyName: string);
     function Count(AClassType: TClass; ACriteria: ICriteria = nil): Int64;
@@ -636,6 +638,11 @@ end;
 procedure TSession.EnableLazyLoad(AClass: TClass; const APropertyName: string);
 begin
   SetLazyLoadFor(AClass.ClassInfo, APropertyName, true);
+end;
+
+function TSession.ExecuteCommand(ACommand: IdormCommand): Int64;
+begin
+  Result := GetStrategy.ExecuteCommand(ACommand);
 end;
 
 // QUESTA RIMANE

@@ -82,6 +82,11 @@ type
     procedure Execute;
   end;
 
+  IdormCommand = interface
+    ['{A403A53F-B0F0-4A35-B014-5EBFAABDE5D3}']
+    function GetSQL: String;
+  end;
+
   IList = interface
     ['{2A1BCB3C-17A2-4F8D-B6FB-32B2A1BFE840}']
     function Add(const Value: TObject): Integer;
@@ -92,17 +97,16 @@ type
 
   IdormPersistStrategy = interface
     ['{04A7F5C2-9B9B-4259-90C2-F23894189717}']
-    function Insert(ARttiType: TRttiType; AObject: TObject;
-      AMappingTable: TMappingTable): TValue;
-    function Update(ARttiType: TRttiType; AObject: TObject;
-      AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
-    function Delete(ARttiType: TRttiType; AObject: TObject;
-      AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
-    function Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
-      const Value: TValue; AObject: TObject): boolean; overload;
-    function Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
-      AMappingRelationField: TMappingField; const Value: TValue;
+    function Insert(ARttiType: TRttiType; AObject: TObject; AMappingTable: TMappingTable): TValue;
+    function Update(ARttiType: TRttiType; AObject: TObject; AMappingTable: TMappingTable;
+      ACurrentVersion: Int64): Int64;
+    function Delete(ARttiType: TRttiType; AObject: TObject; AMappingTable: TMappingTable;
+      ACurrentVersion: Int64): Int64;
+    function Load(ARttiType: TRttiType; AMappingTable: TMappingTable; const Value: TValue;
       AObject: TObject): boolean; overload;
+    function Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
+      AMappingRelationField: TMappingField; const Value: TValue; AObject: TObject)
+      : boolean; overload;
     procedure DeleteAll(AMappingTable: TMappingTable);
     function Count(AMappingTable: TMappingTable): Int64;
 
@@ -112,8 +116,8 @@ type
     // procedure FillList(AList: TObject; ARttiType: TRttiType;
     // ATableName: string; AMappingFields: TMappingFieldList;
     // AdormSearchCriteria: ICustomCriteria); overload;
-    procedure LoadList(AList: TObject; ARttiType: TRttiType;
-      AMappingTable: TMappingTable; ACriteria: ICriteria); overload;
+    procedure LoadList(AList: TObject; ARttiType: TRttiType; AMappingTable: TMappingTable;
+      ACriteria: ICriteria); overload;
     function GetLastInsertOID: TValue;
     procedure ConfigureStrategy(ConfigurationInfo: ISuperObject);
     procedure InitStrategy;
@@ -127,13 +131,11 @@ type
     function EscapeString(const Value: string): string;
     function EscapeDate(const Value: TDate): string;
     function EscapeDateTime(const Value: TDate): string;
-    function GetSelectSQL(ACriteria: ICriteria;
-      AMappingTable: TMappingTable): string;
-    function GetCountSQL(ACriteria: ICriteria;
-      AMappingTable: TMappingTable): string;
-    function GetDatabaseBuilder(AEntities: TList<String>;
-      AMappings: ICacheMappingStrategy): IDataBaseBuilder;
-
+    function GetSelectSQL(ACriteria: ICriteria; AMappingTable: TMappingTable): string;
+    function GetCountSQL(ACriteria: ICriteria; AMappingTable: TMappingTable): string;
+    function GetDatabaseBuilder(AEntities: TList<String>; AMappings: ICacheMappingStrategy)
+      : IDataBaseBuilder;
+    function ExecuteCommand(ACommand: IdormCommand): Int64;
   end;
 
   TdormListEnumerator = class(TEnumerator<TObject>)
@@ -153,8 +155,7 @@ type
     ['{476D88A6-E7A1-48A2-8673-C2B646A2E7F4}']
     function NewStringKey(const Entity: string): string;
     function NewIntegerKey(const Entity: string): UInt64;
-    procedure SetPersistStrategy(const PersistentStrategy
-      : IdormPersistStrategy);
+    procedure SetPersistStrategy(const PersistentStrategy: IdormPersistStrategy);
   end;
 
   IWrappedList = interface
@@ -280,17 +281,16 @@ function GetMappingRelationByPropertyName(ARelationList: TMappingRelationList;
   const APropertyName: string): TMappingRelation;
 function GetMappingBelongsToByPropertyName(ARelationList: TMappingBelongsToList;
   const APropertyName: string): TMappingBelongsTo;
-function GetSelectFieldsList(AMapping: TMappingFieldList;
-  AWithPrimaryKey: boolean): string;
+function GetSelectFieldsList(AMapping: TMappingFieldList; AWithPrimaryKey: boolean): string;
 
 function WrapAsList(const AObject: TObject): IWrappedList;
-function WrapAsValidateableObject(AObject: TObject;
-  AValidateableDuckObject: TDuckTypedObject = nil): TdormValidateable;
+function WrapAsValidateableObject(AObject: TObject; AValidateableDuckObject: TDuckTypedObject = nil)
+  : TdormValidateable;
 
 implementation
 
-function WrapAsValidateableObject(AObject: TObject;
-  AValidateableDuckObject: TDuckTypedObject = nil): TdormValidateable;
+function WrapAsValidateableObject(AObject: TObject; AValidateableDuckObject: TDuckTypedObject = nil)
+  : TdormValidateable;
 begin
   if Assigned(AValidateableDuckObject) then
     Result := AValidateableDuckObject.WrapObject(AObject)
@@ -301,8 +301,7 @@ begin
   end;
 end;
 
-function GetSelectFieldsList(AMapping: TMappingFieldList;
-  AWithPrimaryKey: boolean): string;
+function GetSelectFieldsList(AMapping: TMappingFieldList; AWithPrimaryKey: boolean): string;
 var
   field: TMappingField;
 begin
@@ -416,36 +415,29 @@ constructor TDuckTypedList.Create(AObjectAsDuck: TObject);
 begin
   inherited Create;
   FObjectAsDuck := AObjectAsDuck;
-  FAddMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-    .GetMethod('Add');
+  FAddMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo).GetMethod('Add');
   if not Assigned(FAddMethod) then
     raise EdormException.Create('Cannot find method "Add" in the duck object');
-  FClearMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-    .GetMethod('Clear');
+  FClearMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo).GetMethod('Clear');
   if not Assigned(FClearMethod) then
-    raise EdormException.Create
-      ('Cannot find method "Clear" in the duck object');
+    raise EdormException.Create('Cannot find method "Clear" in the duck object');
   FGetItemMethod := nil;
 
 {$IF CompilerVersion >= 23}
-  FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-    .GetIndexedProperty('Items').ReadMethod;
+  FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo).GetIndexedProperty('Items')
+    .ReadMethod;
 
 {$IFEND}
   if not Assigned(FGetItemMethod) then
-    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-      .GetMethod('GetItem');
+    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo).GetMethod('GetItem');
   if not Assigned(FGetItemMethod) then
-    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-      .GetMethod('GetElement');
+    FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo).GetMethod('GetElement');
   if not Assigned(FGetItemMethod) then
     raise EdormException.Create
       ('Cannot find method Indexed property "Items" or method "GetItem" or method "GetElement" in the duck object');
-  FCountProperty := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo)
-    .GetProperty('Count');
+  FCountProperty := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo).GetProperty('Count');
   if not Assigned(FCountProperty) then
-    raise EdormException.Create
-      ('Cannot find property "Count" in the duck object');
+    raise EdormException.Create('Cannot find property "Count" in the duck object');
 end;
 
 destructor TDuckTypedList.Destroy;
@@ -679,8 +671,7 @@ begin
   SafeMethodCall(FOnBeforeUpdate, FObjectAsDuck);
 end;
 
-function TDuckTypedObject.SafeMethodCall(AMethod: TRttiMethod;
-  AObject: TObject): boolean;
+function TDuckTypedObject.SafeMethodCall(AMethod: TRttiMethod; AObject: TObject): boolean;
 begin
   Result := True;
   if Assigned(AMethod) then

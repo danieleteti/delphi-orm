@@ -89,6 +89,7 @@ type
     function ExecuteAndGetFirst(SQL: string): Int64;
     function GetDatabaseBuilder(AEntities: TList<String>; AMappings: ICacheMappingStrategy)
       : IDataBaseBuilder;
+    function ExecuteCommand(ACommand: IdormCommand): Int64;
   end;
 
   TUIBBaseTableSequence = class abstract(TdormInterfacedObject, IdormKeysGenerator)
@@ -293,6 +294,26 @@ begin
     GetLogger.ExitLevel('ExecuteAndGetFirst');
     cmd.Free;
   end;
+end;
+
+function TUIBBaseAdapter.ExecuteCommand(ACommand: IdormCommand): Int64;
+var
+  SQL: string;
+  reader: TUIBQuery;
+  CustomCriteria: ICustomCriteria;
+  sr: Cardinal;
+  ir: Cardinal;
+  ur: Cardinal;
+  dr: Cardinal;
+begin
+  SQL := ACommand.GetSQL;
+  GetLogger.Debug('EXECUTING: ' + SQL);
+  reader := FB.Prepare(SQL);
+  if reader.Params.ParamCount <> 0 then
+    raise EdormException.Create('Parameters not replaced');
+  reader.Execute;
+  reader.AffectedRows(sr, ir, ur, dr);
+  Result := sr + ir + ur + dr;
 end;
 
 function TUIBBaseAdapter.GenerateAndFillPrimaryKeyParam(Query: TUIBStatement; ParamIndex: Integer;
