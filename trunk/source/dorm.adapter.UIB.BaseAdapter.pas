@@ -313,7 +313,7 @@ begin
     raise EdormException.Create('Parameters not replaced');
   reader.Execute;
   reader.AffectedRows(sr, ir, ur, dr);
-  Result := sr + ir + ur + dr;
+  Result := ir + ur + dr;
 end;
 
 function TUIBBaseAdapter.GenerateAndFillPrimaryKeyParam(Query: TUIBStatement; ParamIndex: Integer;
