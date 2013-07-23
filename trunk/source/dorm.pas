@@ -30,11 +30,13 @@ uses
   dorm.Mappings.Strategies,
   dorm.Mappings,
   dorm.Commons,
-  dorm.Query, dorm.ObjectStatus;
+  dorm.Query,
+  dorm.ObjectStatus;
 
 type
 
-{$IF CompilerVersion = 22}
+  {$IF CompilerVersion = 22}
+
   // In DelphiXE you cannot use directly TObjectList<T> because
   // GetItem method is private. SO you have to use a specific typed list
   // as this sample show. However, you can avoid default delphi collections
@@ -48,7 +50,7 @@ type
     function GetElement(Index: Integer): T;
   end;
 
-{$IFEND}
+  {$IFEND}
 
   TdormStrategyConfigEvent = procedure(Sender: TObject;
     AAdapterConfiguration: ISuperObject) of object;
@@ -58,19 +60,19 @@ type
 
   TSession = class(TdormInterfacedObject)
   private
-    FMappingStrategy: ICacheMappingStrategy;
-    FCTX: TRttiContext;
-    FConfig: ISuperObject;
-    FIdType: TdormKeyType;
-    FIdNullValue: TValue;
-    FPersistStrategy: IdormPersistStrategy;
-    FLogger: IdormLogger;
-    FEnvironment: TdormEnvironment;
-    EnvironmentNames: TArray<string>;
-    FLoadEnterExitCounter: Integer;
-    LoadedObjects: TObjectDictionary<string, TObject>;
-    FOnAfterPersistObject: TdormSessionPersistEvent;
-    FOnBeforePersistObject: TdormSessionPersistEvent;
+    FMappingStrategy          : ICacheMappingStrategy;
+    FCTX                      : TRttiContext;
+    FConfig                   : ISuperObject;
+    FIdType                   : TdormKeyType;
+    FIdNullValue              : TValue;
+    FPersistStrategy          : IdormPersistStrategy;
+    FLogger                   : IdormLogger;
+    FEnvironment              : TdormEnvironment;
+    EnvironmentNames          : TArray<string>;
+    FLoadEnterExitCounter     : Integer;
+    LoadedObjects             : TObjectDictionary<string, TObject>;
+    FOnAfterPersistObject     : TdormSessionPersistEvent;
+    FOnBeforePersistObject    : TdormSessionPersistEvent;
     FOnBeforeConfigureStrategy: TdormStrategyConfigEvent;
     procedure LoadEnter;
     procedure LoadExit;
@@ -87,7 +89,7 @@ type
 
   strict protected
     CurrentObjectStatus: TdormObjectStatus;
-    FValidatingDuck: TDuckTypedObject;
+    FValidatingDuck    : TDuckTypedObject;
     procedure UpdateChildTypeWithRealListInnerType(AMappingTable: TMappingTable;
       var AChildType: TRttiType);
 
@@ -119,22 +121,22 @@ type
     procedure DeleteHasOneRelation(AMappingTable: TMappingTable;
       AIdValue: TValue; ARttiType: TRttiType; AObject: TObject);
     procedure LoadHasManyRelation(ATableMapping: TMappingTable;
-      AIdValue: TValue; ARttiType: TRttiType; AObject: TObject;
+      AIdValue            : TValue; ARttiType: TRttiType; AObject: TObject;
       AConsiderLazyLoading: boolean = true);
     procedure LoadHasManyRelationByPropertyName(AIdValue: TValue;
-      ARttiType: TRttiType; AClassName: string; APropertyName: string;
+      ARttiType  : TRttiType; AClassName: string; APropertyName: string;
       var AObject: TObject);
     procedure LoadHasOneRelation(ATableMapping: TMappingTable; AIdValue: TValue;
-      ARttiType: TRttiType; AObject: TObject;
+      ARttiType           : TRttiType; AObject: TObject;
       AConsiderLazyLoading: boolean = true);
     procedure LoadBelongsToRelation(ATableMapping: TMappingTable;
-      AIdValue: TValue; ARttiType: TRttiType; AObject: TObject;
+      AIdValue            : TValue; ARttiType: TRttiType; AObject: TObject;
       AConsiderLazyLoading: boolean = true);
     procedure LoadHasOneRelationByPropertyName(AIdValue: TValue;
-      ARttiType: TRttiType; AClassName: string; APropertyName: string;
+      ARttiType  : TRttiType; AClassName: string; APropertyName: string;
       var AObject: TObject);
     procedure LoadBelongsToRelationByPropertyName(AIdValue: TValue;
-      ARttiType: TRttiType; AClassName, APropertyName: string;
+      ARttiType  : TRttiType; AClassName, APropertyName: string;
       var AObject: TObject);
     function Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject; overload;
     // Internal use
@@ -152,9 +154,9 @@ type
     function IsAlreadyLoaded(ATypeInfo: PTypeInfo; AValue: TValue;
       out AOutObject: TObject): boolean;
     function GetLoadedObjectHashCode(AObject: TObject;
-      AMappingField: TMappingField): String; overload;
+      AMappingField: TMappingField): string; overload;
     function GetLoadedObjectHashCode(ATypeInfo: PTypeInfo; AValue: TValue)
-      : String; overload;
+      : string; overload;
     procedure InternalUpdate(AObject: TObject; AValidaetable: TdormValidateable;
       AOnlyChild: boolean = false);
     function InternalInsert(AObject: TObject;
@@ -162,6 +164,7 @@ type
     procedure InternalDelete(AObject: TObject;
       AValidaetable: TdormValidateable);
     procedure CheckChangedRows(const HowManyChangedRows: Integer);
+
   public
     constructor Create(Environment: TdormEnvironment); overload; virtual;
     destructor Destroy; override;
@@ -177,15 +180,15 @@ type
     procedure ClearOID(AObject: TObject);
     // Configuration
     procedure Configure(APersistenceConfiguration: TTextReader;
-      AMappingConfiguration: TTextReader = nil;
+      AMappingConfiguration             : TTextReader = nil;
       AOwnPersistenceConfigurationReader: boolean = true;
-      AOwnMappingConfigurationReader: boolean = true);
+      AOwnMappingConfigurationReader    : boolean = true);
     class function CreateConfigured(APersistenceConfiguration: TTextReader;
       AMappingConfiguration: TTextReader; AEnvironment: TdormEnvironment)
       : TSession; overload;
     class function CreateConfigured(APersistenceConfiguration: TTextReader;
       AEnvironment: TdormEnvironment): TSession; overload;
-    class function CreateConfigured(APersistenceConfigurationFile: String;
+    class function CreateConfigured(APersistenceConfigurationFile: string;
       AEnvironment: TdormEnvironment): TSession; overload;
     // Persistence
     procedure Persist(AObject: TObject);
@@ -215,16 +218,16 @@ type
       ARaiseExceptionIfNotExists: boolean = true);
 
     function GetCurrentAndIncrementObjectVersion(AObject: TObject;
-      out ACurrentVersion: Int64;
+      out ACurrentVersion       : Int64;
       ARaiseExceptionIfNotExists: boolean = true): boolean;
     function IsDirty(AObject: TObject): boolean;
     function IsClean(AObject: TObject): boolean;
     function IsUnknown(AObject: TObject): boolean;
     procedure LoadRelations(AObject: TObject;
-      ARelationsSet: TdormRelations = [drBelongsTo, drHasMany, drHasOne];
+      ARelationsSet       : TdormRelations = [drBelongsTo, drHasMany, drHasOne];
       AConsiderLazyLoading: boolean = true); overload;
     procedure LoadRelationsForEachElement(AList: TObject;
-      ARelationsSet: TdormRelations = [drBelongsTo, drHasMany, drHasOne];
+      ARelationsSet       : TdormRelations = [drBelongsTo, drHasMany, drHasOne];
       AConsiderLazyLoading: boolean = true); overload;
     { Non generic version of  Load<> }
     function Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject)
@@ -241,10 +244,12 @@ type
       AObject: TObject); overload;
     { Load all the objects that satisfy the Criteria. The Session will create and return a TObjectList with objects of type <T> }
     function LoadList<T: class>(Criteria: ICriteria = nil):
-{$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
+
+    {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
       overload;
     function LoadListSQL<T: class>(ASQLable: ISQLable):
-{$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
+
+    {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
       overload;
     // COMMANDERS
     function ExecuteCommand(ACommand: IdormCommand): Int64;
@@ -265,7 +270,7 @@ type
     function Load<T: class>(ASQLable: ISQLable): T; overload;
     function ListAll<T: class>():
 
-{$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
+    {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
       deprecated;
     // transaction
     procedure StartTransaction;
@@ -274,7 +279,7 @@ type
     function IsInTransaction: boolean;
     // expose mapping
     function GetMapping: ICacheMappingStrategy;
-    function GetEntitiesNames: TList<String>;
+    function GetEntitiesNames: TList<string>;
     // session events
     property OnBeforePersistObject: TdormSessionPersistEvent
       read FOnBeforePersistObject write FOnBeforePersistObject;
@@ -345,14 +350,14 @@ begin
 end;
 
 procedure TSession.Configure(APersistenceConfiguration: TTextReader;
-  AMappingConfiguration: TTextReader = nil;
+  AMappingConfiguration             : TTextReader = nil;
   AOwnPersistenceConfigurationReader: boolean = true;
-  AOwnMappingConfigurationReader: boolean = true);
+  AOwnMappingConfigurationReader    : boolean = true);
 var
-  _ConfigText: string;
-  _MappingText: string;
+  _ConfigText     : string;
+  _MappingText    : string;
   _MappingStrategy: IMappingStrategy;
-  _JSonConfigEnv: ISuperObject;
+  _JSonConfigEnv  : ISuperObject;
 begin
   try
     _ConfigText := APersistenceConfiguration.ReadToEnd;
@@ -510,7 +515,7 @@ begin
   CreateSession(Environment);
 end;
 
-class function TSession.CreateConfigured(APersistenceConfigurationFile: String;
+class function TSession.CreateConfigured(APersistenceConfigurationFile: string;
   AEnvironment: TdormEnvironment): TSession;
 begin
   Result := CreateConfigured(TFile.OpenText(APersistenceConfigurationFile),
@@ -520,8 +525,8 @@ end;
 function TSession.CreateLogger: IdormLogger;
 var
   LogClassName: string;
-  l: TRttiType;
-  Section: ISuperObject;
+  l           : TRttiType;
+  Section     : ISuperObject;
 begin
   // section config/logger_class_name is deprecated
   // if there is a specific logger_class_name per the devenv, so we'll use that
@@ -586,11 +591,11 @@ end;
 procedure TSession.DeleteHasManyRelation(AMappingTable: TMappingTable;
   AIdValue: TValue; ARttiType: TRttiType; AObject: TObject);
 var
-  _has_many: TMappingRelation;
+  _has_many  : TMappingRelation;
   _child_type: TRttiType;
-  v: TValue;
-  List: IWrappedList;
-  Obj: TObject;
+  v          : TValue;
+  List       : IWrappedList;
+  Obj        : TObject;
 begin
   if CurrentObjectStatus <> osUnknown then
     raise EdormException.Create
@@ -622,10 +627,10 @@ end;
 procedure TSession.DeleteHasOneRelation(AMappingTable: TMappingTable;
   AIdValue: TValue; ARttiType: TRttiType; AObject: TObject);
 var
-  _has_one: TMappingRelation;
+  _has_one   : TMappingRelation;
   _child_type: TRttiType;
-  v: TValue;
-  Obj: TObject;
+  v          : TValue;
+  Obj        : TObject;
 begin
   GetLogger.EnterLevel('has_one ' + ARttiType.ToString);
   GetLogger.Debug('Deleting has_one for ' + ARttiType.ToString);
@@ -690,14 +695,14 @@ end;
 // QUESTA RIMANE
 procedure TSession.FillList<T>(ACollection: TObject; ACriteria: ICriteria);
 var
-  rt: TRttiType;
-  _table: TMappingTable;
-  _fields: TMappingFieldList;
-  _type_info: PTypeInfo;
+  rt               : TRttiType;
+  _table           : TMappingTable;
+  _fields          : TMappingFieldList;
+  _type_info       : PTypeInfo;
   SearcherClassname: string;
-  List: IWrappedList;
-  Obj: TObject;
-  _validateable: TdormValidateable;
+  List             : IWrappedList;
+  Obj              : TObject;
+  _validateable    : TdormValidateable;
 begin
   _type_info := TypeInfo(T);
   rt := FCTX.GetType(_type_info);
@@ -721,16 +726,16 @@ begin
 end;
 
 function TSession.GetLoadedObjectHashCode(AObject: TObject;
-  AMappingField: TMappingField): String;
+  AMappingField: TMappingField): string;
 begin
   Result := AObject.ClassName + '_' +
     inttostr(GetIdValue(AMappingField, AObject).AsInt64);
 end;
 
 function TSession.GetLoadedObjectHashCode(ATypeInfo: PTypeInfo;
-  AValue: TValue): String;
+  AValue: TValue): string;
 begin
-  Result := String(ATypeInfo.Name) + '_' + inttostr(AValue.AsInt64);
+  Result := string(ATypeInfo.Name) + '_' + inttostr(AValue.AsInt64);
 end;
 
 function TSession.GetLogger: IdormLogger;
@@ -745,7 +750,7 @@ end;
 
 function TSession.GetObjectStatus(AObject: TObject): TdormObjectStatus;
 var
-  _Type: TRttiType;
+  _Type     : TRttiType;
   _objstatus: TRttiProperty;
 begin
   _Type := FCTX.GetType(AObject.ClassInfo);
@@ -763,7 +768,7 @@ end;
 
 function TSession.GetStrategy: IdormPersistStrategy;
 var
-  T: TRttiType;
+  T               : TRttiType;
   AdapterClassName: SOString;
 begin
   if not assigned(FPersistStrategy) then
@@ -847,14 +852,14 @@ begin
   Result := TdormUtils.GetField(AObject, AIdMappingField.Name);
 end;
 
-function TSession.GetEntitiesNames: TList<String>;
+function TSession.GetEntitiesNames: TList<string>;
 var
-  alltypes: TArray<TRttiType>;
-  _Type: TRttiType;
+  alltypes   : TArray<TRttiType>;
+  _Type      : TRttiType;
   _attributes: TArray<TCustomAttribute>;
-  _attrib: TCustomAttribute;
+  _attrib    : TCustomAttribute;
 begin
-  Result := TList<String>.Create;
+  Result := TList<string>.Create;
   alltypes := FCTX.GetTypes;
   for _Type in alltypes do
   begin
@@ -863,13 +868,16 @@ begin
       if _attrib is Entity then
       begin
 
-{$IF CompilerVersion > 22}
+        {$IF CompilerVersion > 22}
+
         Result.Add(_Type.QualifiedClassName);
 
-{$ELSE}
+        {$ELSE}
+
         Result.Add(_Type.QualifiedName);
 
-{$IFEND}
+        {$IFEND}
+
         Break;
       end;
   end;
@@ -883,9 +891,9 @@ end;
 function TSession.LoadByMappingField(ATypeInfo: PTypeInfo;
   AMappingField: TMappingField; const Value: TValue): TObject;
 var
-  rt: TRttiType;
-  _table: TMappingTable;
-  Obj: TObject;
+  rt        : TRttiType;
+  _table    : TMappingTable;
+  Obj       : TObject;
   _validable: TdormValidateable;
 begin
   LoadEnter;
@@ -932,7 +940,7 @@ end;
 
 function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject;
 var
-  rt: TRttiType;
+  rt    : TRttiType;
   _table: TMappingTable;
   // _idValue: TValue;
   // Obj: TObject;
@@ -960,9 +968,9 @@ end;
 function TSession.Load(ATypeInfo: PTypeInfo; const Value: TValue;
   AObject: TObject): boolean;
 var
-  rt: TRttiType;
-  _table: TMappingTable;
-  _idValue: TValue;
+  rt           : TRttiType;
+  _table       : TMappingTable;
+  _idValue     : TValue;
   _validateable: TdormValidateable;
 begin
   LoadEnter;
@@ -987,15 +995,15 @@ end;
 
 function TSession.Load<T>(ASQLable: ISQLable): T;
 var
-  rt: TRttiType;
-  _table: TMappingTable;
-  _fields: TMappingFieldList;
-  _type_info: PTypeInfo;
+  rt               : TRttiType;
+  _table           : TMappingTable;
+  _fields          : TMappingFieldList;
+  _type_info       : PTypeInfo;
   SearcherClassname: string;
-  List: IWrappedList;
-  Obj: T;
-  _validateable: TdormValidateable;
-  ACollection: TObjectList<T>;
+  List             : IWrappedList;
+  Obj              : T;
+  _validateable    : TdormValidateable;
+  ACollection      : TObjectList<T>;
 begin
   _type_info := TypeInfo(T);
   rt := FCTX.GetType(_type_info);
@@ -1008,12 +1016,16 @@ begin
       ASQLable.ToSQL(self.GetMapping, self.GetStrategy));
     if ACollection.Count > 1 then
       raise EdormException.Create('Singleton query returned more than 1 row');
-
-    Obj := ACollection[0];
-    SetObjectStatus(Obj, osClean, false);
-    _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
-    _validateable.OnAfterLoad;
-    Result := Obj;
+    if ACollection.Count = 1 then
+    begin
+      Obj := ACollection[0];
+      SetObjectStatus(Obj, osClean, false);
+      _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
+      _validateable.OnAfterLoad;
+      Result := Obj;
+    end
+    else
+      Result := nil;
   finally
     ACollection.Free;
   end;
@@ -1026,7 +1038,7 @@ begin
 end;
 
 procedure TSession.LoadHasManyRelation(ATableMapping: TMappingTable;
-  AIdValue: TValue; ARttiType: TRttiType; AObject: TObject;
+  AIdValue            : TValue; ARttiType: TRttiType; AObject: TObject;
   AConsiderLazyLoading: boolean);
 var
   _has_many: TMappingRelation;
@@ -1042,16 +1054,16 @@ begin
 end;
 
 procedure TSession.LoadHasManyRelationByPropertyName(AIdValue: TValue;
-  ARttiType: TRttiType; AClassName: string; APropertyName: string;
+  ARttiType  : TRttiType; AClassName: string; APropertyName: string;
   var AObject: TObject);
 var
-  _has_many: TMappingRelation;
-  Table, ChildTable: TMappingTable;
-  v: TValue;
-  _child_type: TRttiType;
+  _has_many                     : TMappingRelation;
+  Table, ChildTable             : TMappingTable;
+  v                             : TValue;
+  _child_type                   : TRttiType;
   AttributeNameInTheParentObject: string;
-  Coll: TObject;
-  Criteria: ICriteria;
+  Coll                          : TObject;
+  Criteria                      : ICriteria;
 begin
   GetLogger.Debug('Loading HAS_MANY for ' + AClassName + '.' + APropertyName);
   Table := FMappingStrategy.GetMapping(ARttiType);
@@ -1092,7 +1104,7 @@ begin
 end;
 
 procedure TSession.LoadHasOneRelation(ATableMapping: TMappingTable;
-  AIdValue: TValue; ARttiType: TRttiType; AObject: TObject;
+  AIdValue            : TValue; ARttiType: TRttiType; AObject: TObject;
   AConsiderLazyLoading: boolean);
 var
   _has_one: TMappingRelation;
@@ -1108,7 +1120,7 @@ begin
 end;
 
 procedure TSession.LoadBelongsToRelation(ATableMapping: TMappingTable;
-  AIdValue: TValue; ARttiType: TRttiType; AObject: TObject;
+  AIdValue            : TValue; ARttiType: TRttiType; AObject: TObject;
   AConsiderLazyLoading: boolean);
 var
   _belongs_to: TMappingBelongsTo;
@@ -1124,12 +1136,12 @@ begin
 end;
 
 procedure TSession.LoadHasOneRelationByPropertyName(AIdValue: TValue;
-  ARttiType: TRttiType; AClassName, APropertyName: string;
+  ARttiType  : TRttiType; AClassName, APropertyName: string;
   var AObject: TObject);
 var
-  _table: TMappingTable;
-  _has_one: TMappingRelation;
-  _child_type: TRttiType;
+  _table      : TMappingTable;
+  _has_one    : TMappingRelation;
+  _child_type : TRttiType;
   DestObj, Obj: TObject;
 begin
   GetLogger.Debug('Loading HAS_ONE for ' + AClassName + '.' + APropertyName);
@@ -1180,6 +1192,7 @@ begin
 end;
 
 function TSession.LoadListSQL<T>(ASQLable: ISQLable):
+
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
 begin
   Result := {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}.Create(true);
@@ -1187,6 +1200,7 @@ begin
 end;
 
 function TSession.LoadList<T>(Criteria: ICriteria):
+
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
 begin
   Result := {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}.Create(true);
@@ -1195,16 +1209,16 @@ end;
 
 procedure TSession.LoadList<T>(Criteria: ICriteria; AObject: TObject);
 var
-  SQL: string;
-  Table: TMappingTable;
-  ItemClassInfo: PTypeInfo;
-  rt: TRttiType;
-  _fields: TMappingFieldList;
+  SQL              : string;
+  Table            : TMappingTable;
+  ItemClassInfo    : PTypeInfo;
+  rt               : TRttiType;
+  _fields          : TMappingFieldList;
   SearcherClassname: string;
-  List: IWrappedList;
-  Obj: TObject;
-  CustomCrit: ICustomCriteria;
-  _validateable: TdormValidateable;
+  List             : IWrappedList;
+  Obj              : TObject;
+  CustomCrit       : ICustomCriteria;
+  _validateable    : TdormValidateable;
 begin
   ItemClassInfo := TypeInfo(T);
   rt := FCTX.GetType(ItemClassInfo);
@@ -1238,7 +1252,7 @@ end;
 procedure TSession.LoadRelationsForEachElement(AList: TObject;
   ARelationsSet: TdormRelations; AConsiderLazyLoading: boolean);
 var
-  el: TObject;
+  el  : TObject;
   List: IWrappedList;
 begin
   List := WrapAsList(AList);
@@ -1248,7 +1262,7 @@ end;
 
 function TSession.OIDIsSet(AObject: TObject): boolean;
 var
-  _table: TMappingTable;
+  _table  : TMappingTable;
   _idValue: TValue;
 begin
   _table := FMappingStrategy.GetMapping(FCTX.GetType(AObject.ClassType));
@@ -1259,9 +1273,9 @@ end;
 procedure TSession.Persist(AObject: TObject);
 var
   _idValue: TValue;
-  _table: TMappingTable;
-  _Type: TRttiType;
-  _v: TdormValidateable;
+  _table  : TMappingTable;
+  _Type   : TRttiType;
+  _v      : TdormValidateable;
 begin
   DoSessionOnBeforePersistObject(AObject);
   _Type := FCTX.GetType(AObject.ClassInfo);
@@ -1347,11 +1361,11 @@ end;
 procedure TSession.PersistHasManyRelation(AMappingTable: TMappingTable;
   AIdValue: TValue; ARttiType: TRttiType; AObject: TObject);
 var
-  _has_many: TMappingRelation;
+  _has_many  : TMappingRelation;
   _child_type: TRttiType;
-  v: TValue;
-  List: IWrappedList;
-  Obj: TObject;
+  v          : TValue;
+  List       : IWrappedList;
+  Obj        : TObject;
   // _table: TMappingTable;
   _type_name: string;
 begin
@@ -1409,11 +1423,11 @@ end;
 procedure TSession.PersistHasOneRelation(AMappingTable: TMappingTable;
   AIdValue: TValue; ARttiType: TRttiType; AObject: TObject);
 var
-  _has_one: TMappingRelation;
-  _child_type: TRttiType;
-  v: TValue;
-  Obj: TObject;
-  _child_mapping: TMappingTable;
+  _has_one            : TMappingRelation;
+  _child_type         : TRttiType;
+  v                   : TValue;
+  Obj                 : TObject;
+  _child_mapping      : TMappingTable;
   _CurrentChildIDValue: TValue;
 begin
   GetLogger.EnterLevel('persist has_one ' + ARttiType.ToString);
@@ -1448,8 +1462,8 @@ end;
 procedure TSession.LoadRelations(AObject: TObject;
   ARelationsSet: TdormRelations; AConsiderLazyLoading: boolean);
 var
-  rt: TRttiType;
-  _table: TMappingTable;
+  rt      : TRttiType;
+  _table  : TMappingTable;
   _idValue: TValue;
 begin
   if assigned(AObject) then
@@ -1468,15 +1482,15 @@ begin
 end;
 
 procedure TSession.LoadBelongsToRelationByPropertyName(AIdValue: TValue;
-  ARttiType: TRttiType; AClassName, APropertyName: string;
+  ARttiType  : TRttiType; AClassName, APropertyName: string;
   var AObject: TObject);
 var
-  _table: TMappingTable;
-  _belongs_to: TMappingBelongsTo;
-  _belong_type: TRttiType;
+  _table                 : TMappingTable;
+  _belongs_to            : TMappingBelongsTo;
+  _belong_type           : TRttiType;
   _belong_field_key_value: TValue;
-  v: TValue;
-  parent_mapping: TMappingTable;
+  v                      : TValue;
+  parent_mapping         : TMappingTable;
 begin
   GetLogger.Debug('Loading BELONGS_TO for ' + AClassName + '.' + APropertyName);
   _table := FMappingStrategy.GetMapping(ARttiType);
@@ -1508,9 +1522,9 @@ end;
 function TSession.LoadByMappingField(ATypeInfo: PTypeInfo;
   AMappingField: TMappingField; const Value: TValue; AObject: TObject): boolean;
 var
-  rt: TRttiType;
-  _table: TMappingTable;
-  _idValue: TValue;
+  rt           : TRttiType;
+  _table       : TMappingTable;
+  _idValue     : TValue;
   _validateable: TdormValidateable;
 begin
   LoadEnter;
@@ -1567,7 +1581,7 @@ end;
 function TSession.GetCurrentAndIncrementObjectVersion(AObject: TObject;
   out ACurrentVersion: Int64; ARaiseExceptionIfNotExists: boolean): boolean;
 var
-  _Type: TRttiType;
+  _Type      : TRttiType;
   _objversion: TRttiProperty;
 begin
   Result := false;
@@ -1634,10 +1648,10 @@ end;
 procedure TSession.SetLazyLoadFor(ATypeInfo: PTypeInfo;
   const APropertyName: string; const Value: boolean);
 var
-  _rttitype: TRttiType;
+  _rttitype          : TRttiType;
   _has_many, _has_one: TMappingRelation;
-  _belongs_to: TMappingBelongsTo;
-  _table: TMappingTable;
+  _belongs_to        : TMappingBelongsTo;
+  _table             : TMappingTable;
 begin
   _rttitype := FCTX.GetType(ATypeInfo);
   _table := FMappingStrategy.GetMapping(_rttitype);
@@ -1670,7 +1684,7 @@ end;
 procedure TSession.SetObjectsStatus(ACollection: TObject;
   AStatus: TdormObjectStatus; ARaiseExceptionIfNotExists: boolean);
 var
-  Obj: TObject;
+  Obj : TObject;
   Coll: IWrappedList;
 begin
   Coll := WrapAsList(ACollection);
@@ -1683,7 +1697,7 @@ end;
 procedure TSession.SetObjectStatus(AObject: TObject; AStatus: TdormObjectStatus;
   ARaiseExceptionIfNotExists: boolean);
 var
-  _Type: TRttiType;
+  _Type     : TRttiType;
   _objstatus: TRttiProperty;
 begin
   if assigned(AObject) then
@@ -1703,7 +1717,7 @@ end;
 procedure TSession.SetObjectVersion(AObject: TObject; AVersion: Int64;
   ARaiseExceptionIfNotExists: boolean);
 var
-  _Type: TRttiType;
+  _Type      : TRttiType;
   _objversion: TRttiProperty;
 begin
   if assigned(AObject) then
@@ -1722,7 +1736,7 @@ end;
 
 procedure TSession.InsertCollection(ACollection: TObject);
 var
-  Obj: TObject;
+  Obj : TObject;
   Coll: IWrappedList;
 begin
   Coll := WrapAsList(ACollection);
@@ -1735,11 +1749,11 @@ end;
 procedure TSession.InsertHasManyRelation(AMappingTable: TMappingTable;
   AIdValue: TValue; ARttiType: TRttiType; AObject: TObject);
 var
-  _has_many: TMappingRelation;
+  _has_many  : TMappingRelation;
   _child_type: TRttiType;
-  v: TValue;
-  List: IWrappedList;
-  Obj: TObject;
+  v          : TValue;
+  List       : IWrappedList;
+  Obj        : TObject;
 begin
   if CurrentObjectStatus <> osUnknown then
     raise EdormException.Create
@@ -1773,10 +1787,10 @@ end;
 procedure TSession.InsertHasOneRelation(AMappingTable: TMappingTable;
   AIdValue: TValue; ARttiType: TRttiType; AObject: TObject);
 var
-  _has_one: TMappingRelation;
+  _has_one   : TMappingRelation;
   _child_type: TRttiType;
-  v: TValue;
-  Obj: TObject;
+  v          : TValue;
+  Obj        : TObject;
 begin
   GetLogger.EnterLevel('has_one ' + ARttiType.ToString);
   GetLogger.Debug('Saving _has_one for ' + ARttiType.ToString);
@@ -1803,11 +1817,11 @@ end;
 procedure TSession.InternalDelete(AObject: TObject;
   AValidaetable: TdormValidateable);
 var
-  _rttitype: TRttiType;
-  _table: TMappingTable;
-  _class_name: string;
-  _idValue: TValue;
-  _validateable: TdormValidateable;
+  _rttitype     : TRttiType;
+  _table        : TMappingTable;
+  _class_name   : string;
+  _idValue      : TValue;
+  _validateable : TdormValidateable;
   CurrentVersion: Int64;
 begin
   GetLogger.EnterLevel('Delete');
@@ -1856,9 +1870,9 @@ end;
 function TSession.InternalInsert(AObject: TObject;
   AValidaetable: TdormValidateable): TValue;
 var
-  _Type: TRttiType;
-  _table: TMappingTable;
-  _idValue: TValue;
+  _Type        : TRttiType;
+  _table       : TMappingTable;
+  _idValue     : TValue;
   _validateable: TdormValidateable;
 begin
   _Type := FCTX.GetType(AObject.ClassInfo);
@@ -1914,10 +1928,10 @@ end;
 procedure TSession.InternalUpdate(AObject: TObject;
   AValidaetable: TdormValidateable; AOnlyChild: boolean);
 var
-  _Type: TRttiType;
-  _class_name: string;
-  _table: TMappingTable;
-  _idValue: TValue;
+  _Type         : TRttiType;
+  _class_name   : string;
+  _table        : TMappingTable;
+  _idValue      : TValue;
   CurrentVersion: Int64;
 begin
   GetLogger.EnterLevel('UPDATE ' + AObject.ClassName);
@@ -2008,14 +2022,14 @@ end;
 procedure TSession.FillListSQL(APTypeInfo: PTypeInfo; ACollection: TObject;
   ASQLable: ISQLable);
 var
-  rt: TRttiType;
-  _table: TMappingTable;
-  _fields: TMappingFieldList;
-  _type_info: PTypeInfo;
+  rt               : TRttiType;
+  _table           : TMappingTable;
+  _fields          : TMappingFieldList;
+  _type_info       : PTypeInfo;
   SearcherClassname: string;
-  List: IWrappedList;
-  Obj: TObject;
-  _validateable: TdormValidateable;
+  List             : IWrappedList;
+  Obj              : TObject;
+  _validateable    : TdormValidateable;
 begin
   _type_info := APTypeInfo;
   rt := FCTX.GetType(_type_info);
@@ -2046,9 +2060,9 @@ end;
 procedure TSession.FixBelongsToRelation(AMappingTable: TMappingTable;
   AIdValue: TValue; ARttiType: TRttiType; AObject: TObject);
 var
-  _belongs_to: TMappingBelongsTo;
+  _belongs_to : TMappingBelongsTo;
   _parent_type: TRttiType;
-  v: TValue;
+  v           : TValue;
   ParentObject: TObject;
 begin
   GetLogger.EnterLevel('Fixing belongs_to ' + ARttiType.ToString);
@@ -2115,7 +2129,7 @@ end;
 procedure TSession.UpdateChildTypeWithRealListInnerType(AMappingTable
   : TMappingTable; var AChildType: TRttiType);
 var
-  attr: ListOf;
+  attr      : ListOf;
   _type_name: string;
 begin
   // When you have an HasMany relations declared as "TPhones = class(TObjectLlist<TPhone>)" dorm
@@ -2134,7 +2148,7 @@ end;
 
 procedure TSession.UpdateCollection(ACollection: TObject);
 var
-  Obj: TObject;
+  Obj : TObject;
   Coll: IWrappedList;
 begin
   Coll := WrapAsList(ACollection);
@@ -2144,7 +2158,7 @@ end;
 
 procedure TSession.DeleteCollection(ACollection: TObject);
 var
-  Obj: TObject;
+  Obj : TObject;
   Coll: IWrappedList;
 begin
   Coll := WrapAsList(ACollection);
