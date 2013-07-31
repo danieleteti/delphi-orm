@@ -38,7 +38,7 @@ type
     procedure TestUpdate;
     procedure TestCRUD;
     procedure TestCRUDAndFree;
-    procedure TestUOW;
+//    procedure TestUOW;
     procedure TestDormObject;
     procedure TestDormObjectEventAfterLoad;
     procedure TestDormObjectFillListEventAfterLoad;
@@ -308,69 +308,68 @@ begin
   CheckEquals(1, Session.Count(TPerson));
 end;
 
-procedure TTestDORM.TestUOW;
-var
-  UOW: TdormUOW;
-  p1: TPerson;
-  p2: TPerson;
-begin
-
-  p1 := TPerson.NewPerson;
-  try
-    p1.FirstName := 'John';
-    p1.LastName := 'Doe';
-    p2 := TPerson.NewPerson;
-    try
-      UOW := TdormUOW.Create;
-      try
-        p1.FirstName := 'Scott';
-        p1.LastName := 'Summer';
-        CheckFalse(Session.OIDIsSet(p1));
-        UOW.AddInsert(p1);
-        Session.Save(UOW);
-
-        UOW.FreeDeleted; // free nothing... there aren't "deleted" objects
-        CheckTrue(Session.OIDIsSet(p1));
-        UOW.Clear;
-
-        p1.FirstName := 'John';
-        UOW.AddUpdate(p1);
-        Session.Save(UOW);
-        CheckTrue(Session.OIDIsSet(p1));
-        UOW.Clear;
-        UOW.AddDelete(p1);
-        Session.Save(UOW);
-        UOW.GetUOWDelete.Extract(p1);
-        UOW.AddInsert(p1);
-        // This will not actually add the object to the collection.
-        UOW.AddInsert(p1);
-        CheckEquals(1, UOW.GetUOWInsert.Count);
-        Session.Save(UOW);
-        CheckTrue(Session.OIDIsSet(p1));
-      finally
-        UOW.Free;
-      end;
-
-      UOW := TdormUOW.Create;
-      try
-        Session.ClearOID(p1);
-        Session.ClearOID(p1.Car); // contained objects
-        Session.ClearOID(p1.Email); // contained objects
-        Session.ClearOID(p2);
-        UOW.AddInsert(p1);
-        UOW.AddDelete(p2);
-        Session.Save(UOW);
-      finally
-        UOW.Free;
-      end;
-    finally
-      p2.Free;
-    end;
-  finally
-    p1.Free;
-  end;
-
-end;
+//procedure TTestDORM.TestUOW;
+//var
+//  UOW: TdormUOW;
+//  p1: TPerson;
+//  p2: TPerson;
+//begin
+//  p1 := TPerson.NewPerson;
+//  try
+//    p1.FirstName := 'John';
+//    p1.LastName := 'Doe';
+//    p2 := TPerson.NewPerson;
+//    try
+//      UOW := TdormUOW.Create;
+//      try
+//        p1.FirstName := 'Scott';
+//        p1.LastName := 'Summer';
+//        CheckFalse(Session.OIDIsSet(p1));
+//        UOW.AddInsert(p1);
+//        Session.Save(UOW);
+//
+//        UOW.FreeDeleted; // free nothing... there aren't "deleted" objects
+//        CheckTrue(Session.OIDIsSet(p1));
+//        UOW.Clear;
+//
+//        p1.FirstName := 'John';
+//        UOW.AddUpdate(p1);
+//        Session.Save(UOW);
+//        CheckTrue(Session.OIDIsSet(p1));
+//        UOW.Clear;
+//        UOW.AddDelete(p1);
+//        Session.Save(UOW);
+//        UOW.GetUOWDelete.Extract(p1);
+//        UOW.AddInsert(p1);
+//        // This will not actually add the object to the collection.
+//        UOW.AddInsert(p1);
+//        CheckEquals(1, UOW.GetUOWInsert.Count);
+//        Session.Save(UOW);
+//        CheckTrue(Session.OIDIsSet(p1));
+//      finally
+//        UOW.Free;
+//      end;
+//
+//      UOW := TdormUOW.Create;
+//      try
+//        Session.ClearOID(p1);
+//        Session.ClearOID(p1.Car); // contained objects
+//        Session.ClearOID(p1.Email); // contained objects
+//        Session.ClearOID(p2);
+//        UOW.AddInsert(p1);
+//        UOW.AddDelete(p2);
+//        Session.Save(UOW);
+//      finally
+//        UOW.Free;
+//      end;
+//    finally
+//      p2.Free;
+//    end;
+//  finally
+//    p1.Free;
+//  end;
+//
+//end;
 
 procedure TTestDORM.TestUpdate;
 var

@@ -240,6 +240,7 @@
         <DCCReference Include="TestDORMObjStatus.pas"/>
         <DCCReference Include="..\source\dorm.Query.pas"/>
         <DCCReference Include="TestDORMObjVersion.pas"/>
+        <DCCReference Include="..\source\dorm.loggers.CodeSite.pas"/>
         <None Include="ModelSupport_DORM_UnitTests\default.txaPackage"/>
         <None Include="ModelSupport_DORM_UnitTests\default.txvpck"/>
         <None Include="ModelSupport_DORM_UnitTests\dorm\default.txvpck"/>

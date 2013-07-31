@@ -45,7 +45,8 @@ uses
   dorm.tests.objstatus.bo in 'dorm.tests.objstatus.bo.pas',
   TestDORMObjStatus in 'TestDORMObjStatus.pas',
   dorm.Query in '..\source\dorm.Query.pas',
-  TestDORMObjVersion in 'TestDORMObjVersion.pas';
+  TestDORMObjVersion in 'TestDORMObjVersion.pas',
+  dorm.loggers.CodeSite in '..\source\dorm.loggers.CodeSite.pas';
 
 {$R *.RES}
 

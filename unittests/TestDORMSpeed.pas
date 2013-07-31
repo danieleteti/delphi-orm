@@ -29,6 +29,7 @@ type
   public
     procedure SetUp; override;
     procedure TearDown; override;
+
   published
     procedure TestLotOfObjects;
     procedure TestList;
@@ -60,11 +61,11 @@ end;
 
 procedure TTestDORMSpeed.TestList;
 var
-  I: Integer;
-  p: TPerson;
+  I      : Integer;
+  p      : TPerson;
   persone: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
-  start: TDateTime;
-  cmp: TdormComparer<TPerson>;
+  start  : TDateTime;
+  cmp    : TdormComparer<TPerson>;
 const
   OBJECTS_NUMBER = 1000;
 begin
@@ -104,8 +105,8 @@ end;
 
 procedure TTestDORMSpeed.TestLotOfObjects;
 var
-  I: Integer;
-  p: TPerson;
+  I    : Integer;
+  p    : TPerson;
   start: TDateTime;
 begin
   start := now;
@@ -122,14 +123,12 @@ begin
     'Too slow: ' + inttostr(MilliSecondsBetween(now, start)));
 end;
 
-
 {$IFNDEF FIREBIRD_CI}
+
 initialization
 
 RegisterTest(TTestDORMSpeed.Suite);
+
 {$ENDIF}
+
 end.
-
-
-
-
