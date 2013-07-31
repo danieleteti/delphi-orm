@@ -27,6 +27,7 @@ type
   TdormCodeSiteBaseLog = class abstract(TdormInterfacedObject, IdormLogger)
   protected
     dest: TCodeSiteDestination;
+
   public
     class procedure register;
     destructor Destroy; override;
@@ -51,7 +52,15 @@ type
 
   end;
 
-
+  TCodeSiteWarningErrorLog = class(TCodeSiteDefaultLog)
+    procedure EnterLevel(const Value: string); override;
+    procedure ExitLevel(const Value: string); override;
+    procedure Error(const Value: string); override;
+    procedure Warning(const Value: string); override;
+    procedure Info(const Value: string); override;
+    procedure Debug(const Value: string); override;
+    procedure AfterConstruction; override; override;
+  end;
 
 implementation
 
@@ -139,10 +148,54 @@ begin
   Info(ClassName + ' Logger initialized');
 end;
 
+{ TCodeSiteWarningErrorLog }
+
+procedure TCodeSiteWarningErrorLog.AfterConstruction;
+begin
+  inherited;
+
+end;
+
+procedure TCodeSiteWarningErrorLog.Debug(const Value: string);
+begin
+  // do nothing
+end;
+
+procedure TCodeSiteWarningErrorLog.EnterLevel(const Value: string);
+begin
+  // do nothing
+
+end;
+
+procedure TCodeSiteWarningErrorLog.Error(const Value: string);
+begin
+  inherited;
+
+end;
+
+procedure TCodeSiteWarningErrorLog.ExitLevel(const Value: string);
+begin
+  // do nothing
+
+end;
+
+procedure TCodeSiteWarningErrorLog.Info(const Value: string);
+begin
+  // do nothing
+
+end;
+
+procedure TCodeSiteWarningErrorLog.Warning(const Value: string);
+begin
+  inherited;
+
+end;
+
 initialization
 
 TCodeSiteDefaultLog.register;
 TCodeSiteFileLog.register;
 TCodeSiteLiveLog.register;
+TCodeSiteWarningErrorLog.register;
 
 end.
