@@ -59,7 +59,7 @@ type
     procedure Warning(const Value: string);
     procedure Info(const Value: string);
     procedure Debug(const Value: string);
-    procedure AfterConstruction;
+    procedure AfterConstruction; override;
   end;
 
 implementation
