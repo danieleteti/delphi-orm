@@ -53,13 +53,13 @@ type
   end;
 
   TCodeSiteWarningErrorLog = class(TCodeSiteDefaultLog)
-    procedure EnterLevel(const Value: string); override;
-    procedure ExitLevel(const Value: string); override;
-    procedure Error(const Value: string); override;
-    procedure Warning(const Value: string); override;
-    procedure Info(const Value: string); override;
-    procedure Debug(const Value: string); override;
-    procedure AfterConstruction; override; override;
+    procedure EnterLevel(const Value: string);
+    procedure ExitLevel(const Value: string);
+    procedure Error(const Value: string);
+    procedure Warning(const Value: string);
+    procedure Info(const Value: string);
+    procedure Debug(const Value: string);
+    procedure AfterConstruction;
   end;
 
 implementation
