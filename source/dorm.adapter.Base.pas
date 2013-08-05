@@ -21,7 +21,7 @@ type
     function EscapeDateTime(const Value: TDate): string;
     function EscapeTime(const Value: TTime): string;
     //
-    function GetBooleanValueAsString(Value: Boolean): String; virtual;
+    function GetBooleanValueAsString(Value: Boolean): string; virtual;
 
     // iso related functions
     class function ISODateTimeToString(ADateTime: TDateTime): string;
@@ -43,7 +43,8 @@ type
 implementation
 
 uses
-  SysUtils, System.DateUtils;
+  SysUtils,
+  System.DateUtils;
 
 { TBaseAdapter }
 
@@ -93,10 +94,10 @@ end;
 function TBaseAdapter.GetWhereSQL(ACriteria: ICriteria;
   AMappingTable: TMappingTable): string;
 var
-  I: Integer;
-  SQL: String;
+  I       : Integer;
+  SQL     : string;
   CritItem: ICriteriaItem;
-  Crit: ICriteria;
+  Crit    : ICriteria;
 begin
   if ACriteria.Count > 0 then
     for I := 0 to ACriteria.Count - 1 do
@@ -136,10 +137,10 @@ end;
 function TBaseAdapter.GetSelectSQL(Criteria: ICriteria;
   AMappingTable: TMappingTable): string;
 var
-  SQL: string;
-  _fields: TMappingFieldList;
+  SQL          : string;
+  _fields      : TMappingFieldList;
   select_fields: string;
-  WhereSQL: string;
+  WhereSQL     : string;
 begin
   _fields := AMappingTable.Fields;
   select_fields := GetSelectFieldsList(_fields, true);
@@ -155,7 +156,7 @@ begin
   Result := SQL;
 end;
 
-function TBaseAdapter.GetBooleanValueAsString(Value: Boolean): String;
+function TBaseAdapter.GetBooleanValueAsString(Value: Boolean): string;
 begin
   Result := BoolToStr(Value, true);
 end;
@@ -185,9 +186,9 @@ function TBaseAdapter.GetWhereSQL(ACriteriaItem: ICriteriaItem;
   AMappingTable: TMappingTable): string;
 var
   SQL: string;
-  fm: TMappingField;
-  d: TDate;
-  dt: TDateTime;
+  fm : TMappingField;
+  d  : TDate;
+  dt : TDateTime;
 begin
   fm := AMappingTable.FindByName(ACriteriaItem.GetAttribute);
   if not Assigned(fm) then
