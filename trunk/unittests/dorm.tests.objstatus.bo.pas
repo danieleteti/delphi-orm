@@ -161,7 +161,8 @@ type
     procedure SetIsMale(const Value: Boolean);
 
   public
-    constructor Create; reintroduce; virtual;
+    constructor Create; overload; virtual;
+    constructor Create(AFirstName, ALastName: string); overload; virtual;
     destructor Destroy; override;
     function ToString: string; override;
     class function NewPerson: TPersonOS;
@@ -206,17 +207,17 @@ type
     procedure SetID(const Value: Integer);
     procedure SetPersonID(const Value: Integer);
     function GetIsItalianNumber: Boolean;
-    // Private!!!
-    [Column('ID_PERSON')]
-    property PersonID: Integer read FPersonID write SetPersonID;
 
   public
     class constructor Create;
     class procedure register;
-    constructor Create; override;
+    constructor Create; overload; override;
+    constructor Create(ANumber, AModel: string); overload;
     property Number: string read FNumber write SetNumber;
     property Model: string read FModel write SetModel;
     property ID: Integer read FID write SetID;
+    [Column('ID_PERSON')]
+    property PersonID: Integer read FPersonID write SetPersonID;
     [NoAutomapping]
     property IsItalianNumber: Boolean read GetIsItalianNumber;
   end;
@@ -321,6 +322,13 @@ begin
   FEmail.Value := 'd.teti@bittime.it';
 end;
 
+constructor TPersonOS.Create(AFirstName, ALastName: string);
+begin
+  Create;
+  FFirstName := AFirstName;
+  FLastName := ALastName;
+end;
+
 destructor TPersonOS.Destroy;
 begin
   FreeAndNil(FPhoto);
@@ -415,6 +423,13 @@ end;
 constructor TPhoneOS.Create;
 begin
   inherited;
+end;
+
+constructor TPhoneOS.Create(ANumber, AModel: string);
+begin
+  Create;
+  FNumber := ANumber;
+  FModel := AModel;
 end;
 
 function TPhoneOS.GetIsItalianNumber: Boolean;

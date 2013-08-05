@@ -30,11 +30,13 @@ type
   public
     procedure SetUp; override;
     procedure TearDown; override;
+
   published
     procedure TestLoadHasMany;
     procedure TestHasManyLazyLoad;
     procedure TestBelongsTo;
     procedure TestLoadRelations;
+    procedure TestLoadRelationsWithOBJSTATUS;
   end;
 
 implementation
@@ -44,7 +46,9 @@ uses
   Classes,
   dorm.Collections,
   dorm.tests.bo,
-  SysUtils;
+  SysUtils,
+  dorm.tests.objstatus.bo,
+  dorm.ObjectStatus;
 
 { TTestDORMRelations }
 
@@ -60,10 +64,10 @@ end;
 
 procedure TTestDORMRelations.TestBelongsTo;
 var
-  Car: TCar;
+  Car     : TCar;
   CarOwner: TPerson;
-  car_id: Integer;
-  p: TPerson;
+  car_id  : Integer;
+  p       : TPerson;
 begin
   CarOwner := TPerson.NewPerson;
   try
@@ -109,7 +113,7 @@ begin
     p.Car := nil;
     Car.Free;
     Car := nil;
-    p.Car:=nil;
+    p.Car := nil;
     p.Free;
   end;
 end;
@@ -157,8 +161,8 @@ end;
 procedure TTestDORMRelations.TestLoadHasMany;
 var
   t, t1: TPhone;
-  p: TPerson;
-  ID: Integer;
+  p    : TPerson;
+  ID   : Integer;
 begin
   p := TPerson.NewPerson;
   try
@@ -195,7 +199,7 @@ end;
 
 procedure TTestDORMRelations.TestLoadRelations;
 var
-  p: TPerson;
+  p  : TPerson;
   oid: Integer;
 begin
   Session.EnableLazyLoad(TPerson, 'Car');
@@ -217,14 +221,17 @@ begin
     CheckFalse(Session.OIDIsSet(p.Car));
     CheckEquals(0, p.Phones.Count);
     CheckFalse(Session.OIDIsSet(p.Email));
+
     Session.LoadRelations(p, [drBelongsTo]);
     CheckFalse(Session.OIDIsSet(p.Car));
     CheckEquals(0, p.Phones.Count);
     CheckFalse(Session.OIDIsSet(p.Email));
+
     Session.LoadRelations(p, [drHasMany]);
     CheckFalse(Session.OIDIsSet(p.Car));
     CheckEquals(0, p.Phones.Count);
     CheckFalse(Session.OIDIsSet(p.Email));
+
     Session.LoadRelations(p, [drHasOne]);
     CheckTrue(Session.OIDIsSet(p.Car));
     CheckEquals(0, p.Phones.Count);
@@ -233,6 +240,63 @@ begin
     p.Free;
   end;
 
+end;
+
+procedure TTestDORMRelations.TestLoadRelationsWithOBJSTATUS;
+var
+  p    : TPersonOS;
+  oid  : Integer;
+  phone: TPhoneOS;
+begin
+  Session.EnableLazyLoad(TPersonOS, 'Car');
+  Session.EnableLazyLoad(TPersonOS, 'Phones');
+  Session.EnableLazyLoad(TPersonOS, 'Email');
+  p := TPersonOS.NewPerson;
+  try
+    p.Phones.Add(TPhoneOS.Create('555-567893', 'Sony'));;
+    p.Phones.Add(TPhoneOS.Create('555-233445', 'HTC'));
+    p.Phones.Add(TPhoneOS.Create('555-908978', 'LG'));
+    Session.Persist(p);
+    oid := p.ID;
+  finally
+    p.Free;
+  end;
+
+  p := Session.Load<TPersonOS>(oid);
+  try
+    // check lazyloading works
+    CheckFalse(Session.OIDIsSet(p.Car));
+    CheckEquals(0, p.Phones.Count);
+    CheckFalse(Session.OIDIsSet(p.Email));
+
+    // now, disable lazyloading...
+    Session.DisableLazyLoad(TPersonOS, 'Car'); // has_one
+    Session.DisableLazyLoad(TPersonOS, 'Phones'); // has_many
+    Session.DisableLazyLoad(TPersonOS, 'Email'); // has_one
+
+    // reload relations.. and check the behaviour
+    { TODO -oDaniele : Check for BelongsTo relations }
+    // Session.LoadRelations(p, [drBelongsTo]);
+    // CheckFalse(Session.OIDIsSet(p.Car));
+    // CheckEquals(0, p.Phones.Count);
+    // CheckFalse(Session.OIDIsSet(p.Email));
+    // CheckTrue(p.Car.objstatus = osClean);
+
+    Session.LoadRelations(p, [drHasMany]);
+    CheckFalse(Session.OIDIsSet(p.Car));
+    CheckEquals(3, p.Phones.Count);
+    CheckFalse(Session.OIDIsSet(p.Email));
+    for phone in p.Phones do
+      CheckTrue(Session.IsClean(phone));
+
+    Session.LoadRelations(p, [drHasOne]);
+    CheckTrue(Session.OIDIsSet(p.Car));
+    CheckEquals(3, p.Phones.Count);
+    CheckTrue(Session.OIDIsSet(p.Email));
+    CheckTrue(Session.IsClean(p.Email));
+  finally
+    p.Free;
+  end;
 end;
 
 initialization

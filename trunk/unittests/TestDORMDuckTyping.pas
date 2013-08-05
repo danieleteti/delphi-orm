@@ -3,7 +3,9 @@ unit TestDORMDuckTyping;
 interface
 
 uses
-  TestFramework, dorm.Commons, BaseTestCase;
+  TestFramework,
+  dorm.Commons,
+  BaseTestCase;
 
 type
   TTestDuckTyping = class(TBaseTestCase)
@@ -24,13 +26,20 @@ type
     procedure Test_ErrorOnlyInOnBeforeSave;
     procedure Test_All_Methods_Called;
     procedure Test_LifeCicle;
+    procedure Test_MethodsOnLoadList;
+    procedure Test_FilterList;
   end;
 
 implementation
 
 uses
-  dorm.Utils, System.Rtti, System.SysUtils, System.Classes,
-  dorm.tests.objstatus.bo;
+  dorm.Utils,
+  System.Rtti,
+  System.SysUtils,
+  System.Classes,
+  dorm.tests.objstatus.bo,
+  dorm.Query,
+  System.Generics.Collections;
 
 type
   TSimpleValidatingObjectWithNoMethod = class(TObject)
@@ -55,21 +64,21 @@ type
 
   TValidatingMock = class
   protected
-    FHistory: TStringList;
-    FValidate: boolean;
-    FInsertValidate: boolean;
-    FUpdateValidate: boolean;
-    FDeleteValidate: boolean;
-    FOnAfterLoad: boolean;
-    FOnBeforeLoad: boolean;
+    FHistory        : TStringList;
+    FValidate       : boolean;
+    FInsertValidate : boolean;
+    FUpdateValidate : boolean;
+    FDeleteValidate : boolean;
+    FOnAfterLoad    : boolean;
+    FOnBeforeLoad   : boolean;
     FOnBeforePersist: boolean;
-    FOnAfterPersist: boolean;
-    FOnBeforeInsert: boolean;
-    FOnAfterInsert: boolean;
-    FOnBeforeUpdate: boolean;
-    FOnAfterUpdate: boolean;
-    FOnBeforeDelete: boolean;
-    FOnAfterDelete: boolean;
+    FOnAfterPersist : boolean;
+    FOnBeforeInsert : boolean;
+    FOnAfterInsert  : boolean;
+    FOnBeforeUpdate : boolean;
+    FOnAfterUpdate  : boolean;
+    FOnBeforeDelete : boolean;
+    FOnAfterDelete  : boolean;
 
   public
     constructor Create;
@@ -120,7 +129,7 @@ begin
   AValidateable.OnAfterPersist;
 end;
 
-procedure TTestDuckTyping.Setup;
+procedure TTestDuckTyping.SetUp;
 begin
   inherited;
   FDuckObject := TDuckTypedObject.Create;
@@ -135,7 +144,7 @@ end;
 
 procedure TTestDuckTyping.Test_All_Methods_Called;
 var
-  v: TValidatingMock;
+  v        : TValidatingMock;
   Validable: TdormValidateable;
 begin
   v := TValidatingMock.Create;
@@ -148,7 +157,7 @@ end;
 
 procedure TTestDuckTyping.Test_ErrorOnlyInOnBeforeSave;
 var
-  obj: TValidatingObjectWithExceptionInBeforeSave;
+  obj         : TValidatingObjectWithExceptionInBeforeSave;
   Validateable: TdormValidateable;
 begin
   obj := TValidatingObjectWithExceptionInBeforeSave.Create;
@@ -166,20 +175,83 @@ begin
   obj.Free;
 end;
 
+procedure TTestDuckTyping.Test_FilterList;
+var
+  L: IWrappedList;
+begin
+  Session.Persist(TPersonOS.Create('Daniele', 'Teti')).Free;
+  Session.Persist(TPersonOS.Create('Peter', 'Parker')).Free;
+  Session.Persist(TPersonOS.Create('Bruce', 'Banner')).Free;
+  Session.Persist(TPersonOS.Create('Sue', 'Storm')).Free;
+
+  L := Session.Filter<TPersonOS>(
+    WrapAsList(Session.LoadListSQL<TPersonOS>(Select.From(TPersonOS)), true),
+    function(O: TPersonOS): boolean
+    begin
+      Result := O.FirstName.Contains('r');
+    end);
+  CheckEquals(2, L.Count);
+end;
+
 procedure TTestDuckTyping.Test_LifeCicle;
 var
-  p: TPersonOS;
-  s: string;
+  p : TPersonOS;
+  s : string;
+  p2: TPersonOS;
 begin
   p := TPersonOS.NewPerson;
   Session.Persist(p);
   s := p.GetEventAndValidationHistory.DelimitedText;
+  CheckEquals
+    ('TPersonOS.OnBeforePersist-TPersonOS.Validate-TPersonOS.InsertValidate-TPersonOS.OnBeforeInsert-TPersonOS.OnAfterInsert-TPersonOS.OnAfterPersist',
+    s);
+
+  p2 := Session.Load<TPersonOS>(p.ID);
+  s := p2.GetEventAndValidationHistory.DelimitedText;
+  CheckEquals
+    ('TPersonOS.OnAfterLoad',
+    s);
+  p2.Free;
   p.Free;
+end;
+
+procedure TTestDuckTyping.Test_MethodsOnLoadList;
+var
+  List: TObjectList<TPersonOS>;
+begin
+  Session.Persist(TPersonOS.NewPerson).Free;
+  Session.Persist(TPersonOS.NewPerson).Free;
+  Session.Persist(TPersonOS.NewPerson).Free;
+  Session.Persist(TPersonOS.NewPerson).Free;
+
+  List := Session.LoadList<TPersonOS>();
+  try
+    Session.ForEach<TPersonOS>(List,
+      procedure(O: TPersonOS)
+      begin
+        CheckTrue(Session.IsClean(O));
+        CheckEquals('TPersonOS.OnAfterLoad', O.GetEventAndValidationHistory.DelimitedText);
+      end);
+  finally
+    List.Free;
+  end;
+
+  List := Session.LoadListSQL<TPersonOS>(Select.From(TPersonOS));
+  try
+    Session.ForEach<TPersonOS>(List,
+      procedure(O: TPersonOS)
+      begin
+        CheckTrue(Session.IsClean(O));
+        CheckEquals('TPersonOS.OnAfterLoad', O.GetEventAndValidationHistory.DelimitedText);
+      end);
+  finally
+    List.Free;
+  end;
 end;
 
 procedure TTestDuckTyping.Test_TSimpleValidatingObject;
 var
-  obj: TSimpleValidatingObject;
+  obj         : TSimpleValidatingObject;
   Validateable: TdormValidateable;
 begin
   obj := TSimpleValidatingObject.Create;
@@ -192,7 +264,7 @@ end;
 
 procedure TTestDuckTyping.Test_TSimpleValidatingObjectInsertAndUpdate;
 var
-  obj: TSimpleValidatingObjectInsertAndUpdate;
+  obj         : TSimpleValidatingObjectInsertAndUpdate;
   Validateable: TdormValidateable;
 begin
   obj := TSimpleValidatingObjectInsertAndUpdate.Create;
@@ -205,7 +277,7 @@ end;
 
 procedure TTestDuckTyping.Test_TSimpleValidatingObjectWithNoMethod;
 var
-  obj: TSimpleValidatingObjectWithNoMethod;
+  obj         : TSimpleValidatingObjectWithNoMethod;
   Validateable: TdormValidateable;
 begin
   obj := TSimpleValidatingObjectWithNoMethod.Create;
@@ -219,14 +291,14 @@ end;
 
 function TSimpleValidatingObject.Validate: boolean;
 begin
-  Result := True;
+  Result := true;
 end;
 
 { TSimpleValidatingObjectInsertAndUpdate }
 
 function TSimpleValidatingObjectInsertAndUpdate.InsertValidate: boolean;
 begin
-  Result := True;
+  Result := true;
 end;
 
 function TSimpleValidatingObjectInsertAndUpdate.UpdateValidate: boolean;
@@ -270,7 +342,7 @@ end;
 
 procedure TValidatingMock.DeleteValidate;
 begin
-  FDeleteValidate := True;
+  FDeleteValidate := true;
   FHistory.Add('DeleteValidate');
 end;
 
@@ -287,79 +359,79 @@ end;
 
 procedure TValidatingMock.InsertValidate;
 begin
-  FInsertValidate := True;
+  FInsertValidate := true;
   FHistory.Add('InsertValidate');
 end;
 
 procedure TValidatingMock.OnAfterDelete;
 begin
-  FOnAfterDelete := True;
+  FOnAfterDelete := true;
   FHistory.Add('OnAfterDelete');
 end;
 
 procedure TValidatingMock.OnAfterInsert;
 begin
-  FOnAfterInsert := True;
+  FOnAfterInsert := true;
   FHistory.Add('OnAfterInsert');
 end;
 
 procedure TValidatingMock.OnAfterLoad;
 begin
-  FOnAfterLoad := True;
+  FOnAfterLoad := true;
   FHistory.Add('OnAfterLoad');
 end;
 
 procedure TValidatingMock.OnAfterPersist;
 begin
-  FOnAfterPersist := True;
+  FOnAfterPersist := true;
   FHistory.Add('OnAfterPersist');
 end;
 
 procedure TValidatingMock.OnAfterUpdate;
 begin
-  FOnAfterUpdate := True;
+  FOnAfterUpdate := true;
   FHistory.Add('OnAfterUpdate');
 end;
 
 procedure TValidatingMock.OnBeforeDelete;
 begin
-  FOnBeforeDelete := True;
+  FOnBeforeDelete := true;
   FHistory.Add('OnBeforeDelete');
 end;
 
 procedure TValidatingMock.OnBeforeInsert;
 begin
-  FOnBeforeInsert := True;
+  FOnBeforeInsert := true;
   FHistory.Add('OnBeforeInsert');
 end;
 
 procedure TValidatingMock.OnBeforeLoad;
 begin
-  FOnBeforeLoad := True;
+  FOnBeforeLoad := true;
   FHistory.Add('OnBeforeLoad');
 end;
 
 procedure TValidatingMock.OnBeforePersist;
 begin
-  FOnBeforePersist := True;
+  FOnBeforePersist := true;
   FHistory.Add('OnBeforePersist');
 end;
 
 procedure TValidatingMock.OnBeforeUpdate;
 begin
-  FOnBeforeUpdate := True;
+  FOnBeforeUpdate := true;
   FHistory.Add('OnBeforeUpdate');
 end;
 
 procedure TValidatingMock.UpdateValidate;
 begin
-  FUpdateValidate := True;
+  FUpdateValidate := true;
   FHistory.Add('UpdateValidate');
 end;
 
 procedure TValidatingMock.Validate;
 begin
-  FValidate := True;
+  FValidate := true;
   FHistory.Add('Validate');
 end;
 

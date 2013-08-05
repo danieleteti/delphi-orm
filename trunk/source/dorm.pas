@@ -31,7 +31,8 @@ uses
   dorm.Mappings,
   dorm.Commons,
   dorm.Query,
-  dorm.ObjectStatus;
+  dorm.ObjectStatus,
+  System.SysUtils;
 
 type
 
@@ -178,6 +179,10 @@ type
     function Strategy: IdormPersistStrategy;
     function OIDIsSet(AObject: TObject): boolean;
     procedure ClearOID(AObject: TObject);
+    procedure ForEach<T: class>(List: TObjectList<T>; AProc: TProc<T>); overload;
+    procedure ForEach<T: class>(List: IWrappedList; AProc: TProc<T>); overload;
+    function Filter<T: class>(ACollection: IWrappedList; AFunc: TPredicate<T>)
+      : IWrappedList; overload;
     // Configuration
     procedure Configure(APersistenceConfiguration: TTextReader;
       AMappingConfiguration             : TTextReader = nil;
@@ -191,7 +196,7 @@ type
     class function CreateConfigured(APersistenceConfigurationFile: string;
       AEnvironment: TdormEnvironment): TSession; overload;
     // Persistence
-    procedure Persist(AObject: TObject);
+    function Persist(AObject: TObject): TObject;
     procedure HandleDirtyPersist(AIdValue: TValue; AObject: TObject;
       AValidateable: TdormValidateable);
     function Insert(AObject: TObject): TValue; overload;
@@ -203,8 +208,8 @@ type
     procedure Save(dormUOW: TdormUOW); overload;
     procedure Delete(AObject: TObject);
     procedure DeleteAndFree(AObject: TObject);
-    procedure PersistCollection(ACollection: TObject); overload;
-    procedure PersistCollection(ACollection: IWrappedList); overload;
+    function PersistCollection(ACollection: TObject): TObject; overload;
+    function PersistCollection(ACollection: IWrappedList): IWrappedList; overload;
     procedure InsertCollection(ACollection: TObject);
     procedure UpdateCollection(ACollection: TObject);
     procedure DeleteCollection(ACollection: TObject);
@@ -215,8 +220,9 @@ type
     procedure SetObjectVersion(AObject: TObject; AVersion: Int64;
       ARaiseExceptionIfNotExists: boolean = true);
     procedure SetObjectsStatus(ACollection: TObject; AStatus: TdormObjectStatus;
-      ARaiseExceptionIfNotExists: boolean = true);
-
+      ARaiseExceptionIfNotExists: boolean = true); overload;
+    procedure SetObjectsStatus(ACollection: IWrappedList; AStatus: TdormObjectStatus;
+      ARaiseExceptionIfNotExists: boolean = true; ACallOnAfterLoad: boolean = true); overload;
     function GetCurrentAndIncrementObjectVersion(AObject: TObject;
       out ACurrentVersion       : Int64;
       ARaiseExceptionIfNotExists: boolean = true): boolean;
@@ -294,7 +300,6 @@ type
 implementation
 
 uses
-  SysUtils,
   dorm.Adapters,
   dorm.Utils;
 { TSession }
@@ -716,12 +721,7 @@ begin
   TdormUtils.MethodCall(ACollection, 'Clear', []);
   GetStrategy.LoadList(ACollection, rt, _table, ACriteria);
   List := WrapAsList(ACollection);
-  for Obj in List do
-  begin
-    SetObjectStatus(Obj, osClean, false);
-    _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
-    _validateable.OnAfterLoad;
-  end;
+  SetObjectsStatus(List, osClean, false, true);
   GetLogger.ExitLevel(SearcherClassname);
 end;
 
@@ -1088,7 +1088,7 @@ begin
       GetStrategy.LoadList(Coll, _child_type, ChildTable, Criteria);
       { todo: callafterloadevent }
       AddAsLoadedObject(WrapAsList(Coll), ChildTable.Id);
-      // LoadList<TObject>(Criteria, Coll, [CallAfterLoadEvent]);
+      SetObjectsStatus(Coll, osClean, false);
       LoadRelationsForEachElement(Coll);
     end
     else
@@ -1237,15 +1237,9 @@ begin
   GetLogger.EnterLevel(SearcherClassname);
   TdormUtils.MethodCall(AObject, 'Clear', []);
 
-  { TODO -oDaniele -cLoadList : Event "OnBeforeLoad" cannot be called here. Changes to the strategies is required }
   GetStrategy.LoadList(AObject, rt, Table, Criteria);
   List := WrapAsList(AObject);
-  for Obj in List do
-  begin
-    SetObjectStatus(Obj, osClean, false);
-    _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
-    _validateable.OnAfterLoad;
-  end;
+  SetObjectsStatus(List, osClean, false, true);
   GetLogger.ExitLevel(SearcherClassname);
 end;
 
@@ -1270,7 +1264,7 @@ begin
   Result := not IsNullKey(_table, _idValue);
 end;
 
-procedure TSession.Persist(AObject: TObject);
+function TSession.Persist(AObject: TObject): TObject;
 var
   _idValue: TValue;
   _table  : TMappingTable;
@@ -1338,24 +1332,25 @@ begin
     end;
   end;
   DoSessionOnAfterPersistObject(AObject);
+  Result := AObject;
 end;
 
-procedure TSession.PersistCollection(ACollection: IWrappedList);
+function TSession.PersistCollection(ACollection: IWrappedList): IWrappedList;
 var
   Obj: TObject;
 begin
   for Obj in ACollection do
-  begin
     Persist(Obj);
-  end;
+  Result := ACollection;
 end;
 
-procedure TSession.PersistCollection(ACollection: TObject);
+function TSession.PersistCollection(ACollection: TObject): TObject;
 var
   List: IWrappedList;
 begin
   List := WrapAsList(ACollection);
   PersistCollection(List);
+  Result := ACollection;
 end;
 
 procedure TSession.PersistHasManyRelation(AMappingTable: TMappingTable;
@@ -1691,6 +1686,20 @@ begin
   for Obj in Coll do
   begin
     SetObjectStatus(Obj, AStatus, ARaiseExceptionIfNotExists);
+  end;
+end;
+
+procedure TSession.SetObjectsStatus(ACollection: IWrappedList;
+  AStatus: TdormObjectStatus; ARaiseExceptionIfNotExists: boolean; ACallOnAfterLoad: boolean);
+var
+  Obj          : TObject;
+  _validateable: TdormValidateable;
+begin
+  for Obj in ACollection do
+  begin
+    SetObjectStatus(Obj, AStatus, ARaiseExceptionIfNotExists);
+    _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
+    _validateable.OnAfterLoad;
   end;
 end;
 
@@ -2040,12 +2049,7 @@ begin
   GetStrategy.LoadList(ACollection, rt, _table, ASQLable.ToSQL(self.GetMapping,
     self.GetStrategy));
   List := WrapAsList(ACollection);
-  for Obj in List do
-  begin
-    SetObjectStatus(Obj, osClean, false);
-    _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
-    _validateable.OnAfterLoad;
-  end;
+  SetObjectsStatus(List, osClean, false, true);
   GetLogger.ExitLevel('FillListSQL');
 end;
 
@@ -2055,6 +2059,24 @@ var
 begin
   _type_info := TypeInfo(T);
   FillListSQL(_type_info, ACollection, ASQLable);
+end;
+
+function TSession.Filter<T>(ACollection: IWrappedList;
+  AFunc: TPredicate<T>): IWrappedList;
+var
+  Obj : TObject;
+  Coll: TObjectList<T>;
+begin
+  Coll := TObjectList<T>.Create(false);
+  try
+    for Obj in ACollection do
+      if AFunc(T(Obj)) then
+        Coll.Add(T(Obj));
+    Result := WrapAsList(Coll, true);
+  except
+    Coll.Free;
+    raise;
+  end;
 end;
 
 procedure TSession.FixBelongsToRelation(AMappingTable: TMappingTable;
@@ -2081,6 +2103,19 @@ begin
     end;
   end;
   GetLogger.ExitLevel('Fixing belongs_to ' + ARttiType.ToString);
+end;
+
+procedure TSession.ForEach<T>(List: IWrappedList; AProc: TProc<T>);
+var
+  Obj: TObject;
+begin
+  for Obj in List do
+    AProc(T(Obj));
+end;
+
+procedure TSession.ForEach<T>(List: TObjectList<T>; AProc: TProc<T>);
+begin
+  ForEach<T>(WrapAsList(List), AProc);
 end;
 
 procedure TSession.StartTransaction;

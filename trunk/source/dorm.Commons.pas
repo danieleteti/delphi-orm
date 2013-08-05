@@ -62,7 +62,7 @@ type
     procedure SetObjStatus(const Value: TdormObjectStatus);
 
   public
-    function ObjStatusAsString: String;
+    function ObjStatusAsString: string;
     [Transient]
     property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
   end;
@@ -84,7 +84,7 @@ type
 
   IdormCommand = interface
     ['{A403A53F-B0F0-4A35-B014-5EBFAABDE5D3}']
-    function GetSQL: String;
+    function GetSQL: string;
   end;
 
   IList = interface
@@ -133,14 +133,14 @@ type
     function EscapeDateTime(const Value: TDate): string;
     function GetSelectSQL(ACriteria: ICriteria; AMappingTable: TMappingTable): string;
     function GetCountSQL(ACriteria: ICriteria; AMappingTable: TMappingTable): string;
-    function GetDatabaseBuilder(AEntities: TList<String>; AMappings: ICacheMappingStrategy)
+    function GetDatabaseBuilder(AEntities: TList<string>; AMappings: ICacheMappingStrategy)
       : IDataBaseBuilder;
     function ExecuteCommand(ACommand: IdormCommand): Int64;
   end;
 
   TdormListEnumerator = class(TEnumerator<TObject>)
   protected
-    FPosition: Int64;
+    FPosition     : Int64;
     FDuckTypedList: TDuckTypedList;
 
   protected
@@ -169,18 +169,19 @@ type
 
   TDuckTypedList = class(TInterfacedObject, IWrappedList)
   protected
-    FObjectAsDuck: TObject;
-    FAddMethod: TRttiMethod;
-    FClearMethod: TRttiMethod;
+    FObjectAsDuck : TObject;
+    FAddMethod    : TRttiMethod;
+    FClearMethod  : TRttiMethod;
     FCountProperty: TRttiProperty;
     FGetItemMethod: TRttiMethod;
+    FOwnsObject   : boolean;
     function Count: Integer;
     function GetItem(const index: Integer): TObject;
     procedure Add(const AObject: TObject);
     procedure Clear;
 
   public
-    constructor Create(AObjectAsDuck: TObject);
+    constructor Create(AObjectAsDuck: TObject; AOwnsObject: boolean);
     destructor Destroy; override;
     function GetEnumerator: TdormListEnumerator;
   end;
@@ -218,26 +219,26 @@ type
     FLastWrapperClassType: TClass;
 
   private
-    FObjectAsDuck: TObject;
-    _type: TRttiType;
-    FValidate: TRttiMethod;
+    FObjectAsDuck  : TObject;
+    _type          : TRttiType;
+    FValidate      : TRttiMethod;
     FInsertValidate: TRttiMethod;
     FUpdateValidate: TRttiMethod;
     FDeleteValidate: TRttiMethod;
-    FOnBeforeLoad: TRttiMethod;
-    FOnAfterLoad: TRttiMethod;
+    FOnBeforeLoad  : TRttiMethod;
+    FOnAfterLoad   : TRttiMethod;
 
     FOnBeforePersist: TRttiMethod;
-    FOnAfterPersist: TRttiMethod;
+    FOnAfterPersist : TRttiMethod;
 
     FOnBeforeInsert: TRttiMethod;
-    FOnAfterInsert: TRttiMethod;
+    FOnAfterInsert : TRttiMethod;
 
     FOnBeforeUpdate: TRttiMethod;
-    FOnAfterUpdate: TRttiMethod;
+    FOnAfterUpdate : TRttiMethod;
 
     FOnBeforeDelete: TRttiMethod;
-    FOnAfterDelete: TRttiMethod;
+    FOnAfterDelete : TRttiMethod;
 
     procedure BindValidatingMethods(AType: TRttiType);
     procedure BindEventsMethods(AType: TRttiType);
@@ -283,7 +284,7 @@ function GetMappingBelongsToByPropertyName(ARelationList: TMappingBelongsToList;
   const APropertyName: string): TMappingBelongsTo;
 function GetSelectFieldsList(AMapping: TMappingFieldList; AWithPrimaryKey: boolean): string;
 
-function WrapAsList(const AObject: TObject): IWrappedList;
+function WrapAsList(const AObject: TObject; AOwnsObject: boolean = false): IWrappedList;
 function WrapAsValidateableObject(AObject: TObject; AValidateableDuckObject: TDuckTypedObject = nil)
   : TdormValidateable;
 
@@ -355,7 +356,7 @@ begin
   for I := 0 to AMappingFields.Count - 1 do
     if AMappingFields[I].IsPK then
       Exit(I);
-  Exit(-1);
+  Exit( - 1);
 end;
 
 { TdormInterfacedObject }
@@ -369,12 +370,12 @@ constructor TdormListEnumerator.Create(ADuckTypedList: TDuckTypedList);
 begin
   inherited Create;
   FDuckTypedList := ADuckTypedList;
-  FPosition := -1;
+  FPosition := - 1;
 end;
 
 function TdormListEnumerator.DoGetCurrent: TObject;
 begin
-  if FPosition > -1 then
+  if FPosition > - 1 then
     Result := FDuckTypedList.GetItem(FPosition)
   else
     raise Exception.Create('Enumerator error: Call MoveNext first');
@@ -411,9 +412,10 @@ begin
   Result := FCountProperty.GetValue(FObjectAsDuck).AsInteger;
 end;
 
-constructor TDuckTypedList.Create(AObjectAsDuck: TObject);
+constructor TDuckTypedList.Create(AObjectAsDuck: TObject; AOwnsObject: boolean);
 begin
   inherited Create;
+  FOwnsObject := AOwnsObject;
   FObjectAsDuck := AObjectAsDuck;
   FAddMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo).GetMethod('Add');
   if not Assigned(FAddMethod) then
@@ -423,11 +425,13 @@ begin
     raise EdormException.Create('Cannot find method "Clear" in the duck object');
   FGetItemMethod := nil;
 
-{$IF CompilerVersion >= 23}
+  {$IF CompilerVersion >= 23}
+
   FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo).GetIndexedProperty('Items')
     .ReadMethod;
 
-{$IFEND}
+  {$IFEND}
+
   if not Assigned(FGetItemMethod) then
     FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo).GetMethod('GetItem');
   if not Assigned(FGetItemMethod) then
@@ -442,7 +446,8 @@ end;
 
 destructor TDuckTypedList.Destroy;
 begin
-
+  if FOwnsObject then
+    FreeAndNil(FObjectAsDuck);
   inherited;
 end;
 
@@ -451,14 +456,14 @@ begin
   Result := FGetItemMethod.Invoke(FObjectAsDuck, [index]).AsObject;
 end;
 
-function WrapAsList(const AObject: TObject): IWrappedList;
+function WrapAsList(const AObject: TObject; AOwnsObject: boolean): IWrappedList;
 begin
-  Result := TDuckTypedList.Create(AObject);
+  Result := TDuckTypedList.Create(AObject, AOwnsObject);
 end;
 
 { TdormBaseObject }
 
-function TdormBaseObject.ObjStatusAsString: String;
+function TdormBaseObject.ObjStatusAsString: string;
 begin
   case FObjStatus of
     osDirty:
@@ -584,25 +589,25 @@ var
   _Method: TRttiMethod;
 begin
   _Method := _type.GetMethod('Validate');
-  if Assigned(_Method) and (not((Length(_Method.GetParameters) <> 0))) then
+  if Assigned(_Method) and (not ((Length(_Method.GetParameters) <> 0))) then
     FValidate := _Method
   else
     FValidate := nil;
 
   _Method := _type.GetMethod('InsertValidate');
-  if Assigned(_Method) and (not((Length(_Method.GetParameters) <> 0))) then
+  if Assigned(_Method) and (not ((Length(_Method.GetParameters) <> 0))) then
     FInsertValidate := _Method
   else
     FInsertValidate := nil;
 
   _Method := _type.GetMethod('UpdateValidate');
-  if Assigned(_Method) and (not((Length(_Method.GetParameters) <> 0))) then
+  if Assigned(_Method) and (not ((Length(_Method.GetParameters) <> 0))) then
     FUpdateValidate := _Method
   else
     FUpdateValidate := nil;
 
   _Method := _type.GetMethod('DeleteValidate');
-  if Assigned(_Method) and (not((Length(_Method.GetParameters) <> 0))) then
+  if Assigned(_Method) and (not ((Length(_Method.GetParameters) <> 0))) then
     FDeleteValidate := _Method
   else
     FDeleteValidate := nil;
