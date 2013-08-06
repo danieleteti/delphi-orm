@@ -3,6 +3,7 @@ unit dorm.Mappings.Strategies;
 interface
 
 uses
+  Classes,
   Rtti,
   Generics.Collections,
   superobject,
@@ -10,10 +11,10 @@ uses
 
 type
 
-{$RTTI EXPLICIT
-    FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
-    METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
-    PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
+  {$RTTI EXPLICIT
+  FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
+  METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
+  PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
 
   IMappingStrategy = interface
     ['{F64D6AF3-C4C2-4098-A241-B3401CE3FB03}']
@@ -40,9 +41,9 @@ type
 
   TCacheMappingStrategy = class(TInterfacedObject, ICacheMappingStrategy)
   private
-    FMerger: TMappingTableMerger;
+    FMerger           : TMappingTableMerger;
     FMappingStrategies: TList<IMappingStrategy>;
-    FMappings: TDictionary<TRttiType, TMappingTable>;
+    FMappings         : TDictionary<TRttiType, TMappingTable>;
     function GetMapping(const AType: TRttiType): TMappingTable;
     procedure Add(const AMappingStrategy: IMappingStrategy);
 
@@ -56,13 +57,15 @@ type
     FMapping: ISuperObject;
     procedure GetMapping(const AType: TRttiType; ATable: TMappingTable);
     procedure ParseTable(ATable: TMappingTable; const AJsonTable: ISuperObject);
-    procedure ParseIdField(ATable: TMappingTable; const AJsonTable: ISuperObject; const AType: TRttiType);
-    procedure ParseField(const AField: TMappingField; const AJsonField: ISuperObject; const AType: TRttiType);
-    procedure ParseHasMany(const AHasMany: TMappingRelation;
+    procedure ParseIdField(ATable: TMappingTable; const AJsonTable: ISuperObject;
+      const AType: TRttiType);
+    procedure ParseField(const AField: TMappingField; const AJsonField: ISuperObject;
+      const AType: TRttiType);
+    procedure ParseHasMany(const PackageName: string; const AHasMany: TMappingRelation;
       const AJsonRelation: ISuperObject; const AType: TRttiType);
-    procedure ParseHasOne(const AHasOne: TMappingRelation;
+    procedure ParseHasOne(const PackageName: string; const AHasOne: TMappingRelation;
       const AJsonRelation: ISuperObject; const AType: TRttiType);
-    procedure ParseBelongsTo(const ABelongsTo: TMappingBelongsTo;
+    procedure ParseBelongsTo(const PackageName: string; const ABelongsTo: TMappingBelongsTo;
       const AJsonRelation: ISuperObject; const AType: TRttiType);
 
   public
@@ -94,10 +97,10 @@ type
       Have a GetItem method with one argument of type Integer and that
       returns the same type used on Add method
       Have a Count property of type integer. }
-    function IsACollectionClass(const AType: TRttiType;
+    class function IsACollectionClass(const AType: TRttiType;
       out ElementType: TRttiType): Boolean;
-    function SkipClassPrefix(const ClassName: String): String;
-    function GetMethod(const AType: TRttiType; const Name: String;
+    function SkipClassPrefix(const ClassName: string): string;
+    class function GetMethod(const AType: TRttiType; const Name: string;
       const ArgCount: Integer; out AMethod: TRttiMethod): Boolean;
     procedure ParseTable(const AType: TRttiType; const ATable: TMappingTable);
     procedure ParseField(ATable: TMappingTable; AProp: TRttiProperty);
@@ -119,7 +122,7 @@ uses
   StrUtils,
   dorm.Utils,
   Typinfo,
-  Classes;
+  dorm;
 
 { TCacheMappingStrategy }
 
@@ -152,23 +155,23 @@ end;
 function TCacheMappingStrategy.GetMapping(const AType: TRttiType): TMappingTable;
 var
   tables: array of TMappingTable;
-  i: Integer;
+  i     : Integer;
 begin
   if not FMappings.TryGetValue(AType, Result) then
   begin
     Result := TMappingTable.Create;
     SetLength(tables, FMappingStrategies.Count);
-    for i := 0 to High(tables) do
+    for i := 0 to high(tables) do
       tables[i] := TMappingTable.Create;
     try
-      for i := 0 to High(tables) do
+      for i := 0 to high(tables) do
         FMappingStrategies[i].GetMapping(AType, tables[i]);
       FMerger.Merge(Result, tables);
       if Result.TableName = EmptyStr then
         raise Exception.Create(Format('Cound not find mapping to Class %s', [AType.QualifiedName]));
       FMappings.Add(AType, Result);
     finally
-      for i := 0 to High(tables) do
+      for i := 0 to high(tables) do
         tables[i].Free;
     end;
   end;
@@ -186,7 +189,8 @@ procedure TFileMappingStrategy.GetMapping(const AType: TRttiType; ATable: TMappi
 var
   jsonArray: TSuperArray;
   jsonTable: ISuperObject;
-  i: Integer;
+  i        : Integer;
+  sl       : TStringList;
 begin
   jsonTable := FMapping.O[AType.Name];
   if not Assigned(jsonTable) then
@@ -206,17 +210,17 @@ begin
   jsonArray := jsonTable.A['has_one'];
   if Assigned(jsonArray) then
     for i := 0 to jsonArray.Length - 1 do
-      ParseHasOne(ATable.AddHasOne, jsonArray[i], AType);
+      ParseHasOne(jsonTable.S['package'], ATable.AddHasOne, jsonArray[i], AType);
 
   jsonArray := jsonTable.A['has_many'];
   if Assigned(jsonArray) then
     for i := 0 to jsonArray.Length - 1 do
-      ParseHasMany(ATable.AddHasMany, jsonArray[i], AType);
+      ParseHasMany(jsonTable.S['package'], ATable.AddHasMany, jsonArray[i], AType);
 
   jsonArray := jsonTable.A['belongs_to'];
   if Assigned(jsonArray) then
     for i := 0 to jsonArray.Length - 1 do
-      ParseBelongsTo(ATable.AddBelongsTo, jsonArray[i], AType);
+      ParseBelongsTo(jsonTable.S['package'], ATable.AddBelongsTo, jsonArray[i], AType);
 end;
 
 procedure TFileMappingStrategy.ParseTable(ATable: TMappingTable;
@@ -229,7 +233,7 @@ end;
 procedure TFileMappingStrategy.ParseIdField(ATable: TMappingTable;
   const AJsonTable: ISuperObject; const AType: TRttiType);
 var
-  idField: TMappingField;
+  idField    : TMappingField;
   jsonIDField: ISuperObject;
 begin
   jsonIDField := AJsonTable.O['id'];
@@ -278,13 +282,14 @@ begin
     end; }
 end;
 
-procedure TFileMappingStrategy.ParseHasOne(const AHasOne: TMappingRelation;
+procedure TFileMappingStrategy.ParseHasOne(const PackageName: string;
+  const AHasOne: TMappingRelation;
   const AJsonRelation: ISuperObject; const AType: TRttiType);
 var
   RTTICache: TMappingCache;
 begin
   AHasOne.Name := AJsonRelation.S['name'];
-  AHasOne.ChildClassName := AJsonRelation.S['class_name'];
+  AHasOne.ChildClassName := PackageName + '.' + AJsonRelation.S['class_name'];
   AHasOne.ChildFieldName := AJsonRelation.S['child_field_name'];
   AHasOne.LazyLoad := AJsonRelation.B['lazy_load'];
 
@@ -293,13 +298,14 @@ begin
   AHasOne.RTTICache := RTTICache;
 end;
 
-procedure TFileMappingStrategy.ParseHasMany(const AHasMany: TMappingRelation;
+procedure TFileMappingStrategy.ParseHasMany(const PackageName: string;
+  const AHasMany     : TMappingRelation;
   const AJsonRelation: ISuperObject; const AType: TRttiType);
 var
   RTTICache: TMappingCache;
 begin
   AHasMany.Name := AJsonRelation.S['name'];
-  AHasMany.ChildClassName := AJsonRelation.S['class_name'];
+  AHasMany.ChildClassName := PackageName + '.' + AJsonRelation.S['class_name'];
   AHasMany.ChildFieldName := AJsonRelation.S['child_field_name'];
   AHasMany.LazyLoad := AJsonRelation.B['lazy_load'];
 
@@ -308,13 +314,14 @@ begin
   AHasMany.RTTICache := RTTICache;
 end;
 
-procedure TFileMappingStrategy.ParseBelongsTo(const ABelongsTo: TMappingBelongsTo;
+procedure TFileMappingStrategy.ParseBelongsTo(const PackageName: string;
+  const ABelongsTo: TMappingBelongsTo;
   const AJsonRelation: ISuperObject; const AType: TRttiType);
 var
   RTTICache: TMappingCache;
 begin
   ABelongsTo.Name := AJsonRelation.S['name'];
-  ABelongsTo.OwnerClassName := AJsonRelation.S['class_name'];
+  ABelongsTo.OwnerClassName := PackageName + '.' + AJsonRelation.S['class_name'];
   ABelongsTo.RefFieldName := AJsonRelation.S['ref_field_name'];
   ABelongsTo.LazyLoad := AJsonRelation.B['lazy_load'];
 
@@ -356,9 +363,10 @@ end;
 procedure TAttributesMappingStrategy.ParseField(const AType: TRttiType;
   const ATable: TMappingTable; AProp: TRttiProperty);
 var
-  field: TMappingField;
+  field    : TMappingField;
   attribute: TCustomAttribute;
-  C: Column;
+  C        : Column;
+  t        : TRttiType;
 begin
   if TdormUtils.HasAttribute<Transient>(AProp) then
     Exit;
@@ -408,9 +416,9 @@ procedure TAttributesMappingStrategy.ParseHasOne(const AType: TRttiType;
   const ATable: TMappingTable; AProp: TRttiProperty);
 var
   hasOneAttribute: TCustomAttribute;
-  isLazy: Boolean;
-  relation: TMappingRelation;
-  RTTICache: TMappingCache;
+  isLazy         : Boolean;
+  relation       : TMappingRelation;
+  RTTICache      : TMappingCache;
 begin
   isLazy := TdormUtils.HasAttribute<Lazy>(AProp);
   hasOneAttribute := TdormUtils.GetAttribute<HasOne>(AProp);
@@ -418,7 +426,8 @@ begin
   begin
     relation := ATable.AddHasOne;
     relation.Name := AProp.Name;
-    relation.ChildClassName := AProp.PropertyType.AsInstance.MetaclassType.ClassName;
+    // relation.ChildClassName := AProp.PropertyType.AsInstance.MetaclassType.ClassName;
+    relation.ChildClassName := AProp.PropertyType.AsInstance.MetaclassType.QualifiedClassName;
     relation.ChildFieldName := HasOne(hasOneAttribute).ChildPropertyName;
     relation.LazyLoad := isLazy or HasMany(hasOneAttribute).LazyLoad;
     RTTICache.RTTIProp := AProp;
@@ -430,9 +439,12 @@ procedure TAttributesMappingStrategy.ParseHasMany(const AType: TRttiType;
   const ATable: TMappingTable; AProp: TRttiProperty);
 var
   hasManyAttribute: TCustomAttribute;
-  relation: TMappingRelation;
-  isLazy: Boolean;
-  RTTICache: TMappingCache;
+  relation        : TMappingRelation;
+  isLazy          : Boolean;
+  RTTICache       : TMappingCache;
+  attr            : ListOf;
+  _type_name      : string;
+  AChildType      : TRttiType;
 begin
   isLazy := TdormUtils.HasAttribute<Lazy>(AProp);
   hasManyAttribute := TdormUtils.GetAttribute<HasMany>(AProp);
@@ -440,7 +452,25 @@ begin
   begin
     relation := ATable.AddHasMany;
     relation.Name := AProp.Name;
-    relation.ChildClassName := AProp.PropertyType.AsInstance.MetaclassType.ClassName;
+
+    /// ////////////////////////////////////////////////////////////
+    // When you have an HasMany relations declared as "TPhones = class(TObjectLlist<TPhone>)" dorm
+    // needs to know the mapping of the internal object and not of the list object itself. So now we're
+    // searching for an attribute named "ListOf" that explain to the RTTI engine what is internal object type
+    attr := TdormUtils.GetAttribute<ListOf>(AProp);
+    if Assigned(attr) then
+    begin
+      _type_name := attr.Value;
+      AChildType := TdormUtils.ctx.FindType(_type_name);
+      if not Assigned(AChildType) then
+        raise Exception.Create('Unknown type ' + _type_name + ' (ListOf ' +
+          attr.Value + ')');
+      relation.ChildClassName := _type_name;
+      // AChildType.AsInstance.MetaclassType.QualifiedClassName;
+    end
+    else
+      /// ////////////////////////////////////////////////////////////
+      relation.ChildClassName := AProp.PropertyType.AsInstance.MetaclassType.QualifiedClassName;
     relation.ChildFieldName := HasMany(hasManyAttribute).ChildPropertyName;
     relation.LazyLoad := isLazy or HasMany(hasManyAttribute).LazyLoad;
     RTTICache.RTTIProp := AProp;
@@ -452,9 +482,9 @@ procedure TAttributesMappingStrategy.ParseBelongsTo(const AType: TRttiType;
   const ATable: TMappingTable; AProp: TRttiProperty);
 var
   belongsToAttribute: TCustomAttribute;
-  relation: TMappingBelongsTo;
-  isLazy: Boolean;
-  RTTICache: TMappingCache;
+  relation          : TMappingBelongsTo;
+  isLazy            : Boolean;
+  RTTICache         : TMappingCache;
 begin
   isLazy := TdormUtils.HasAttribute<Lazy>(AProp);
   belongsToAttribute := TdormUtils.GetAttribute<BelongsTo>(AProp);
@@ -462,7 +492,8 @@ begin
   begin
     relation := ATable.AddBelongsTo;
     relation.Name := AProp.Name;
-    relation.OwnerClassName := AProp.PropertyType.AsInstance.MetaclassType.ClassName;
+    // relation.OwnerClassName := AProp.PropertyType.AsInstance.MetaclassType.ClassName;
+    relation.OwnerClassName := AProp.PropertyType.AsInstance.MetaclassType.QualifiedClassName;
     relation.RefFieldName := HasOne(belongsToAttribute).ChildPropertyName;
     relation.LazyLoad := isLazy or HasMany(belongsToAttribute).LazyLoad;
     RTTICache.RTTIProp := AProp;
@@ -487,7 +518,7 @@ end;
 function TCoCMappingStrategy.IsCoCEnabledForType(const AType: TRttiType): Boolean;
 var
   Attrs: TArray<TCustomAttribute>;
-  attr: TObject;
+  attr : TObject;
 begin
   Result := True;
   Attrs := AType.GetAttributes;
@@ -499,7 +530,7 @@ end;
 procedure TCoCMappingStrategy.GetMapping(const AType: TRttiType;
   ATable: TMappingTable);
 var
-  prop: TRttiProperty;
+  prop              : TRttiProperty;
   collectionItemType: TRttiType;
 begin
   if not IsCoCEnabledForType(AType) then
@@ -532,8 +563,8 @@ end;
 
 procedure TCoCMappingStrategy.ParseField(ATable: TMappingTable; AProp: TRttiProperty);
 var
-  field: TMappingField;
-  FieldType: String;
+  field    : TMappingField;
+  FieldType: string;
   RTTICache: TMappingCache;
 begin
   FieldType := TdormUtils.GetFieldType(AProp);
@@ -552,7 +583,7 @@ end;
 procedure TCoCMappingStrategy.ParseHasOne(AType: TRttiType;
   ATable: TMappingTable; AProp: TRttiProperty);
 var
-  relation: TMappingRelation;
+  relation      : TMappingRelation;
   ChildFieldName: string;
 begin
   ChildFieldName := SkipClassPrefix(AType.Name) + 'ID';
@@ -560,7 +591,7 @@ begin
   begin
     relation := ATable.AddHasOne;
     relation.Name := AProp.Name;
-    relation.ChildClassName := AProp.PropertyType.Name;
+    relation.ChildClassName := AProp.PropertyType.QualifiedClassName;
     relation.ChildFieldName := ChildFieldName;
     relation.LazyLoad := false;
   end;
@@ -569,7 +600,7 @@ end;
 function TCoCMappingStrategy.ParseBelongsTo(AType: TRttiType; ATable: TMappingTable;
   AProp: TRttiProperty): Boolean;
 var
-  relation: TMappingBelongsTo;
+  relation    : TMappingBelongsTo;
   RefFieldName: string;
 begin
   Result := false;
@@ -584,7 +615,7 @@ begin
     begin
       relation := ATable.AddBelongsTo;
       relation.Name := AProp.Name;
-      relation.OwnerClassName := AProp.PropertyType.Name;
+      relation.OwnerClassName := AProp.PropertyType.QualifiedName;
       relation.RefFieldName := RefFieldName;
       relation.LazyLoad := True;
       Result := True;
@@ -595,7 +626,7 @@ end;
 procedure TCoCMappingStrategy.ParseHasMany(AType, ACollectionItemType: TRttiType;
   ATable: TMappingTable; AProp: TRttiProperty);
 var
-  relation: TMappingRelation;
+  relation      : TMappingRelation;
   ChildFieldName: string;
 begin
   ChildFieldName := SkipClassPrefix(AType.Name) + 'ID';
@@ -603,16 +634,17 @@ begin
   begin
     relation := ATable.AddHasMany;
     relation.Name := AProp.Name;
-    relation.ChildClassName := ACollectionItemType.Name;
+    relation.ChildClassName := ACollectionItemType.QualifiedName;
     relation.ChildFieldName := ChildFieldName;
     relation.LazyLoad := false;
   end;
 end;
 
-function TCoCMappingStrategy.GetMethod(const AType: TRttiType; const Name: String;
+class
+  function TCoCMappingStrategy.GetMethod(const AType: TRttiType; const Name: string;
   const ArgCount: Integer; out AMethod: TRttiMethod): Boolean;
 begin
-  AMethod := AType.GetMethod(Name);
+  AMethod := AType.GetMethod(name);
   Result := Assigned(AMethod) and (Length(AMethod.GetParameters) = ArgCount);
 end;
 
@@ -625,11 +657,12 @@ begin
   Result := Assigned(prop);
 end;
 
-function TCoCMappingStrategy.IsACollectionClass(
+class
+  function TCoCMappingStrategy.IsACollectionClass(
   const AType: TRttiType; out ElementType: TRttiType): Boolean;
 var
   method: TRttiMethod;
-  prop: TRttiProperty;
+  prop  : TRttiProperty;
 begin
   // Check Add
   if not GetMethod(AType, 'Add', 1, method) then
@@ -658,7 +691,7 @@ begin
   Result := True;
 end;
 
-function TCoCMappingStrategy.SkipClassPrefix(const ClassName: String): String;
+function TCoCMappingStrategy.SkipClassPrefix(const ClassName: string): string;
 begin
   Result := Copy(ClassName, 2);
 end;
@@ -668,10 +701,10 @@ end;
 procedure TMappingTableMerger.Merge(AOutput: TMappingTable;
   AInput: array of TMappingTable);
 var
-  tableToMerge: TMappingTable;
-  fieldToMerge: TMappingField;
-  hasOneToMerge: TMappingRelation;
-  hasManyToMerge: TMappingRelation;
+  tableToMerge    : TMappingTable;
+  fieldToMerge    : TMappingField;
+  hasOneToMerge   : TMappingRelation;
+  hasManyToMerge  : TMappingRelation;
   belongsToToMerge: TMappingBelongsTo;
 begin
   for tableToMerge in AInput do
@@ -749,8 +782,10 @@ begin
     if not outPutField.IsPK and AField.IsPK then
       outPutField.IsPK := AField.IsPK;
 
-    if ((not Assigned(outPutField.RTTICache.RTTIField)) and (Assigned((AField.RTTICache.RTTIField)))) or
-      ((not Assigned(outPutField.RTTICache.RTTIProp)) and (Assigned((AField.RTTICache.RTTIProp)))) then
+    if ((not Assigned(outPutField.RTTICache.RTTIField)) and (Assigned((AField.RTTICache.RTTIField)))
+      ) or
+      ((not Assigned(outPutField.RTTICache.RTTIProp)) and (Assigned((AField.RTTICache.RTTIProp))))
+    then
       outPutField.RTTICache := AField.RTTICache;
   end;
 end;

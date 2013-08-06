@@ -102,9 +102,7 @@ type
     constructor CreateSession(Environment: TdormEnvironment); overload; virtual;
     // Validations
     function CreateLogger: IdormLogger;
-    function Qualified(AMappingTable: TMappingTable;
-      const AClassName: string): string;
-    function GetPackageName(AMappingTable: TMappingTable;
+    class function GetPackageName(AMappingTable: TMappingTable;
       const AClassName: string): string;
     function GetStrategy: IdormPersistStrategy;
     procedure InsertHasManyRelation(AMappingTable: TMappingTable;
@@ -172,6 +170,8 @@ type
     // Environments
     function GetEnv: string;
     // Utils
+    class function Qualified(AMappingTable: TMappingTable;
+      const AClassName: string): string;
     procedure BuildDatabase;
     function Clone<T: class, constructor>(Obj: T): T;
     procedure CopyObject(SourceObject, TargetObject: TObject);
@@ -363,6 +363,7 @@ var
   _MappingText    : string;
   _MappingStrategy: IMappingStrategy;
   _JSonConfigEnv  : ISuperObject;
+  s               : ISuperObject;
 begin
   try
     _ConfigText := APersistenceConfiguration.ReadToEnd;
@@ -371,7 +372,7 @@ begin
       APersistenceConfiguration.Free;
   end;
   try
-    FConfig := TSuperObject.ParseString(PWideChar(_ConfigText), true);
+    FConfig := TSuperObject.ParseString(PWideChar(_ConfigText), false);
     if not assigned(FConfig) then
       raise Exception.Create('Cannot parse persistence configuration');
     _JSonConfigEnv := FConfig.O['persistence'].O[GetEnv];
@@ -391,8 +392,7 @@ begin
         if AOwnMappingConfigurationReader then
           AMappingConfiguration.Free;
       end;
-      FConfig.O['mapping'] := TSuperObject.ParseString
-        (PWideChar(_MappingText), true);
+      FConfig.O['mapping'] := TSuperObject.ParseString(PChar(_MappingText), true, false, nil, []);
       if FConfig.O['mapping'] = nil then
         raise Exception.Create('Cannot parse mapping configuration');
     end;
@@ -610,8 +610,7 @@ begin
   for _has_many in AMappingTable.HasManyList do
   begin
     v := TdormUtils.GetField(AObject, _has_many.Name);
-    _child_type := FCTX.FindType(Qualified(AMappingTable,
-      _has_many.ChildClassName));
+    _child_type := FCTX.FindType(_has_many.ChildClassName);
     if not assigned(_child_type) then
     begin
       raise Exception.Create('Unknown type ' + _has_many.ChildClassName);
@@ -642,8 +641,7 @@ begin
   for _has_one in AMappingTable.HasOneList do
   begin
     v := TdormUtils.GetField(AObject, _has_one.Name);
-    _child_type := FCTX.FindType(Qualified(AMappingTable,
-      _has_one.ChildClassName));
+    _child_type := FCTX.FindType(_has_one.ChildClassName);
     if not assigned(_child_type) then
       raise Exception.Create('Unknown type ' + _has_one.ChildClassName);
     Obj := v.AsObject; // if the relation is LazyLoad...
@@ -760,7 +758,7 @@ begin
   Result := TdormObjectStatus(_objstatus.GetValue(AObject).AsOrdinal);
 end;
 
-function TSession.GetPackageName(AMappingTable: TMappingTable;
+class function TSession.GetPackageName(AMappingTable: TMappingTable;
   const AClassName: string): string;
 begin
   Result := AMappingTable.Package;
@@ -1072,7 +1070,8 @@ begin
   if assigned(_has_many) then
   begin
     AttributeNameInTheParentObject := _has_many.Name;
-    _child_type := FCTX.FindType(Qualified(Table, _has_many.ChildClassName));
+    // _child_type := FCTX.FindType(Qualified(Table, _has_many.ChildClassName));
+    _child_type := FCTX.FindType(_has_many.ChildClassName);
     if not assigned(_child_type) then
       raise Exception.Create('Unknown type ' + _has_many.ChildClassName);
     UpdateChildTypeWithRealListInnerType(Table, _child_type);
@@ -1152,7 +1151,7 @@ begin
   begin
     if not _has_one.LazyLoad then
     begin
-      _child_type := FCTX.FindType(Qualified(_table, _has_one.ChildClassName));
+      _child_type := FCTX.FindType(_has_one.ChildClassName);
       if not assigned(_child_type) then
         raise Exception.Create('Unknown type ' + _has_one.ChildClassName);
       if _has_one.ChildFieldName = EmptyStr then
@@ -1362,15 +1361,15 @@ var
   List       : IWrappedList;
   Obj        : TObject;
   // _table: TMappingTable;
-  _type_name: string;
+  // _type_name: string;
 begin
   GetLogger.EnterLevel('persist has_many ' + ARttiType.ToString);
   for _has_many in AMappingTable.HasManyList do
   begin
     v := TdormUtils.GetField(AObject, _has_many.Name);
     GetLogger.Debug('-- Inspecting for ' + _has_many.ChildClassName);
-    _type_name := Qualified(AMappingTable, _has_many.ChildClassName);
-    _child_type := FCTX.FindType(_type_name);
+    // _type_name := Qualified(AMappingTable, _has_many.ChildClassName);
+    _child_type := FCTX.FindType(_has_many.ChildClassName);
     if not assigned(_child_type) then
       raise Exception.Create('Unknown type ' + _has_many.ChildClassName);
     UpdateChildTypeWithRealListInnerType(AMappingTable, _child_type);
@@ -1493,17 +1492,15 @@ begin
     APropertyName);
   if assigned(_belongs_to) then
   begin
-    _belong_type := FCTX.FindType(Qualified(_table,
-      _belongs_to.OwnerClassName));
+    _belong_type := FCTX.FindType(_belongs_to.OwnerClassName);
     if not assigned(_belong_type) then
       raise Exception.Create('Unknown type ' + _belongs_to.OwnerClassName);
     _belong_field_key_value := TdormUtils.GetProperty(AObject,
       _belongs_to.RefFieldName);
     parent_mapping := FMappingStrategy.GetMapping
-      (FCTX.FindType(Qualified(_table, _belongs_to.OwnerClassName)));
+      (FCTX.FindType(_belongs_to.OwnerClassName));
     // parent_field_mapping := child_mapping.Id;
-    v := LoadByMappingField(FCTX.FindType(Qualified(_table,
-      _belongs_to.OwnerClassName)).Handle, parent_mapping.Id,
+    v := LoadByMappingField(FCTX.FindType(_belongs_to.OwnerClassName).Handle, parent_mapping.Id,
       _belong_field_key_value);
     //
     // _belong_field_key_value);
@@ -1553,12 +1550,16 @@ begin
     LoadedObjects.Clear;
 end;
 
-function TSession.Qualified(AMappingTable: TMappingTable;
+class function TSession.Qualified(AMappingTable: TMappingTable;
   const AClassName: string): string;
 begin
   // if AClassName = 'TRates' then
   // Exit('ModelQuaestioU.TRate');
-  Result := GetPackageName(AMappingTable, AClassName) + '.' + AClassName;
+  Result := GetPackageName(AMappingTable, AClassName);
+  if Result = '' then
+    Result := AClassName
+  else
+    Result := Result + '.' + AClassName;
   // if Pos('<', Result) > 0 then // is a genric type
   // begin
   // _p1 := Pos('<', Result) + 1;
@@ -1774,8 +1775,7 @@ begin
     // v := TdormUtils.GetField(AObject, _has_many.Name);
     v := TdormUtils.GetField(AObject, _has_many.RTTICache);
     GetLogger.Debug('-- Inspecting for ' + _has_many.ChildClassName);
-    _child_type := FCTX.FindType(Qualified(AMappingTable,
-      _has_many.ChildClassName));
+    _child_type := FCTX.FindType(_has_many.ChildClassName);
     if not assigned(_child_type) then
       raise Exception.Create('Unknown type ' + _has_many.ChildClassName);
     List := WrapAsList(v.AsObject);
@@ -1807,8 +1807,7 @@ begin
   begin
     v := TdormUtils.GetField(AObject, _has_one.RTTICache);
     GetLogger.Debug('-- Inspecting for ' + _has_one.ChildClassName);
-    _child_type := FCTX.FindType(Qualified(AMappingTable,
-      _has_one.ChildClassName));
+    _child_type := FCTX.FindType(_has_one.ChildClassName);
     if not assigned(_child_type) then
       raise Exception.Create('Unknown type ' + _has_one.ChildClassName);
     Obj := v.AsObject;
@@ -2173,7 +2172,8 @@ begin
   attr := TdormUtils.GetAttribute<ListOf>(AChildType);
   if assigned(attr) then
   begin
-    _type_name := Qualified(AMappingTable, attr.Value);
+    // _type_name := Qualified(AMappingTable, attr.Value);
+    _type_name := attr.Value;
     AChildType := FCTX.FindType(_type_name);
     if not assigned(AChildType) then
       raise Exception.Create('Unknown type ' + _type_name + ' (ListOf ' +
