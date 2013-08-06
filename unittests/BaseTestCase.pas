@@ -22,7 +22,8 @@ uses
   Generics.Collections,
   dorm,
   dorm.Collections,
-  dorm.tests.bo, superobject;
+  dorm.tests.bo,
+  superobject;
 
 type
   TBaseTestCase = class(TTestCase)
@@ -32,7 +33,9 @@ type
     function GetDORMConfigFileName: string;
     function GetDORMMappingFileName: string;
     function CreateRandomPeople:
-{$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
+
+    {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
+
   public
     procedure OnBeforeConfigureStrategy(Sender: TObject;
       AAdapterConfiguration: ISuperObject);
@@ -45,9 +48,11 @@ implementation
 uses
   ioutils,
   classes,
-  dorm.Commons, System.SysUtils;
+  dorm.Commons,
+  System.SysUtils;
 
 function TBaseTestCase.CreateRandomPeople:
+
 {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
 var
   p: TPerson;
@@ -80,59 +85,77 @@ function TBaseTestCase.CreateSession: dorm.TSession;
 begin
   Result := TSession.Create(deTest);
   Result.OnBeforeConfigureStrategy := OnBeforeConfigureStrategy;
-  Result.Configure(TStreamReader.Create(GetDORMConfigFileName),
-    TStreamReader.Create(GetDORMMappingFileName));
+  Result.Configure(TStreamReader.Create(GetDORMConfigFileName)
+    , TStreamReader.Create(GetDORMMappingFileName));
   Result.StartTransaction;
 end;
 
 function TBaseTestCase.GetDORMConfigFileName: string;
 begin
-{$IFDEF INTERBASE_STRATEGY}
+
+  {$IFDEF INTERBASE_STRATEGY}
+
   Result := 'dorm_interbase.conf';
-{$ENDIF}
-{$IFDEF INTERBASE_UIB_STRATEGY}
+
+  {$ENDIF}
+  {$IFDEF INTERBASE_UIB_STRATEGY}
+
   Result := 'dorm_interbase_uib.conf';
-{$ENDIF}
-{$IFDEF FIREBIRD_STRATEGY}
+
+  {$ENDIF}
+  {$IFDEF FIREBIRD_STRATEGY}
+
   Result := 'dorm_firebird.conf';
-{$ENDIF}
-{$IFDEF FIREBIRD_UIB_STRATEGY}
+
+  {$ENDIF}
+  {$IFDEF FIREBIRD_UIB_STRATEGY}
+
   Result := 'dorm_firebird_uib.conf';
-{$ENDIF}
-{$IFDEF FIREBIRD_CI}
+
+  {$ENDIF}
+  {$IFDEF FIREBIRD_CI}
+
   Result := 'dorm_firebird_uib_ci.conf';
-{$ENDIF}
-{$IFDEF SQLSERVER_STRATEGY}
+
+  {$ENDIF}
+  {$IFDEF SQLSERVER_STRATEGY}
+
   Result := 'dorm_sqlserver.conf';
-{$ENDIF}
-{$IFDEF SQLSERVER_DEVART_STRATEGY}
+
+  {$ENDIF}
+  {$IFDEF SQLSERVER_DEVART_STRATEGY}
+
   Result := 'dorm_sqlserver_devart.conf';
-{$ENDIF}
-{$IFDEF SQLITE3_STRATEGY}
+
+  {$ENDIF}
+  {$IFDEF SQLITE3_STRATEGY}
+
   Result := 'dorm_sqlite3.conf';
-{$ENDIF}
-{$IFNDEF INTERBASE_STRATEGY}
-{$IFNDEF INTERBASE_UIB_STRATEGY}
-{$IFNDEF FIREBIRD_STRATEGY}
-{$IFNDEF FIREBIRD_UIB_STRATEGY}
-{$IFNDEF SQLITE3_STRATEGY}
-{$IFNDEF SQLSERVER_STRATEGY}
-{$IFNDEF SQLSERVER_DEVART_STRATEGY}
-{$IFNDEF FIREBIRD_CI}
-{$IFNDEF CONSOLE_TESTRUNNER}
-{$MESSAGE ERROR '**************************************************'}
-{$MESSAGE ERROR '**>>> There are not strategy conditionals defined '}
-{$MESSAGE ERROR '**>>> You should select a REAL BUILD configuration'}
-{$MESSAGE ERROR '**************************************************'}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
-{$ENDIF}
+
+  {$ENDIF}
+  {$IFNDEF INTERBASE_STRATEGY}
+  {$IFNDEF INTERBASE_UIB_STRATEGY}
+  {$IFNDEF FIREBIRD_STRATEGY}
+  {$IFNDEF FIREBIRD_UIB_STRATEGY}
+  {$IFNDEF SQLITE3_STRATEGY}
+  {$IFNDEF SQLSERVER_STRATEGY}
+  {$IFNDEF SQLSERVER_DEVART_STRATEGY}
+  {$IFNDEF FIREBIRD_CI}
+  {$IFNDEF CONSOLE_TESTRUNNER}
+  {$MESSAGE ERROR '**************************************************'}
+  {$MESSAGE ERROR '**>>> There are not strategy conditionals defined '}
+  {$MESSAGE ERROR '**>>> You should select a REAL BUILD configuration'}
+  {$MESSAGE ERROR '**************************************************'}
+  {$ENDIF}
+  {$ENDIF}
+  {$ENDIF}
+  {$ENDIF}
+  {$ENDIF}
+  {$ENDIF}
+  {$ENDIF}
+  {$ENDIF}
+  {$ENDIF}
+
 end;
 
 function TBaseTestCase.GetDORMMappingFileName: string;
@@ -143,10 +166,14 @@ end;
 procedure TBaseTestCase.OnBeforeConfigureStrategy(Sender: TObject;
   AAdapterConfiguration: ISuperObject);
 begin
-{$IFDEF FIREBIRD_CI}
+
+  {$IFDEF FIREBIRD_CI}
+
   AAdapterConfiguration.S['database_connection_string'] := 'localhost:' +
     ExtractFilePath(ParamStr(0)) + '..\Samples\Data\DORM_TEST.FDB';
-{$ENDIF}
+
+  {$ENDIF}
+
 end;
 
 procedure TBaseTestCase.SetUp;

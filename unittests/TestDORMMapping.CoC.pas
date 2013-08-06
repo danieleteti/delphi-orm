@@ -6,21 +6,25 @@ uses
   TestFramework,
   Generics.Collections,
   Rtti,
-  dorm.Mappings.Strategies;
+  dorm.Mappings,
+  dorm.Mappings.Strategies,
+  System.Classes;
 
 {$RTTI EXPLICIT
-  FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
-  METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
-  PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
+FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
+METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
+PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
 
 type
   TCocMappingStrategyTests = class(TTestCase)
   private
     FMapping: IMappingStrategy;
     FContext: TRttiContext;
+
   protected
     procedure SetUp; override;
     procedure TearDown; override;
+
   published
     procedure TestGetMappingEntity_EmailCoC;
     procedure TestGetMappingEntity_PersonCoC;
@@ -40,48 +44,48 @@ type
     procedure TestGetMappingPersonHasManyPhones;
   end;
 
-implementation
-
-uses
-  Classes,
-  dorm.Mappings;
-
 type
   TPersonCoC = class;
 
   TPhoneCoC = class
   private
-    FNumber: string;
-    FModel: string;
-    FID: Integer;
+    FNumber     : string;
+    FModel      : string;
+    FID         : Integer;
     FPersonCoCID: Integer;
     // Private!!!
     property PersonCoCID: Integer read FPersonCoCID write FPersonCoCID;
+
   public
-    property ID: Integer read FID write FID;
+    property ID    : Integer read FID write FID;
     property Number: string read FNumber write FNumber;
-    property Model: string read FModel write FModel;
+    property Model : string read FModel write FModel;
   end;
 
-{$IF CompilerVersion >= 23}
+  {$IF CompilerVersion >= 23}
 
   TPhonesCoC = class(TObjectList<TPhoneCoC>)
-{$ELSE}
+
+  {$ELSE}
+
   TPhonesCoC = class(TdormObjectList<TPhoneCoC>)
-{$IFEND}
+
+    {$IFEND}
+
   end;
 
   TCarCoC = class
   private
-    FModel: string;
-    FBrand: string;
+    FModel      : string;
+    FBrand      : string;
     FPersonCoCID: Integer;
-    FID: Integer;
-    FOwner: TPersonCoC;
+    FID         : Integer;
+    FOwner      : TPersonCoC;
     // Private!!!
     property PersonCoCID: Integer read FPersonCoCID write FPersonCoCID;
+
   public
-    property ID: Integer read FID write FID;
+    property ID   : Integer read FID write FID;
     property Brand: string read FBrand write FBrand;
     property Model: string read FModel write FModel;
     property Owner: TPersonCoC read FOwner write FOwner;
@@ -89,71 +93,81 @@ type
 
   TEmailCoC = class
   private
-    FValue: string;
+    FValue   : string;
     FPersonID: Integer;
-    FID: Integer;
+    FID      : Integer;
     // Private!!!
     property PersonID: Integer read FPersonID write FPersonID;
+
   public
-    property ID: Integer read FID write FID;
+    property ID   : Integer read FID write FID;
     property Value: string read FValue write FValue;
   end;
 
   TLaptopCoC = class;
 
-{$IF CompilerVersion >= 23}
+  {$IF CompilerVersion >= 23}
 
   TLaptopsCoC = class(TObjectList<TLaptopCoC>)
-{$ELSE}
+
+  {$ELSE}
+
   TLaptopsCoC = class(TdormObjectList<TLaptopCoC>)
-{$IFEND}
+
+    {$IFEND}
+
   end;
 
   TPersonCoC = class
   private
-    FLastName: string;
-    FAge: Int32;
-    FFirstName: string;
-    FID: Integer;
-    FBornDate: TDate;
-    FPhones: TPhonesCoC;
-    FCar: TCarCoC;
-    FEmail: TEmailCoC;
+    FLastName     : string;
+    FAge          : Int32;
+    FFirstName    : string;
+    FID           : Integer;
+    FBornDate     : TDate;
+    FPhones       : TPhonesCoC;
+    FCar          : TCarCoC;
+    FEmail        : TEmailCoC;
     FBornTimeStamp: TDateTime;
-    FPhoto: TStream;
-    FLaptops: TLaptopsCoC;
+    FPhoto        : TStream;
+    FLaptops      : TLaptopsCoC;
     function GetFullName: string;
+
   public
-    property ID: Integer read FID write FID;
-    property FirstName: string read FFirstName write FFirstName;
-    property LastName: string read FLastName write FLastName;
-    property Age: Int32 read FAge write FAge;
-    property BornDate: TDate read FBornDate write FBornDate;
+    property ID           : Integer read FID write FID;
+    property FirstName    : string read FFirstName write FFirstName;
+    property LastName     : string read FLastName write FLastName;
+    property Age          : Int32 read FAge write FAge;
+    property BornDate     : TDate read FBornDate write FBornDate;
     property BornTimeStamp: TDateTime read FBornTimeStamp write FBornTimeStamp;
-    property Photo: TStream read FPhoto write FPhoto;
-    property Phones: TPhonesCoC read FPhones;
-    property Car: TCarCoC read FCar write FCar;
-    property Email: TEmailCoC read FEmail write FEmail;
-    property Laptops: TLaptopsCoC read FLaptops write FLaptops;
+    property Photo        : TStream read FPhoto write FPhoto;
+    property Phones       : TPhonesCoC read FPhones;
+    property Car          : TCarCoC read FCar write FCar;
+    property Email        : TEmailCoC read FEmail write FEmail;
+    property Laptops      : TLaptopsCoC read FLaptops write FLaptops;
     [Transient]
     property FullName: string read GetFullName;
   end;
 
   TLaptopCoC = class
   private
-    FModel: String;
-    FPersonCoCID: Integer;
-    FID: Integer;
-    FOwner: TPersonCoC;
+    FModel              : string;
+    FPersonCoCID        : Integer;
+    FID                 : Integer;
+    FOwner              : TPersonCoC;
     property PersonCoCID: Integer read FPersonCoCID write FPersonCoCID;
+
   public
-    constructor Create(AModel: String); overload;
+    constructor Create(AModel: string); overload;
     property Owner: TPersonCoC read FOwner write FOwner;
     property ID: Integer read FID write FID;
-    property Model: String read FModel write FModel;
+    property Model: string read FModel write FModel;
   end;
 
-  { TPersonCoC }
+implementation
+
+
+{ TPersonCoC }
 
 function TPersonCoC.GetFullName: string;
 begin
@@ -435,7 +449,7 @@ end;
 
 procedure TCocMappingStrategyTests.TestGetMappingPersonHasOneCar;
 var
-  table: TMappingTable;
+  table   : TMappingTable;
   relation: TMappingRelation;
 begin
   table := TMappingTable.Create;
@@ -456,7 +470,7 @@ end;
 
 procedure TCocMappingStrategyTests.TestGetMappingPersonHasOneEmail;
 var
-  table: TMappingTable;
+  table   : TMappingTable;
   relation: TMappingRelation;
 begin
   table := TMappingTable.Create;
@@ -472,7 +486,7 @@ end;
 
 procedure TCocMappingStrategyTests.TestGetMappingLaptopBelongToPerson;
 var
-  table: TMappingTable;
+  table   : TMappingTable;
   relation: TMappingBelongsTo;
 begin
   table := TMappingTable.Create;
@@ -493,7 +507,7 @@ end;
 
 procedure TCocMappingStrategyTests.TestGetMappingPersonHasManyPhones;
 var
-  table: TMappingTable;
+  table   : TMappingTable;
   relation: TMappingRelation;
 begin
   table := TMappingTable.Create;
@@ -514,7 +528,7 @@ end;
 
 { TLaptop }
 
-constructor TLaptopCoC.Create(AModel: String);
+constructor TLaptopCoC.Create(AModel: string);
 begin
   inherited Create;
   FModel := AModel;

@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{6E22397B-AA4C-4AD3-AA92-7D61C3E8FBD4}</ProjectGuid>
         <ProjectVersion>14.6</ProjectVersion>
-        <Config Condition="'$(Config)'==''">FIREBIRD_CI</Config>
+        <Config Condition="'$(Config)'==''">FIREBIRD_UIB_STRATEGY</Config>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
         <MainSource>DORM_UnitTests_XE4.dpr</MainSource>
         <Base>True</Base>

@@ -8,34 +8,38 @@ uses
   superobject;
 
 type
-{$RTTI EXPLICIT
-    FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
-    METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
-    PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
+
+  {$RTTI EXPLICIT
+  FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
+  METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
+  PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
+
   // Mapping Attibutes
   Entity = class(TCustomAttribute)
   private
-    FTableName: String;
-    FPackage: String;
+    FTableName: string;
+    FPackage  : string;
+
   public
-    constructor Create(const ATableName: String = ''; const APackageName: String = '');
-    property TableName: String read FTableName;
-    property Package: String read FPackage;
+    constructor Create(const ATableName: string = ''; const APackageName: string = '');
+    property TableName: string read FTableName;
+    property package: string read FPackage;
   end;
 
   Column = class(TCustomAttribute)
   private
-    FFieldName: string;
-    FFieldType: string;
-    FSize: Cardinal;
-    FPrecision: Cardinal;
+    FFieldName   : string;
+    FFieldType   : string;
+    FSize        : Cardinal;
+    FPrecision   : Cardinal;
     FDefaultValue: string;
+
   public
     constructor Create; overload;
-    constructor Create(const AColumnName: String; ASize: Cardinal = 0; APrecision: Cardinal = 0;
-      ADefaultValue: String = ''); overload;
-    constructor Create(const AColumnName: string; AFieldType: String; ASize: Cardinal = 0;
-      APrecision: Cardinal = 0; ADefaultValue: String = ''); overload;
+    constructor Create(const AColumnName: string; ASize: Cardinal = 0; APrecision: Cardinal = 0;
+      ADefaultValue: string = ''); overload;
+    constructor Create(const AColumnName: string; AFieldType: string; ASize: Cardinal = 0;
+      APrecision: Cardinal = 0; ADefaultValue: string = ''); overload;
     property FieldName: string read FFieldName write FFieldName;
     property FieldType: string read FFieldType write FFieldType;
     property Size: Cardinal read FSize write FSize;
@@ -48,8 +52,9 @@ type
 
   Size = class(TCustomAttribute)
   private
-    FColumnSize: Cardinal;
+    FColumnSize     : Cardinal;
     FColumnPrecision: Cardinal;
+
   public
     constructor Create(const ASize: Cardinal; const APrecision: Cardinal = 0);
     property ColumnSize: Cardinal read FColumnSize;
@@ -58,22 +63,30 @@ type
 
   DefaultValue = class(TCustomAttribute)
   private
-    FValue: String;
+    FValue: string;
+
   public
-    constructor Create(const ADefaultValue: String);
-    property Value: String read FValue;
+    constructor Create(const ADefaultValue: string);
+    property Value: string read FValue;
   end;
 
-  ListOf = class(DefaultValue)
+  ListOf = class(TCustomAttribute)
+  private
+    FValue: string;
+
+  public
+    constructor Create(const ADefaultValue: string);
+    property Value: string read FValue;
   end;
 
   TCustomRelationAttribute = class(TCustomAttribute)
   private
-    FChildPropertyName: String;
-    FLazyLoad: boolean;
+    FChildPropertyName: string;
+    FLazyLoad         : boolean;
+
   public
-    constructor Create(const AChildPropertyName: String; ALazyLoad: boolean = False);
-    property ChildPropertyName: String read FChildPropertyName;
+    constructor Create(const AChildPropertyName: string; ALazyLoad: boolean = False);
+    property ChildPropertyName: string read FChildPropertyName;
     property LazyLoad: boolean read FLazyLoad;
   end;
 
@@ -83,11 +96,12 @@ type
 
   BelongsTo = class(TCustomAttribute)
   private
-    FRefPropertyName: String;
-    FLazyLoad: boolean;
+    FRefPropertyName: string;
+    FLazyLoad       : boolean;
+
   public
-    constructor Create(const ARefPropertyName: String; ALazyLoad: boolean = False);
-    property RefPropertyName: String read FRefPropertyName;
+    constructor Create(const ARefPropertyName: string; ALazyLoad: boolean = False);
+    property RefPropertyName: string read FRefPropertyName;
     property LazyLoad: boolean read FLazyLoad;
   end;
 
@@ -107,20 +121,21 @@ type
 
   TMappingField = class
   private
-    FPK: boolean;
-    FName: string;
-    FFieldType: string;
+    FPK          : boolean;
+    FName        : string;
+    FFieldType   : string;
     FDefaultValue: string;
-    FIndexType: TdormIndexType;
-    FPrecision: Cardinal;
-    FFieldName: string;
-    FSize: Cardinal;
-    FRTTICache: TMappingCache;
+    FIndexType   : TdormIndexType;
+    FPrecision   : Cardinal;
+    FFieldName   : string;
+    FSize        : Cardinal;
+    FRTTICache   : TMappingCache;
+
   public
     constructor Create;
     procedure Assign(Source: TMappingField);
     function ToString: string; override;
-    property Name: string read FName write FName;
+    property name: string read FName write FName;
     property FieldName: string read FFieldName write FFieldName;
     property FieldType: string read FFieldType write FFieldType;
     property DefaultValue: string read FDefaultValue write FDefaultValue;
@@ -133,33 +148,35 @@ type
 
   TMappingRelation = class
   private
-    FName: string;
+    FName          : string;
     FChildClassName: string;
     FChildFieldName: string;
-    FLazyLoad: boolean;
-    FRTTICache: TMappingCache;
+    FLazyLoad      : boolean;
+    FRTTICache     : TMappingCache;
+
   public
-    property Name: string read FName write FName;
+    property name          : string read FName write FName;
     property ChildClassName: string read FChildClassName write FChildClassName;
     property ChildFieldName: string read FChildFieldName write FChildFieldName;
-    property LazyLoad: boolean read FLazyLoad write FLazyLoad;
-    property RTTICache: TMappingCache read FRTTICache write FRTTICache;
+    property LazyLoad      : boolean read FLazyLoad write FLazyLoad;
+    property RTTICache     : TMappingCache read FRTTICache write FRTTICache;
     procedure Assign(Source: TMappingRelation);
   end;
 
   TMappingBelongsTo = class
   private
-    FName: string;
+    FName          : string;
     FOwnerClassName: string;
-    FRefFieldName: string;
-    FLazyLoad: boolean;
-    FRTTICache: TMappingCache;
+    FRefFieldName  : string;
+    FLazyLoad      : boolean;
+    FRTTICache     : TMappingCache;
+
   public
-    property Name: string read FName write FName;
+    property name          : string read FName write FName;
     property OwnerClassName: string read FOwnerClassName write FOwnerClassName;
-    property RefFieldName: string read FRefFieldName write FRefFieldName;
-    property LazyLoad: boolean read FLazyLoad write FLazyLoad;
-    property RTTICache: TMappingCache read FRTTICache write FRTTICache;
+    property RefFieldName  : string read FRefFieldName write FRefFieldName;
+    property LazyLoad      : boolean read FLazyLoad write FLazyLoad;
+    property RTTICache     : TMappingCache read FRTTICache write FRTTICache;
     procedure Assign(Source: TMappingBelongsTo);
   end;
 
@@ -169,13 +186,14 @@ type
 
   TMappingTable = class
   private
-    FPackage: string;
-    FTableName: string;
-    FFields: TMappingFieldList;
+    FPackage      : string;
+    FTableName    : string;
+    FFields       : TMappingFieldList;
     FBelongsToList: TMappingBelongsToList;
-    FHasManyList: TMappingRelationList;
-    FHasOneList: TMappingRelationList;
+    FHasManyList  : TMappingRelationList;
+    FHasOneList   : TMappingRelationList;
     function GetId: TMappingField;
+
   public
     constructor Create;
     destructor Destroy; override;
@@ -188,7 +206,7 @@ type
     function AddHasMany: TMappingRelation;
     function AddHasOne: TMappingRelation;
     function ToString: string; override;
-    property Package: string read FPackage write FPackage;
+    property package: string read FPackage write FPackage;
     property TableName: string read FTableName write FTableName;
     property Id: TMappingField read GetId;
     property Fields: TMappingFieldList read FFields;
@@ -207,7 +225,7 @@ uses
   dorm.Commons;
 { Entity }
 
-constructor Entity.Create(const ATableName: String = ''; const APackageName: String = '');
+constructor Entity.Create(const ATableName: string = ''; const APackageName: string = '');
 begin
   FTableName := ATableName;
   FPackage := APackageName;
@@ -224,8 +242,8 @@ begin
   FPrecision := 0;
 end;
 
-constructor Column.Create(const AColumnName: String; ASize: Cardinal = 0; APrecision: Cardinal = 0;
-  ADefaultValue: String = '');
+constructor Column.Create(const AColumnName: string; ASize: Cardinal = 0; APrecision: Cardinal = 0;
+  ADefaultValue: string = '');
 begin
   Create;
   FSize := ASize;
@@ -234,8 +252,8 @@ begin
   FDefaultValue := ADefaultValue;
 end;
 
-constructor Column.Create(const AColumnName: string; AFieldType: String; ASize: Cardinal = 0;
-  APrecision: Cardinal = 0; ADefaultValue: String = '');
+constructor Column.Create(const AColumnName: string; AFieldType: string; ASize: Cardinal = 0;
+  APrecision: Cardinal = 0; ADefaultValue: string = '');
 begin
   Create(AColumnName, ASize, APrecision, ADefaultValue);
   FFieldType := LowerCase(AFieldType);
@@ -250,14 +268,14 @@ begin
 end;
 { DefaultValue }
 
-constructor DefaultValue.Create(const ADefaultValue: String);
+constructor DefaultValue.Create(const ADefaultValue: string);
 begin
   inherited Create;
   FValue := ADefaultValue;
 end;
 { TCustomRelationAttribute }
 
-constructor TCustomRelationAttribute.Create(const AChildPropertyName: String;
+constructor TCustomRelationAttribute.Create(const AChildPropertyName: string;
   ALazyLoad: boolean = False);
 begin
   inherited Create;
@@ -266,7 +284,7 @@ begin
 end;
 { BelongsTo }
 
-constructor BelongsTo.Create(const ARefPropertyName: String; ALazyLoad: boolean = False);
+constructor BelongsTo.Create(const ARefPropertyName: string; ALazyLoad: boolean = False);
 begin
   inherited Create;
   FRefPropertyName := ARefPropertyName;
@@ -347,7 +365,7 @@ function TMappingTable.GetId: TMappingField;
 var
   F: TMappingField;
 begin
-  Result := Nil;
+  Result := nil;
   for F in Fields do
     if F.IsPK then
       Exit(F);
@@ -379,7 +397,7 @@ end;
 
 function TMappingTable.ToString: string;
 begin
-  Result := Format('Package: %s,  Table: %s', [Package, TableName]);
+  Result := Format('Package: %s,  Table: %s', [package, TableName]);
 end;
 { TMappingField }
 
@@ -434,6 +452,14 @@ begin
   FRefFieldName := Source.RefFieldName;
   FLazyLoad := Source.LazyLoad;
   FRTTICache := Source.RTTICache;
+end;
+
+{ ListOf }
+
+constructor ListOf.Create(const ADefaultValue: string);
+begin
+  inherited Create;
+  FValue := ADefaultValue;
 end;
 
 end.

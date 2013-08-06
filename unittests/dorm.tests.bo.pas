@@ -51,6 +51,7 @@ type
     )
   end;
 
+  [Entity('CARS')]
   TCar = class
   private
     FModel   : string;
@@ -74,6 +75,7 @@ type
     property Owner: TPerson read FOwner write SetOwner;
   end;
 
+  [Entity('EMAILS')]
   TEmail = class
   private
     FValue      : string;
@@ -145,6 +147,7 @@ type
     property ObjVersion: Integer read FObjVersion write SetObjVersion;
   end;
 
+  [Entity('PHONES')]
   TPhone = class
   private
     FNumber  : string;

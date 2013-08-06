@@ -68,7 +68,7 @@ type
   TPhoneOS = class;
   TEmployeeOS = class;
 
-  [ListOf('TPhoneOS')]
+  [ListOf('dorm.tests.objstatus.bo.TPhoneOS')]
   TPhonesOS = class(
 
     {$IF CompilerVersion >= 23}
@@ -191,7 +191,7 @@ type
 
   end;
 
-  [ListOf('TPersonOS')]
+  [ListOf('dorm.tests.objstatus.bo.TPersonOS')]
   TPeopleOS = class(TObjectList<TPersonOS>)
   end;
 
@@ -222,7 +222,7 @@ type
     property IsItalianNumber: Boolean read GetIsItalianNumber;
   end;
 
-  [ListOf('TEmployeeOS')]
+  [ListOf('dorm.tests.objstatus.bo.TEmployeeOS')]
   TEmployeesOS = class
     ({$IF CompilerVersion >= 23}TObjectList<TEmployeeOS>{$ELSE}TdormObjectList<TEmployeeOS>{$IFEND})
   end;
