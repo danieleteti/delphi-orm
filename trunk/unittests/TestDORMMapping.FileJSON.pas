@@ -388,7 +388,7 @@ begin
     CheckNotNull(_Relation, 'TPerson.Car property should be a HasOne relation');
     with _Relation do
     begin
-      CheckEquals('TCar', _Relation.ChildClassName);
+      CheckEquals('dorm.tests.bo.TCar', _Relation.ChildClassName);
       CheckEquals('PersonID', _Relation.ChildFieldName);
       CheckFalse(_Relation.LazyLoad, 'TPerson.Car should be not lazyload');
     end;
@@ -409,7 +409,7 @@ begin
     CheckNotNull(_Relation, 'TPerson.Email property should be a HasOne relation');
     with _Relation do
     begin
-      CheckEquals('TEmail', _Relation.ChildClassName);
+      CheckEquals('dorm.tests.bo.TEmail', _Relation.ChildClassName);
       CheckEquals('PersonID', _Relation.ChildFieldName);
       CheckFalse(_Relation.LazyLoad, 'TPerson.Email should be not lazyload');
     end;
@@ -431,7 +431,7 @@ begin
     CheckNotNull(_Relation, 'TPerson.Phones property should be a HasMany relation');
     with _Relation do
     begin
-      CheckEquals('TPhone', _Relation.ChildClassName);
+      CheckEquals('dorm.tests.bo.TPhone', _Relation.ChildClassName);
       CheckEquals('PersonID', _Relation.ChildFieldName);
       CheckFalse(_Relation.LazyLoad, 'TPerson.Phones should be not lazyload');
     end;
@@ -453,7 +453,7 @@ begin
     CheckNotNull(_Relation, 'TPerson.Owner property should be a BelongsTo relation');
     with _Relation do
     begin
-      CheckEquals('TPerson', _Relation.OwnerClassName);
+      CheckEquals('dorm.tests.bo.TPerson', _Relation.OwnerClassName);
       CheckEquals('PersonID', _Relation.RefFieldName);
       CheckTrue(_Relation.LazyLoad, 'TPerson.Phones should be not lazyload');
     end;

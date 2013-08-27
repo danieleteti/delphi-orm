@@ -459,7 +459,7 @@ begin
     CheckNotNull(relation, 'TPersonCoC.Car property should be a HasOne relation');
     with relation do
     begin
-      CheckEquals('TCarCoC', relation.ChildClassName);
+      CheckEquals('TestDORMMapping.CoC.TCarCoC', relation.ChildClassName);
       CheckEquals('PersonCoCID', relation.ChildFieldName);
       CheckFalse(relation.LazyLoad, 'TPersonCoC.Car should be not lazyload');
     end;
@@ -496,7 +496,7 @@ begin
     CheckNotNull(relation, 'TLaptopCoC.Owner property should be a BelongsTo relation');
     with relation do
     begin
-      CheckEquals('TPersonCoC', relation.OwnerClassName);
+      CheckEquals('TestDORMMapping.CoC.TPersonCoC', relation.OwnerClassName);
       CheckEquals('PersonCoCID', relation.RefFieldName);
       CheckTrue(relation.LazyLoad, 'TLaptopCoC.Owner should be lazyload');
     end;
@@ -517,7 +517,7 @@ begin
     CheckNotNull(relation, 'TPersonCoC.Phones property should be a HasMany relation');
     with relation do
     begin
-      CheckEquals('TPhoneCoC', relation.ChildClassName);
+      CheckEquals('TestDORMMapping.CoC.TPhoneCoC', relation.ChildClassName);
       CheckEquals('PersonCoCID', relation.ChildFieldName);
       CheckFalse(relation.LazyLoad, 'TPersonCoC.Phones should be not lazyload');
     end;

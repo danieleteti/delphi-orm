@@ -591,7 +591,7 @@ begin
   begin
     relation := ATable.AddHasOne;
     relation.Name := AProp.Name;
-    relation.ChildClassName := AProp.PropertyType.QualifiedClassName;
+    relation.ChildClassName := AProp.PropertyType.QualifiedName;
     relation.ChildFieldName := ChildFieldName;
     relation.LazyLoad := false;
   end;

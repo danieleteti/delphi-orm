@@ -14,7 +14,7 @@
   limitations under the License.
 
   Author: Marcos Barreto
-  ********************************************************************************}
+  ******************************************************************************** }
 unit TestDORMMapping.Attributes;
 
 interface
@@ -28,18 +28,20 @@ uses
   dorm.Utils;
 
 {$RTTI EXPLICIT
-  FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
-  METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
-  PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
+FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
+METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
+PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
 
 type
   TAttributesMappingStrategyTests = class(TTestCase)
   private
     FMapping: IMappingStrategy;
     FContext: TRttiContext;
+
   protected
     procedure SetUp; override;
     procedure TearDown; override;
+
   published
     procedure TestGetMappingEntity_ClassWithoutEntity;
     procedure TestGetMappingEntity_ClassJustWithEntity;
@@ -72,21 +74,26 @@ type
   TPersonATR = class;
   TPhoneATR = class;
 
-{$IF CompilerVersion >= 23}
+  {$IF CompilerVersion >= 23}
 
   TPhones = class(TObjectList<TPhoneATR>)
-{$ELSE}
+
+  {$ELSE}
+
   TPhones = class(TdormObjectList<TPhoneATR>)
-{$IFEND}
+
+    {$IFEND}
+
   end;
 
   TCustomer = class
   private
-    FName: String;
-    FId: Integer;
+    FName: string;
+    FId  : Integer;
+
   public
-    property Id: Integer read FId write FId;
-    property Name: String read FName write FName;
+    property Id  : Integer read FId write FId;
+    property name: string read FName write FName;
   end;
 
   [Entity]
@@ -100,16 +107,17 @@ type
   [Entity('TBL_CUSTOMER_COMPLETE', 'DBO')]
   TCustomerComplete = class
   private
-    FLastName: string;
-    FAge: Int32;
-    FFirstName: string;
-    FId: Integer;
-    FBornDate: TDate;
+    FLastName     : string;
+    FAge          : Int32;
+    FFirstName    : string;
+    FId           : Integer;
+    FBornDate     : TDate;
     FBornTimeStamp: TDateTime;
-    FValor: Double;
-    FValor2: Extended;
-    FValor3: Currency;
+    FValor        : Double;
+    FValor2       : Extended;
+    FValor3       : Currency;
     FTransientProp: TDate;
+
   public
     [Id]
     property Id: Integer read FId write FId;
@@ -119,8 +127,8 @@ type
     [Column('CUSTOMER_LASTNAME', 'String', 0, 0, 'Default LastName')]
     property LastName: string read FLastName write FLastName;
     [DefaultValue('58')]
-    property Age: Int32 read FAge write FAge;
-    property BornDate: TDate read FBornDate write FBornDate;
+    property Age          : Int32 read FAge write FAge;
+    property BornDate     : TDate read FBornDate write FBornDate;
     property BornTimeStamp: TDateTime read FBornTimeStamp write FBornTimeStamp;
     [Size(15, 5)]
     property Valor: Double read FValor write FValor;
@@ -135,14 +143,15 @@ type
   [Entity('CARS', 'dorm.tests.bo')]
   TCarATR = class
   private
-    FModel: string;
-    FBrand: string;
+    FModel   : string;
+    FBrand   : string;
     FPersonID: Integer;
-    FId: Integer;
-    FOwner: TPersonATR;
+    FId      : Integer;
+    FOwner   : TPersonATR;
     // Private!!!
     [Column('ID_PERSON')]
     property PersonID: Integer read FPersonID write FPersonID;
+
   public
     [Id]
     [Column('IDCAR')]
@@ -158,13 +167,14 @@ type
   [Entity('EMAILS', 'dorm.tests.bo')]
   TEmailATR = class
   private
-    FValue: string;
+    FValue   : string;
     FPersonID: Integer;
-    FId: Integer;
+    FId      : Integer;
     // Private!!!
     FOwner: TPersonATR;
     [Column('ID_PERSON')]
     property PersonID: Integer read FPersonID write FPersonID;
+
   public
     [Id]
     [Column('IDMAIL')]
@@ -178,19 +188,20 @@ type
   [Entity('PEOPLE', 'dorm.tests.bo')]
   TPersonATR = class
   private
-    FLastName: string;
-    FAge: Int32;
-    FFirstName: string;
-    FId: Integer;
-    FBornDate: TDate;
-    FPhones: TPhones;
-    FCar: TCarATR;
-    FEmail: TEmailATR;
+    FLastName     : string;
+    FAge          : Int32;
+    FFirstName    : string;
+    FId           : Integer;
+    FBornDate     : TDate;
+    FPhones       : TPhones;
+    FCar          : TCarATR;
+    FEmail        : TEmailATR;
     FBornTimeStamp: TDateTime;
-    FPhoto: TStream;
-    FIsMale: boolean;
+    FPhoto        : TStream;
+    FIsMale       : boolean;
     function GetFullName: string;
     procedure SetIsMale(const Value: boolean);
+
   public
     [Id]
     [Column('ID')]
@@ -222,13 +233,14 @@ type
   [Entity('PHONES', 'dorm.tests.bo')]
   TPhoneATR = class
   private
-    FNumber: string;
-    FModel: string;
-    FId: Integer;
+    FNumber  : string;
+    FModel   : string;
+    FId      : Integer;
     FPersonID: Integer;
     // Private!!!
     [Column('ID_PERSON')]
     property PersonID: Integer read FPersonID write FPersonID;
+
   public
     [Id]
     [Column('ID')]
@@ -706,9 +718,9 @@ end;
 
 procedure TAttributesMappingStrategyTests.TestGetMappingHasOne;
 var
-  _Table: TMappingTable;
+  _Table       : TMappingTable;
   _CustomerType: TRttiType;
-  _Relation: TMappingRelation;
+  _Relation    : TMappingRelation;
 begin
   _Table := TMappingTable.Create;
   try
@@ -720,8 +732,8 @@ begin
     CheckNotNull(_Relation, 'TPersonATR.Car property should be a HasOne relation');
     with _Relation do
     begin
-      CheckEquals(_Relation.ChildClassName, 'TCarATR');
-      CheckEquals(_Relation.ChildFieldName, 'PersonID');
+      CheckEquals('TestDORMMapping.Attributes.TCarATR', _Relation.ChildClassName);
+      CheckEquals('PersonID', _Relation.ChildFieldName);
       CheckFalse(_Relation.LazyLoad, 'TPersonATR.Car should be not lazyload');
     end;
 
@@ -729,7 +741,7 @@ begin
     CheckNotNull(_Relation, 'TPersonATR.Email property should be a HasOne relation');
     with _Relation do
     begin
-      CheckEquals(_Relation.ChildClassName, 'TEmailATR');
+      CheckEquals('TestDORMMapping.Attributes.TEmailATR', _Relation.ChildClassName);
       CheckEquals(_Relation.ChildFieldName, 'PersonID');
       CheckFalse(_Relation.LazyLoad, 'TPersonATR.Email should be not lazyload');
     end;
