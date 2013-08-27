@@ -306,8 +306,11 @@ uses
 
 procedure TSession.AddAsLoadedObject(AObject: TObject;
   AMappingField: TMappingField);
+var
+  o: TObject;
 begin
-  LoadedObjects.Add(GetLoadedObjectHashCode(AObject, AMappingField), AObject);
+  if not IsAlreadyLoaded(AObject.ClassInfo, GetIdValue(AMappingField, AObject), o) then
+    LoadedObjects.Add(GetLoadedObjectHashCode(AObject, AMappingField), AObject);
 end;
 
 procedure TSession.AddAsLoadedObject(ACollection: IWrappedList;
@@ -375,12 +378,12 @@ begin
     FConfig := TSuperObject.ParseString(PWideChar(_ConfigText), false);
     if not assigned(FConfig) then
       raise Exception.Create('Cannot parse persistence configuration');
-    _JSonConfigEnv := FConfig.O['persistence'].O[GetEnv];
-    FConfig.O['mapping'] := nil; // is needed to avoid embedded configuration
+    _JSonConfigEnv := FConfig.o['persistence'].o[GetEnv];
+    FConfig.o['mapping'] := nil; // is needed to avoid embedded configuration
     // Check for the old persistence file version
     _MappingText := '';
-    if assigned(FConfig.O['config']) then
-      _MappingText := FConfig.O['config'].s['mapping_file'];
+    if assigned(FConfig.o['config']) then
+      _MappingText := FConfig.o['config'].s['mapping_file'];
     if _MappingText <> '' then
       raise EdormException.Create
         ('WARNING! Is no more allowed to specify the mapping file inside the persistence file');
@@ -392,15 +395,15 @@ begin
         if AOwnMappingConfigurationReader then
           AMappingConfiguration.Free;
       end;
-      FConfig.O['mapping'] := TSuperObject.ParseString(PChar(_MappingText), true, false, nil, []);
-      if FConfig.O['mapping'] = nil then
+      FConfig.o['mapping'] := TSuperObject.ParseString(PChar(_MappingText), true, false, nil, []);
+      if FConfig.o['mapping'] = nil then
         raise Exception.Create('Cannot parse mapping configuration');
     end;
     ReadIDConfig(_JSonConfigEnv);
     FMappingStrategy := TCacheMappingStrategy.Create;
     if AMappingConfiguration <> nil then
     begin
-      _MappingStrategy := TFileMappingStrategy.Create(FConfig.O['mapping']);
+      _MappingStrategy := TFileMappingStrategy.Create(FConfig.o['mapping']);
       FMappingStrategy.Add(_MappingStrategy);
     end;
     _MappingStrategy := TAttributesMappingStrategy.Create;
@@ -536,10 +539,10 @@ begin
   // section config/logger_class_name is deprecated
   // if there is a specific logger_class_name per the devenv, so we'll use that
   LogClassName := '';
-  Section := FConfig.O['persistence'].O[GetEnv];
+  Section := FConfig.o['persistence'].o[GetEnv];
   LogClassName := Section.s['logger_class_name'];
   if LogClassName = EmptyStr then
-    LogClassName := FConfig.O['config'].s['logger_class_name']; // fallback
+    LogClassName := FConfig.o['config'].s['logger_class_name']; // fallback
   if LogClassName = EmptyStr then
     Result := nil // consider null object pattern
   else
@@ -771,7 +774,7 @@ var
 begin
   if not assigned(FPersistStrategy) then
   begin
-    AdapterClassName := FConfig.O['persistence'].O[GetEnv].s
+    AdapterClassName := FConfig.o['persistence'].o[GetEnv].s
       ['database_adapter'];
     T := FCTX.FindType(AdapterClassName);
     if assigned(T) then
