@@ -27,17 +27,19 @@ type
   protected
   var
     FUIBDatabase: TUIBDatabase;
+
   protected
-    FCurrentTransaction: TUIBTransaction;
+    FCurrentTransaction      : TUIBTransaction;
     FDatabaseConnectionString: string;
-    FUsername: string;
-    FPassword: string;
-    FLibraryName: string;
+    FUsername                : string;
+    FPassword                : string;
+    FLibraryName             : string;
     function NewStatement: TUIBStatement;
     function NewQuery: TUIBQuery;
+
   public
-    constructor Create(const LibraryName: String;
-      AUserName, APassword, AConnectionString: String);
+    constructor Create(const LibraryName: string;
+      AUserName, APassword, AConnectionString: string);
     destructor Destroy; override;
     function GetConnection: TUIBDatabase;
     function GetCurrentTransaction: TUIBTransaction;
@@ -105,8 +107,8 @@ begin
   Result := Cmd;
 end;
 
-constructor TUIBFacade.Create(const LibraryName: String;
-  AUserName, APassword, AConnectionString: String);
+constructor TUIBFacade.Create(const LibraryName: string;
+  AUserName, APassword, AConnectionString: string);
 begin
   inherited Create;
   FLibraryName := LibraryName;
@@ -119,7 +121,7 @@ destructor TUIBFacade.Destroy;
 begin
   if assigned(FUIBDatabase) then
   begin
-    if Assigned(FCurrentTransaction) and (FCurrentTransaction.InTransaction) then
+    if assigned(FCurrentTransaction) and (FCurrentTransaction.InTransaction) then
       FCurrentTransaction.RollBack;
 
     FUIBDatabase.Connected := False;
@@ -152,6 +154,8 @@ begin
     FUIBDatabase.CharacterSet := csUTF8; // always unicode
     FUIBDatabase.Connected := True;
     FCurrentTransaction := TUIBTransaction.Create(nil);
+    // daniele 30/08/2013
+    FCurrentTransaction.Options := [tpReadCommitted, tpWait, tpWrite];
     FCurrentTransaction.DataBase := GetConnection;
   end;
   Result := FUIBDatabase;
@@ -165,14 +169,14 @@ end;
 function TUIBFacade.NewStatement: TUIBStatement;
 begin
   Result := TUIBStatement.Create(nil);
-  Result.DataBase:=GetConnection;
+  Result.DataBase := GetConnection;
   Result.Transaction := FCurrentTransaction;
 end;
 
 function TUIBFacade.NewQuery: TUIBQuery;
 begin
   Result := TUIBQuery.Create(nil);
-  Result.DataBase:=GetConnection;
+  Result.DataBase := GetConnection;
   Result.Transaction := FCurrentTransaction;
 end;
 
