@@ -155,7 +155,7 @@ begin
     FUIBDatabase.Connected := True;
     FCurrentTransaction := TUIBTransaction.Create(nil);
     // daniele 30/08/2013
-    FCurrentTransaction.Options := [tpReadCommitted, tpWait, tpWrite];
+    FCurrentTransaction.Options := FCurrentTransaction.Options + [tpWait];
     FCurrentTransaction.DataBase := GetConnection;
   end;
   Result := FUIBDatabase;
