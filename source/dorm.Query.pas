@@ -2,8 +2,12 @@ unit dorm.Query;
 
 interface
 
-uses Generics.Collections, dorm.Mappings.Strategies, System.Rtti, dorm.Filters,
-  dorm.Commons, System.TypInfo;
+uses Generics.Collections,
+  dorm.Mappings.Strategies,
+  System.Rtti,
+  dorm.Filters,
+  dorm.Commons,
+  System.TypInfo;
 
 type
   TdormParameterType = (TypeString, TypeInteger, TypeFloat, TypeBoolean,
@@ -11,19 +15,19 @@ type
 
   TdormParameter = class
   private
-    FAsString: String;
+    FAsString: string;
     FStrategy: IdormPersistStrategy;
     procedure SetStrategy(const Value: IdormPersistStrategy);
     procedure SetValue(const Value: TValue);
 
   strict protected
     FParameterType: TdormParameterType;
-    FValue: TValue;
+    FValue        : TValue;
 
   public
     constructor Create(AParameterType: TdormParameterType; AValue: TValue);
     function AsString(AMapping: ICacheMappingStrategy;
-      AStrategy: IdormPersistStrategy): String;
+      AStrategy: IdormPersistStrategy): string;
     property Strategy: IdormPersistStrategy read FStrategy write SetStrategy;
   end;
 
@@ -38,8 +42,8 @@ type
   TSelect = class(TInterfacedObject, ISQLable)
   private
     FDistinct: Boolean;
-    FAll: Boolean;
-    FScope: TDictionary<string, TRttiType>;
+    FAll     : Boolean;
+    FScope   : TDictionary<string, TRttiType>;
 
   protected
     constructor Create; virtual;
@@ -62,21 +66,21 @@ type
 
   TFrom = class(TInterfacedObject, ISQLable)
   strict private
-    mType: TClass;
-    mJoins: TObjectList<TJoin>;
+    mType     : TClass;
+    mJoins    : TObjectList<TJoin>;
     mQueryBase: ISQLable;
     mArguments: TObjectList<TdormParameter>;
-    mAlias: String;
-    mWhere: String;
-    mGroupBy: String;
-    mHaving: String;
-    mOrderBy: String;
-    mLimit: String;
-    mOffset: String;
+    mAlias    : string;
+    mWhere    : string;
+    mGroupBy  : string;
+    mHaving   : string;
+    mOrderBy  : string;
+    mLimit    : string;
+    mOffset   : string;
 
   strict protected
     function GetTableName(AMappingStrategy: ICacheMappingStrategy;
-      AClassObject: TClass): String;
+      AClassObject: TClass): string;
 
   protected
     FScope: TDictionary<string, TRttiType>;
@@ -88,37 +92,37 @@ type
     function ToSQL(AMappingStrategy: ICacheMappingStrategy;
       AStrategy: IdormPersistStrategy): ICustomCriteria;
     //
-    function _as(AAlias: String): TFrom;
-    function Where(AWhere: String): TFrom; overload;
-    function Where(AWhere: String; AParams: array of const): TFrom; overload;
-    function groupBy(AGroupBy: String): TFrom;
-    function having(AHaving: String): TFrom;
+    function _as(AAlias: string): TFrom;
+    function Where(AWhere: string): TFrom; overload;
+    function Where(AWhere: string; AParams: array of const): TFrom; overload;
+    function groupBy(AGroupBy: string): TFrom;
+    function having(AHaving: string): TFrom;
     function limit(ALimit: Integer): TFrom;
-    function orderBy(AOrderBy: String): TFrom;
+    function orderBy(AOrderBy: string): TFrom;
 
   end;
 
   TDSQLParser = class sealed
-    class function GetColumnByField(AClassName, AAttributeName: String;
-      AScope: TDictionary<string, TRttiType>;
-      AMapping: ICacheMappingStrategy;
-      AStrategy: IdormPersistStrategy): String;
+    class function GetColumnByField(AClassName, AAttributeName: string;
+      AScope   : TDictionary<string, TRttiType>;
+      AMapping : ICacheMappingStrategy;
+      AStrategy: IdormPersistStrategy): string;
     class function GetValueOf(AMapping: ICacheMappingStrategy;
       AStrategy: IdormPersistStrategy; AArguments: TObjectList<TdormParameter>;
-      AIndex: Integer): String;
-    class function Parse(ASQLWithParams: String;
-      AMapping: ICacheMappingStrategy; AStrategy: IdormPersistStrategy;
-      AScope: TDictionary<string, TRttiType>;
-      AArguments: TObjectList<TdormParameter>): String;
+      AIndex   : Integer): string;
+    class function Parse(ASQLWithParams: string;
+      AMapping  : ICacheMappingStrategy; AStrategy: IdormPersistStrategy;
+      AScope    : TDictionary<string, TRttiType>;
+      AArguments: TObjectList<TdormParameter>): string;
   end;
 
   TSQLCustomCriteria = class(TdormCriteria, ICustomCriteria)
   strict protected
-    FSQL: String;
+    FSQL       : string;
     FParameters: TObjectList<TdormParameter>;
 
   public
-    constructor Create(ASQL: String);
+    constructor Create(ASQL: string);
     function GetItemClassInfo: PTypeInfo;
     function GetSQL: string;
   end;
@@ -128,7 +132,9 @@ function Select(): TSelect;
 implementation
 
 uses
-  System.SysUtils, dorm.Utils, dorm.Mappings;
+  System.SysUtils,
+  dorm.Utils,
+  dorm.Mappings;
 
 function Select(): TSelect;
 begin
@@ -217,9 +223,9 @@ function TFrom.ToSQL(AMappingStrategy: ICacheMappingStrategy;
   AStrategy: IdormPersistStrategy): ICustomCriteria;
 
 var
-  sql: TStringBuilder;
+  sql : TStringBuilder;
   join: TJoin;
-  ASQL: String;
+  ASQL: string;
 begin
   sql := TStringBuilder.Create;
   try
@@ -259,7 +265,7 @@ begin
   end;
 end;
 
-function TFrom.Where(AWhere: String; AParams: array of const): TFrom;
+function TFrom.Where(AWhere: string; AParams: array of const): TFrom;
 var
   v: TVarRec;
 begin
@@ -306,20 +312,20 @@ begin
         begin
           mArguments.Add(TdormParameter.Create(TypeDecimal, v.VCurrency^));
         end;
-    else
-      raise EdormException.Create('Invalid type for argument');
+      else
+        raise EdormException.Create('Invalid type for argument');
     end;
   end;
   Result := Self;
 end;
 
-function TFrom._as(AAlias: String): TFrom;
+function TFrom._as(AAlias: string): TFrom;
 begin
   mAlias := AAlias;
   Result := Self;
 end;
 
-function TFrom.Where(AWhere: String): TFrom;
+function TFrom.Where(AWhere: string): TFrom;
 begin
   mWhere := AWhere;
   mArguments.Clear();
@@ -334,7 +340,7 @@ begin
 end;
 
 function TFrom.GetTableName(AMappingStrategy: ICacheMappingStrategy;
-  AClassObject: TClass): String;
+  AClassObject: TClass): string;
 var
   m: TMappingTable;
 begin
@@ -346,19 +352,19 @@ begin
   Result := m.TableName;
 end;
 
-function TFrom.groupBy(AGroupBy: String): TFrom;
+function TFrom.groupBy(AGroupBy: string): TFrom;
 begin
   mGroupBy := AGroupBy;
   Result := Self;
 end;
 
-function TFrom.having(AHaving: String): TFrom;
+function TFrom.having(AHaving: string): TFrom;
 begin
   mHaving := AHaving;
   Result := Self;
 end;
 
-function TFrom.orderBy(AOrderBy: String): TFrom;
+function TFrom.orderBy(AOrderBy: string): TFrom;
 begin
   mOrderBy := AOrderBy;
   Result := Self;
@@ -381,7 +387,7 @@ end;
 
 { TSQLCustomCriteria }
 
-constructor TSQLCustomCriteria.Create(ASQL: String);
+constructor TSQLCustomCriteria.Create(ASQL: string);
 begin
   inherited Create;
   FSQL := ASQL;
@@ -400,7 +406,7 @@ end;
 { TdormParameter }
 
 function TdormParameter.AsString(AMapping: ICacheMappingStrategy;
-  AStrategy: IdormPersistStrategy): String;
+  AStrategy: IdormPersistStrategy): string;
 begin
   case Self.FParameterType of
     TypeString:
@@ -438,14 +444,14 @@ end;
 
 { TDSQLParser }
 
-class function TDSQLParser.GetColumnByField(AClassName, AAttributeName: String;
-  AScope: TDictionary<string, TRttiType>;
-  AMapping: ICacheMappingStrategy;
-  AStrategy: IdormPersistStrategy): String;
+class function TDSQLParser.GetColumnByField(AClassName, AAttributeName: string;
+  AScope   : TDictionary<string, TRttiType>;
+  AMapping : ICacheMappingStrategy;
+  AStrategy: IdormPersistStrategy): string;
 var
-  m: TMappingTable;
+  m : TMappingTable;
   mf: TMappingField;
-  t: TRttiType;
+  t : TRttiType;
 begin
   t := AScope[AClassName];
   if not assigned(t) then
@@ -466,23 +472,23 @@ end;
 
 class function TDSQLParser.GetValueOf(AMapping: ICacheMappingStrategy;
   AStrategy: IdormPersistStrategy; AArguments: TObjectList<TdormParameter>;
-  AIndex: Integer): String;
+  AIndex   : Integer): string;
 begin
   Result := AArguments[AIndex].AsString(AMapping, AStrategy);
 end;
 
-class function TDSQLParser.Parse(ASQLWithParams: String;
-  AMapping: ICacheMappingStrategy; AStrategy: IdormPersistStrategy;
-  AScope: TDictionary<string, TRttiType>;
-  AArguments: TObjectList<TdormParameter>): String;
+class function TDSQLParser.Parse(ASQLWithParams: string;
+  AMapping  : ICacheMappingStrategy; AStrategy: IdormPersistStrategy;
+  AScope    : TDictionary<string, TRttiType>;
+  AArguments: TObjectList<TdormParameter>): string;
 var
-  sb: TStringBuilder;
-  i: Integer;
-  c: char;
-  state: Integer;
-  _ClassName, _AttributeName: String;
-  param_index: Integer;
-  l: Integer;
+  sb                        : TStringBuilder;
+  i                         : Integer;
+  c                         : char;
+  state                     : Integer;
+  _ClassName, _AttributeName: string;
+  param_index               : Integer;
+  l                         : Integer;
 const
   SINK = 0;
   SHARP = 1;
@@ -527,6 +533,20 @@ begin
               sb.append(c);
           end;
 
+        SQUOTE:
+          begin
+            if c = '''' then
+              state := SINK;
+            sb.append(c);
+          end;
+
+        DQUOTE:
+          begin
+            if c = '"' then
+              state := SINK;
+            sb.append(c);
+          end;
+
         ATTRIBUTE:
           begin
             if CharInSet(c, ['A' .. 'Z', 'a' .. 'z', '0' .. '9', '_']) then
@@ -542,7 +562,7 @@ begin
             end
             else
               raise EdormException.CreateFmt
-                ('Invalid character at pos %d', [i]);
+                ('Invalid character at pos %d. Expected attribute.', [i]);
           end;
 
         DOT:

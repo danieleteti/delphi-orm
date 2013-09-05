@@ -40,9 +40,12 @@ type
   TTestDORMQueryable = class(TBaseTestCase)
   published
     procedure TestSelectListWithHardCoded;
+    procedure TestWithDoubleQuotedStringInWhere;
     procedure TestSelectListWithParams;
     procedure TestExecSimpleSelectAllFromTable;
     procedure TestCustomSearchCriteriaWithParams;
+    procedure TestCustomSearchCriteriaWithHardCodedStrings;
+    procedure TestCustomSearchCriteriaWithHardCodedStringsQuoteInStrings;
   end;
 
 implementation
@@ -51,14 +54,17 @@ uses
   Rtti,
   dorm.tests.bo,
   dorm.Collections,
-  SysUtils, dorm.Query, dorm.tests.objstatus.bo, dorm.Utils;
+  SysUtils,
+  dorm.Query,
+  dorm.tests.objstatus.bo,
+  dorm.Utils;
 
 { TTestDORMSearchCriteria }
 
 procedure TTestDORMSearchCriteria.TestNestedCriteria;
 var
-  Crit1: ICriteria;
-  Crit2: ICriteria;
+  Crit1                  : ICriteria;
+  Crit2                  : ICriteria;
   CriteriaOr, CriteriaAnd: ICriteria;
 begin
   Crit1 := NewCriteria('LastName', coEqual, 'Smith')
@@ -84,8 +90,8 @@ end;
 procedure TTestDORMSearchCriteria.TestSearchByAttributes;
 var
   Criteria: ICriteria;
-  People: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
-  p: TPerson;
+  People  : {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
+  p       : TPerson;
 begin
   Session.DeleteAll(TPerson);
   p := TPerson.NewPerson;
@@ -107,7 +113,7 @@ end;
 
 procedure TTestDORMSearchCriteria.TestSearchByAttributesAll;
 var
-  p: TPerson;
+  p   : TPerson;
   crit: ICriteria;
   List: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
 begin
@@ -154,10 +160,10 @@ end;
 procedure TTestDORMSearchCriteria.TestSearchByAttributesWithNestedCriteria;
 var
   Criteria: ICriteria;
-  People: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
-  p: TPerson;
-  Crit1: ICriteria;
-  Crit2: ICriteria;
+  People  : {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
+  p       : TPerson;
+  Crit1   : ICriteria;
+  Crit2   : ICriteria;
 begin
   Session.DeleteAll(TPerson);
   p := TPerson.NewPerson;
@@ -206,9 +212,9 @@ end;
 
 procedure TTestDORMSearchCriteria.TestSimpleRawCriteria;
 var
-  intf: ICriteria;
+  intf  : ICriteria;
   People: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
-  SQL: string;
+  SQL   : string;
 begin
   Session.DeleteAll(TPerson);
   SQL := 'SELECT * FROM PEOPLE WHERE LAST_NAME = ''TETI''';
@@ -233,12 +239,55 @@ end;
 
 { TTestDORMQueryable }
 
+procedure TTestDORMQueryable.TestCustomSearchCriteriaWithHardCodedStrings;
+var
+  mArguments: TObjectList<TdormParameter>;
+  SQL       : string;
+  mScope    : TDictionary<string, TRttiType>;
+begin
+  mArguments := TObjectList<TdormParameter>.Create(true);
+  mScope := TDictionary<string, TRttiType>.Create;
+  mScope.Add('TPersonOS', TdormUtils.ctx.GetType(TPersonOS));
+  SQL := TDSQLParser.Parse
+    ('select * from tablename where #TPersonOS.FirstName# = ''DANIELE'' or #TPersonOS.FirstName# = ''PETER''',
+    Session.GetMapping,
+    Session.Strategy,
+    mScope,
+    mArguments);
+  mArguments.Free;
+  mScope.Free;
+  CheckEquals
+    ('select * from tablename where FIRST_NAME = ''DANIELE'' or FIRST_NAME = ''PETER''', SQL);
+end;
+
+procedure TTestDORMQueryable.TestCustomSearchCriteriaWithHardCodedStringsQuoteInStrings;
+var
+  mArguments: TObjectList<TdormParameter>;
+  SQL       : string;
+  mScope    : TDictionary<string, TRttiType>;
+begin
+  mArguments := TObjectList<TdormParameter>.Create(true);
+  mScope := TDictionary<string, TRttiType>.Create;
+  mScope.Add('TPersonOS', TdormUtils.ctx.GetType(TPersonOS));
+  SQL := TDSQLParser.Parse
+    ('select * from tablename where #TPersonOS.FirstName# = ''DAN''''IELE'' or #TPersonOS.FirstName# = ''PET''''ER''',
+    Session.GetMapping,
+    Session.Strategy,
+    mScope,
+    mArguments);
+  mArguments.Free;
+  mScope.Free;
+  CheckEquals
+    ('select * from tablename where FIRST_NAME = ''DAN''''IELE'' or FIRST_NAME = ''PET''''ER''',
+    SQL);
+end;
+
 procedure TTestDORMQueryable.TestCustomSearchCriteriaWithParams;
 var
-//  intf: ICustomCriteria;
+  // intf: ICustomCriteria;
   mArguments: TObjectList<TdormParameter>;
-//  cc: TSQLCustomCriteria;
-  SQL: string;
+  // cc: TSQLCustomCriteria;
+  SQL   : string;
   mScope: TDictionary<string, TRttiType>;
 begin
   mArguments := TObjectList<TdormParameter>.Create(true);
@@ -253,7 +302,7 @@ begin
     mScope,
     mArguments);
   mArguments.Free;
-//  cc.Free;
+  // cc.Free;
   mScope.Free;
   CheckEquals
     ('select * from tablename where ID = 1 and FIRST_NAME = ''daniele''', SQL);
@@ -262,7 +311,7 @@ end;
 procedure TTestDORMQueryable.TestExecSimpleSelectAllFromTable;
 var
   List: TPeopleOS;
-  p: TPersonOS;
+  p   : TPersonOS;
 begin
   List := TPeopleOS.Create(true);
   try
@@ -282,8 +331,8 @@ end;
 procedure TTestDORMQueryable.TestSelectListWithHardCoded;
 var
   List: TObjectList<TPersonOS>;
-  p: TPersonOS;
-  pid: Integer;
+  p   : TPersonOS;
+  pid : Integer;
 begin
   List := TObjectList<TPersonOS>.Create(true);
   try
@@ -311,8 +360,8 @@ end;
 procedure TTestDORMQueryable.TestSelectListWithParams;
 var
   List: TObjectList<TPersonOS>;
-  p: TPersonOS;
-  pid: Integer;
+  p   : TPersonOS;
+  pid : Integer;
 begin
   List := TObjectList<TPersonOS>.Create(true);
   try
@@ -331,6 +380,33 @@ begin
     Session.FillListSQL<TPersonOS>(List, Select().From(TPersonOS)
       .Where('#TPersonOS.FirstName# = ? or #TPersonOS.FirstName# = ?',
       ['The First', 'The Second']).orderBy('#TPersonOS.ID#'));
+    CheckEquals(2, List.Count);
+    CheckEquals('The First', List[0].FirstName);
+    CheckEquals('The Second', List[1].FirstName);
+  finally
+    List.Free;
+  end;
+end;
+
+procedure TTestDORMQueryable.TestWithDoubleQuotedStringinWhere;
+var
+  List: TObjectList<TPersonOS>;
+  p   : TPersonOS;
+  pid : Integer;
+begin
+  List := TObjectList<TPersonOS>.Create(true);
+  try
+    p := TPersonOS.NewPerson;
+    p.FirstName := 'The First';
+    Session.Persist(p);
+    Session.ClearOID(p);
+    p.FirstName := 'The Second';
+    Session.Persist(p);
+    pid := p.ID;
+    p.Free;
+    Session.FillListSQL<TPersonOS>(List, Select().From(TPersonOS)
+      .Where('#TPersonOS.FirstName# = ''The First'' or #TPersonOS.FirstName# = ''The Second''')
+      .orderBy('#TPersonOS.ID#'));
     CheckEquals(2, List.Count);
     CheckEquals('The First', List[0].FirstName);
     CheckEquals('The Second', List[1].FirstName);
