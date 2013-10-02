@@ -133,6 +133,7 @@ end;
 
 function TUIBFacade.Execute(ASQLCommand: TUIBStatement): Int64;
 begin
+  ASQLCommand.OnError := TEndTransMode.etmStayIn; // always!!!
   ASQLCommand.Execute;
   Result := ASQLCommand.RowsAffected;
 end;
@@ -171,6 +172,7 @@ begin
   Result := TUIBStatement.Create(nil);
   Result.DataBase := GetConnection;
   Result.Transaction := FCurrentTransaction;
+  Result.OnError := TEndTransMode.etmStayIn;
 end;
 
 function TUIBFacade.NewQuery: TUIBQuery;
@@ -178,6 +180,7 @@ begin
   Result := TUIBQuery.Create(nil);
   Result.DataBase := GetConnection;
   Result.Transaction := FCurrentTransaction;
+  Result.OnError := TEndTransMode.etmStayIn;
 end;
 
 end.
