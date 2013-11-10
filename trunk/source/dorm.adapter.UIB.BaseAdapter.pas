@@ -138,11 +138,9 @@ begin
   SQL := Format('UPDATE %S SET %S WHERE %S = ?', [AMappingTable.TableName, sql_fields_names,
     pk_field]);
   if ACurrentVersion >= 0 then // optlock
-  begin
     SQL := SQL + ' AND OBJVERSION = ' + IntToStr(ACurrentVersion);
-  end
-  else
-    raise EdormLockingException.Create('Invalid ObjVersion');
+//  else
+//    raise EdormLockingException.Create('Invalid ObjVersion');
   GetLogger.Debug(AMappingTable.Fields[GetPKMappingIndex(AMappingTable.Fields)].FieldName);
   GetLogger.Debug('PREPARING: ' + SQL);
   Query := FB.Prepare(SQL);
@@ -244,9 +242,9 @@ begin
   pk_value := ARttiType.GetProperty(pk_attribute_name).GetValue(AObject);
   SQL := 'DELETE FROM ' + AMappingTable.TableName + ' WHERE ' + pk_field_name + ' = ?';
   if ACurrentVersion >= 0 then
-    SQL := SQL + ' AND OBJVERSION = ' + IntToStr(ACurrentVersion)
-  else
-    raise EdormLockingException.Create('Invalid ObjVersion');
+    SQL := SQL + ' AND OBJVERSION = ' + IntToStr(ACurrentVersion);
+//  else
+//    raise EdormLockingException.Create('Invalid ObjVersion');
   GetLogger.Debug('PREPARING: ' + SQL);
   cmd := FB.Prepare(SQL);
   try
