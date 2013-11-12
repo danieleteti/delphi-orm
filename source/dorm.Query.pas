@@ -22,7 +22,7 @@ type
 
   strict protected
     FParameterType: TdormParameterType;
-    FValue        : TValue;
+    FValue: TValue;
 
   public
     constructor Create(AParameterType: TdormParameterType; AValue: TValue);
@@ -42,8 +42,8 @@ type
   TSelect = class(TInterfacedObject, ISQLable)
   private
     FDistinct: Boolean;
-    FAll     : Boolean;
-    FScope   : TDictionary<string, TRttiType>;
+    FAll: Boolean;
+    FScope: TDictionary<string, TRttiType>;
 
   protected
     constructor Create; virtual;
@@ -66,17 +66,17 @@ type
 
   TFrom = class(TInterfacedObject, ISQLable)
   strict private
-    mType     : TClass;
-    mJoins    : TObjectList<TJoin>;
+    mType: TClass;
+    mJoins: TObjectList<TJoin>;
     mQueryBase: ISQLable;
     mArguments: TObjectList<TdormParameter>;
-    mAlias    : string;
-    mWhere    : string;
-    mGroupBy  : string;
-    mHaving   : string;
-    mOrderBy  : string;
-    mLimit    : string;
-    mOffset   : string;
+    mAlias: string;
+    mWhere: string;
+    mGroupBy: string;
+    mHaving: string;
+    mOrderBy: string;
+    mLimit: string;
+    mOffset: string;
 
   strict protected
     function GetTableName(AMappingStrategy: ICacheMappingStrategy;
@@ -104,21 +104,21 @@ type
 
   TDSQLParser = class sealed
     class function GetColumnByField(AClassName, AAttributeName: string;
-      AScope   : TDictionary<string, TRttiType>;
-      AMapping : ICacheMappingStrategy;
+      AScope: TDictionary<string, TRttiType>;
+      AMapping: ICacheMappingStrategy;
       AStrategy: IdormPersistStrategy): string;
     class function GetValueOf(AMapping: ICacheMappingStrategy;
       AStrategy: IdormPersistStrategy; AArguments: TObjectList<TdormParameter>;
-      AIndex   : Integer): string;
+      AIndex: Integer): string;
     class function Parse(ASQLWithParams: string;
-      AMapping  : ICacheMappingStrategy; AStrategy: IdormPersistStrategy;
-      AScope    : TDictionary<string, TRttiType>;
+      AMapping: ICacheMappingStrategy; AStrategy: IdormPersistStrategy;
+      AScope: TDictionary<string, TRttiType>;
       AArguments: TObjectList<TdormParameter>): string;
   end;
 
   TSQLCustomCriteria = class(TdormCriteria, ICustomCriteria)
   strict protected
-    FSQL       : string;
+    FSQL: string;
     FParameters: TObjectList<TdormParameter>;
 
   public
@@ -223,7 +223,7 @@ function TFrom.ToSQL(AMappingStrategy: ICacheMappingStrategy;
   AStrategy: IdormPersistStrategy): ICustomCriteria;
 
 var
-  sql : TStringBuilder;
+  sql: TStringBuilder;
   join: TJoin;
   ASQL: string;
 begin
@@ -268,6 +268,7 @@ end;
 function TFrom.Where(AWhere: string; AParams: array of const): TFrom;
 var
   v: TVarRec;
+  S: String;
 begin
   mWhere := AWhere;
   for v in AParams do
@@ -296,6 +297,21 @@ begin
           mArguments.Add(TdormParameter.Create(TypeString, v.VString^));
         end;
 
+      vtWideString:
+        begin
+          mArguments.Add(TdormParameter.Create(TypeString, String(v.VWideString^)));
+        end;
+
+      vtWideChar:
+        begin
+          mArguments.Add(TdormParameter.Create(TypeString, v.VWideChar));
+        end;
+
+      vtChar:
+        begin
+          mArguments.Add(TdormParameter.Create(TypeString, v.VChar));
+        end;
+
       vtAnsiString:
         begin
           mArguments.Add(TdormParameter.Create(TypeString,
@@ -312,8 +328,8 @@ begin
         begin
           mArguments.Add(TdormParameter.Create(TypeDecimal, v.VCurrency^));
         end;
-      else
-        raise EdormException.Create('Invalid type for argument');
+    else
+      raise EdormException.Create('Invalid type for argument');
     end;
   end;
   Result := Self;
@@ -445,13 +461,13 @@ end;
 { TDSQLParser }
 
 class function TDSQLParser.GetColumnByField(AClassName, AAttributeName: string;
-  AScope   : TDictionary<string, TRttiType>;
-  AMapping : ICacheMappingStrategy;
+  AScope: TDictionary<string, TRttiType>;
+  AMapping: ICacheMappingStrategy;
   AStrategy: IdormPersistStrategy): string;
 var
-  m : TMappingTable;
+  m: TMappingTable;
   mf: TMappingField;
-  t : TRttiType;
+  t: TRttiType;
 begin
   t := AScope[AClassName];
   if not assigned(t) then
@@ -472,23 +488,23 @@ end;
 
 class function TDSQLParser.GetValueOf(AMapping: ICacheMappingStrategy;
   AStrategy: IdormPersistStrategy; AArguments: TObjectList<TdormParameter>;
-  AIndex   : Integer): string;
+  AIndex: Integer): string;
 begin
   Result := AArguments[AIndex].AsString(AMapping, AStrategy);
 end;
 
 class function TDSQLParser.Parse(ASQLWithParams: string;
-  AMapping  : ICacheMappingStrategy; AStrategy: IdormPersistStrategy;
-  AScope    : TDictionary<string, TRttiType>;
+  AMapping: ICacheMappingStrategy; AStrategy: IdormPersistStrategy;
+  AScope: TDictionary<string, TRttiType>;
   AArguments: TObjectList<TdormParameter>): string;
 var
-  sb                        : TStringBuilder;
-  i                         : Integer;
-  c                         : char;
-  state                     : Integer;
+  sb: TStringBuilder;
+  i: Integer;
+  c: char;
+  state: Integer;
   _ClassName, _AttributeName: string;
-  param_index               : Integer;
-  l                         : Integer;
+  param_index: Integer;
+  l: Integer;
 const
   SINK = 0;
   SHARP = 1;
