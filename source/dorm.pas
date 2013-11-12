@@ -769,7 +769,7 @@ end;
 function TSession.GetStrategy: IdormPersistStrategy;
 var
   T: TRttiType;
-  AdapterClassName: SOString;
+  AdapterClassName: String;
 begin
   if not assigned(FPersistStrategy) then
   begin
