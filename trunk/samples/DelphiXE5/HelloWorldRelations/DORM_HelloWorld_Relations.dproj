@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{226C6169-EB8A-4566-A8B8-F45FDCA47881}</ProjectGuid>
+        <ProjectGuid>{14CB346D-D739-4CB5-B531-890AD90EA336}</ProjectGuid>
         <ProjectVersion>15.2</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <MainSource>DORM_HelloWorld_Relations.dpr</MainSource>
@@ -125,6 +125,7 @@
         </DelphiCompile>
         <DCCReference Include="..\..\Commons\BObjectsU.pas"/>
         <DCCReference Include="..\..\Commons\RandomUtilsU.pas"/>
+        <DCCReference Include="..\..\Commons\Console.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

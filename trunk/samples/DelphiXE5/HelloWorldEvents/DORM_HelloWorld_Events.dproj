@@ -1,9 +1,9 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{8161BDBA-96B6-4A3E-BC7F-5B719C48BEC0}</ProjectGuid>
+        <ProjectGuid>{B99C0F0F-8EEB-40E2-AF82-B694B731CA9C}</ProjectGuid>
         <ProjectVersion>15.2</ProjectVersion>
         <FrameworkType>None</FrameworkType>
-        <MainSource>DORM_HelloWorld.dpr</MainSource>
+        <MainSource>DORM_HelloWorld_Events.dpr</MainSource>
         <Base>True</Base>
         <Config Condition="'$(Config)'==''">Debug</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
@@ -193,7 +193,7 @@
                     <VersionInfoKeys Name="theme"/>
                 </VersionInfoKeys>
                 <Source>
-                    <Source Name="MainSource">DORM_HelloWorld.dpr</Source>
+                    <Source Name="MainSource">DORM_HelloWorld_Events.dpr</Source>
                 </Source>
                 <Excluded_Packages>
                     <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\12.0\Bpl\DMVCFramework_RT_XE5.bpl">DelphiMVCFramework</Excluded_Packages>
