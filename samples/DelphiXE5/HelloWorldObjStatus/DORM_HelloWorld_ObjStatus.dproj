@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{226C6169-EB8A-4566-A8B8-F45FDCA47881}</ProjectGuid>
+        <ProjectGuid>{55F04F0A-6879-4CE1-800D-9F1BC07602BD}</ProjectGuid>
         <ProjectVersion>15.2</ProjectVersion>
         <FrameworkType>None</FrameworkType>
         <MainSource>DORM_HelloWorld_ObjStatus.dpr</MainSource>

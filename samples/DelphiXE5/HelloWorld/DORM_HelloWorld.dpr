@@ -11,7 +11,8 @@ uses
   dorm,
   dorm.commons,
   dorm.loggers,
-  BObjectsU in '..\..\Commons\BObjectsU.pas';
+  BObjectsU in '..\..\Commons\BObjectsU.pas',
+  RandomUtilsU in '..\..\Commons\RandomUtilsU.pas';
 
 procedure SimpleInsert;
 var
@@ -69,6 +70,7 @@ end;
 
 begin
   SimpleInsert;
-  SimpleCRUD;
+  // SimpleCRUD;
+  ReadLn;
 
 end.

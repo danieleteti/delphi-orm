@@ -1,4 +1,4 @@
-program DORM_HelloWorld_ObjStatus;
+program DORM_HelloWorld_Events;
 
 {$APPTYPE CONSOLE}
 
@@ -24,7 +24,7 @@ begin
   dormSession := TSession.CreateConfigured(
     TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
   try
-    Customer := TCustomerOS.Create;
+    Customer := TCustomerVal.Create;
     Customer.Name := 'Daniele Teti Inc.';
     Customer.Address := 'Via Roma, 16';
     Customer.EMail := 'daniele@danieleteti.it';

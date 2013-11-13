@@ -87,7 +87,6 @@ begin
     Filter := '';
     while True do
     begin
-      dormSession.LoadListSQL<TCustomerOS>(
       Customers := dormSession.LoadListSQL<TCustomerOS>(
         Select
         .From(TCustomerOS)
@@ -131,7 +130,7 @@ begin
   // Lists;
 
   // uncomment the following line to see a DSQL criteria driven search
-  SearchCriteria;
+  // SearchCriteria;
 
   // uncomment the following line to see a criteria driven search
   // SearchCriteriaFinder;
