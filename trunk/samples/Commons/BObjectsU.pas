@@ -41,6 +41,22 @@ type
     property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
   end;
 
+  [Entity('CUSTOMERS_OS')]
+  TCustomerVal = class(TCustomerOS)
+  protected
+    procedure OnBeforePersist;
+    procedure Validate;
+  end;
+
+  [Entity('CUSTOMERS_VERSIONED')]
+  TCustomerV = class(TCustomerOS)
+  private
+    FObjVersion: Integer;
+    procedure SetObjVersion(const Value: Integer);
+  public
+    property ObjVersion: Integer read FObjVersion write SetObjVersion;
+  end;
+
   [Entity('PHONES')]
   TPhone = class
   private
@@ -48,24 +64,28 @@ type
     FModel: string;
     FID: Integer;
     FPersonID: Integer;
+    FObjStatus: TdormObjectStatus;
     procedure SetNumber(const Value: string);
     procedure SetModel(const Value: string);
     procedure SetID(const Value: Integer);
     procedure SetPersonID(const Value: Integer);
     function GetIsItalianNumber: Boolean;
-    // Private!!!
-    property PersonID: Integer read FPersonID write SetPersonID;
-
+    procedure SetObjStatus(const Value: TdormObjectStatus);
   public
     constructor Create;
+    property ID: Integer read FID write SetID;
     property Number: string read FNumber write SetNumber;
     property Model: string read FModel write SetModel;
-    property ID: Integer read FID write SetID;
+    [Column('ID_PERSON')]
+    property PersonID: Integer read FPersonID write SetPersonID;
     [NoAutomapping]
     property IsItalianNumber: Boolean read GetIsItalianNumber;
+    [Transient]
+    property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
+    function ToString: String; override;
   end;
 
-  [ListOf('TPhone')]
+  [ListOf('BObjectsU.TPhone')]
   TPhones = class(TObjectList<TPhone>)
   end;
 
@@ -73,14 +93,13 @@ type
   TPerson = class
   private
     FLastName: string;
-    FAge: Int32;
     FFirstName: string;
     FID: Integer;
     FBornDate: TDate;
     FPhones: TPhones;
     FPhoto: TStream;
     FIsMale: Boolean;
-    FObjVersion: Integer;
+    FObjStatus: TdormObjectStatus;
     procedure SetLastName(const Value: string);
     procedure SetFirstName(const Value: string);
     procedure SetID(const Value: Integer);
@@ -88,9 +107,8 @@ type
     procedure SetPhoto(const Value: TStream);
     function GetFullName: string;
     procedure SetIsMale(const Value: Boolean);
-    procedure SetObjVersion(const Value: Integer);
     function GetAge: Int32;
-    procedure SetAge(const Value: Int32);
+    procedure SetObjStatus(const Value: TdormObjectStatus);
 
   public
     constructor Create; virtual;
@@ -102,15 +120,21 @@ type
     property FirstName: string read FFirstName write SetFirstName;
     [Column('LAST_NAME')]
     property LastName: string read FLastName write SetLastName;
-    property Age: Int32 read GetAge;
+    // [Transient]
+    // property Age: Int32 read GetAge write FAge;
     [Column('BORN_DATE')]
     property BornDate: TDate read FBornDate write SetBornDate;
     [HasMany('PersonID')]
     property Phones: TPhones read FPhones;
+
+    // [Transient] {if you dont want save AGE}
+    property Age: Integer read GetAge; // Saved but not retrieved
+
     property Photo: TStream read FPhoto write SetPhoto;
     [Column('IS_MALE')]
     property IsMale: Boolean read FIsMale write SetIsMale;
-    property ObjVersion: Integer read FObjVersion write SetObjVersion;
+    [Transient]
+    property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
     [Transient]
     property FullName: string read GetFullName;
   end;
@@ -132,7 +156,7 @@ function IsValidEmail(const Value: string): Boolean;
       if not(CharInSet(s[i], ['a' .. 'z', 'A' .. 'Z', '0' .. '9', '_', '-',
         '.'])) then
         Exit;
-    Result := true;
+    Result := True;
   end;
 
 var
@@ -212,7 +236,7 @@ constructor TPerson.Create;
 begin
   inherited;
   FPhoto := nil;
-  FPhones := TPhones.Create(true);
+  FPhones := TPhones.Create(True);
 end;
 
 destructor TPerson.Destroy;
@@ -240,11 +264,6 @@ begin
   Result.BornDate := EncodeDate(1979, 11, 4);
 end;
 
-procedure TPerson.SetAge(const Value: Int32);
-begin
-  FAge := Value;
-end;
-
 procedure TPerson.SetBornDate(const Value: TDate);
 begin
   FBornDate := Value;
@@ -270,9 +289,9 @@ begin
   FLastName := Value;
 end;
 
-procedure TPerson.SetObjVersion(const Value: Integer);
+procedure TPerson.SetObjStatus(const Value: TdormObjectStatus);
 begin
-  FObjVersion := Value;
+  FObjStatus := Value;
 end;
 
 procedure TPerson.SetPhoto(const Value: TStream);
@@ -308,16 +327,48 @@ end;
 procedure TPhone.SetModel(const Value: string);
 begin
   FModel := Value;
+  ObjStatus := osDirty;
 end;
 
 procedure TPhone.SetNumber(const Value: string);
 begin
   FNumber := Value;
+  ObjStatus := osDirty;
+end;
+
+procedure TPhone.SetObjStatus(const Value: TdormObjectStatus);
+begin
+  FObjStatus := Value;
 end;
 
 procedure TPhone.SetPersonID(const Value: Integer);
 begin
   FPersonID := Value;
+end;
+
+function TPhone.ToString: String;
+begin
+  Result := Format(' %-15s (%s)', [Number, Model]);
+end;
+
+{ TCustomerV }
+
+procedure TCustomerV.SetObjVersion(const Value: Integer);
+begin
+  FObjVersion := Value;
+end;
+
+{ TCustomerVal }
+
+procedure TCustomerVal.OnBeforePersist;
+begin
+  FEMail := EMail.ToUpper;
+end;
+
+procedure TCustomerVal.Validate;
+begin
+  if not IsValidEmail(EMail) then
+    raise Exception.Create('Email is not valid');
 end;
 
 end.

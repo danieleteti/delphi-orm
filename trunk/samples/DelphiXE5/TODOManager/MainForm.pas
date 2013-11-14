@@ -158,8 +158,9 @@ begin
   Criteria := nil;
   if chkFilter.Checked then
     Criteria := NewCriteria('done', coEqual, False);
-  GetDORMSession.FillList<TTodo>(FTodoList, Criteria);
+  BindSourceTodos.First;
   BindSourceTodos.Active := False;
+  GetDORMSession.FillList<TTodo>(FTodoList, Criteria);
   BindSourceTodos.Active := True;
 end;
 
