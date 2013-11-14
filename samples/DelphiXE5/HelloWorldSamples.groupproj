@@ -21,6 +21,9 @@
         <Projects Include="HelloWorldEvents\DORM_HelloWorld_Events.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="TODOManager\TODOManager.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -83,14 +86,23 @@
     <Target Name="DORM_HelloWorld_Events:Make">
         <MSBuild Projects="HelloWorldEvents\DORM_HelloWorld_Events.dproj" Targets="Make"/>
     </Target>
+    <Target Name="TODOManager">
+        <MSBuild Projects="TODOManager\TODOManager.dproj"/>
+    </Target>
+    <Target Name="TODOManager:Clean">
+        <MSBuild Projects="TODOManager\TODOManager.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TODOManager:Make">
+        <MSBuild Projects="TODOManager\TODOManager.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="DORM_HelloWorld;DORM_HelloWorld_ObjStatus;DORM_HelloWorldLists;DORM_HelloWorld_Relations;DORM_HelloWorld_ObjVersion;DORM_HelloWorld_Events"/>
+        <CallTarget Targets="DORM_HelloWorld;DORM_HelloWorld_ObjStatus;DORM_HelloWorldLists;DORM_HelloWorld_Relations;DORM_HelloWorld_ObjVersion;DORM_HelloWorld_Events;TODOManager"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="DORM_HelloWorld:Clean;DORM_HelloWorld_ObjStatus:Clean;DORM_HelloWorldLists:Clean;DORM_HelloWorld_Relations:Clean;DORM_HelloWorld_ObjVersion:Clean;DORM_HelloWorld_Events:Clean"/>
+        <CallTarget Targets="DORM_HelloWorld:Clean;DORM_HelloWorld_ObjStatus:Clean;DORM_HelloWorldLists:Clean;DORM_HelloWorld_Relations:Clean;DORM_HelloWorld_ObjVersion:Clean;DORM_HelloWorld_Events:Clean;TODOManager:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="DORM_HelloWorld:Make;DORM_HelloWorld_ObjStatus:Make;DORM_HelloWorldLists:Make;DORM_HelloWorld_Relations:Make;DORM_HelloWorld_ObjVersion:Make;DORM_HelloWorld_Events:Make"/>
+        <CallTarget Targets="DORM_HelloWorld:Make;DORM_HelloWorld_ObjStatus:Make;DORM_HelloWorldLists:Make;DORM_HelloWorld_Relations:Make;DORM_HelloWorld_ObjVersion:Make;DORM_HelloWorld_Events:Make;TODOManager:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

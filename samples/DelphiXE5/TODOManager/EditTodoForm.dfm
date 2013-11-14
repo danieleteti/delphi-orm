@@ -66,7 +66,7 @@ object frmEditTodo: TfrmEditTodo
     TabOrder = 3
   end
   object BitBtn1: TBitBtn
-    Left = 197
+    Left = 181
     Top = 282
     Width = 113
     Height = 34
@@ -76,7 +76,7 @@ object frmEditTodo: TfrmEditTodo
     OnClick = BitBtn1Click
   end
   object BitBtn2: TBitBtn
-    Left = 78
+    Left = 62
     Top = 282
     Width = 113
     Height = 34
@@ -103,6 +103,7 @@ object frmEditTodo: TfrmEditTodo
   end
   object BindSourceTodo: TPrototypeBindSource
     AutoActivate = False
+    AutoPost = False
     RecordCount = 1
     FieldDefs = <
       item
@@ -135,7 +136,6 @@ object frmEditTodo: TfrmEditTodo
   object BindingsList1: TBindingsList
     Methods = <>
     OutputConverters = <>
-    UseAppManager = True
     Left = 20
     Top = 5
     object LinkControlToField1: TLinkControlToField

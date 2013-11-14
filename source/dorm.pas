@@ -1366,7 +1366,7 @@ begin
   for _has_many in AMappingTable.HasManyList do
   begin
     v := TdormUtils.GetField(AObject, _has_many.Name);
-    GetLogger.Debug('-- Inspecting for ' + _has_many.ChildClassName);
+    // GetLogger.Debug('-- Inspecting for ' + _has_many.ChildClassName);
     // _type_name := Qualified(AMappingTable, _has_many.ChildClassName);
     _child_type := FCTX.FindType(_has_many.ChildClassName);
     if not assigned(_child_type) then
@@ -1379,8 +1379,8 @@ begin
       List := WrapAsList(Obj);
       for Obj in List do
       begin
-        GetLogger.Debug('-- Saving ' + _child_type.QualifiedName);
-        GetLogger.Debug('----> Setting property ' + _has_many.ChildFieldName);
+        // GetLogger.Debug('-- Saving ' + _child_type.QualifiedName);
+        // GetLogger.Debug('----> Setting property ' + _has_many.ChildFieldName);
         TdormUtils.SetField(Obj, _has_many.ChildFieldName, AIdValue);
         Persist(Obj); // help me!!!
         {
@@ -1771,8 +1771,10 @@ begin
   GetLogger.Debug('Saving has_many for ' + ARttiType.ToString);
   for _has_many in AMappingTable.HasManyList do
   begin
-    // v := TdormUtils.GetField(AObject, _has_many.Name);
-    v := TdormUtils.GetField(AObject, _has_many.RTTICache);
+    v := TdormUtils.GetField(AObject, _has_many.Name);
+    { TODO -oDaniele -cBUG : RTTICache }
+    // DANIELE: There is a bug in this RTTICache... Investigate please
+    // v := TdormUtils.GetField(AObject, _has_many.RTTICache);
     GetLogger.Debug('-- Inspecting for ' + _has_many.ChildClassName);
     _child_type := FCTX.FindType(_has_many.ChildClassName);
     if not assigned(_child_type) then

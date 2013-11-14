@@ -131,8 +131,8 @@ end;
 class function TdormUtils.GetField(Obj: TObject;
   const PropertyName: string): TValue;
 var
-  Field    : TRttiField;
-  Prop     : TRttiProperty;
+  Field: TRttiField;
+  Prop: TRttiProperty;
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
@@ -155,7 +155,7 @@ end;
 class function TdormUtils.GetProperty(Obj: TObject;
   const PropertyName: string): TValue;
 var
-  Prop     : TRttiProperty;
+  Prop: TRttiProperty;
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
@@ -181,8 +181,8 @@ end;
 class procedure TdormUtils.SetField(Obj: TObject; const PropertyName: string;
   const Value: TValue);
 var
-  Field    : TRttiField;
-  Prop     : TRttiProperty;
+  Field: TRttiField;
+  Prop: TRttiProperty;
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
@@ -223,7 +223,7 @@ end;
 class procedure TdormUtils.SetProperty(Obj: TObject; const PropertyName: string;
   const Value: TValue);
 var
-  Prop     : TRttiProperty;
+  Prop: TRttiProperty;
   ARttiType: TRttiType;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
@@ -298,9 +298,9 @@ end;
 class procedure TdormUtils.DatasetToObject(Dataset: TDataset; Obj: TObject);
 var
   ARttiType: TRttiType;
-  props    : TArray<TRttiProperty>;
-  Prop     : TRttiProperty;
-  f        : TField;
+  props: TArray<TRttiProperty>;
+  Prop: TRttiProperty;
+  f: TField;
 begin
   ARttiType := ctx.GetType(Obj.ClassType);
   props := ARttiType.GetProperties;
@@ -326,18 +326,18 @@ end;
 
 class procedure TdormUtils.CopyObject(SourceObj, TargetObj: TObject);
 var
-  _ARttiType      : TRttiType;
-  Field           : TRttiField;
-  master, cloned  : TObject;
-  Src             : TObject;
-  sourceStream    : TStream;
-  SavedPosition   : Int64;
-  targetStream    : TStream;
+  _ARttiType: TRttiType;
+  Field: TRttiField;
+  master, cloned: TObject;
+  Src: TObject;
+  sourceStream: TStream;
+  SavedPosition: Int64;
+  targetStream: TStream;
   targetCollection: TObjectList<TObject>;
   sourceCollection: TObjectList<TObject>;
-  I               : Integer;
-  sourceObject    : TObject;
-  targetObject    : TObject;
+  I: Integer;
+  sourceObject: TObject;
+  targetObject: TObject;
 begin
   if not Assigned(TargetObj) then
     Exit;
@@ -406,7 +406,7 @@ end;
 
 class function TdormUtils.CreateObject(ARttiType: TRttiType): TObject;
 var
-  Method   : TRttiMethod;
+  Method: TRttiMethod;
   metaClass: TClass;
 begin
   { First solution, clear and slow }
@@ -432,18 +432,18 @@ end;
 
 class function TdormUtils.Clone(Obj: TObject): TObject;
 var
-  _ARttiType      : TRttiType;
-  Field           : TRttiField;
-  master, cloned  : TObject;
-  Src             : TObject;
-  sourceStream    : TStream;
-  SavedPosition   : Int64;
-  targetStream    : TStream;
+  _ARttiType: TRttiType;
+  Field: TRttiField;
+  master, cloned: TObject;
+  Src: TObject;
+  sourceStream: TStream;
+  SavedPosition: Int64;
+  targetStream: TStream;
   targetCollection: TObjectList<TObject>;
   sourceCollection: TObjectList<TObject>;
-  I               : Integer;
-  sourceObject    : TObject;
-  targetObject    : TObject;
+  I: Integer;
+  sourceObject: TObject;
+  targetObject: TObject;
 begin
   Result := nil;
   if not Assigned(Obj) then

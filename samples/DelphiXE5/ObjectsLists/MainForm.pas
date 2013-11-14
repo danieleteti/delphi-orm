@@ -31,7 +31,7 @@ uses
   dorm.Commons,
   dorm.Configuration,
   dorm.Loggers,
-  dorm.Filters;
+  dorm.Filters, FMX.StdCtrls;
 
 type
   TForm11 = class(TForm)
