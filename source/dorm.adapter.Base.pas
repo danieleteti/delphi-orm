@@ -210,29 +210,36 @@ begin
       SQL := SQL + ' != ';
     coLike:
       SQL := SQL + ' LIKE ';
+    coIsNull:
+      SQL := SQL + ' IS NULL';
+    coIsNotNull:
+      SQL := SQL + ' IS NOT NULL';
   end;
 
-  if fm.FieldType = 'string' then
-    SQL := SQL + '''' + EscapeString(ACriteriaItem.GetValue.AsString) + ''''
-  else if fm.FieldType = 'uniqueidentifier' then
-    SQL := SQL + '''' + EscapeString(ACriteriaItem.GetValue.AsString) + ''''
-  else if fm.FieldType = 'integer' then
-    SQL := SQL + inttostr(ACriteriaItem.GetValue.AsInteger)
-  else if fm.FieldType = 'boolean' then
-    SQL := SQL + GetBooleanValueAsString(ACriteriaItem.GetValue.AsBoolean)
-  else if fm.FieldType = 'date' then
+  if Not(ACriteriaItem.GetCompareOperator in [coIsNull, coIsNotNull]) then
   begin
-    d := ACriteriaItem.GetValue.AsExtended;
-    SQL := SQL + '''' + EscapeDate(d) + ''''
-  end
-  else if (fm.FieldType = 'timestamp') or (fm.FieldType = 'datetime') then
-  begin
-    dt := ACriteriaItem.GetValue.AsExtended;
-    SQL := SQL + '''' + EscapeDateTime(dt) + ''''
-  end
-  else
-    raise EdormException.CreateFmt('Unknown type %s in criteria',
-      [fm.FieldType]);
+      if fm.FieldType = 'string' then
+        SQL := SQL + '''' + EscapeString(ACriteriaItem.GetValue.AsString) + ''''
+      else if fm.FieldType = 'uniqueidentifier' then
+        SQL := SQL + '''' + EscapeString(ACriteriaItem.GetValue.AsString) + ''''
+      else if fm.FieldType = 'integer' then
+        SQL := SQL + inttostr(ACriteriaItem.GetValue.AsInteger)
+      else if fm.FieldType = 'boolean' then
+        SQL := SQL + GetBooleanValueAsString(ACriteriaItem.GetValue.AsBoolean)
+      else if fm.FieldType = 'date' then
+      begin
+        d := ACriteriaItem.GetValue.AsExtended;
+        SQL := SQL + '''' + EscapeDate(d) + ''''
+      end
+      else if (fm.FieldType = 'timestamp') or (fm.FieldType = 'datetime') then
+      begin
+        dt := ACriteriaItem.GetValue.AsExtended;
+        SQL := SQL + '''' + EscapeDateTime(dt) + ''''
+      end
+      else
+        raise EdormException.CreateFmt('Unknown type %s in criteria',
+          [fm.FieldType]);
+  end;
   Result := SQL;
 end;
 
