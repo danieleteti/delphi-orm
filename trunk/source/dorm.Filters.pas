@@ -10,7 +10,7 @@ uses
 type
 
   TdormCompareOperator = (coEqual, coGreaterThan, coLowerThan, coGreaterOrEqual,
-    coLowerOrEqual, coNotEqual, coLike);
+    coLowerOrEqual, coNotEqual, coLike, coIsNull, coIsNotNull);
   TdormLogicRelation = (lrAnd, lrOr);
 
   ICriteriaItem = interface;
