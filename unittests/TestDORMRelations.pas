@@ -110,7 +110,7 @@ begin
     CheckEquals('d.teti@bittime.it', Car.Owner.Email.Value);
   finally
     p := Car.Owner;
-    p.Car := nil;
+    p.Car.Free;
     Car.Free;
     Car := nil;
     p.Car := nil;

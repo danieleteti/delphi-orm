@@ -1,6 +1,7 @@
 { *************************************************** }
 { This file is for Global Compiler Defines for DORM }
 { *************************************************** }
+
 { ****************** start adapters section ********************* }
 { These defines control if a specified adapter will be
   linked into Sample Projects, Unit Tests and all your dorm projects
@@ -9,20 +10,21 @@
   define a comment.
 }
 {$DEFINE LINK_FIREBIRDUIB_ADAPTER }
-{$DEFINE LINK_INTERBASEUIB_ADAPTER }
-{$DEFINE LINK_SQLITE3_ADAPTER}
+{ .$DEFINE LINK_INTERBASEUIB_ADAPTER }
+{$DEFINE LINK_SQLITE3_ADAPTER }
 
-// requires delphi ent or better - NOT YET SUPPORTED
-{ . $DEFINE LINK_SQLSERVER_ADAPTER }
+{ .$DEFINE LINK_SQLSERVER_ADAPTER } // require delphi ent or better
+// require DevArt dbExpress driver for sqlserver
+{ .$DEFINE LINK_SQLSERVERDEVART_ADAPTER }
+{ . $DEFINE LINK_FIREBIRD_ADAPTER }
+// require delphi ent or better (deprecated, do not use. Use LINK_FIREBIRDUIB_ADAPTER )
+{ .$DEFINE LINK_INTERBASE_ADAPTER }
+// require delphi ent or better (deprecated, do not use. Use LINK_INTERBASEUIB_ADAPTER)
 
-// requires DevArt dbExpress driver for sqlserver - NOT YET SUPPORTED
-{ . $DEFINE LINK_SQLSERVERDEVART_ADAPTER }
+// requires FireDac for sqlserver
+{.$DEFINE LINK_SQLSERVER_FIREDAC_ADAPTER}
 
 { **************** end adapters section ************************* }
-
-
-
-
 
 { ****************** start loggers section ********************* }
 { These defines control if a specified logger will be
