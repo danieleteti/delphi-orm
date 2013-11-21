@@ -32,12 +32,16 @@ uses
   dorm.adapter.sqlite3
 {$ENDIF}
 {$IFDEF LINK_SQLSERVER_ADAPTER}
-  SQLServer is not supported in this version of dorm,
+    ,
   dorm.adapter.sqlserver9
 {$ENDIF}
 {$IFDEF LINK_SQLSERVERDEVART_ADAPTER}
-  SQLServer is not supported in this version of dorm,
+    ,
   dorm.adapter.sqlserverdevart
+{$ENDIF}
+{$IFDEF LINK_SQLSERVER_FIREDAC_ADAPTER}
+    ,
+  dorm.adapter.FireDac.SQLServer
 {$ENDIF}
     ;
 { ************************ WARNING ************************ }

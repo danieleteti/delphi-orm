@@ -133,6 +133,11 @@ begin
   Result := 'dorm_sqlite3.conf';
 
   {$ENDIF}
+  {$IFDEF SQLSERVER_FIREDAC_STRATEGY}
+
+  Result := 'dorm_sqlserver_firedac.conf';
+
+  {$ENDIF}
   {$IFNDEF INTERBASE_STRATEGY}
   {$IFNDEF INTERBASE_UIB_STRATEGY}
   {$IFNDEF FIREBIRD_STRATEGY}
@@ -142,10 +147,12 @@ begin
   {$IFNDEF SQLSERVER_DEVART_STRATEGY}
   {$IFNDEF FIREBIRD_CI}
   {$IFNDEF CONSOLE_TESTRUNNER}
+  {$IFNDEF SQLSERVER_FIREDAC_STRATEGY}
   {$MESSAGE ERROR '**************************************************'}
   {$MESSAGE ERROR '**>>> There are not strategy conditionals defined '}
   {$MESSAGE ERROR '**>>> You should select a REAL BUILD configuration'}
   {$MESSAGE ERROR '**************************************************'}
+  {$ENDIF}
   {$ENDIF}
   {$ENDIF}
   {$ENDIF}
