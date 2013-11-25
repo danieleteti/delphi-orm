@@ -1,0 +1,646 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <title>Unified Interbase</title>
+  <meta content="True" name="vs_showGrid">
+  <link href="stylesheet.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+<table class="Menu">
+  <tbody>
+    <tr>
+      <th height="20"> &nbsp;Unified Interbase v2.0 (2005-03-21) </th>
+    </tr>
+    <tr>
+      <td>
+      <p align="left">UIB is a set of components to use <strong>Interbase</strong>,
+      <strong>FireBird</strong> and <strong>YAFFIL</strong>.</p>
+      <p align="left">These components were born from the need to use
+Interbase, FireBird or Yaffil&nbsp;indifferently as fast as possible in
+a Multithreading environment, a Server for example. UIB&nbsp;have a
+Borland Compliant conversion API for Interbase, FireBird and
+YAFFIL.&nbsp;&nbsp; </p>
+      <p align="left">UIB include&nbsp;11 components:</p>
+      <ul>
+        <li>
+          <div align="left">TUIBDatabase. </div>
+        </li>
+        <li>
+          <div align="left">TUIBTransaction.</div>
+        </li>
+        <li>
+          <div align="left">TUIBQuery.</div>
+        </li>
+        <li>
+          <div align="left">TUIBBackup.</div>
+        </li>
+        <li>
+          <div align="left">TUIBRestore.</div>
+        </li>
+        <li>
+          <div align="left">TUIBScript.</div>
+        </li>
+        <li>
+          <div align="left">TUIBDataSet (<strong>read only</strong>).</div>
+        </li>
+        <li>
+          <div align="left">TUIBSecurity</div>
+        </li>
+        <li>
+          <div align="left">TUIBEvents</div>
+        </li>
+        <li>
+          <div align="left">TUIBRepair</div>
+        </li>
+        <li>&nbsp; TUIBConfig</li>
+      </ul>
+      <p align="left">&nbsp;These components are "<strong>Thread-Safe</strong>"
+with any version of Interbase, FireBird and Yaffil and are working with
+      <strong>Delphi</strong>, <strong>BCB,</strong> &nbsp;<strong>Kylix,
+Lazarus &amp;&nbsp;FPC (Win32, Linux, FreeBsd)</strong>.</p>
+      <p align="center"> </p>
+      <p align="left">
+      <table id="Table1" style="height: 597px;" border="1"
+ cellpadding="1" cellspacing="1" width="100%">
+        <tbody>
+          <tr>
+            <td colspan="2" bgcolor="gray" height="30">
+            <h2><font color="#999999"><font color="#ffffff">History</font>
+            </font> </h2>
+            </td>
+          </tr>
+          <tr>
+            <td height="31"><font color="#006600">2005-03-21</font></td>
+            <td height="31" width="680">
+            <p><strong>UIB 2<br>
+            </strong></p>
+            <li> New component TUIBConfig. </li>
+            <li> New component TUIBRepair.</li>
+            <li>&nbsp;New component TUIBSecurity (thanks to Volkan
+Ceylan). </li>
+            <li> New component TUIBEvents. </li>
+            <li> Rewritten TUIBScript to handle large script. </li>
+            <li> Corrected dataset and FPC 1.9.6 compatibility. </li>
+            <li> Improved TUIBDatabase to retrieve database
+informations. </li>
+            <li> Corrected "uibmetadata" to retrieve array
+informations. </li>
+            <li> Read/write faster NUMERIC data types. (thanks to
+Volkan Ceylan).&nbsp; </li>
+            <li> Delphi 2005 for win32 compatibility. </li>
+            <li> new compiler option: "HAVE_SYNEDIT", if you don't want
+to use synedit, desactivate this option in uib.inc. </li>
+            <li> Firebird 2 compatibility. </li>
+            <li> Again faster :)&nbsp;
+              <p><u>Compatibility with previous version</u> </p>
+            </li>
+            <li> In previous version of TUIBBackUp &amp;
+TUIBRestore you need to implement the OnVerbose event to wait for the
+end of the operation. Now you also have to set the new "verbose"
+property to true. </li>
+            <li> If you use the dataset with persistent BCD fields you
+have to regenerate them !!! </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31"><font color="#006600">2004-05-06</font></td>
+            <td height="31" width="680"> <li> <u>UIB v1.2h
+maintenance update.</u> </li>
+            <li> Bug corrected on TUIBDataset when 2 fields&nbsp;have
+the same alias name. </li>
+            <li> Improved speed on TUIBQuery.Open (thanks to Volkan
+Ceylan). </li>
+            <li> Added SQL Editor on Kylix (Get the latest SynEdit
+Version). </li>
+            <li> DBExpress drivers recompiled for Windows and Linux. </li>
+            <li> Corrected packages and TUIBDataset for FreePascal
+and Lazarus Ide (Win32+ Linux). </li>
+            <li> I've checked all supported version of Delphi, Kylix,
+BCB, FPC and Lazarus.</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="#006600">2004-04-08</font></td>
+            <td height="31"> <li> <u>UIB v1.2g maintenance update.</u>
+            </li>
+            <li> Bug corrected on "TUIBStatement.ParamsSetBlob(fIeld,
+buffer, size)" function. </li>
+            <li> FreeBsd Compatibilitty with FPC (Thank to Sergey
+Shilov). </li>
+            <li> Added "TMetaTableField.ComputedSource" property for
+computed fields. </li>
+            <li> IFPS3 Interfaces updated.</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="#006600">2004-03-07</font></td>
+            <td height="31"> <li> <u>UIB v1.2f maintenance update.</u>
+            </li>
+            <li> TUIBQuery &gt; Corrected Eof property when prior is
+called. (Thank to Francois Piette) </li>
+            <li> TUIBQuery &gt; Added Bof property. </li>
+            <li> TUIBDataSet &gt; Corrected Refresh method.</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="#006600">2004-02-06</font></td>
+            <td height="31"> <li> <u>UIB v1.2e maintenance update.</u>
+            </li>
+            <li> Bug corrected with empty string parametters, previous
+version was including zero terminal. </li>
+            <li> <u>DBExpress&nbsp;v1.2e update</u> </li>
+            <li> Include correction&nbsp;from the core components. </li>
+            <li> BCD fields error corrected. </li>
+            <li> Various internal modifications on transactions and
+cursors. </li>
+            <li> Considering reported bugs, the dbexpress driver is a
+beta release.</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74">
+            <p><font color="#006600">2004-01-16</font></p>
+            </td>
+            <td height="31"> <li> <u>UIB &amp; DBExpress&nbsp;v1.2c
+maintenance update</u> </li>
+            <li> Corrected: some bugs in DBExpress driver (no bugs in
+UIB components) </li>
+            <li> Added: more inline documentation. </li>
+            <li> Added:&nbsp;<a href="http://ifps3.php">IFPS3</a>&nbsp;interfaces
+for UIB. </li>
+            <li> UIB DBexpress binaries updated.</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="#006600">2004-01-09</font></td>
+            <td height="31"> <li> <u>UIB &amp; DBExpress&nbsp;v1.2b
+maintenance update</u> </li>
+            <li> Updated Kylix Packages. </li>
+            <li> Added Kylix DBExpress Drivers.</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="#006600">2004-01-04</font></td>
+            <td height="31"> <li> <u>UIB &amp; DBExpress&nbsp;v1.2a
+maintenance update</u> </li>
+            <li> Fix Firebird 1.5 RC8 compatibility issue (incorrect
+blob size returned).</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="#006600">2003-12-31</font></td>
+            <td height="31"> <li> <u>UIB v1.2 Release</u> </li>
+            <li> Some minor updates. </li>
+            <li> New: <strong>DBExress Drivers</strong> for any
+version of Interbase and Firebird. </li>
+            <li> New Tool: Firebird Packet Analyser. </li>
+            <li> Happy new year :)</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="#006600">2003-12-20</font></td>
+            <td height="31"> <li> <u>UIB v1.2 RC1</u> </li>
+            <li> Improved SQL Editor (code completion, code parameter,
+syntax HighLighter ...). </li>
+            <li> Bug corrected in UIBMetadata (when reading a double
+foreign key). </li>
+            <li> TUIBQuery can now excecute a stored proc that return
+values&nbsp;without adding&nbsp;"suspend" at the end.</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="#006600">2003-12-12</font></td>
+            <td height="31"> <li> <u>UIB v1.1d</u>: Maintenance
+Update. </li>
+            <li> BUG corrected on blob Read/Write operations, the bug
+was occuring on blobs&nbsp;&gt; 64 Kb. </li>
+            <li> TUIBStatement.SetTransaction corrected.</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="darkgreen">2003-12-09</font></td>
+            <td height="31"> <li> <u>UIB v1.2 beta 2</u> </li>
+            <li> New property editors for Database, Transaction and
+Query components, SQL property editor need <a
+ href="http://prdownloads.sourceforge.net/synedit/synedit-cvs-2003-12-07.zip?download">
+SYNEDIT</a> components. </li>
+            <li> New "Autostop" property, default = false, if True you
+need to close transaction explicitly. </li>
+            <li> There is now 2 packages to install, the Runtime and
+the design pakages, read help file. </li>
+            <li> UIBScript doesn't commit automatically anymore. </li>
+            <li> BUG corrected on blob Read/Write operations, the bug
+was occuring on blobs&nbsp;&gt; 64 Kb. </li>
+            <li> Spanish language support.&nbsp;</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="darkgreen">2003-11-16</font></td>
+            <td height="31"> <li> <u>UIB v1.2 beta 1</u> </li>
+            <li> <strong>Major update&nbsp;on transaction rules</strong>,&nbsp;in
+the&nbsp;previous versions when a transaction is committed
+and&nbsp;there is at least one query alive, "Commit" was changed to
+"CommitRetaining"&nbsp;to make other&nbsp;queries
+still&nbsp;usable.&nbsp;&nbsp;The new&nbsp;"<strong>AutoRetain</strong>"
+property on Transaction component change this behaviour to close all
+active queries when transaction commited. The default value is "False",
+              <strong>for compatibility with the previous versions you
+must set this property manually to "True". </strong> It is
+highly&nbsp;recommended&nbsp;to keep the default value, excepted if you
+perfectly understand this feature. </li>
+            <li> New "<strong>AutoStart</strong>" property on
+transaction component, default value&nbsp; is "True", if&nbsp;this
+property is set to "False", you have to call <strong>StartTransaction</strong>.
+            </li>
+            <li> More debugging informations in&nbsp;exceptions
+messages, previously only the first line was diplayed :( </li>
+            <li> New exception: <strong>EUIBException</strong> =
+class(EUIBError). This exception class&nbsp;is raised when stored
+procedures or triggers raise interbase exceptions. You can&nbsp;add
+your own exceptions&nbsp;using "<strong>RegisterException"</strong>
+method on the database component,&nbsp;so UIB will be able to
+raise&nbsp;different&nbsp;exeption for each Interbase exception. </li>
+            <li> If FB15 compiler option is defined, you can use the
+"GetClientLibrary" method (UIBLib.pas)&nbsp;to retrieve absolute path
+of the client library according to to the new Firebird specifications. </li>
+            <li> UIBMetadata unit: Now support <strong>Roles</strong>
+and <strong>Domains</strong> (thank to Ritsaert Hornstra). </li>
+            <li> UIB join&nbsp; <a
+ href="http://v.webring.com/hub?ring=interbase">Interbase&reg; WebRing</a>.</li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="darkgreen">2003-10-22</font></td>
+            <td height="31"> <li> <u>UIB v1.1c</u> </li>
+            <li> Bug corrected when reading a large blob as string. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="56" width="74"><font color="darkgreen">2003-10-11</font></td>
+            <td height="56"> <li> <u>UIB v1.1b</u> </li>
+            <li> TUIBDataBase.OnConnectionLost. </li>
+            <li> "Two Phase Commits" support. </li>
+            <li> Bug on TUIBDataSet.Fields[n].IsNull corrected. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="41" width="74"><font color="darkgreen">2003-10-04</font></td>
+            <td height="41"> <li> <u>UIB v1.1a</u> </li>
+            <li> Improved speed on Blob operations. </li>
+            <li> Bug corrected in TUIBScript with "Drop" statements. </li>
+            <li> Deutch&nbsp;language support. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="darkgreen">2003-10-01</font></td>
+            <td height="31"> <li> <u>UIB v1.1 Stable Release.</u> </li>
+            <li> Now working with Delphi 4 and BCB 5. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="41" width="74"><font color="darkgreen">2003-09-21</font></td>
+            <td height="41"> <li> <u>UIB v 1.1 RC3 </u> </li>
+            <li> New TUIBDataSet component, at this time the
+component is "read only". </li>
+            <li> New package for Delphi 6&nbsp;Personnal Editions. </li>
+            <li> New CZECH language support (Thank to Petr Stasiak). </li>
+            <li> Bugs corrected:
+              <ul>
+                <ul>
+                  <li> Now, setting a param as an&nbsp;empty string
+don't&nbsp;change the parametter&nbsp;to NULL. </li>
+                  <li> Setting a blob parametter with a stream was not
+working correctly. </li>
+                  <li> Renamed TFieldType to TUIBFieldType.</li>
+                </ul>
+              </ul>
+            </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="41" width="74"><font color="darkgreen">2003-09-07</font></td>
+            <td height="41"> <li> <u>UIB v 1.1 RC2</u> </li>
+            <li> New component TUIBScript (You don't need to use "SET
+TERM"). </li>
+            <li> New method: TUIBDataBase.CreateDatabase. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="41" width="74"><font color="darkgreen">2003-08-15</font></td>
+            <td height="41"> <li> <u>UIB v 1.1 RC1. </u> </li>
+            <li> New unit UIBMetaData, to extract Metadatas (see
+UIB\examples\UIB\Component\Metadata sample). </li>
+            <li> New Widestring data type (Params &amp; Fields). </li>
+            <li> New optimization on TUIBQuery.Open, now you can
+reopen the same query just changing parametters to save the "prepare
+time" (the query is still closed if you change Sql text). </li>
+            <li> new method (TUIBQuery.BuildStoredProc):
+automatically create sql query and find parametter types from procedure
+name. </li>
+            <li> new event: TUIBTransaction.OnStartTransaction &amp;
+OnEndTransaction; </li>
+            <li> UIB source code on sourceforge. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="31" width="74"><font color="darkgreen">2003-07-13</font></td>
+            <td height="31"> <li> <u>UIB v 1.1 Beta 2. </u> </li>
+            <li> Parsing error corrected with "CREATE XXX" statements. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="41" width="74"><font color="darkgreen">2003-07-09</font></td>
+            <td height="41"> <li> <u>UIB v 1.1 Beta 1. </u> </li>
+            <li> UIB now working with&nbsp;<a
+ href="http://www.freepascal.org">FreePascal</a> Compiler
+v1.1&nbsp;(win32 &amp; Linux) and&nbsp;<a
+ href="http://www.lazarus.freepascal.org">Lazarus</a> IDE&nbsp;(Linux
+Only).&nbsp; <br>
+&nbsp;*** Special thanks to <strong>Olivier Guilbaud</strong> for his
+help :) ***&nbsp; </li>
+            <li> new: <strong>Parametters by name</strong>
+(:identifier), you can still use "?" as identifier. </li>
+            <li> removed: "UseCursor", now query component always use a
+cursor to avoid conficts when updating metadatas. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="20" width="74"><font color="darkgreen">2003-06-28</font></td>
+            <td height="20"> <li> Previous version become
+a&nbsp;stable release, this version will&nbsp;allways be available
+here. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="41" width="74"><font color="darkgreen">2003-06-25</font></td>
+            <td height="41"> <li> New property on TUIBDataBase,
+TUIBackUp &amp; TUIBRestore: <strong>LibraryName</strong>, to
+specify thr GDS library to use (helpfull for embeded versions). </li>
+            <li> Added <strong>Interbase 7.1</strong> compatibility. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="20" width="74"><font color="darkgreen">2003-06-14</font></td>
+            <td height="20"> <li> A bug corrected with string param. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="28" width="74"><font color="darkgreen">2003-06-12</font></td>
+            <td height="28"> <li> Corrected: AsVariant with boolean
+data types. </li>
+            <li> Missed methods added (AddCurrency, AddBoolean). </li>
+            <li> Added: Execute method on TUIBQuery (see data pump
+example). </li>
+            <li> Transaction can lock more than one table (ex: LockRead
+:= 'Table1;Table2 ...'). </li>
+            <li> New Compiler Options:<br>
+- FB103: Firebird 1.03.<br>
+- UIBLANG_EN: UIB messages in English (Default).<br>
+- UIBLANG_FR: UIB messages in French.<br>
+- UIBNOCOMPONENT: Use class instead of components.<br>
+              <p>Contact me to add your language.</p>
+            </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="28" width="74"><font color="darkgreen">2003-06-08</font></td>
+            <td height="28"> <li> Added Currency Data Type. </li>
+            <li> Added Boolean Data Type. </li>
+            <li> Added UseCursor: boolean&nbsp;property on TUIBQuery
+(see cursor example). </li>
+            <li> Added OnError: TEndTransMode property on TUIBQuery
+to define what to do on transaction when error occur&nbsp;(see cursor
+example). </li>
+            <li> AddBlob <strong>renamed</strong> with ParamAddBlob. </li>
+            <li> Added ParamReadBlob. </li>
+            <li> Added ParamSetBlob. </li>
+            <li> First Release Candidate: V1.0 RC1</li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-05-31</font></td>
+            <td> <li> A bug corrected when&nbsp;adding a blob
+parametter from a stream (too many data are saved). </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-05-29</font></td>
+            <td> <li> Minor design update. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-05-14</font></td>
+            <td> <li> Bug corrected when adding an empty string
+parametter to Query. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-05-07</font></td>
+            <td> <li> Threaded Query sample modified. </li>
+            <li> Disconnecting Database now close transactions properly
+when needed. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-05-03</font></td>
+            <td> <li> Minor bug corrected on TUIBQuery.ExecSQL. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-04-25</font></td>
+            <td> <li> UIB working with Kylix 3. </li>
+            <li> New compiler option: "FBEMBED" to use FireBird 1.5
+Embed. ("FB15" must be defined). </li>
+            <li> Database Handle property, set this property with the
+handle of another IB Database Component to migrate to UIB easier. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-04-20</font></td>
+            <td> <li> New compiler option: "UIBTHREADSAFE",
+desactivate multithreading to retrieve records faster.&nbsp;(single
+thread applications only) </li>
+            <li> New TUIBQuery property: "BufferChunks" to allocate
+memory faster when "CachedFetch" property is set to True. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-04-16</font></td>
+            <td> <li> Minor update to retrieve faster&nbsp;(27.5%) a
+field by his name. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-04-15</font></td>
+            <td> <li> BCB6 compatibility improved. </li>
+            <li> A bug with VARCHAR Type corrected. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-04-12</font></td>
+            <td> <li> align="left"&gt;Read Blob as Variant. </li>
+            <li> A minor bug corrected on a Blob function. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-04-11</font></td>
+            <td> <li> Automation sample to use with Excel, VBScript
+... </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-04-10</font></td>
+            <td> <li> Now work with BCB6 </li>
+            <li> New components: TUIBBackup &amp; TUIBRestore. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-03-29</font></td>
+            <td> <li> UIB now work with Delphi 5. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-03-26</font></td>
+            <td> <li> UIB now work with YAFFIL. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-03-18</font></td>
+            <td> <li> Now blobs can be fetched in a TSQLResult (See
+FetchBlob Property). </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-03-16</font></td>
+            <td> <li> UIB now include an ORB working wtih Indy (See
+Client/Server sample). </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-03-12</font></td>
+            <td> <li> Synchronisation corrected with multi-database
+connections. </li>
+            </td>
+          </tr>
+          <tr>
+            <td height="18" width="74"><font color="darkgreen">2003-03-11</font></td>
+            <td height="18"> <li> UIB Will be included to JVCL 3.0,
+Components are now compliant to JVCL Specifications. </li>
+            <li> QuickScript property on TUIBQuery. </li>
+            </td>
+          </tr>
+          <tr>
+            <td width="74"><font color="darkgreen">2003-03-07</font></td>
+            <td> <li> Read/Write Blob. </li>
+            <li> Fields by name. </li>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </p>
+      <h3 align="left">Why to use UIB ?</h3>
+      <ul>
+        <li>
+          <div align="left">You need a&nbsp;fast access to database.</div>
+        </li>
+        <li>
+          <div align="left">You need a threaded access to database.</div>
+        </li>
+        <li>
+          <div align="left">You want to use indifferently Interbase,
+FireBird or Yaffil.</div>
+        </li>
+      </ul>
+      <h3 align="left">Which version of Database are supported ?</h3>
+      <ul>
+        <li>
+          <div align="left">Interbase 6.00, 6.01, 6.02, 6.5, 7.0, 7.1,
+7.5.</div>
+        </li>
+        <li>
+          <div align="left">Firebird 1.02, 1.03,&nbsp;1.5, 2.</div>
+        </li>
+        <li>
+          <div align="left">Yaffil 1.0.xxx</div>
+        </li>
+      </ul>
+      <h3 align="left">Which version of&nbsp;compilers&nbsp;are
+supported ?</h3>
+      <ul>
+        <li>
+          <div align="left">Delphi 5.</div>
+        </li>
+        <li>
+          <div align="left">Delphi 6&nbsp;&amp; PE.</div>
+        </li>
+        <li>
+          <div align="left">Delphi 7.</div>
+        </li>
+        <li>
+          <div align="left">BCB 5.</div>
+        </li>
+        <li>
+          <div align="left">BCB 6.</div>
+        </li>
+        <li>
+          <div align="left">Kylix 3.</div>
+        </li>
+        <li>
+          <div align="left">FreePascal V1.9.x (Win32 &amp; Linux).</div>
+        </li>
+        <li>
+          <div align="left">Other versions are not tested.</div>
+        </li>
+      </ul>
+      <h3 align="left">Compiler options:</h3>
+      <p align="left">Edit "UIB.inc" and activate what you need.</p>
+      <p align="left">(UIB work in compatibility mode
+(IB6)&nbsp;if&nbsp;any option&nbsp;is defined.)</p>
+      <ul>
+        <li>
+          <div align="left">"FB102" (FireBird 1.02)</div>
+        </li>
+        <li>
+          <div align="left">"FB103" (FireBird 1.03)</div>
+        </li>
+        <li>
+          <div align="left">"FB15" (FireBird 1.5)</div>
+        </li>
+        <li>&nbsp;&nbsp; "FB20" (Firebird 2)</li>
+        <li>
+          <div align="left">"IB65" (Interbase 6.5)</div>
+        </li>
+        <li>
+          <div align="left">"IB7" (Interbase 7)</div>
+        </li>
+        <li>
+          <div align="left">"IB71" (Interbase 7.1)</div>
+        </li>
+        <li>
+          <div align="left">"YF867" (YAFFIL 1 build&nbsp;867)</div>
+        </li>
+        <li>
+          <div align="left">UIBTHREADSAFE&nbsp;(DEFAULT)</div>
+        </li>
+        <li>
+          <div align="left">UIBLANG_EN : messages in English (DEFAULT).</div>
+        </li>
+        <li>
+          <div align="left">UIBLANG_FR : messages in French.</div>
+        </li>
+        <li>
+          <div align="left">UIBLANG_CZ: messages in Czech.</div>
+        </li>
+        <li>
+          <div align="left">UIBLANG_DE: messages in Deutch.</div>
+        </li>
+        <li>
+          <div align="left">UIBLANG_ES: messages in Spanish.</div>
+        </li>
+      </ul>
+      </td>
+    </tr>
+  </tbody>
+</table>
+</body>
+</html>

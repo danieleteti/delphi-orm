@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+  <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+  <title>UIB SQL Monitor</title>
+
+</head>
+<body>
+<h3 align="center">UIB SQL Monitor V1.3</h3>
+
+Cet utilitaire permet de montrer en temps r&eacute;el les
+requ&ecirc;tes utilis&eacute;es&nbsp;par une application
+utilisant Interbase ou Firebird.<br>
+
+On peut &eacute;gualement visualiser et trier les performances
+des&nbsp;requ&ecirc;tes. Ce moniteur SQL ne
+n&eacute;cessite
+normallement pas de modification de votre application si celle ci
+utilise une DLL cliente (gds32.dll, fbclient.dll ou fbembed.dll). Cela fonctionne aussi avec les applications dot.net.<br>
+
+<br>
+
+<div align="center"><img src="screenshot.PNG"><br>
+</div>
+
+<br>
+
+<h3>Usage</h3>
+
+S&eacute;lectionnez l'ex&eacute;cutable &agrave; lancer ansi que la dll cliente plus cliquez sur le bouton "Run".<br>
+
+<h3>Statistiques</h3>
+
+Les temps sont exprim&eacute;s en milisecondes,<br>
+
+<br>
+<b>Time</b>: Le moment de la requ&ecirc;te.<br>
+<b>Query</b>: La&nbsp;requ&ecirc;te SQL.<br>
+
+<b>Exec&nbsp;Count</b>: Est le nombre d'ex&eacute;cutions de la requ&ecirc;te.<br>
+
+
+<b>Field Count</b>: Est le nombre de lignes lues ou modifi&eacute;es par des re(SELECT, INSERT, UPDATE, DELETE).<br>
+
+
+<b>Prep Time</b>: Est le temp de pr&eacute;paration de la requ&ecirc;te.<br>
+
+<b>Exec Time</b>: Est le temps total de toutes les ex&eacute;cutions de la requ&ecirc;te.<br>
+
+<b>Fetch Time</b>: Est le temps total de tous les fetchs.<br>
+
+<b>Total</b>: Est le temp total entre la premiere action et la dernierre action sur la requ&ecirc;te.<br>
+
+<br>
+
+<h3>Problemes connus</h3>
+
+Parfois rien n'apparait dans la liste d&eacute;roulante, cela peut provenir de plusieurs choses:<br>
+
+<ol>
+
+<li>Vous n'avez pas s&eacute;lectionn&eacute; la bonne DLL.</li>
+<li>Le programme surveill&eacute; ne trouve pas "madCHook.dll", placez alors une copie du fichier dans system32.</li><li>Vous n'&ecirc;tes pas administrateur de la machine.</li>
+</ol>
+
+<h3>Compatibilit&eacute; "Firebird .Net Data Provider"</h3>
+
+Par d&eacute;faut le provider Firebird communique en tcp avec le
+serveur et n'utilise pas de DLL. Vous devez modifier la chaine de
+connexion <br>
+
+par exemple:
+<br>
+
+<br>
+
+FbConnectionStringBuilder *cs = new FbConnectionStringBuilder();
+<br>
+
+cs-&gt;DataSource = "localhost";
+<br>
+
+cs-&gt;Database = "C:\\Program Files\\Firebird\\Firebird_2_0\\examples\\empbuild\\EMPLOYEE.FDB";
+<br>
+
+cs-&gt;UserID = "SYSDBA";
+<br>
+
+cs-&gt;Password = "masterkey";
+<br>
+
+cs-&gt;Dialect = 3;
+<br>
+
+<b><font color="#990000">cs-&gt;ServerType = 1;
+</font></b><br>
+
+<br>
+
+Quand ServerType = 1 le provider utilise fbembed.dll, vous devez alors
+copier fbclient.dll dans le r&eacute;pertoire de votre application puis
+la renommer en fbembed.dll.<br>
+
+Ou tout simplement utiliser Firebird Embeded. Consultez la documentation du provider pour plus d'information.<br>
+
+<br>
+
+<h3>Auteur</h3>
+
+<a href="mailto:hgourvest@progdigy.com">Henri Gourvest</a><br>
+
+<a href="http://www.progdigy.com">http://www.progdigy.com</a><br>
+
+<br>
+
+<h3>Outils utilis&eacute;s</h3>
+
+MadCodeHook: <a href="http://www.madshi.net">http://www.madshi.net</a><br>
+
+VirtualTreeView: <a href="http://www.delphi-gems.com/VirtualTreeview">http://www.delphi-gems.com/VirtualTreeview</a><br>
+
+SynEdit: <a href="http://synedit.sourceforge.net">http://synedit.sourceforge.net</a>
+</body></html>
