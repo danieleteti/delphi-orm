@@ -12,46 +12,59 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
+
+  Contributor: Marco Mottadelli
   ******************************************************************************** }
 
-unit dorm.adapter.FireDac.Facade;
+unit dorm.adapter.FireDAC.Facade;
 
 interface
 
 uses
-  uADGUIxIntf, uADGUIxFormsWait,
-  uADStanIntf, uADStanOption, uADStanError, uADPhysIntf, uADStanDef,
-  uADStanPool, uADStanAsync, uADPhysManager, uADStanParam, uADDatSManager,
-  uADDAptIntf, uADDAptManager, uADCompClient, Data.DB, uADCompDataSet,
-  uADCompGUIx,
-  superobject, Classes;
+  System.Classes,
+  Data.DB,
+  FireDAC.UI.Intf,
+  FireDAC.VCLUI.Wait,
+  FireDAC.Stan.Intf,
+  FireDAC.Stan.Option,
+  FireDAC.Stan.Error,
+  FireDAC.Stan.Def,
+  FireDAC.Stan.Pool,
+  FireDAC.Stan.Async,
+  FireDAC.Stan.Param,
+  FireDAC.DatS,
+  FireDAC.DApt.Intf,
+  FireDAC.DApt,
+  FireDAC.Comp.UI,
+  FireDAC.Comp.DataSet,
+  FireDAC.Comp.Client,
+  FireDAC.Phys,
+  FireDAC.Phys.Intf,
+  FireDAC.Phys.ODBCBase,
+  superobject;
 
 type
-  TFireDacFacade = class
+  TFireDACFacade = class
   protected
-  var
-    FFireDacDatabase: TADConnection;
-
-  protected
-    FCurrentTransaction      : TADTransaction;
-    FParameters              : TStringList;
-    FDriverID                : string;
-    function NewStatement: TADCommand;
-    function NewQuery: TADQuery;
-
+    FConnectionString: string;
+    FConnection: TFDConnection;
+    FCurrentTransaction: TFDTransaction;
+    FDriverLink: TFDPhysODBCBaseDriverLink;
+    function NewCommand: TFDCommand;
+    procedure SetConnectionParams;
   public
-    constructor Create(AParameters: TStringList);
+    constructor Create(const AConnectionString: string; DriverLink: TFDPhysODBCBaseDriverLink);
     destructor Destroy; override;
-    function GetConnection: TADConnection;
-    function GetCurrentTransaction: TADTransaction;
     procedure StartTransaction;
     procedure CommitTransaction;
     procedure RollbackTransaction;
+    function GetConnection: TFDConnection;
+    function GetCurrentTransaction: TFDTransaction;
+    function NewQuery: TFDQuery;
     function Execute(ASQL: string): Int64; overload;
-    function Execute(ASQLCommand: TADCommand): Int64; overload;
-    function Execute(ASQLCommand: TADQuery): Int64; overload;
-    function ExecuteQuery(ASQLCommand: TADQuery): TADQuery; overload;
-    function Prepare(ASQL: string): TADQuery;
+    function Execute(ASQLCommand: TFDCommand): Int64; overload;
+    function Execute(ASQLQuery: TFDQuery): Int64; overload;
+
   end;
 
 implementation
@@ -60,31 +73,46 @@ uses
   sysutils,
   dorm.Commons;
 
-{ Factory }
+procedure TFireDACFacade.SetConnectionParams;
+var
+  SlParams: TStringList;
+  i: Integer;
+begin
+  SlParams := TStringList.Create;
+  SlParams.Delimiter := ';';
+  SlParams.DelimitedText := FConnectionString;
 
-procedure TFireDacFacade.StartTransaction;
+  for i := 0 to SlParams.Count-1 do
+  begin
+    FConnection.Params.Add(SlParams.Strings[i]);
+  end;
+
+  FreeAndNil(SlParams);
+end;
+
+procedure TFireDACFacade.StartTransaction;
 begin
   GetConnection;
   FCurrentTransaction.StartTransaction;
 end;
 
-procedure TFireDacFacade.CommitTransaction;
+procedure TFireDACFacade.CommitTransaction;
 begin
   FCurrentTransaction.Commit;
 end;
 
-procedure TFireDacFacade.RollbackTransaction;
+procedure TFireDACFacade.RollbackTransaction;
 begin
   FCurrentTransaction.RollBack;
 end;
 
-function TFireDacFacade.Execute(ASQL: string): Int64;
+function TFireDACFacade.Execute(ASQL: string): Int64;
 var
-  Cmd: TADCommand;
+  Cmd: TFDCommand;
 begin
-  Cmd := NewStatement;
+  Cmd := NewCommand;
   try
-    Cmd.CommandText.Text := ASQL;
+    Cmd.CommandText.Add(ASQL);
     Cmd.Execute;
     Result := Cmd.RowsAffected;
   finally
@@ -92,96 +120,68 @@ begin
   end;
 end;
 
-function TFireDacFacade.Prepare(ASQL: string): TADQuery;
-var
-  Cmd: TADQuery;
-begin
-  Cmd := NewQuery;
-  try
-    Cmd.SQL.Text := ASQL;
-    //Cmd.Prepare;
-  except
-    FreeAndNil(Cmd);
-    raise;
-  end;
-  Result := Cmd;
-end;
-
-constructor TFireDacFacade.Create(AParameters: TStringList);
+constructor TFireDACFacade.Create(const AConnectionString: string; DriverLink: TFDPhysODBCBaseDriverLink);
 begin
   inherited Create;
-  FParameters:=TStringList.Create;
-  FParameters.Text:=AParameters.Text;
+  FConnectionString := AConnectionString;
+  FDriverLink := DriverLink;
 end;
 
-destructor TFireDacFacade.Destroy;
+destructor TFireDACFacade.Destroy;
 begin
-  if assigned(FFireDacDatabase) then
+  if Assigned(FConnection) then
   begin
-    if assigned(FCurrentTransaction) and (FCurrentTransaction.Connection.InTransaction) then
+    if Assigned(FCurrentTransaction) and (FCurrentTransaction.Active) then
       FCurrentTransaction.RollBack;
 
-    FFireDacDatabase.Connected := False;
+    FConnection.Connected := False;
     FCurrentTransaction.Free;
-    FFireDacDatabase.Free;
+    FConnection.Free;
   end;
-
-  FParameters.Free;
-
   inherited;
 end;
 
-function TFireDacFacade.Execute(ASQLCommand: TADCommand): Int64;
+function TFireDACFacade.Execute(ASQLCommand: TFDCommand): Int64;
 begin
-  ASQLCommand.Execute;
+  ASQLCommand.Execute();
   Result := ASQLCommand.RowsAffected;
 end;
 
-function TFireDacFacade.ExecuteQuery(ASQLCommand: TADQuery): TADQuery;
+function TFireDACFacade.GetConnection: TFDConnection;
 begin
-  Result:=ASQLCommand;
-  ASQLCommand.Execute;
-end;
-
-function TFireDacFacade.GetConnection: TADConnection;
-begin
-  if FFireDacDatabase = nil then
+  if FConnection = nil then
   begin
-    FFireDacDatabase := TADConnection.Create(nil);
-    FFireDacDatabase.Params.Text:=FParameters.Text;
-    FFireDacDatabase.Connected := True;
-
-    FCurrentTransaction := TADTransaction.Create(nil);
-    FCurrentTransaction.Connection:=GetConnection;
-    FFireDacDatabase.Transaction:=FCurrentTransaction;
-    FFireDacDatabase.UpdateTransaction:=FCurrentTransaction;
+    FConnection := TFDConnection.Create(nil);
+    SetConnectionParams;
+    FCurrentTransaction := TFDTransaction.Create(nil);
+    FCurrentTransaction.Connection := GetConnection;
   end;
-  Result := FFireDacDatabase;
+  Result := FConnection;
 end;
 
-function TFireDacFacade.GetCurrentTransaction: TADTransaction;
+function TFireDACFacade.GetCurrentTransaction: TFDTransaction;
 begin
   Result := FCurrentTransaction
 end;
 
-function TFireDacFacade.NewStatement: TADCommand;
+function TFireDACFacade.NewCommand: TFDCommand;
 begin
-  Result := TADCommand.Create(nil);
+  Result := TFDCommand.Create(nil);
   Result.Connection := GetConnection;
   Result.Transaction := FCurrentTransaction;
 end;
 
-function TFireDacFacade.NewQuery: TADQuery;
+function TFireDACFacade.NewQuery: TFDQuery;
 begin
-  Result := TADQuery.Create(nil);
+  Result := TFDQuery.Create(nil);
   Result.Connection := GetConnection;
   Result.Transaction := FCurrentTransaction;
 end;
 
-function TFireDacFacade.Execute(ASQLCommand: TADQuery): Int64;
+function TFireDACFacade.Execute(ASQLQuery: TFDQuery): Int64;
 begin
-  ASQLCommand.Execute;
-  Result := ASQLCommand.RowsAffected;
+  ASQLQuery.ExecSQL;
+  Result := ASQLQuery.RowsAffected;
 end;
 
 end.
