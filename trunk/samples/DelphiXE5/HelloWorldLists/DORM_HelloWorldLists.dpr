@@ -20,6 +20,15 @@ uses
   Console in '..\..\Commons\Console.pas',
   FindersU in 'FindersU.pas';
 
+  {$IFDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+  const CONFIG_FILE = '..\..\dorm_sqlserver_firedac.conf';
+  const FILTER_WHERE = '(#TCustomerOS.Name# LIKE ''%''+?+''%'') OR (#TCustomerOS.Address# LIKE ''%''+?+''%'')';
+  {$ENDIF}
+  {$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+  const CONFIG_FILE = '..\..\dorm.conf';
+  const FILTER_WHERE = '#TCustomerOS.Name# CONTAINING ? or #TCustomerOS.Address# CONTAINING ?'';
+  {$ENDIF}
+
 procedure Lists;
 var
   dormSession: TSession;
@@ -29,7 +38,7 @@ var
   Customers: TObjectList<TCustomerOS>;
 begin
   dormSession := TSession.CreateConfigured(
-    TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
+    TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
     CreateCustomers(dormSession, 20);
     Customers := dormSession.LoadList<TCustomerOS>;
@@ -54,7 +63,7 @@ var
   Customers: TObjectList<TCustomerOS>;
 begin
   dormSession := TSession.CreateConfigured(
-    TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
+    TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
     CreateCustomers(dormSession, 20);
     Customers := dormSession.LoadList<TCustomerOS>(TPeopleFinder.Create);
@@ -81,7 +90,7 @@ var
   Attr: Integer;
 begin
   dormSession := TSession.CreateConfigured(
-    TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
+    TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
     CreateCustomers(dormSession, 30);
     Filter := '';
@@ -90,7 +99,7 @@ begin
       Customers := dormSession.LoadListSQL<TCustomerOS>(
         Select
         .From(TCustomerOS)
-        .Where('#TCustomerOS.Name# CONTAINING ? or #TCustomerOS.Address# CONTAINING ?', [Filter, Filter])
+        .Where(FILTER_WHERE, [Filter, Filter])
         .orderBy('#TCustomerOS.Name#')
         );
       TextColor(Red);
@@ -130,10 +139,9 @@ begin
   // Lists;
 
   // uncomment the following line to see a DSQL criteria driven search
-  // SearchCriteria;
-
+  SearchCriteria;
   // uncomment the following line to see a criteria driven search
-  // SearchCriteriaFinder;
+  //SearchCriteriaFinder;
   ReadLn;
 
 end.

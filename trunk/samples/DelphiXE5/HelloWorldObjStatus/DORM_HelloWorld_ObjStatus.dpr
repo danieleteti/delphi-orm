@@ -15,6 +15,13 @@ uses
   dorm.ObjectStatus,
   RandomUtilsU in '..\..\Commons\RandomUtilsU.pas';
 
+  {$IFDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+  const CONFIG_FILE = '..\..\dorm_sqlserver_firedac.conf';
+  {$ENDIF}
+  {$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+  const CONFIG_FILE = '..\..\dorm.conf';
+  {$ENDIF}
+
 procedure SimpleCRUD;
 var
   dormSession: TSession;
@@ -22,7 +29,7 @@ var
   id: Integer;
 begin
   dormSession := TSession.CreateConfigured(
-    TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
+    TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
     Customer := TCustomerOS.Create;
     Customer.Name := 'Daniele Teti Inc.';

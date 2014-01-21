@@ -15,6 +15,13 @@ uses
   dorm.ObjectStatus,
   RandomUtilsU in '..\..\Commons\RandomUtilsU.pas';
 
+  {$IFDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+  const CONFIG_FILE = '..\..\dorm_sqlserver_firedac.conf';
+  {$ENDIF}
+  {$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+  const CONFIG_FILE = '..\..\dorm.conf';
+  {$ENDIF}
+
 procedure ObjVersionDEMO;
 var
   dormSession: TSession;
@@ -22,7 +29,7 @@ var
   id: Integer;
 begin
   dormSession := TSession.CreateConfigured(
-    TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
+    TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
     Customer := TCustomerV.Create;
     WriteLn('Version: ', Customer.ObjVersion);
@@ -55,7 +62,7 @@ var
   id: Integer;
 begin
   dormSession := TSession.CreateConfigured(
-    TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
+    TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
     Customer := TCustomerV.Create;
     Customer.Name := 'Daniele Teti Inc.';
@@ -71,10 +78,10 @@ begin
   end;
 
   dormSession1 := TSession.CreateConfigured(
-    TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
+    TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
     dormSession2 := TSession.CreateConfigured(
-      TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
+      TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
     try
       // Two users gets the same record
       C1 := dormSession1.Load<TCustomerV>(id);

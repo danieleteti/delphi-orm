@@ -14,13 +14,20 @@ uses
   BObjectsU in '..\..\Commons\BObjectsU.pas',
   RandomUtilsU in '..\..\Commons\RandomUtilsU.pas';
 
+  {$IFDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+  const CONFIG_FILE = '..\..\dorm_sqlserver_firedac.conf';
+  {$ENDIF}
+  {$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+  const CONFIG_FILE = '..\..\dorm.conf';
+  {$ENDIF}
+
 procedure SimpleInsert;
 var
   dormSession: TSession;
   Customer: TCustomer;
 begin
   dormSession := TSession.CreateConfigured(
-    TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
+    TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
     Customer := TCustomer.Create;
     Customer.Name := 'Daniele Teti Inc.';
@@ -41,7 +48,7 @@ var
   id: Integer;
 begin
   dormSession := TSession.CreateConfigured(
-    TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
+    TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
     Customer := TCustomer.Create;
     Customer.Name := 'Daniele Teti Inc.';
@@ -70,7 +77,7 @@ end;
 
 begin
   SimpleInsert;
-  // SimpleCRUD;
+  //SimpleCRUD;
   ReadLn;
 
 end.
