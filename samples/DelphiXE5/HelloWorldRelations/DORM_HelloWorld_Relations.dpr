@@ -16,6 +16,13 @@ uses
   RandomUtilsU in '..\..\Commons\RandomUtilsU.pas',
   Console in '..\..\Commons\Console.pas';
 
+  {$IFDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+  const CONFIG_FILE = '..\..\dorm_sqlserver_firedac.conf';
+  {$ENDIF}
+  {$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+  const CONFIG_FILE = '..\..\dorm.conf';
+  {$ENDIF}
+
 procedure RelationOneToMany;
 var
   dormSession: TSession;
@@ -40,7 +47,7 @@ var
 
 begin
   dormSession := TSession.CreateConfigured(
-    TStreamReader.Create('..\..\dorm.conf'), TdormEnvironment.deDevelopment);
+    TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
     // the main object
     Person := TPerson.Create;
