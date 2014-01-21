@@ -1,69 +1,58 @@
-unit dorm.adapter.FireDac.SQLServer;
+unit dorm.adapter.FireDAC.SQLServer;
 
 interface
 
-uses dorm.adapter.FireDac.BaseAdapter, dorm.adapter.FireDac.Facade, superobject,
-      uADPhysODBCBase, uADPhysMSSQL, Classes;
+uses
+  dorm.adapter.FireDAC.BaseAdapter,
+  dorm.adapter.FireDAC.Facade,
+  FireDAC.Phys.MSSQL,
+  superobject;
 
 type
-  TFireDacSQLServerPersistStrategy = class(TFireDacBaseAdapter)
-  protected
-    function CalculatePrimaryKey: Boolean; override;
-  public
-    function CreateFireDacFacade(Conf: ISuperObject): TFireDacFacade; override;
-    class procedure register;
-  end;
-
-  TFireDacSQLServerTableSequence = class(TFireDacBaseTableSequence)
+  TFireDACSQLServerPersistStrategy = class(TFireDACBaseAdapter)
   private
+    FDriverLink: TFDPhysMSSQLDriverLink;
+  protected
+    // SqlServer does not support boolean field. So boolean value are mapped to 0 = false and 1 = true
+    function GetBooleanValueAsString(Value: Boolean): String; override;
   public
-    function NewIntegerKey(const Entity: string): UInt64; override;
+    destructor Destroy; override;
+    function CreateFireDACFacade(Conf: ISuperObject): TFireDACFacade; override;
     class procedure register;
   end;
 
 implementation
 
-class procedure TFireDacSQLServerPersistStrategy.register;
+destructor TFireDACSQLServerPersistStrategy.Destroy;
+begin
+  if Assigned(FDriverLink) then FDriverLink.Free;
+  inherited;
+end;
+
+function TFireDACSQLServerPersistStrategy.GetBooleanValueAsString
+  (Value: Boolean): String;
+begin
+  if Value then
+    Result := '1'
+  else
+    Result := '0';
+end;
+
+class procedure TFireDACSQLServerPersistStrategy.register;
 begin
   //
 end;
 
-function TFireDacSQLServerPersistStrategy.CalculatePrimaryKey: Boolean;
+function TFireDACSQLServerPersistStrategy.CreateFireDACFacade(Conf: ISuperObject)
+  : TFireDACFacade;
 begin
-   Result:=False;
-end;
-
-function TFireDacSQLServerPersistStrategy.CreateFireDacFacade(Conf: ISuperObject)
-  : TFireDacFacade;
-var Params: TStringList;
-begin
-  Params:=TStringList.Create;
-  try
-    Params.Values['SERVER']:=Conf.S['hostname'];
-    Params.Values['User_Name']:=Conf.S['username'];
-    Params.Values['Password']:=Conf.S['password'];
-    Params.Values['Database']:=Conf.S['database_connection_string'];
-    Params.Values['DriverID']:='MSSQL';
-    Result := TFireDacFacade.Create(Params);
-  finally
-    Params.Free;
-  end;
-end;
-
-function TFireDacSQLServerTableSequence.NewIntegerKey(const Entity: string): UInt64;
-begin
-  Result := FPersistStrategy.ExecuteAndGetFirst('SELECT @@IDENTITY');
-end;
-
-class procedure TFireDacSQLServerTableSequence.register;
-begin
-  // do nothing
+  FDriverLink := TFDPhysMSSQLDriverLink.Create(nil);
+  Result := TFireDACFacade.Create(Conf.S['database_connection_string'],FDriverLink);
 end;
 
 initialization
 
-TFireDacSQLServerPersistStrategy.register;
-TFireDacSQLServerTableSequence.register;
+TFireDACSQLServerPersistStrategy.register;
 
 finalization
 
