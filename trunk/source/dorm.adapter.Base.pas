@@ -16,10 +16,10 @@ type
       AMappingTable: TMappingTable): string; overload;
     // function GetFieldMappingByAttribute(AttributeName: string;
     // AMappingTable: TMappingTable): TMappingField;
-    function EscapeString(const Value: string): string;
-    function EscapeDate(const Value: TDate): string;
-    function EscapeDateTime(const Value: TDate): string;
-    function EscapeTime(const Value: TTime): string;
+    function EscapeString(const Value: string): string; virtual;
+    function EscapeDate(const Value: TDate): string; virtual;
+    function EscapeDateTime(const Value: TDate): string; virtual;
+    function EscapeTime(const Value: TTime): string; virtual;
     //
     function GetBooleanValueAsString(Value: Boolean): string; virtual;
 
@@ -94,10 +94,10 @@ end;
 function TBaseAdapter.GetWhereSQL(ACriteria: ICriteria;
   AMappingTable: TMappingTable): string;
 var
-  I       : Integer;
-  SQL     : string;
+  I: Integer;
+  SQL: string;
   CritItem: ICriteriaItem;
-  Crit    : ICriteria;
+  Crit: ICriteria;
 begin
   if ACriteria.Count > 0 then
     for I := 0 to ACriteria.Count - 1 do
@@ -137,10 +137,10 @@ end;
 function TBaseAdapter.GetSelectSQL(Criteria: ICriteria;
   AMappingTable: TMappingTable): string;
 var
-  SQL          : string;
-  _fields      : TMappingFieldList;
+  SQL: string;
+  _fields: TMappingFieldList;
   select_fields: string;
-  WhereSQL     : string;
+  WhereSQL: string;
 begin
   _fields := AMappingTable.Fields;
   select_fields := GetSelectFieldsList(_fields, true);
@@ -186,9 +186,9 @@ function TBaseAdapter.GetWhereSQL(ACriteriaItem: ICriteriaItem;
   AMappingTable: TMappingTable): string;
 var
   SQL: string;
-  fm : TMappingField;
-  d  : TDate;
-  dt : TDateTime;
+  fm: TMappingField;
+  d: TDate;
+  dt: TDateTime;
 begin
   fm := AMappingTable.FindByName(ACriteriaItem.GetAttribute);
   if not Assigned(fm) then
@@ -218,27 +218,27 @@ begin
 
   if Not(ACriteriaItem.GetCompareOperator in [coIsNull, coIsNotNull]) then
   begin
-      if fm.FieldType = 'string' then
-        SQL := SQL + '''' + EscapeString(ACriteriaItem.GetValue.AsString) + ''''
-      else if fm.FieldType = 'uniqueidentifier' then
-        SQL := SQL + '''' + EscapeString(ACriteriaItem.GetValue.AsString) + ''''
-      else if fm.FieldType = 'integer' then
-        SQL := SQL + inttostr(ACriteriaItem.GetValue.AsInteger)
-      else if fm.FieldType = 'boolean' then
-        SQL := SQL + GetBooleanValueAsString(ACriteriaItem.GetValue.AsBoolean)
-      else if fm.FieldType = 'date' then
-      begin
-        d := ACriteriaItem.GetValue.AsExtended;
-        SQL := SQL + '''' + EscapeDate(d) + ''''
-      end
-      else if (fm.FieldType = 'timestamp') or (fm.FieldType = 'datetime') then
-      begin
-        dt := ACriteriaItem.GetValue.AsExtended;
-        SQL := SQL + '''' + EscapeDateTime(dt) + ''''
-      end
-      else
-        raise EdormException.CreateFmt('Unknown type %s in criteria',
-          [fm.FieldType]);
+    if fm.FieldType = 'string' then
+      SQL := SQL + '''' + EscapeString(ACriteriaItem.GetValue.AsString) + ''''
+    else if fm.FieldType = 'uniqueidentifier' then
+      SQL := SQL + '''' + EscapeString(ACriteriaItem.GetValue.AsString) + ''''
+    else if fm.FieldType = 'integer' then
+      SQL := SQL + inttostr(ACriteriaItem.GetValue.AsInteger)
+    else if fm.FieldType = 'boolean' then
+      SQL := SQL + GetBooleanValueAsString(ACriteriaItem.GetValue.AsBoolean)
+    else if fm.FieldType = 'date' then
+    begin
+      d := ACriteriaItem.GetValue.AsExtended;
+      SQL := SQL + '''' + EscapeDate(d) + ''''
+    end
+    else if (fm.FieldType = 'timestamp') or (fm.FieldType = 'datetime') then
+    begin
+      dt := ACriteriaItem.GetValue.AsExtended;
+      SQL := SQL + '''' + EscapeDateTime(dt) + ''''
+    end
+    else
+      raise EdormException.CreateFmt('Unknown type %s in criteria',
+        [fm.FieldType]);
   end;
   Result := SQL;
 end;

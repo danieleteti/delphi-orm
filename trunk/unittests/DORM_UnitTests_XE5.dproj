@@ -1,7 +1,7 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <ProjectGuid>{6E22397B-AA4C-4AD3-AA92-7D61C3E8FBD4}</ProjectGuid>
-        <ProjectVersion>15.2</ProjectVersion>
+        <ProjectVersion>15.3</ProjectVersion>
         <Config Condition="'$(Config)'==''">FIREBIRD_UIB_STRATEGY</Config>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
         <MainSource>DORM_UnitTests_XE5.dpr</MainSource>
@@ -115,6 +115,17 @@
         <Cfg_7>true</Cfg_7>
         <Base>true</Base>
     </PropertyGroup>
+    <PropertyGroup Condition="'$(Config)'=='SQLSERVER_FIREDAC_STRATEGY' or '$(Cfg_5)'!=''">
+        <Cfg_5>true</Cfg_5>
+        <CfgParent>Base</CfgParent>
+        <Base>true</Base>
+    </PropertyGroup>
+    <PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_5)'=='true') or '$(Cfg_5_Win32)'!=''">
+        <Cfg_5_Win32>true</Cfg_5_Win32>
+        <CfgParent>Cfg_5</CfgParent>
+        <Cfg_5>true</Cfg_5>
+        <Base>true</Base>
+    </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
         <Manifest_File>None</Manifest_File>
         <VerInfo_Locale>1040</VerInfo_Locale>
@@ -201,6 +212,12 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_7_Win64)'!=''">
         <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Cfg_5_Win32)'!=''">
+        <Manifest_File>$(BDS)\bin\default_app.manifest</Manifest_File>
+        <VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+        <DCC_Define>SQLSERVER_FIREDAC_STRATEGY;$(DCC_Define)</DCC_Define>
+        <VerInfo_Locale>1033</VerInfo_Locale>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -502,17 +519,13 @@
         <None Include="ModelSupport_DORM_UnitTests_XE5\dorm\CodeGenerator\Delphi\default.txaPackage"/>
         <None Include="ModelSupport_DORM_UnitTests_XE5\dorm\Collections\default.txaPackage"/>
         <None Include="ModelSupport_DORM_UnitTests_XE5\dorm\Mappings\default.txaPackage"/>
-        <BuildConfiguration Include="FIREBIRD_UIB_STRATEGY">
-            <Key>Cfg_2</Key>
-            <CfgParent>Base</CfgParent>
-        </BuildConfiguration>
         <BuildConfiguration Include="FIREBIRD_CI">
             <Key>Cfg_4</Key>
             <CfgParent>Cfg_2</CfgParent>
         </BuildConfiguration>
-        <BuildConfiguration Include="CI_SQLITE3">
-            <Key>Cfg_3</Key>
-            <CfgParent>Cfg_1</CfgParent>
+        <BuildConfiguration Include="SQLSERVER_FIREDAC_STRATEGY">
+            <Key>Cfg_5</Key>
+            <CfgParent>Base</CfgParent>
         </BuildConfiguration>
         <BuildConfiguration Include="INTERBASE_UIB_STRATEGY">
             <Key>Cfg_7</Key>
@@ -520,6 +533,14 @@
         </BuildConfiguration>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
+        </BuildConfiguration>
+        <BuildConfiguration Include="FIREBIRD_UIB_STRATEGY">
+            <Key>Cfg_2</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="CI_SQLITE3">
+            <Key>Cfg_3</Key>
+            <CfgParent>Cfg_1</CfgParent>
         </BuildConfiguration>
         <BuildConfiguration Include="SQLITE3_STRATEGY">
             <Key>Cfg_1</Key>
@@ -565,13 +586,10 @@
                     <Source Name="MainSource">DORM_UnitTests_XE5.dpr</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\10.0\Bpl\dorm_runtime_xe3.bpl">(untitled)</Excluded_Packages>
-                    <Excluded_Packages Name="D:\DXE3Lib\DeveloperExpressVCL\Library\RS17\dclcxPivotGridOLAPRS17.bpl">ExpressPivotGrid OLAP by Developer Express Inc.</Excluded_Packages>
-                    <Excluded_Packages Name="C:\Users\Public\Documents\RAD Studio\10.0\Bpl\dclTreeViewPresenter170.bpl">DSharp treeview presenter designtime package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k170.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp170.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k170.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp170.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k190.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp190.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k190.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp190.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <UnitTesting>
