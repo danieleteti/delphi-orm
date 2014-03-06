@@ -20,22 +20,35 @@ uses
   Console in '..\..\Commons\Console.pas',
   FindersU in 'FindersU.pas';
 
-  {$IFDEF LINK_SQLSERVERFIREDAC_ADAPTER}
-  const CONFIG_FILE = '..\..\dorm_sqlserver_firedac.conf';
-  const FILTER_WHERE = '(#TCustomerOS.Name# LIKE ''%''+?+''%'') OR (#TCustomerOS.Address# LIKE ''%''+?+''%'')';
-  {$ENDIF}
-  {$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
-  const CONFIG_FILE = '..\..\dorm.conf';
-  const FILTER_WHERE = '#TCustomerOS.Name# CONTAINING ? or #TCustomerOS.Address# CONTAINING ?'';
-  {$ENDIF}
+{$IFDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+
+
+const
+  CONFIG_FILE = '..\..\dorm_sqlserver_firedac.conf';
+
+const
+  FILTER_WHERE = '(#TCustomerOS.Name# LIKE ''%''+?+''%'') OR (#TCustomerOS.Address# LIKE ''%''+?+''%'')';
+{$ENDIF}
+{$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+
+
+const
+  CONFIG_FILE = '..\..\dorm.conf';
+
+const
+  FILTER_WHERE = '#TCustomerOS.Name# CONTAINING ? or #TCustomerOS.Address# CONTAINING ?';
+{$ENDIF}
+
 
 procedure Lists;
+
 var
   dormSession: TSession;
   Customer: TCustomerOS;
   id: Integer;
   I: Integer;
   Customers: TObjectList<TCustomerOS>;
+
 begin
   dormSession := TSession.CreateConfigured(
     TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
@@ -134,14 +147,13 @@ end;
 begin
   // uncomments only one of the following lines
 
-
   // uncomment the following line to see a normal search
   // Lists;
 
   // uncomment the following line to see a DSQL criteria driven search
   SearchCriteria;
   // uncomment the following line to see a criteria driven search
-  //SearchCriteriaFinder;
+  // SearchCriteriaFinder;
   ReadLn;
 
 end.
