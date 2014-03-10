@@ -1,0 +1,108 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{792C4AC2-010C-4E54-8069-43427F7A02E9}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="HelloWorld\DORM_HelloWorld.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="HelloWorldLists\DORM_HelloWorldLists.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="HelloWorldRelations\DORM_HelloWorld_Relations.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="HelloWorldObjVersion\DORM_HelloWorld_ObjVersion.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="HelloWorldEvents\DORM_HelloWorld_Events.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="TODOManager\TODOManager.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="DORM_HelloWorld">
+        <MSBuild Projects="HelloWorld\DORM_HelloWorld.dproj"/>
+    </Target>
+    <Target Name="DORM_HelloWorld:Clean">
+        <MSBuild Projects="HelloWorld\DORM_HelloWorld.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DORM_HelloWorld:Make">
+        <MSBuild Projects="HelloWorld\DORM_HelloWorld.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_ObjStatus">
+        <MSBuild Projects="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_ObjStatus:Clean">
+        <MSBuild Projects="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_ObjStatus:Make">
+        <MSBuild Projects="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DORM_HelloWorldLists">
+        <MSBuild Projects="HelloWorldLists\DORM_HelloWorldLists.dproj"/>
+    </Target>
+    <Target Name="DORM_HelloWorldLists:Clean">
+        <MSBuild Projects="HelloWorldLists\DORM_HelloWorldLists.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DORM_HelloWorldLists:Make">
+        <MSBuild Projects="HelloWorldLists\DORM_HelloWorldLists.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_Relations">
+        <MSBuild Projects="HelloWorldRelations\DORM_HelloWorld_Relations.dproj"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_Relations:Clean">
+        <MSBuild Projects="HelloWorldRelations\DORM_HelloWorld_Relations.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_Relations:Make">
+        <MSBuild Projects="HelloWorldRelations\DORM_HelloWorld_Relations.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_ObjVersion">
+        <MSBuild Projects="HelloWorldObjVersion\DORM_HelloWorld_ObjVersion.dproj"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_ObjVersion:Clean">
+        <MSBuild Projects="HelloWorldObjVersion\DORM_HelloWorld_ObjVersion.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_ObjVersion:Make">
+        <MSBuild Projects="HelloWorldObjVersion\DORM_HelloWorld_ObjVersion.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_Events">
+        <MSBuild Projects="HelloWorldEvents\DORM_HelloWorld_Events.dproj"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_Events:Clean">
+        <MSBuild Projects="HelloWorldEvents\DORM_HelloWorld_Events.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_Events:Make">
+        <MSBuild Projects="HelloWorldEvents\DORM_HelloWorld_Events.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="TODOManager">
+        <MSBuild Projects="TODOManager\TODOManager.dproj"/>
+    </Target>
+    <Target Name="TODOManager:Clean">
+        <MSBuild Projects="TODOManager\TODOManager.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="TODOManager:Make">
+        <MSBuild Projects="TODOManager\TODOManager.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="DORM_HelloWorld;DORM_HelloWorld_ObjStatus;DORM_HelloWorldLists;DORM_HelloWorld_Relations;DORM_HelloWorld_ObjVersion;DORM_HelloWorld_Events;TODOManager"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="DORM_HelloWorld:Clean;DORM_HelloWorld_ObjStatus:Clean;DORM_HelloWorldLists:Clean;DORM_HelloWorld_Relations:Clean;DORM_HelloWorld_ObjVersion:Clean;DORM_HelloWorld_Events:Clean;TODOManager:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="DORM_HelloWorld:Make;DORM_HelloWorld_ObjStatus:Make;DORM_HelloWorldLists:Make;DORM_HelloWorld_Relations:Make;DORM_HelloWorld_ObjVersion:Make;DORM_HelloWorld_Events:Make;TODOManager:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

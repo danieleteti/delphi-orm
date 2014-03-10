@@ -1,0 +1,16 @@
+{     
+  "TButton":
+  {
+    "package":"Vcl.StdCtrls",
+    "table": "BUTTONS",
+    "id": {"name":"Tag", "field":"ID", "field_type":"integer"},
+    "fields":[
+      {"name":"Name", "field":"NAME", "field_type":"string", "size": 50},
+      {"name":"Caption", "field":"CAPTION", "field_type":"string", "size": 50},
+      {"name":"Top", "field":"POSITION_TOP", "field_type":"integer"},
+      {"name":"Left", "field":"POSITION_LEFT", "field_type":"integer"},
+			{"name":"Width", "field":"SIZE_WIDTH", "field_type":"integer"},          
+			{"name":"Height", "field":"SIZE_HEIGHT", "field_type":"integer"}
+			]							
+	}  
+}
