@@ -35,10 +35,12 @@ type
     procedure LoadPersonaPassingNilAsReturnObject;
   published
     procedure TestInsert;
+    procedure TestInsertWithNull;
     procedure TestUpdate;
     procedure TestCRUD;
+    procedure TestCRUDWithNull;
     procedure TestCRUDAndFree;
-//    procedure TestUOW;
+    // procedure TestUOW;
     procedure TestDormObject;
     procedure TestDormObjectEventAfterLoad;
     procedure TestDormObjectFillListEventAfterLoad;
@@ -53,7 +55,7 @@ uses
   SysUtils,
   dorm.Commons,
   dorm.tests.bo,
-  dorm.UOW, dorm.Query;
+  dorm.UOW, dorm.Query, dorm.ObjectStatus, dorm.tests.objstatus.bo;
 
 { TTestDORM }
 
@@ -174,6 +176,67 @@ begin
   p1 := Session.Load<TPerson>(id);
   try
     CheckNull(p1);
+  finally
+    p1.Free;
+  end;
+end;
+
+procedure TTestDORM.TestCRUDWithNull;
+var
+  p1: TNullTest;
+  p1asstring: string;
+  id: integer;
+begin
+  p1 := TNullTest.Create;
+  try
+    Session.Persist(p1);
+    p1asstring := p1.ToString;
+    id := p1.id;
+    Session.Commit;
+  finally
+    p1.Free;
+  end;
+
+  Session.StartTransaction;
+  p1 := Session.Load<TNullTest>(id);
+  try
+    CheckEquals(p1asstring, p1.ToString);
+    Session.Commit;
+  finally
+    p1.Free;
+  end;
+
+  Session.StartTransaction;
+  p1 := Session.Load<TNullTest>(id);
+  try
+    p1.IntegerNull := 1234;
+    p1.StringNull := 'Summer';
+    p1.Int64Null := 12345678;
+    p1.DateTimeNull := EncodeDateTime(1965, 1, 1, 12, 30, 0, 0);
+    p1.objstatus := osDirty;
+    Session.Persist(p1);
+    p1asstring := p1.ToString;
+    Session.Commit;
+  finally
+    p1.Free;
+  end;
+
+  Session.StartTransaction;
+  p1 := Session.Load<TNullTest>(id);
+  try
+    CheckEquals(p1asstring, p1.ToString);
+    p1.objstatus := osDeleted;
+    Session.Persist(p1);
+    Session.Commit;
+  finally
+    p1.Free;
+  end;
+
+  Session.StartTransaction;
+  p1 := Session.Load<TNullTest>(id);
+  try
+    CheckNull(p1);
+    Session.Commit;
   finally
     p1.Free;
   end;
@@ -308,68 +371,89 @@ begin
   CheckEquals(1, Session.Count(TPerson));
 end;
 
-//procedure TTestDORM.TestUOW;
-//var
-//  UOW: TdormUOW;
-//  p1: TPerson;
-//  p2: TPerson;
-//begin
-//  p1 := TPerson.NewPerson;
-//  try
-//    p1.FirstName := 'John';
-//    p1.LastName := 'Doe';
-//    p2 := TPerson.NewPerson;
-//    try
-//      UOW := TdormUOW.Create;
-//      try
-//        p1.FirstName := 'Scott';
-//        p1.LastName := 'Summer';
-//        CheckFalse(Session.OIDIsSet(p1));
-//        UOW.AddInsert(p1);
-//        Session.Save(UOW);
+procedure TTestDORM.TestInsertWithNull;
+var
+  p: TNullTest;
+begin
+  p := TNullTest.Create;
+  try
+    Session.Persist(p);
+    Session.Commit;
+    p.IntegerNull := 1234;
+    p.objstatus := osDirty;
+    Session.Persist(p);
+    Session.Commit;
+    p.StringNull := 'Hello World';
+    p.objstatus := osDirty;
+    Session.Persist(p);
+    Session.Commit;
+  finally
+    p.Free;
+  end;
+end;
+
+// procedure TTestDORM.TestUOW;
+// var
+// UOW: TdormUOW;
+// p1: TPerson;
+// p2: TPerson;
+// begin
+// p1 := TPerson.NewPerson;
+// try
+// p1.FirstName := 'John';
+// p1.LastName := 'Doe';
+// p2 := TPerson.NewPerson;
+// try
+// UOW := TdormUOW.Create;
+// try
+// p1.FirstName := 'Scott';
+// p1.LastName := 'Summer';
+// CheckFalse(Session.OIDIsSet(p1));
+// UOW.AddInsert(p1);
+// Session.Save(UOW);
 //
-//        UOW.FreeDeleted; // free nothing... there aren't "deleted" objects
-//        CheckTrue(Session.OIDIsSet(p1));
-//        UOW.Clear;
+// UOW.FreeDeleted; // free nothing... there aren't "deleted" objects
+// CheckTrue(Session.OIDIsSet(p1));
+// UOW.Clear;
 //
-//        p1.FirstName := 'John';
-//        UOW.AddUpdate(p1);
-//        Session.Save(UOW);
-//        CheckTrue(Session.OIDIsSet(p1));
-//        UOW.Clear;
-//        UOW.AddDelete(p1);
-//        Session.Save(UOW);
-//        UOW.GetUOWDelete.Extract(p1);
-//        UOW.AddInsert(p1);
-//        // This will not actually add the object to the collection.
-//        UOW.AddInsert(p1);
-//        CheckEquals(1, UOW.GetUOWInsert.Count);
-//        Session.Save(UOW);
-//        CheckTrue(Session.OIDIsSet(p1));
-//      finally
-//        UOW.Free;
-//      end;
+// p1.FirstName := 'John';
+// UOW.AddUpdate(p1);
+// Session.Save(UOW);
+// CheckTrue(Session.OIDIsSet(p1));
+// UOW.Clear;
+// UOW.AddDelete(p1);
+// Session.Save(UOW);
+// UOW.GetUOWDelete.Extract(p1);
+// UOW.AddInsert(p1);
+// // This will not actually add the object to the collection.
+// UOW.AddInsert(p1);
+// CheckEquals(1, UOW.GetUOWInsert.Count);
+// Session.Save(UOW);
+// CheckTrue(Session.OIDIsSet(p1));
+// finally
+// UOW.Free;
+// end;
 //
-//      UOW := TdormUOW.Create;
-//      try
-//        Session.ClearOID(p1);
-//        Session.ClearOID(p1.Car); // contained objects
-//        Session.ClearOID(p1.Email); // contained objects
-//        Session.ClearOID(p2);
-//        UOW.AddInsert(p1);
-//        UOW.AddDelete(p2);
-//        Session.Save(UOW);
-//      finally
-//        UOW.Free;
-//      end;
-//    finally
-//      p2.Free;
-//    end;
-//  finally
-//    p1.Free;
-//  end;
+// UOW := TdormUOW.Create;
+// try
+// Session.ClearOID(p1);
+// Session.ClearOID(p1.Car); // contained objects
+// Session.ClearOID(p1.Email); // contained objects
+// Session.ClearOID(p2);
+// UOW.AddInsert(p1);
+// UOW.AddDelete(p2);
+// Session.Save(UOW);
+// finally
+// UOW.Free;
+// end;
+// finally
+// p2.Free;
+// end;
+// finally
+// p1.Free;
+// end;
 //
-//end;
+// end;
 
 procedure TTestDORM.TestUpdate;
 var

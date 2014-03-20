@@ -29,7 +29,8 @@ uses
   Classes,
   Generics.Collections,
   dorm.Mappings,
-  dorm.ObjectStatus;
+  dorm.ObjectStatus,
+  Spring;
 
 type
   TPerson = class;
@@ -38,27 +39,24 @@ type
 
   TPhones = class(
 
-    {$IF CompilerVersion >= 23}
-
+{$IF CompilerVersion >= 23}
     TObjectList<TPhone>
 
-    {$ELSE}
-
+{$ELSE}
     TdormObjectList<TPhone>
 
-    {$IFEND}
-
+{$IFEND}
     )
   end;
 
   [Entity('CARS')]
   TCar = class
   private
-    FModel   : string;
-    FBrand   : string;
+    FModel: string;
+    FBrand: string;
     FPersonID: Integer;
-    FID      : Integer;
-    FOwner   : TPerson;
+    FID: Integer;
+    FOwner: TPerson;
     procedure SetBrand(const Value: string);
     procedure SetModel(const Value: string);
     procedure SetPersonID(const Value: Integer);
@@ -78,9 +76,9 @@ type
   [Entity('EMAILS')]
   TEmail = class
   private
-    FValue      : string;
-    FPersonID   : Integer;
-    FID         : Integer;
+    FValue: string;
+    FPersonID: Integer;
+    FID: Integer;
     FCopiedValue: string; // used only for the test
     procedure SetValue(const Value: string);
     procedure SetPersonID(const Value: Integer);
@@ -100,18 +98,18 @@ type
 
   TPerson = class
   private
-    FLastName     : string;
-    FAge          : Int32;
-    FFirstName    : string;
-    FID           : Integer;
-    FBornDate     : TDate;
-    FPhones       : TPhones;
-    FCar          : TCar;
-    FEmail        : TEmail;
+    FLastName: string;
+    FAge: Int32;
+    FFirstName: string;
+    FID: Integer;
+    FBornDate: TDate;
+    FPhones: TPhones;
+    FCar: TCar;
+    FEmail: TEmail;
     FBornTimeStamp: TDateTime;
-    FPhoto        : TStream;
-    FIsMale       : Boolean;
-    FObjVersion   : Integer;
+    FPhoto: TStream;
+    FIsMale: Boolean;
+    FObjVersion: Integer;
     procedure SetLastName(const Value: string);
     procedure SetAge(const Value: Int32);
     procedure SetFirstName(const Value: string);
@@ -147,12 +145,13 @@ type
     property ObjVersion: Integer read FObjVersion write SetObjVersion;
   end;
 
+ 
   [Entity('PHONES')]
   TPhone = class
   private
-    FNumber  : string;
-    FModel   : string;
-    FID      : Integer;
+    FNumber: string;
+    FModel: string;
+    FID: Integer;
     FPersonID: Integer;
     procedure SetNumber(const Value: string);
     procedure SetModel(const Value: string);
@@ -179,8 +178,8 @@ type
   TDepartment = class
   private
     FDepartmentName: string;
-    FID            : string;
-    FEmployees     : TEmployees;
+    FID: string;
+    FEmployees: TEmployees;
     procedure setDepartmentName(const Value: string);
     procedure setEmployees(const Value: TEmployees);
     procedure SetID(const Value: string);
@@ -197,11 +196,11 @@ type
 
   TEmployee = class
   private
-    FLastName    : string;
-    FEmployeeID  : string;
-    FAddress     : string;
-    FFirstName   : string;
-    FDepartment  : TDepartment;
+    FLastName: string;
+    FEmployeeID: string;
+    FAddress: string;
+    FFirstName: string;
+    FDepartment: TDepartment;
     FDepartmentID: string;
     procedure setAddress(const Value: string);
     procedure setDepartment(const Value: TDepartment);
@@ -223,7 +222,7 @@ type
   TPersonDirty = class(TPerson)
   private
     FObjStatus: TdormObjectStatus;
-    FHistory  : TStringList;
+    FHistory: TStringList;
     procedure SetObjStatus(const Value: TdormObjectStatus);
 
   public
@@ -285,13 +284,13 @@ type
   [Entity('TODOS')]
   TToDo = class
   private
-    FDone       : Boolean;
-    FObjVersion : Int64;
-    FDueTime    : TTime;
-    FID         : Integer;
+    FDone: Boolean;
+    FObjVersion: Int64;
+    FDueTime: TTime;
+    FID: Integer;
     FDescription: string;
-    FDueDate    : TDate;
-    FObjStatus  : TdormObjectStatus;
+    FDueDate: TDate;
+    FObjStatus: TdormObjectStatus;
     procedure SetDescription(const Value: string);
     procedure SetDone(const Value: Boolean);
     procedure SetDueDate(const Value: TDate);
@@ -301,13 +300,13 @@ type
     procedure SetObjStatus(const Value: TdormObjectStatus);
 
   public
-    property ID         : Integer read FID write SetID;
+    property ID: Integer read FID write SetID;
     property Description: string read FDescription write SetDescription;
     [Column('DUE_DATE')]
     property DueDate: TDate read FDueDate write SetDueDate;
     [Column('DUE_TIME')]
-    property DueTime   : TTime read FDueTime write SetDueTime;
-    property Done      : Boolean read FDone write SetDone;
+    property DueTime: TTime read FDueTime write SetDueTime;
+    property Done: Boolean read FDone write SetDone;
     property ObjVersion: Int64 read FObjVersion write SetObjVersion;
     [Transient]
     property ObjStatus: TdormObjectStatus read FObjStatus write SetObjStatus;
@@ -327,14 +326,14 @@ function IsValidEmail(const Value: string): Boolean;
   begin
     Result := false;
     for i := 1 to Length(s) do
-      if not (CharInSet(s[i], ['a' .. 'z', 'A' .. 'Z', '0' .. '9', '_', '-',
+      if not(CharInSet(s[i], ['a' .. 'z', 'A' .. 'Z', '0' .. '9', '_', '-',
         '.'])) then
         Exit;
     Result := true;
   end;
 
 var
-  i                   : Integer;
+  i: Integer;
   NamePart, ServerPart: string;
 begin
   Result := false;
