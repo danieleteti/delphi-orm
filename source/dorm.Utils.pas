@@ -22,7 +22,7 @@ uses
   RTTI,
   DB,
   Generics.Collections,
-  dorm.Mappings;
+  dorm.Mappings, System.TypInfo;
 
 type
   TdormUtils = class sealed
@@ -46,6 +46,9 @@ type
       : TValue; overload;
     class function GetField(Obj: TObject; const MappingCache: TMappingCache)
       : TValue; overload;
+    class function TryGetObjectField(Obj: TObject; const MappingCache: TMappingCache;
+      out RealValue: TValue;
+      out IsNullable: boolean; out IsNull: boolean): boolean;
     class procedure SetField(Obj: TObject; const PropertyName: string;
       const Value: TValue); overload;
     class procedure SetField(Obj: TObject; const MappingCache: TMappingCache;
@@ -58,20 +61,32 @@ type
     class function GetAttribute<T: TCustomAttribute>(const Obj: TRttiType)
       : T; overload;
     class function HasAttribute<T: TCustomAttribute>
-      (const Obj: TRttiObject): Boolean;
-    class function EqualValues(source, destination: TValue): Boolean;
+      (const Obj: TRttiObject): boolean;
+    class function EqualValues(source, destination: TValue): boolean;
   end;
 
 function FieldFor(const PropertyName: string): string; inline;
+function IsNullableType(typeInfo: PTypeInfo): boolean;
+procedure SetAsNull(Value: TValue);
 
 implementation
 
 uses
   SysUtils,
   Classes,
-  TypInfo,
+  Spring.SystemUtils,
   dorm.Commons,
-  dorm.Collections;
+  System.StrUtils,
+  dorm.Collections,
+  dorm.adapter.Base;
+
+threadvar
+  NullableTypeMapping: TDictionary<String, String>;
+
+procedure SetAsNull(Value: TValue);
+begin
+
+end;
 
 class function TdormUtils.MethodCall(AObject: TObject; AMethodName: string;
   AParameters: array of TValue): TValue;
@@ -173,7 +188,7 @@ begin
       [ARttiType.ToString, PropertyName]);
 end;
 
-class function TdormUtils.HasAttribute<T>(const Obj: TRttiObject): Boolean;
+class function TdormUtils.HasAttribute<T>(const Obj: TRttiObject): boolean;
 begin
   Result := Assigned(GetAttribute<T>(Obj));
 end;
@@ -191,7 +206,9 @@ begin
       [ARttiType.ToString]);
   Field := ARttiType.GetField(FieldFor(PropertyName));
   if Assigned(Field) then
-    Field.SetValue(Obj, Value)
+  begin
+    Field.SetValue(Obj, Value);
+  end
   else
   begin
     Prop := ARttiType.GetProperty(PropertyName);
@@ -256,23 +273,59 @@ begin
     raise Exception.Create('Property is not writeable');
 end;
 
+class function TdormUtils.TryGetObjectField(Obj: TObject; const MappingCache: TMappingCache;
+  out RealValue: TValue; out IsNullable, IsNull: boolean): boolean;
+begin
+  IsNull := False;
+  Result := Assigned(MappingCache.RTTIField);
+  if Result then
+  begin
+    IsNullable := IsNullableType(MappingCache.RTTIField.FieldType.Handle);
+    if IsNullable then
+      IsNull := not TryGetUnderlyingValue(MappingCache.RTTIField.GetValue(Obj), RealValue)
+    else
+      RealValue := TdormUtils.GetField(Obj, MappingCache);
+  end
+  else
+  begin
+    Result := Assigned(MappingCache.RTTIProp);
+    if Result then
+    begin
+      IsNullable := IsNullableType(MappingCache.RTTIProp.PropertyType.Handle);
+      if IsNullable then
+        IsNull := not TryGetUnderlyingValue(MappingCache.RTTIProp.GetValue(Obj), RealValue)
+      else
+        RealValue := TdormUtils.GetField(Obj, MappingCache);
+    end
+  end;
+end;
+
+function IsNullableType(typeInfo: PTypeInfo): boolean;
+const
+  PrefixString = 'Nullable<'; // DO NOT LOCALIZE
+begin
+  Result := Assigned(typeInfo) and (typeInfo.Kind = tkRecord)
+    and StartsText(PrefixString, GetTypeName(typeInfo));
+end;
+
 class function TdormUtils.GetFieldType(AProp: TRttiProperty): string;
 var
   _PropInfo: PTypeInfo;
 begin
   _PropInfo := AProp.PropertyType.Handle;
+
   if _PropInfo.Kind in [tkString, tkWString, tkChar, tkWChar, tkLString,
     tkUString] then
     Result := 'string'
   else if _PropInfo.Kind in [tkInteger, tkInt64] then
     Result := 'integer'
-  else if _PropInfo = TypeInfo(TDate) then
+  else if _PropInfo = typeInfo(TDate) then
     Result := 'date'
-  else if _PropInfo = TypeInfo(TDateTime) then
+  else if _PropInfo = typeInfo(TDateTime) then
     Result := 'datetime'
-  else if _PropInfo = TypeInfo(Currency) then
+  else if _PropInfo = typeInfo(Currency) then
     Result := 'decimal'
-  else if _PropInfo = TypeInfo(TTime) then
+  else if _PropInfo = typeInfo(TTime) then
   begin
     Result := 'time'
   end
@@ -286,7 +339,14 @@ begin
     AProp.PropertyType.AsInstance.MetaclassType.InheritsFrom(TStream) then
     Result := 'blob'
   else
-    Result := EmptyStr;
+    // nullables
+    if IsNullableType(_PropInfo) then
+    begin
+      if not NullableTypeMapping.TryGetValue(_PropInfo.Name, Result) then
+        raise EdormException.Create('Cannot find mapping for nullable type ' + _PropInfo.Name);
+    end
+    else
+      Result := EmptyStr;
 end;
 
 class procedure TdormUtils.ObjectToDataSet(Obj: TObject; Field: TField;
@@ -318,7 +378,7 @@ begin
     end;
 end;
 
-class function TdormUtils.EqualValues(source, destination: TValue): Boolean;
+class function TdormUtils.EqualValues(source, destination: TValue): boolean;
 begin
   // Really UniCodeCompareStr (Annoying VCL Name for backwards compatablity)
   Result := AnsiCompareStr(source.ToString, destination.ToString) = 0;
@@ -515,5 +575,22 @@ begin
 end;
 
 { TListDuckTyping }
+
+initialization
+
+NullableTypeMapping := TDictionary<String, String>.Create;
+NullableTypeMapping.Add('Nullable<System.Integer>', 'integer');
+NullableTypeMapping.Add('Nullable<System.Int64>', 'integer');
+NullableTypeMapping.Add('Nullable<System.string>', 'string');
+NullableTypeMapping.Add('Nullable<System.Boolean>', 'boolean');
+NullableTypeMapping.Add('Nullable<System.Double>', 'float');
+NullableTypeMapping.Add('Nullable<System.TDateTime>', 'datetime');
+NullableTypeMapping.Add('Nullable<System.TDate>', 'date');
+NullableTypeMapping.Add('Nullable<System.TTime>', 'time');
+NullableTypeMapping.Add('Nullable<System.Currency>', 'decimal');
+
+finalization
+
+NullableTypeMapping.Free;
 
 end.

@@ -5,7 +5,7 @@ interface
 uses
   dorm.Commons,
   dorm.Filters,
-  dorm.Mappings;
+  dorm.Mappings, Spring;
 
 type
   TBaseAdapter = class abstract(TdormInterfacedObject)
@@ -44,7 +44,9 @@ implementation
 
 uses
   SysUtils,
-  System.DateUtils;
+  System.DateUtils,
+  System.TypInfo,
+  System.StrUtils;
 
 { TBaseAdapter }
 
