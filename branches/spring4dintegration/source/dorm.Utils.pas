@@ -67,7 +67,7 @@ type
 
 function FieldFor(const PropertyName: string): string; inline;
 function IsNullableType(typeInfo: PTypeInfo): boolean;
-procedure SetAsNull(Value: TValue);
+procedure SetAsNull(ATypeInfo: PTypeInfo; AInstance: Pointer);
 
 implementation
 
@@ -83,9 +83,17 @@ uses
 threadvar
   NullableTypeMapping: TDictionary<String, String>;
 
-procedure SetAsNull(Value: TValue);
+procedure SetAsNull(ATypeInfo: PTypeInfo; AInstance: Pointer);
+var
+  context: TRttiContext;
+  rttiType: TRttiType;
+  hasValueField: TRttiField;
 begin
-
+  if not IsNullableType(ATypeInfo) then
+    raise EdormException.Create('Not a nullable type');
+  rttiType := context.GetType(ATypeInfo);
+  hasValueField := rttiType.GetField('fHasValue');
+  hasValueField.SetValue(AInstance, '');
 end;
 
 class function TdormUtils.MethodCall(AObject: TObject; AMethodName: string;
@@ -282,9 +290,7 @@ begin
   begin
     IsNullable := IsNullableType(MappingCache.RTTIField.FieldType.Handle);
     if IsNullable then
-      IsNull := not TryGetUnderlyingValue(MappingCache.RTTIField.GetValue(Obj), RealValue)
-    else
-      RealValue := TdormUtils.GetField(Obj, MappingCache);
+      IsNull := not TryGetUnderlyingValue(MappingCache.RTTIField.GetValue(Obj), RealValue);
   end
   else
   begin
@@ -293,11 +299,10 @@ begin
     begin
       IsNullable := IsNullableType(MappingCache.RTTIProp.PropertyType.Handle);
       if IsNullable then
-        IsNull := not TryGetUnderlyingValue(MappingCache.RTTIProp.GetValue(Obj), RealValue)
-      else
-        RealValue := TdormUtils.GetField(Obj, MappingCache);
+        IsNull := not TryGetUnderlyingValue(MappingCache.RTTIProp.GetValue(Obj), RealValue);
     end
   end;
+  RealValue := TdormUtils.GetField(Obj, MappingCache);
 end;
 
 function IsNullableType(typeInfo: PTypeInfo): boolean;

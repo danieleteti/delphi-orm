@@ -616,7 +616,7 @@ begin
       IsDataNull := AReader.Fields.ByNameIsNull[field.FieldName];
       TdormUtils.TryGetObjectField(AObject, field.RTTICache, RealValue, IsNullable, IsNull);
 
-      if not IsNull then
+      if not IsDataNull then
       begin
         if CompareText(field.FieldType, 'string') = 0 then
         begin
@@ -680,9 +680,16 @@ begin
         if IsNullable then
         begin
           if IsDataNull then
-            SetAsNull(RealValue)
+          begin
+            SetAsNull(field.RTTICache.GetTypeInfo, @RealValue);
+            // SetAsNull(RealValue);
+            // TdormUtils.SetField(AObject, field.name, v);
+          end
           else
-            TrySetUnderlyingValue(RealValue, v)
+          begin
+            TrySetUnderlyingValue(RealValue, v);
+            TdormUtils.SetField(AObject, field.name, RealValue);
+          end;
         end
         else
           TdormUtils.SetField(AObject, field.name, v);
@@ -721,6 +728,10 @@ begin
     obj := TdormUtils.CreateObject(ARttiType);
     for field in AMappingTable.Fields do
     begin
+      if AReader.Fields.ByNameIsNull[field.FieldName] then
+      begin
+
+      end;
       if CompareText(field.FieldType, 'string') = 0 then
       begin
         v := AReader.Fields.ByNameAsString[field.FieldName];
@@ -805,51 +816,61 @@ procedure TUIBBaseAdapter.SetUIBParameterValue(AFieldType: string; AStatement: T
 var
   sourceStream: TStream;
   str: TBytesStream;
+  v, RealValue: TValue;
 begin
+  if IsNullableType(AValue.TypeInfo) then
+    TryGetUnderlyingValue(AValue, RealValue);
+
   if CompareText(AFieldType, 'string') = 0 then
   begin
-    AStatement.Params.AsString[ParameterIndex] := AValue.AsString;
-    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + AValue.AsString);
+    AStatement.Params.AsString[ParameterIndex] := RealValue.AsString;
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + RealValue.AsString);
   end
   else if CompareText(AFieldType, 'decimal') = 0 then
   begin
-    AStatement.Params.AsDouble[ParameterIndex] := AValue.AsExtended;
-    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + FloatToStr(AValue.AsExtended));
+    AStatement.Params.AsDouble[ParameterIndex] := RealValue.AsExtended;
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + FloatToStr(RealValue.AsExtended));
   end
   else if CompareText(AFieldType, 'integer') = 0 then
   begin
-    AStatement.Params.AsInt64[ParameterIndex] := AValue.AsInt64;
-    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + IntToStr(AValue.AsInt64));
+    // if IsNullableType(AValue.TypeInfo) then
+    // begin
+    // TryGetUnderlyingValue(AValue, v);
+    // AStatement.Params.AsInt64[ParameterIndex] := v.AsInt64;
+    // end
+    // else
+    AStatement.Params.AsInt64[ParameterIndex] := RealValue.AsInt64;
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + IntToStr(RealValue.AsInt64));
   end
   else if CompareText(AFieldType, 'boolean') = 0 then
   begin
-    AStatement.Params.AsBoolean[ParameterIndex] := AValue.AsBoolean;
-    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + BoolToStr(AValue.AsBoolean, True));
+    AStatement.Params.AsBoolean[ParameterIndex] := RealValue.AsBoolean;
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + BoolToStr(RealValue.AsBoolean, True));
   end
   else if CompareText(AFieldType, 'float') = 0 then
   begin
-    AStatement.Params.AsDouble[ParameterIndex] := AValue.AsExtended;
-    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + FloatToStr(AValue.AsExtended));
+    AStatement.Params.AsDouble[ParameterIndex] := RealValue.AsExtended;
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + FloatToStr(RealValue.AsExtended));
   end
   else if CompareText(AFieldType, 'date') = 0 then
   begin
-    AStatement.Params.AsDateTime[ParameterIndex] := trunc(AValue.AsExtended);
+    AStatement.Params.AsDateTime[ParameterIndex] := trunc(RealValue.AsExtended);
     GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' +
-      EscapeDate(trunc(AValue.AsExtended)));
+      EscapeDate(trunc(RealValue.AsExtended)));
   end
   else if CompareText(AFieldType, 'datetime') = 0 then
   begin
-    AStatement.Params.AsDateTime[ParameterIndex] := AValue.AsExtended;
-    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + EscapeDate(AValue.AsExtended));
+    AStatement.Params.AsDateTime[ParameterIndex] := RealValue.AsExtended;
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + EscapeDate(RealValue.AsExtended));
   end
   else if CompareText(AFieldType, 'time') = 0 then
   begin
-    AStatement.Params.AsDateTime[ParameterIndex] := AValue.AsExtended;
-    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + EscapeDateTime(AValue.AsExtended));
+    AStatement.Params.AsDateTime[ParameterIndex] := RealValue.AsExtended;
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + EscapeDateTime(RealValue.AsExtended));
   end
   else if CompareText(AFieldType, 'blob') = 0 then
   begin
-    sourceStream := TStream(AValue.AsObject);
+    sourceStream := TStream(RealValue.AsObject);
     if sourceStream = nil then
     begin
       AStatement.Params.IsNull[ParameterIndex] := True;
