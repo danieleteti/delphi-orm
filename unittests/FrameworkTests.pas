@@ -51,6 +51,7 @@ type
     procedure TestCollectionSorting;
     procedure TestListDuckTyping;
     procedure TestWrapAsList;
+    procedure TestSetAsNull;
   end;
 
   TPersonComparer = class(TComparer<TObject>)
@@ -66,7 +67,7 @@ uses
   dorm.Utils,
   IdHashMessageDigest,
   idHash,
-  RTTI;
+  RTTI, Spring;
 
 // returns MD5 has for a file
 function MD5(const fileName: string): string;
@@ -385,17 +386,14 @@ procedure TFrameworkTests.TestListDuckTyping;
 var
 
 {$IF CompilerVersion = 22}
-
   ObjectList: TPeople;
 
 {$ELSE}
-
   ObjectList:
 
 {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
 
 {$IFEND}
-
   List: IWrappedList;
   o: TObject;
   p: {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND};
@@ -404,14 +402,12 @@ begin
   ObjectList :=
 
 {$IF CompilerVersion = 22}
-
     TPeople.Create;
 
 {$ELSE}
 {$IF CompilerVersion > 22}TObjectList<TPerson>{$ELSE}TdormObjectList<TPerson>{$IFEND}.Create;
 
 {$IFEND}
-
   try
     List := WrapAsList(ObjectList);
     for o in List do
@@ -538,6 +534,19 @@ begin
   finally
     Coll.Free;
   end;
+end;
+
+procedure TFrameworkTests.TestSetAsNull;
+var
+  IntNull: TNullableInteger;
+  StringNull: TNullableString;
+  V: TValue;
+begin
+  CheckFalse(IntNull.HasValue);
+  IntNull := 3;
+  CheckTrue(IntNull.HasValue);
+  SetAsNull(typeInfo(TNullableInteger), @IntNull);
+  CheckFalse(IntNull.HasValue);
 end;
 
 procedure TFrameworkTests.TestTDate;

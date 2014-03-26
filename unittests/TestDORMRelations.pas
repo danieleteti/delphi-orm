@@ -33,6 +33,7 @@ type
 
   published
     procedure TestLoadHasMany;
+    procedure TestLoadHasManyNullable;
     procedure TestHasManyLazyLoad;
     procedure TestBelongsTo;
     procedure TestLoadRelations;
@@ -48,7 +49,7 @@ uses
   dorm.tests.bo,
   SysUtils,
   dorm.tests.objstatus.bo,
-  dorm.ObjectStatus;
+  dorm.ObjectStatus, System.Generics.Collections;
 
 { TTestDORMRelations }
 
@@ -64,10 +65,10 @@ end;
 
 procedure TTestDORMRelations.TestBelongsTo;
 var
-  Car     : TCar;
+  Car: TCar;
   CarOwner: TPerson;
-  car_id  : Integer;
-  p       : TPerson;
+  car_id: Integer;
+  p: TPerson;
 begin
   CarOwner := TPerson.NewPerson;
   try
@@ -161,8 +162,8 @@ end;
 procedure TTestDORMRelations.TestLoadHasMany;
 var
   t, t1: TPhone;
-  p    : TPerson;
-  ID   : Integer;
+  p: TPerson;
+  ID: Integer;
 begin
   p := TPerson.NewPerson;
   try
@@ -197,9 +198,40 @@ begin
   end;
 end;
 
+procedure TTestDORMRelations.TestLoadHasManyNullable;
+var
+  t, t1: TNullDetailTest;
+  p: TNullTest;
+  ID: Integer;
+begin
+  p := TNullTest.Create;
+  try
+    p.IntegerNull := 1234;
+    p.NullablesDetails.Add(TNullDetailTest.CreateNew);
+    p.NullablesDetails.Add(TNullDetailTest.CreateNew);
+    p.NullablesDetails.Add(TNullDetailTest.CreateNew);
+    p.NullablesDetails.Add(TNullDetailTest.CreateNew);
+    Session.Persist(p);
+    ID := p.ID;
+    Session.Commit;
+  finally
+    p.Free;
+  end;
+
+  Session.StartTransaction;
+  p := Session.Load<TNullTest>(ID);
+  try
+    CheckEquals(4, p.NullablesDetails.Count);
+    // CheckEquals(UpperCase(p.Email.Value), p.Email.CopiedValue);
+    Session.Commit;
+  finally
+    p.Free;
+  end;
+end;
+
 procedure TTestDORMRelations.TestLoadRelations;
 var
-  p  : TPerson;
+  p: TPerson;
   oid: Integer;
 begin
   Session.EnableLazyLoad(TPerson, 'Car');
@@ -244,8 +276,8 @@ end;
 
 procedure TTestDORMRelations.TestLoadRelationsWithOBJSTATUS;
 var
-  p    : TPersonOS;
-  oid  : Integer;
+  p: TPersonOS;
+  oid: Integer;
   phone: TPhoneOS;
 begin
   Session.EnableLazyLoad(TPersonOS, 'Car');

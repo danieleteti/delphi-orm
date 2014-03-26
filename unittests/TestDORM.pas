@@ -374,19 +374,25 @@ end;
 procedure TTestDORM.TestInsertWithNull;
 var
   p: TNullTest;
+  PasString: string;
+  id: Integer;
 begin
   p := TNullTest.Create;
   try
-    Session.Persist(p);
-    Session.Commit;
     p.IntegerNull := 1234;
-    p.objstatus := osDirty;
-    Session.Persist(p);
-    Session.Commit;
     p.StringNull := 'Hello World';
     p.objstatus := osDirty;
     Session.Persist(p);
+    id := p.id;
+    PasString := p.ToString;
     Session.Commit;
+  finally
+    p.Free;
+  end;
+
+  p := Session.Load<TNullTest>(id);
+  try
+    CheckEquals(PasString, p.ToString);
   finally
     p.Free;
   end;

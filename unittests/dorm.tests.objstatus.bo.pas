@@ -64,6 +64,13 @@ type
     property ObjVersion: Integer read FObjVersion write SetObjVersion;
   end;
 
+  TNullDetailTest = class;
+  TNullTest = class;
+
+  [ListOf('dorm.tests.objstatus.bo.TNullDetailTest')]
+  TNullTestList = class(TObjectList<TNullDetailTest>)
+  end;
+
   [Entity('NULLABLES')]
   TNullTest = class(TObjStatusSupport)
   private
@@ -76,6 +83,7 @@ type
     FBooleanNull: TNullableBoolean;
     FID: Integer;
     FObjStatus: TdormObjectStatus;
+    FNullablesDetails: TNullTestList;
     procedure SetIntegerNull(const Value: TNullableInteger);
     procedure SetStringNull(const Value: TNullableString);
     procedure SetInt64Null(const Value: TNullableInt64);
@@ -86,7 +94,48 @@ type
     procedure SetID(const Value: Integer);
     procedure SetObjStatus(const Value: TdormObjectStatus);
   public
+    function ToString: String; override;
+    constructor Create; override;
+    destructor Destroy; override;
     property ID: Integer read FID write SetID;
+    property IntegerNull: TNullableInteger read FIntegerNull write SetIntegerNull;
+    property StringNull: TNullableString read FStringNull write SetStringNull;
+    property Int64Null: TNullableInt64 read FInt64Null write SetInt64Null;
+    property DateTimeNull: TNullableDateTime read FDateTimeNull write SetDateTimeNull;
+    property DoubleNull: TNullableDouble read FDoubleNull write SetDoubleNull;
+    property BooleanNull: TNullableBoolean read FBooleanNull write SetBooleanNull;
+    property CurrencyNull: TNullableCurrency read FCurrencyNull write SetCurrencyNull;
+    [HasMany('ID_NULLABLES')]
+    property NullablesDetails: TNullTestList read FNullablesDetails;
+    [Transient]
+    property objstatus: TdormObjectStatus read FObjStatus write SetObjStatus;
+  end;
+
+  [Entity('NULLABLES_DETAILS')]
+  TNullDetailTest = class(TObjStatusSupport)
+  private
+    FDateTimeNull: TNullableDateTime;
+    FInt64Null: TNullableInt64;
+    FStringNull: TNullableString;
+    FCurrencyNull: TNullableCurrency;
+    FID_NULLABLES: Integer;
+    FIntegerNull: TNullableInteger;
+    FID: Integer;
+    FDoubleNull: TNullableDouble;
+    FBooleanNull: TNullableBoolean;
+    procedure SetBooleanNull(const Value: TNullableBoolean);
+    procedure SetCurrencyNull(const Value: TNullableCurrency);
+    procedure SetDateTimeNull(const Value: TNullableDateTime);
+    procedure SetDoubleNull(const Value: TNullableDouble);
+    procedure SetID(const Value: Integer);
+    procedure SetID_NULLABLES(const Value: Integer);
+    procedure SetInt64Null(const Value: TNullableInt64);
+    procedure SetIntegerNull(const Value: TNullableInteger);
+    procedure SetStringNull(const Value: TNullableString);
+  public
+    class function CreateNew: TNullDetailTest;
+    property ID: Integer read FID write SetID;
+    property ID_NULLABLES: Integer read FID_NULLABLES write SetID_NULLABLES;
     property IntegerNull: TNullableInteger read FIntegerNull write SetIntegerNull;
     property StringNull: TNullableString read FStringNull write SetStringNull;
     property Int64Null: TNullableInt64 read FInt64Null write SetInt64Null;
@@ -739,6 +788,18 @@ end;
 
 { TNullTest }
 
+constructor TNullTest.Create;
+begin
+  inherited;
+  FNullablesDetails := TNullTestList.Create(true);
+end;
+
+destructor TNullTest.Destroy;
+begin
+  FNullablesDetails.Free;
+  inherited;
+end;
+
 procedure TNullTest.SetBooleanNull(const Value: TNullableBoolean);
 begin
   FBooleanNull := Value;
@@ -780,6 +841,82 @@ begin
 end;
 
 procedure TNullTest.SetStringNull(const Value: TNullableString);
+begin
+  FStringNull := Value;
+end;
+
+function TNullTest.ToString: String;
+begin
+  Result := inherited ToString;
+  Result := Result + '#ID=' + ID.ToString;
+
+  if IntegerNull.HasValue then
+    Result := Result + '#' + IntegerNull.Value.ToString
+  else
+    Result := Result + '#' + '(null)';
+
+  if StringNull.HasValue then
+    Result := Result + '#' + StringNull.Value
+  else
+    Result := Result + '#' + '(null)';
+
+  if Int64Null.HasValue then
+    Result := Result + '#' + Int64Null.Value.ToString
+  else
+    Result := Result + '#' + '(null)';
+
+end;
+
+{ TNullDetailTest }
+
+class function TNullDetailTest.CreateNew: TNullDetailTest;
+begin
+  Result := TNullDetailTest.Create;
+  Result.IntegerNull := 1234;
+  Result.CurrencyNull := 1234.1234;
+end;
+
+procedure TNullDetailTest.SetBooleanNull(const Value: TNullableBoolean);
+begin
+  FBooleanNull := Value;
+end;
+
+procedure TNullDetailTest.SetCurrencyNull(const Value: TNullableCurrency);
+begin
+  FCurrencyNull := Value;
+end;
+
+procedure TNullDetailTest.SetDateTimeNull(const Value: TNullableDateTime);
+begin
+  FDateTimeNull := Value;
+end;
+
+procedure TNullDetailTest.SetDoubleNull(const Value: TNullableDouble);
+begin
+  FDoubleNull := Value;
+end;
+
+procedure TNullDetailTest.SetID(const Value: Integer);
+begin
+  FID := Value;
+end;
+
+procedure TNullDetailTest.SetID_NULLABLES(const Value: Integer);
+begin
+  FID_NULLABLES := Value;
+end;
+
+procedure TNullDetailTest.SetInt64Null(const Value: TNullableInt64);
+begin
+  FInt64Null := Value;
+end;
+
+procedure TNullDetailTest.SetIntegerNull(const Value: TNullableInteger);
+begin
+  FIntegerNull := Value;
+end;
+
+procedure TNullDetailTest.SetStringNull(const Value: TNullableString);
 begin
   FStringNull := Value;
 end;
