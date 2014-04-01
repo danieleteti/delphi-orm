@@ -117,9 +117,11 @@ object frmMain: TfrmMain
     Height = 351
     Align = alClient
     ColCount = 3
+    DoubleBuffered = True
     FixedCols = 0
     RowCount = 201
     Options = [goFixedVertLine, goFixedHorzLine, goVertLine, goHorzLine, goColSizing, goRowSelect]
+    ParentDoubleBuffered = False
     PopupMenu = PopupMenu1
     TabOrder = 2
     OnDblClick = StringGrid1DblClick

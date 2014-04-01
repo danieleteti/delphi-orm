@@ -65,6 +65,7 @@ type
     procedure StringGrid1DblClick(Sender: TObject);
   private
     FTodoList: TObjectList<TTodo>;
+    FTODOAdapter: TListBindSourceAdapter<TTodo>;
   public
     { Public declarations }
   end;
@@ -81,7 +82,10 @@ uses DORMModule,
   Vcl.GraphUtil,
   EditTodoForm,
   dorm.Commons,
-  dorm.Filters, PresentationLogicU, dorm.ObjectStatus;
+  dorm.Query,
+  dorm.Filters,
+  PresentationLogicU,
+  dorm.ObjectStatus;
 
 procedure TfrmMain.acCreateRandomDataExecute(Sender: TObject);
 begin
@@ -138,7 +142,7 @@ begin
     end
     else
       frm.CurrentTodo.Free;
-    BindSourceTodos.Refresh;
+    FTODOAdapter.Refresh;
   finally
     frm.Free;
   end;
@@ -152,22 +156,22 @@ begin
 end;
 
 procedure TfrmMain.acRefreshExecute(Sender: TObject);
-var
-  Criteria: ICriteria;
 begin
-  Criteria := nil;
+  FTODOAdapter.First; // bug
   if chkFilter.Checked then
-    Criteria := NewCriteria('done', coEqual, False);
-  BindSourceTodos.First;
-  BindSourceTodos.Active := False;
-  GetDORMSession.FillList<TTodo>(FTodoList, Criteria);
-  BindSourceTodos.Active := True;
+    GetDORMSession.FillListSQL<TTodo>(FTodoList,
+      Select.From(TTodo).Where('#TTodo.Done# = 0'))
+  else
+    GetDORMSession.FillList<TTodo>(FTodoList);
+  FTODOAdapter.SetList(FTodoList, False);
+  FTODOAdapter.Active := True;
 end;
 
 procedure TfrmMain.BindSourceTodosCreateAdapter(Sender: TObject;
   var ABindSourceAdapter: TBindSourceAdapter);
 begin
-  ABindSourceAdapter := TListBindSourceAdapter<TTodo>.Create(BindSourceTodos);
+  FTODOAdapter := TListBindSourceAdapter<TTodo>.Create(BindSourceTodos);
+  ABindSourceAdapter := FTODOAdapter;
 end;
 
 procedure TfrmMain.chkFilterClick(Sender: TObject);
@@ -183,8 +187,6 @@ end;
 procedure TfrmMain.FormCreate(Sender: TObject);
 begin
   FTodoList := TObjectList<TTodo>.Create(True);
-  (BindSourceTodos.InternalAdapter as TListBindSourceAdapter<TTodo>)
-    .SetList(FTodoList, False);
   acRefresh.Execute;
 end;
 
