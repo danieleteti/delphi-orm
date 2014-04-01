@@ -8,18 +8,26 @@ program DORM_HelloWorld;
 uses
   System.SysUtils,
   System.Classes,
+
   dorm,
   dorm.commons,
   dorm.loggers,
   BObjectsU in '..\..\Commons\BObjectsU.pas',
   RandomUtilsU in '..\..\Commons\RandomUtilsU.pas';
 
-  {$IFDEF LINK_SQLSERVERFIREDAC_ADAPTER}
-  const CONFIG_FILE = '..\..\dorm_sqlserver_firedac.conf';
-  {$ENDIF}
-  {$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
-  const CONFIG_FILE = '..\..\dorm.conf';
-  {$ENDIF}
+{$IFDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+
+
+const
+  CONFIG_FILE = '..\..\dorm_sqlserver_firedac.conf';
+{$ENDIF}
+{$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+
+
+const
+  CONFIG_FILE = '..\..\dorm.conf';
+{$ENDIF}
+
 
 procedure SimpleInsert;
 var
@@ -77,7 +85,7 @@ end;
 
 begin
   SimpleInsert;
-  //SimpleCRUD;
+  // SimpleCRUD;
   ReadLn;
 
 end.
