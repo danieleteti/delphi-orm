@@ -139,6 +139,28 @@ type
     property FullName: string read GetFullName;
   end;
 
+  [Entity('PEOPLE')]
+  TChild = class(TPerson)
+  private
+    FFatherID: Integer;
+    procedure SetFatherID(const Value: Integer);
+  published
+    [Column('ID_PARENT')]
+    property FatherID: Integer read FFatherID write SetFatherID;
+  end;
+
+  [Entity('PEOPLE')]
+  TFather = class(TPerson)
+  private
+    FChild: TChild;
+  public
+    destructor Destroy; override;
+    constructor Create; override;
+  published
+    [HasOne('FatherID')]
+    property Child: TChild read FChild;
+  end;
+
 procedure CreateCustomers(Session: TSession; HowMany: Integer);
 
 implementation
@@ -262,16 +284,19 @@ begin
   Result.FirstName := 'Daniele';
   Result.LastName := 'Teti';
   Result.BornDate := EncodeDate(1979, 11, 4);
+  Result.ObjStatus := osDirty;
 end;
 
 procedure TPerson.SetBornDate(const Value: TDate);
 begin
   FBornDate := Value;
+  ObjStatus := osDirty;
 end;
 
 procedure TPerson.SetFirstName(const Value: string);
 begin
   FFirstName := Value;
+  ObjStatus := osDirty;
 end;
 
 procedure TPerson.SetID(const Value: Integer);
@@ -282,11 +307,13 @@ end;
 procedure TPerson.SetIsMale(const Value: Boolean);
 begin
   FIsMale := Value;
+  ObjStatus := osDirty;
 end;
 
 procedure TPerson.SetLastName(const Value: string);
 begin
   FLastName := Value;
+  ObjStatus := osDirty;
 end;
 
 procedure TPerson.SetObjStatus(const Value: TdormObjectStatus);
@@ -369,6 +396,27 @@ procedure TCustomerVal.Validate;
 begin
   if not IsValidEmail(EMail) then
     raise Exception.Create('Email is not valid');
+end;
+
+{ TFather }
+
+constructor TFather.Create;
+begin
+  inherited;
+  FChild := TChild.Create;
+end;
+
+destructor TFather.Destroy;
+begin
+  FreeAndNil(FChild);
+  inherited;
+end;
+
+{ TChild }
+
+procedure TChild.SetFatherID(const Value: Integer);
+begin
+  FFatherID := Value;
 end;
 
 end.

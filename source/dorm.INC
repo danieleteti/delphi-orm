@@ -11,7 +11,7 @@
 }
 {$DEFINE LINK_FIREBIRDUIB_ADAPTER }
 { .$DEFINE LINK_INTERBASEUIB_ADAPTER }
-{$DEFINE LINK_SQLITE3_ADAPTER }
+{. $DEFINE LINK_SQLITE3_ADAPTER }
 
 { .$DEFINE LINK_SQLSERVER_ADAPTER } // require delphi ent or better
 // require DevArt dbExpress driver for sqlserver
