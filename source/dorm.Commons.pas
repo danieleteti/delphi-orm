@@ -140,7 +140,7 @@ type
 
   TdormListEnumerator = class(TEnumerator<TObject>)
   protected
-    FPosition     : Int64;
+    FPosition: Int64;
     FDuckTypedList: TDuckTypedList;
 
   protected
@@ -169,12 +169,12 @@ type
 
   TDuckTypedList = class(TInterfacedObject, IWrappedList)
   protected
-    FObjectAsDuck : TObject;
-    FAddMethod    : TRttiMethod;
-    FClearMethod  : TRttiMethod;
+    FObjectAsDuck: TObject;
+    FAddMethod: TRttiMethod;
+    FClearMethod: TRttiMethod;
     FCountProperty: TRttiProperty;
     FGetItemMethod: TRttiMethod;
-    FOwnsObject   : boolean;
+    FOwnsObject: boolean;
     function Count: Integer;
     function GetItem(const index: Integer): TObject;
     procedure Add(const AObject: TObject);
@@ -219,26 +219,26 @@ type
     FLastWrapperClassType: TClass;
 
   private
-    FObjectAsDuck  : TObject;
-    _type          : TRttiType;
-    FValidate      : TRttiMethod;
+    FObjectAsDuck: TObject;
+    _type: TRttiType;
+    FValidate: TRttiMethod;
     FInsertValidate: TRttiMethod;
     FUpdateValidate: TRttiMethod;
     FDeleteValidate: TRttiMethod;
-    FOnBeforeLoad  : TRttiMethod;
-    FOnAfterLoad   : TRttiMethod;
+    FOnBeforeLoad: TRttiMethod;
+    FOnAfterLoad: TRttiMethod;
 
     FOnBeforePersist: TRttiMethod;
-    FOnAfterPersist : TRttiMethod;
+    FOnAfterPersist: TRttiMethod;
 
     FOnBeforeInsert: TRttiMethod;
-    FOnAfterInsert : TRttiMethod;
+    FOnAfterInsert: TRttiMethod;
 
     FOnBeforeUpdate: TRttiMethod;
-    FOnAfterUpdate : TRttiMethod;
+    FOnAfterUpdate: TRttiMethod;
 
     FOnBeforeDelete: TRttiMethod;
-    FOnAfterDelete : TRttiMethod;
+    FOnAfterDelete: TRttiMethod;
 
     procedure BindValidatingMethods(AType: TRttiType);
     procedure BindEventsMethods(AType: TRttiType);
@@ -289,6 +289,8 @@ function WrapAsValidateableObject(AObject: TObject; AValidateableDuckObject: TDu
   : TdormValidateable;
 
 implementation
+
+uses dorm.loggers;
 
 function WrapAsValidateableObject(AObject: TObject; AValidateableDuckObject: TDuckTypedObject = nil)
   : TdormValidateable;
@@ -356,7 +358,7 @@ begin
   for I := 0 to AMappingFields.Count - 1 do
     if AMappingFields[I].IsPK then
       Exit(I);
-  Exit( - 1);
+  Exit(-1);
 end;
 
 { TdormInterfacedObject }
@@ -370,12 +372,12 @@ constructor TdormListEnumerator.Create(ADuckTypedList: TDuckTypedList);
 begin
   inherited Create;
   FDuckTypedList := ADuckTypedList;
-  FPosition := - 1;
+  FPosition := -1;
 end;
 
 function TdormListEnumerator.DoGetCurrent: TObject;
 begin
-  if FPosition > - 1 then
+  if FPosition > -1 then
     Result := FDuckTypedList.GetItem(FPosition)
   else
     raise Exception.Create('Enumerator error: Call MoveNext first');
@@ -425,13 +427,11 @@ begin
     raise EdormException.Create('Cannot find method "Clear" in the duck object');
   FGetItemMethod := nil;
 
-  {$IF CompilerVersion >= 23}
-
+{$IF CompilerVersion >= 23}
   FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo).GetIndexedProperty('Items')
     .ReadMethod;
 
-  {$IFEND}
-
+{$IFEND}
   if not Assigned(FGetItemMethod) then
     FGetItemMethod := TdormUtils.ctx.GetType(AObjectAsDuck.ClassInfo).GetMethod('GetItem');
   if not Assigned(FGetItemMethod) then
@@ -589,25 +589,25 @@ var
   _Method: TRttiMethod;
 begin
   _Method := _type.GetMethod('Validate');
-  if Assigned(_Method) and (not ((Length(_Method.GetParameters) <> 0))) then
+  if Assigned(_Method) and (not((Length(_Method.GetParameters) <> 0))) then
     FValidate := _Method
   else
     FValidate := nil;
 
   _Method := _type.GetMethod('InsertValidate');
-  if Assigned(_Method) and (not ((Length(_Method.GetParameters) <> 0))) then
+  if Assigned(_Method) and (not((Length(_Method.GetParameters) <> 0))) then
     FInsertValidate := _Method
   else
     FInsertValidate := nil;
 
   _Method := _type.GetMethod('UpdateValidate');
-  if Assigned(_Method) and (not ((Length(_Method.GetParameters) <> 0))) then
+  if Assigned(_Method) and (not((Length(_Method.GetParameters) <> 0))) then
     FUpdateValidate := _Method
   else
     FUpdateValidate := nil;
 
   _Method := _type.GetMethod('DeleteValidate');
-  if Assigned(_Method) and (not ((Length(_Method.GetParameters) <> 0))) then
+  if Assigned(_Method) and (not((Length(_Method.GetParameters) <> 0))) then
     FDeleteValidate := _Method
   else
     FDeleteValidate := nil;
