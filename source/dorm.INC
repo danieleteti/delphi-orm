@@ -10,7 +10,7 @@
   define a comment.
 }
 {$DEFINE LINK_FIREBIRDUIB_ADAPTER }
-{ .$DEFINE LINK_INTERBASEUIB_ADAPTER }
+{. $DEFINE LINK_INTERBASEUIB_ADAPTER }
 {. $DEFINE LINK_SQLITE3_ADAPTER }
 
 { .$DEFINE LINK_SQLSERVER_ADAPTER } // require delphi ent or better
@@ -33,7 +33,7 @@
   then remove the period before the $ that makes the
   define a comment.
 }
-{$DEFINE LINK_CODESITE }
-{ .$DEFINE LINK_SMARTINSPECT }
+{.$DEFINE LINK_CODESITE }
+{.$DEFINE LINK_SMARTINSPECT }
 {$DEFINE LINK_FILELOG }
 { **************** end loggers section ************************* }
