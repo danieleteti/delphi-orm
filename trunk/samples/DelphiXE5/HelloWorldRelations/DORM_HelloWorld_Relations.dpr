@@ -197,36 +197,44 @@ var
   K: char;
 
 begin
+  try
+    repeat
+      ClrScr;
+      Writeln('1. One to Many relation sample');
+      Writeln('2. One to One relation sample');
+      Writeln('0. Quit');
+      while true do
+      begin
+        K := ReadKey;
+        if K in ['0', '1', '2'] then
+          Break;
+      end;
 
-  repeat
-    ClrScr;
-    Writeln('1. One to Many relation sample');
-    Writeln('2. One to One relation sample');
-    Writeln('0. Quit');
-    while true do
-    begin
-      K := ReadKey;
-      if K in ['0', '1', '2'] then
-        Break;
-    end;
-
-    case K of
-      '0':
-        Break;
-      '1':
-        begin
-          RelationOneToMany;
-          Write('Hit return to terminate this sample');
-          ReadLn;
-        end;
-      '2':
-        begin
-          RelationOneToOne;
-          Write('Hit return to terminate this sample');
-          ReadLn;
-        end;
-    end;
-  until false;
+      case K of
+        '0':
+          Break;
+        '1':
+          begin
+            ClrScr;
+            RelationOneToMany;
+            Writeln;
+            Write('Hit return to terminate this sample');
+            ReadLn;
+          end;
+        '2':
+          begin
+            ClrScr;
+            RelationOneToOne;
+            Writeln;
+            Write('Hit return to terminate this sample');
+            ReadLn;
+          end;
+      end;
+    until false;
+  except
+    on E: Exception do
+      Writeln(E.ClassName + ' ' + E.Message);
+  end;
   Writeln('See you... hit return to terminate');
   ReadLn;
 
