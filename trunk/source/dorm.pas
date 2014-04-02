@@ -1950,6 +1950,7 @@ begin
       _table := FMappingStrategy.GetMapping(_Type);
       _idValue := GetIdValue(_table.Id, AObject);
       // GetLogger.EnterLevel('UPDATE ' + AObject.ClassName);
+      AValidaetable.Validate;
       AValidaetable.UpdateValidate;
       AValidaetable.OnBeforeUpdate;
       _class_name := _Type.ToString;
