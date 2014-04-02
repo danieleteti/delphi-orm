@@ -132,6 +132,7 @@
         </DelphiCompile>
         <DCCReference Include="..\..\Commons\BObjectsU.pas"/>
         <DCCReference Include="..\..\Commons\RandomUtilsU.pas"/>
+        <DCCReference Include="..\..\Commons\Console.pas"/>
         <BuildConfiguration Include="SQLServerFIREDAC">
             <Key>Cfg_3</Key>
             <CfgParent>Base</CfgParent>

@@ -84,8 +84,13 @@ begin
 end;
 
 begin
+  Write('Press return to execute an insert...');
+  ReadLn;
   SimpleInsert;
-  // SimpleCRUD;
+  Write('Press return to execute a complete CRUD...');
+  ReadLn;
+  SimpleCRUD;
+  Write('Press return to terminate...');
   ReadLn;
 
 end.

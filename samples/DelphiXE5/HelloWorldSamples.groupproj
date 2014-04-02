@@ -6,16 +6,16 @@
         <Projects Include="HelloWorld\DORM_HelloWorld.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="HelloWorldEvents\DORM_HelloWorld_Events.dproj">
+        <Projects Include="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="HelloWorldLists\DORM_HelloWorldLists.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj">
+        <Projects Include="HelloWorldObjVersion\DORM_HelloWorld_ObjVersion.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="HelloWorldObjVersion\DORM_HelloWorld_ObjVersion.dproj">
+        <Projects Include="HelloWorldEvents\DORM_HelloWorld_Events.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="HelloWorldRelations\DORM_HelloWorld_Relations.dproj">
@@ -41,14 +41,14 @@
     <Target Name="DORM_HelloWorld:Make">
         <MSBuild Projects="HelloWorld\DORM_HelloWorld.dproj" Targets="Make"/>
     </Target>
-    <Target Name="DORM_HelloWorld_Events">
-        <MSBuild Projects="HelloWorldEvents\DORM_HelloWorld_Events.dproj"/>
+    <Target Name="DORM_HelloWorld_ObjStatus">
+        <MSBuild Projects="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj"/>
     </Target>
-    <Target Name="DORM_HelloWorld_Events:Clean">
-        <MSBuild Projects="HelloWorldEvents\DORM_HelloWorld_Events.dproj" Targets="Clean"/>
+    <Target Name="DORM_HelloWorld_ObjStatus:Clean">
+        <MSBuild Projects="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="DORM_HelloWorld_Events:Make">
-        <MSBuild Projects="HelloWorldEvents\DORM_HelloWorld_Events.dproj" Targets="Make"/>
+    <Target Name="DORM_HelloWorld_ObjStatus:Make">
+        <MSBuild Projects="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj" Targets="Make"/>
     </Target>
     <Target Name="DORM_HelloWorldLists">
         <MSBuild Projects="HelloWorldLists\DORM_HelloWorldLists.dproj"/>
@@ -59,15 +59,6 @@
     <Target Name="DORM_HelloWorldLists:Make">
         <MSBuild Projects="HelloWorldLists\DORM_HelloWorldLists.dproj" Targets="Make"/>
     </Target>
-    <Target Name="DORM_HelloWorld_ObjStatus">
-        <MSBuild Projects="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj"/>
-    </Target>
-    <Target Name="DORM_HelloWorld_ObjStatus:Clean">
-        <MSBuild Projects="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj" Targets="Clean"/>
-    </Target>
-    <Target Name="DORM_HelloWorld_ObjStatus:Make">
-        <MSBuild Projects="HelloWorldObjStatus\DORM_HelloWorld_ObjStatus.dproj" Targets="Make"/>
-    </Target>
     <Target Name="DORM_HelloWorld_ObjVersion">
         <MSBuild Projects="HelloWorldObjVersion\DORM_HelloWorld_ObjVersion.dproj"/>
     </Target>
@@ -76,6 +67,15 @@
     </Target>
     <Target Name="DORM_HelloWorld_ObjVersion:Make">
         <MSBuild Projects="HelloWorldObjVersion\DORM_HelloWorld_ObjVersion.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_Events">
+        <MSBuild Projects="HelloWorldEvents\DORM_HelloWorld_Events.dproj"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_Events:Clean">
+        <MSBuild Projects="HelloWorldEvents\DORM_HelloWorld_Events.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DORM_HelloWorld_Events:Make">
+        <MSBuild Projects="HelloWorldEvents\DORM_HelloWorld_Events.dproj" Targets="Make"/>
     </Target>
     <Target Name="DORM_HelloWorld_Relations">
         <MSBuild Projects="HelloWorldRelations\DORM_HelloWorld_Relations.dproj"/>
@@ -96,13 +96,13 @@
         <MSBuild Projects="TODOManager\TODOManager.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="DORM_HelloWorld;DORM_HelloWorld_Events;DORM_HelloWorldLists;DORM_HelloWorld_ObjStatus;DORM_HelloWorld_ObjVersion;DORM_HelloWorld_Relations;TODOManager"/>
+        <CallTarget Targets="DORM_HelloWorld;DORM_HelloWorld_ObjStatus;DORM_HelloWorldLists;DORM_HelloWorld_ObjVersion;DORM_HelloWorld_Events;DORM_HelloWorld_Relations;TODOManager"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="DORM_HelloWorld:Clean;DORM_HelloWorld_Events:Clean;DORM_HelloWorldLists:Clean;DORM_HelloWorld_ObjStatus:Clean;DORM_HelloWorld_ObjVersion:Clean;DORM_HelloWorld_Relations:Clean;TODOManager:Clean"/>
+        <CallTarget Targets="DORM_HelloWorld:Clean;DORM_HelloWorld_ObjStatus:Clean;DORM_HelloWorldLists:Clean;DORM_HelloWorld_ObjVersion:Clean;DORM_HelloWorld_Events:Clean;DORM_HelloWorld_Relations:Clean;TODOManager:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="DORM_HelloWorld:Make;DORM_HelloWorld_Events:Make;DORM_HelloWorldLists:Make;DORM_HelloWorld_ObjStatus:Make;DORM_HelloWorld_ObjVersion:Make;DORM_HelloWorld_Relations:Make;TODOManager:Make"/>
+        <CallTarget Targets="DORM_HelloWorld:Make;DORM_HelloWorld_ObjStatus:Make;DORM_HelloWorldLists:Make;DORM_HelloWorld_ObjVersion:Make;DORM_HelloWorld_Events:Make;DORM_HelloWorld_Relations:Make;TODOManager:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

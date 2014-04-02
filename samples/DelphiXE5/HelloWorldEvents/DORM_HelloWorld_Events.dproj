@@ -5,7 +5,7 @@
         <FrameworkType>None</FrameworkType>
         <MainSource>DORM_HelloWorld_Events.dpr</MainSource>
         <Base>True</Base>
-        <Config Condition="'$(Config)'==''">SQLServerFIREDAC</Config>
+        <Config Condition="'$(Config)'==''">FirebirdUIB</Config>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
         <TargetedPlatforms>1</TargetedPlatforms>
         <AppType>Console</AppType>
