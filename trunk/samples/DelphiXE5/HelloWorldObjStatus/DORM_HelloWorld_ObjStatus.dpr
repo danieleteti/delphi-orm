@@ -15,12 +15,17 @@ uses
   dorm.ObjectStatus,
   RandomUtilsU in '..\..\Commons\RandomUtilsU.pas';
 
-  {$IFDEF LINK_SQLSERVERFIREDAC_ADAPTER}
-  const CONFIG_FILE = '..\..\dorm_sqlserver_firedac.conf';
-  {$ENDIF}
-  {$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
-  const CONFIG_FILE = '..\..\dorm.conf';
-  {$ENDIF}
+{$IFDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+
+const
+  CONFIG_FILE = '..\..\dorm_sqlserver_firedac.conf';
+{$ENDIF}
+{$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
+
+const
+  CONFIG_FILE = '..\..\dorm.conf';
+{$ENDIF}
+
 
 procedure SimpleCRUD;
 var
@@ -67,7 +72,11 @@ begin
 end;
 
 begin
+  Write('Press return to execute CRUD using dorm'' ObjStatus...');
+  ReadLn;
+
   SimpleCRUD;
+  Write('Press return to terminate');
   ReadLn;
 
 end.

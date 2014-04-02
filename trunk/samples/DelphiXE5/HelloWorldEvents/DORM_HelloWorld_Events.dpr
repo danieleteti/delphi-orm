@@ -24,12 +24,13 @@ const
 
 {$IFNDEF LINK_SQLSERVERFIREDAC_ADAPTER}
 
+
 const
   CONFIG_FILE = '..\..\dorm.conf';
 {$ENDIF}
 
 
-procedure SimpleCRUD;
+procedure SimpleCRUD(UseWrongEmail: Boolean);
 var
   dormSession: TSession;
   Customer: TCustomerVal;
@@ -41,7 +42,12 @@ begin
     Customer := TCustomerVal.Create;
     Customer.Name := 'Daniele Teti Inc.';
     Customer.Address := 'Via Roma, 16';
-    Customer.EMail := 'daniele@danieleteti.it';
+
+    if UseWrongEmail then
+      Customer.EMail := 'danieleteti.it'
+    else
+      Customer.EMail := 'daniele@danieleteti.it';
+
     Customer.CreatedAt := date;
 
     dormSession.Persist(Customer);
@@ -60,7 +66,20 @@ begin
 end;
 
 begin
-  SimpleCRUD;
+  Writeln('CRUD with correct email (the email is uppercased by the OnBeforePersist method)');
+  SimpleCRUD(false);
+  Writeln;
+  Writeln('CRUD with incorrect email (an exception is raised by the Validate method)');
+  try
+    SimpleCRUD(true);
+  except
+    on E: Exception do
+    begin
+      Writeln('EXCEPTION RAISED: ' + E.ClassName + ' "' + E.Message + '"');
+    end;
+  end;
+  Writeln;
+  Writeln('hit return to terminate demo...');
   ReadLn;
 
 end.

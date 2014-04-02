@@ -193,9 +193,41 @@ begin
   end;
 end;
 
+var
+  K: char;
+
 begin
-  // RelationOneToMany;
-  RelationOneToOne;
+
+  repeat
+    ClrScr;
+    Writeln('1. One to Many relation sample');
+    Writeln('2. One to One relation sample');
+    Writeln('0. Quit');
+    while true do
+    begin
+      K := ReadKey;
+      if K in ['0', '1', '2'] then
+        Break;
+    end;
+
+    case K of
+      '0':
+        Break;
+      '1':
+        begin
+          RelationOneToMany;
+          Write('Hit return to terminate this sample');
+          ReadLn;
+        end;
+      '2':
+        begin
+          RelationOneToOne;
+          Write('Hit return to terminate this sample');
+          ReadLn;
+        end;
+    end;
+  until false;
+  Writeln('See you... hit return to terminate');
   ReadLn;
 
 end.

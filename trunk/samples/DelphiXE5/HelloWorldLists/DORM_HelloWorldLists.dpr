@@ -50,6 +50,7 @@ var
   Customers: TObjectList<TCustomerOS>;
 
 begin
+  ClrScr;
   dormSession := TSession.CreateConfigured(
     TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
@@ -75,6 +76,7 @@ var
   I: Integer;
   Customers: TObjectList<TCustomerOS>;
 begin
+  ClrScr;
   dormSession := TSession.CreateConfigured(
     TStreamReader.Create(CONFIG_FILE), TdormEnvironment.deDevelopment);
   try
@@ -144,16 +146,45 @@ begin
   end;
 end;
 
+var
+  K: char;
+
 begin
-  // uncomments only one of the following lines
+  repeat
+    ClrScr;
+    WriteLn('1. List of object using LoadList<T>');
+    WriteLn('2. Filter sample application using DSQL');
+    WriteLn('3. Filter sample using a dorm'' Finder');
+    WriteLn('0. Quit');
+    while True do
+    begin
+      K := ReadKey;
+      if K in ['0', '1', '2', '3'] then
+        Break;
+    end;
 
-  // uncomment the following line to see a normal search
-  // Lists;
-
-  // uncomment the following line to see a DSQL criteria driven search
-  SearchCriteria;
-  // uncomment the following line to see a criteria driven search
-  // SearchCriteriaFinder;
+    case K of
+      '0':
+        Break;
+      '1':
+        begin
+          Lists;
+          Write('Hit return to terminate this sample');
+          ReadLn;
+        end;
+      '2':
+        begin
+          SearchCriteria;
+        end;
+      '3':
+        begin
+          SearchCriteriaFinder;
+          Write('Hit return to terminate this sample');
+          ReadLn;
+        end;
+    end;
+  until false;
+  WriteLn('See you... hit return to terminate');
   ReadLn;
 
 end.
