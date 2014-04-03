@@ -58,7 +58,7 @@ type
   TdormSessionPersistEvent = procedure(Sender: TObject; AObject: TObject)
     of object;
 
-  TSession = class(TdormInterfacedObject)
+  TSession = class(TdormInterfacedObject, IdormSession)
   private
     FMappingStrategy: ICacheMappingStrategy;
     FCTX: TRttiContext;
@@ -267,6 +267,8 @@ type
     // function FindOne<T: class>(Criteria: TdormCriteria;
     // FillOptions: TdormFillOptions = []; FreeCriteria: Boolean = true): T; overload; deprecated;
     procedure FillList<T: class>(ACollection: TObject;
+      ACriteria: ICriteria = nil); overload;
+    procedure FillList(APTypeInfo: PTypeInfo; ACollection: TObject;
       ACriteria: ICriteria = nil); overload;
     procedure FillListSQL<T: class>(ACollection: TObject;
       ASQLable: ISQLable); overload;
@@ -698,19 +700,18 @@ begin
 end;
 
 // QUESTA RIMANE
-procedure TSession.FillList<T>(ACollection: TObject; ACriteria: ICriteria);
+procedure TSession.FillList(APTypeInfo: PTypeInfo; ACollection: TObject; ACriteria: ICriteria);
 var
   rt: TRttiType;
   _table: TMappingTable;
   _fields: TMappingFieldList;
-  _type_info: PTypeInfo;
+  // _type_info: PTypeInfo;
   SearcherClassname: string;
   List: IWrappedList;
   Obj: TObject;
   _validateable: TdormValidateable;
 begin
-  _type_info := TypeInfo(T);
-  rt := FCTX.GetType(_type_info);
+  rt := FCTX.GetType(APTypeInfo);
   _table := FMappingStrategy.GetMapping(rt);
   _fields := _table.Fields;
   if assigned(ACriteria) then
@@ -723,6 +724,14 @@ begin
   List := WrapAsList(ACollection);
   SetObjectsStatus(List, osClean, false, true);
   GetLogger.ExitLevel(SearcherClassname);
+end;
+
+procedure TSession.FillList<T>(ACollection: TObject; ACriteria: ICriteria);
+var
+  _type_info: PTypeInfo;
+begin
+  _type_info := TypeInfo(T);
+  FillList(_type_info, ACollection, ACriteria);
 end;
 
 function TSession.GetLoadedObjectHashCode(AObject: TObject;

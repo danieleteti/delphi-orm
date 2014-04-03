@@ -139,10 +139,11 @@ begin
     if frm.ShowModal = mrOK then
     begin
       FTodoList.Add(frm.CurrentTodo);
+      FTODOAdapter.Refresh;
     end
     else
       frm.CurrentTodo.Free;
-    FTODOAdapter.Refresh;
+
   finally
     frm.Free;
   end;
@@ -150,7 +151,7 @@ end;
 
 procedure TfrmMain.acPersistExecute(Sender: TObject);
 begin
-  GetDORMSession.PersistCollection(WrapAsList(FTodoList));
+  GetDORMSession.PersistCollection(FTodoList);
   BindSourceTodos.Active := False;
   BindSourceTodos.Active := True;
 end;

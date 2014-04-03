@@ -144,7 +144,7 @@ type
   private
     FFatherID: Integer;
     procedure SetFatherID(const Value: Integer);
-  published
+  public
     [Column('ID_PARENT')]
     property FatherID: Integer read FFatherID write SetFatherID;
   end;

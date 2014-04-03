@@ -7,7 +7,7 @@ uses Generics.Collections,
   System.Rtti,
   dorm.Filters,
   dorm.Commons,
-  System.TypInfo;
+  System.TypInfo, dorm.ObjectStatus;
 
 type
   TdormParameterType = (TypeString, TypeInteger, TypeFloat, TypeBoolean,
@@ -37,12 +37,47 @@ type
       AStrategy: IdormPersistStrategy): ICustomCriteria;
   end;
 
+  IdormSession = interface(IInvokable)
+    ['{74BA59D1-0EF5-471C-9A29-BAD3E55B7627}']
+    procedure CopyObject(SourceObject, TargetObject: TObject);
+    function OIDIsSet(AObject: TObject): boolean;
+    procedure ClearOID(AObject: TObject);
+    function Persist(AObject: TObject): TObject;
+    function PersistCollection(ACollection: TObject): TObject;
+    procedure SetObjectStatus(AObject: TObject; AStatus: TdormObjectStatus;
+      ARaiseExceptionIfNotExists: boolean = true);
+    function IsDirty(AObject: TObject): boolean;
+    function IsClean(AObject: TObject): boolean;
+    function IsUnknown(AObject: TObject): boolean;
+    procedure LoadRelations(AObject: TObject;
+      ARelationsSet: TdormRelations = [drBelongsTo, drHasMany, drHasOne];
+      AConsiderLazyLoading: boolean = true); overload;
+    procedure LoadRelationsForEachElement(AList: TObject;
+      ARelationsSet: TdormRelations = [drBelongsTo, drHasMany, drHasOne];
+      AConsiderLazyLoading: boolean = true); overload;
+    { Load methods }
+    function Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject)
+      : boolean;
+    procedure FillListSQL(APTypeInfo: PTypeInfo; ACollection: TObject;
+      ASQLable: ISQLable); overload;
+    procedure FillList(APTypeInfo: PTypeInfo; ACollection: TObject;
+      ACriteria: ICriteria = nil); overload;
+    // COMMANDERS
+    function ExecuteCommand(ACommand: IdormCommand): Int64;
+    // Other stuff
+    procedure EnableLazyLoad(AClass: TClass; const APropertyName: string);
+    procedure DisableLazyLoad(AClass: TClass; const APropertyName: string);
+    function Count(AClassType: TClass; ACriteria: ICriteria = nil): Int64;
+    procedure DeleteAll(AClassType: TClass);
+
+  end;
+
   TFrom = class;
 
   TSelect = class(TInterfacedObject, ISQLable)
   private
-    FDistinct: Boolean;
-    FAll: Boolean;
+    FDistinct: boolean;
+    FAll: boolean;
     FScope: TDictionary<string, TRttiType>;
 
   protected
