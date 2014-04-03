@@ -388,7 +388,7 @@ begin
   if FPosition < FDuckTypedList.Count - 1 then
   begin
     Inc(FPosition);
-    Result := True;
+    Result := true;
   end
   else
     Result := false;
@@ -678,7 +678,7 @@ end;
 
 function TDuckTypedObject.SafeMethodCall(AMethod: TRttiMethod; AObject: TObject): boolean;
 begin
-  Result := True;
+  Result := true;
   if Assigned(AMethod) then
     AMethod.Invoke(AObject, []);
 end;
