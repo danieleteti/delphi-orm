@@ -86,6 +86,7 @@ type
     function LoadByMappingField(ATypeInfo: PTypeInfo;
       AMappingField: TMappingField; const Value: TValue; AObject: TObject)
       : boolean; overload;
+    function Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject): boolean; overload;
 
   strict protected
     CurrentObjectStatus: TdormObjectStatus;
@@ -235,7 +236,7 @@ type
       ARelationsSet: TdormRelations = [drBelongsTo, drHasMany, drHasOne];
       AConsiderLazyLoading: boolean = true); overload;
     { Non generic version of  Load<> }
-    function Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject)
+    function Load(AClassType: TClass; Criteria: ICriteria; out AObject: TObject)
       : boolean; overload;
     { Load 0 or 1 object by OID (first parameter). The Session will create and returned object of type <T> }
     function Load<T: class>(const Value: TValue): T; overload;
@@ -247,11 +248,21 @@ type
     { Load all the objects that satisfy the Criteria. The Session will fill the list (ducktype) passed on 2nd parameter with objects of type <T> }
     procedure LoadList<T: class>(Criteria: ICriteria;
       AObject: TObject); overload;
+    { Load all the objects that satisfy the Criteria. The Session will fill the list (ducktype) passed on 2nd parameter with objects of type <T> }
+    procedure LoadList(AClassType: TClass; Criteria: ICriteria;
+      AObject: TObject); overload;
+
     { Load all the objects that satisfy the Criteria. The Session will create and return a TObjectList with objects of type <T> }
     function LoadList<T: class>(Criteria: ICriteria = nil):
 
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
       overload;
+
+    function LoadList(AClassType: TClass; Criteria: ICriteria = nil):
+
+{$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
+      overload;
+
     function LoadListSQL<T: class>(ASQLable: ISQLable):
 
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
@@ -983,6 +994,8 @@ begin
   rt := FCTX.GetType(ATypeInfo);
   GetLogger.EnterLevel('Load ' + rt.ToString);
   _table := FMappingStrategy.GetMapping(rt);
+  if not assigned(AObject) then
+    raise EdormException.Create('Object must be initialized');
   _validateable := WrapAsValidateableObject(AObject, FValidatingDuck);
   _validateable.OnBeforeLoad;
   Result := FPersistStrategy.Load(rt, _table, Value, AObject);
@@ -997,6 +1010,23 @@ begin
 
   GetLogger.ExitLevel('Load ' + rt.ToString);
   LoadExit;
+end;
+
+function TSession.Load(AClassType: TClass; Criteria: ICriteria; out AObject: TObject): boolean;
+var
+  List: TObjectList<TObject>;
+begin
+  List := TObjectList<TObject>.Create(true);
+  try
+    LoadList(AClassType, Criteria, List);
+    if List.Count > 1 then
+      raise EdormException.Create('Singleton query returned more than 1 row');
+    Result := List.Count = 1;
+    if Result then
+      AObject := List.Extract(List.First)
+  finally
+    List.Free;
+  end;
 end;
 
 function TSession.Load<T>(ASQLable: ISQLable): T;
@@ -1206,19 +1236,10 @@ begin
   FillListSQL<T>(Result, ASQLable);
 end;
 
-function TSession.LoadList<T>(Criteria: ICriteria):
-
-{$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
-begin
-  Result := {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}.Create(true);
-  LoadList<T>(Criteria, Result);
-end;
-
-procedure TSession.LoadList<T>(Criteria: ICriteria; AObject: TObject);
+procedure TSession.LoadList(AClassType: TClass; Criteria: ICriteria; AObject: TObject);
 var
   SQL: string;
   Table: TMappingTable;
-  ItemClassInfo: PTypeInfo;
   rt: TRttiType;
   _fields: TMappingFieldList;
   SearcherClassname: string;
@@ -1226,9 +1247,10 @@ var
   Obj: TObject;
   CustomCrit: ICustomCriteria;
   _validateable: TdormValidateable;
+  ItemTypeInfo: PTypeInfo;
 begin
-  ItemClassInfo := TypeInfo(T);
-  rt := FCTX.GetType(ItemClassInfo);
+  ItemTypeInfo := AClassType.ClassInfo;
+  rt := FCTX.GetType(ItemTypeInfo);
   Table := FMappingStrategy.GetMapping(rt);
   if Supports(Criteria, ICustomCriteria, CustomCrit) then
   begin
@@ -1248,6 +1270,36 @@ begin
   List := WrapAsList(AObject);
   SetObjectsStatus(List, osClean, false, true);
   GetLogger.ExitLevel(SearcherClassname);
+
+end;
+
+function TSession.LoadList(AClassType: TClass; Criteria: ICriteria):
+{$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
+var
+  List: {$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
+begin
+  List := {$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND}.Create(true);
+  try
+    LoadList(AClassType, Criteria, List);
+    Result := List;
+  except
+    List.Free;
+    Result := nil;
+    raise;
+  end;
+end;
+
+function TSession.LoadList<T>(Criteria: ICriteria):
+
+{$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
+begin
+  Result := {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND}.Create(true);
+  LoadList<T>(Criteria, Result);
+end;
+
+procedure TSession.LoadList<T>(Criteria: ICriteria; AObject: TObject);
+begin
+  LoadList(TypeInfo(T), Criteria, AObject);
 end;
 
 procedure TSession.LoadRelationsForEachElement(AList: TObject;

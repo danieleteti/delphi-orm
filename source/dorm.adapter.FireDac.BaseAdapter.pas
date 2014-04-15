@@ -590,6 +590,11 @@ begin
         v := AReader.FieldByName(field.FieldName).AsDateTime;
         S := field.FieldName + ' as time';
       end
+      else if CompareText(field.FieldType, 'float') = 0 then
+      begin
+        v := AReader.FieldByName(field.FieldName).AsFloat;
+        S := field.FieldName + ' as float';
+      end
       else
         raise Exception.Create('Unknown field type for ' + field.FieldName);
       try
@@ -660,6 +665,11 @@ begin
         v := AReader.FieldByName(field.FieldName).AsFloat;
         S := field.FieldName + ' as decimal';
       end
+      else if CompareText(field.FieldType, 'float') = 0 then
+      begin
+        v := AReader.FieldByName(field.FieldName).AsFloat;
+        S := field.FieldName + ' as float';
+      end
       else if CompareText(field.FieldType, 'boolean') = 0 then
       begin
         v := AReader.FieldByName(field.FieldName).AsInteger = 0;
@@ -719,6 +729,12 @@ begin
     GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + AValue.AsString);
   end
   else if CompareText(AFieldType, 'decimal') = 0 then
+  begin
+    AStatement.Params[ParameterIndex].DataType := ftFloat;
+    AStatement.Params[ParameterIndex].AsFloat := AValue.AsExtended;
+    GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + FloatToStr(AValue.AsExtended));
+  end
+  else if CompareText(AFieldType, 'float') = 0 then
   begin
     AStatement.Params[ParameterIndex].DataType := ftFloat;
     AStatement.Params[ParameterIndex].AsFloat := AValue.AsExtended;
