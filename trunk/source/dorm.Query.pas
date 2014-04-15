@@ -57,7 +57,15 @@ type
       AConsiderLazyLoading: boolean = true); overload;
     { Load methods }
     function Load(ATypeInfo: PTypeInfo; const Value: TValue; AObject: TObject)
-      : boolean;
+      : boolean; overload;
+    function Load(AClassType: TClass; Criteria: ICriteria; out AObject: TObject)
+      : boolean; overload;
+    function Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject; overload;
+    procedure LoadList(AClassType: TClass; Criteria: ICriteria;
+      ACollection: TObject); overload;
+    function LoadList(AClassType: TClass; Criteria: ICriteria = nil):
+{$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
+      overload;
     procedure FillListSQL(APTypeInfo: PTypeInfo; ACollection: TObject;
       ASQLable: ISQLable); overload;
     procedure FillList(APTypeInfo: PTypeInfo; ACollection: TObject;

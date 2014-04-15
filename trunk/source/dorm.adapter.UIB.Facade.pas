@@ -20,26 +20,28 @@ interface
 
 uses
   UIB,
-  superobject;
+  superobject, uiblib;
 
 type
   TUIBFacade = class
+  private
+    FCharSet: string;
   protected
   var
     FUIBDatabase: TUIBDatabase;
 
   protected
-    FCurrentTransaction      : TUIBTransaction;
+    FCurrentTransaction: TUIBTransaction;
     FDatabaseConnectionString: string;
-    FUsername                : string;
-    FPassword                : string;
-    FLibraryName             : string;
+    FUsername: string;
+    FPassword: string;
+    FLibraryName: string;
     function NewStatement: TUIBStatement;
     function NewQuery: TUIBQuery;
-
+    function GetCharsetFromString(const Charset: String): TCharacterSet;
   public
     constructor Create(const LibraryName: string;
-      AUserName, APassword, AConnectionString: string);
+      AUserName, APassword, AConnectionString, ACharSet: string);
     destructor Destroy; override;
     function GetConnection: TUIBDatabase;
     function GetCurrentTransaction: TUIBTransaction;
@@ -56,8 +58,7 @@ implementation
 
 uses
   sysutils,
-  dorm.Commons,
-  uiblib;
+  dorm.Commons;
 
 { Factory }
 
@@ -108,13 +109,14 @@ begin
 end;
 
 constructor TUIBFacade.Create(const LibraryName: string;
-  AUserName, APassword, AConnectionString: string);
+  AUserName, APassword, AConnectionString, ACharSet: string);
 begin
   inherited Create;
   FLibraryName := LibraryName;
   FDatabaseConnectionString := AConnectionString;
   FUsername := AUserName;
   FPassword := APassword;
+  FCharSet := ACharSet;
 end;
 
 destructor TUIBFacade.Destroy;
@@ -143,6 +145,33 @@ begin
   raise EdormException.Create('Not implemented');
 end;
 
+function TUIBFacade.GetCharsetFromString(const Charset: String): TCharacterSet;
+begin
+  if (Charset = '') or (Charset = 'utf8') then
+    Exit(csUTF8);
+  if Charset = 'none' then
+    Exit(csNONE);
+  if Charset = 'ascii' then
+    Exit(csASCII);
+  if Charset = 'utf8' then
+    Exit(csUTF8);
+  if Charset = 'iso8859_1' then
+    Exit(csISO8859_1);
+  if Charset = 'iso8859_2' then
+    Exit(csISO8859_2);
+  if Charset = 'win1250' then
+    Exit(csWIN1250);
+  if Charset = 'win1251' then
+    Exit(csWIN1251);
+  if Charset = 'win1252' then
+    Exit(csWIN1252);
+  if Charset = 'win1253' then
+    Exit(csWIN1253);
+  if Charset = 'win1254' then
+    Exit(csWIN1254);
+  raise EdormException.Create('Invalid charset ' + Charset);
+end;
+
 function TUIBFacade.GetConnection: TUIBDatabase;
 begin
   if FUIBDatabase = nil then
@@ -152,7 +181,7 @@ begin
     FUIBDatabase.DatabaseName := FDatabaseConnectionString;
     FUIBDatabase.username := FUsername;
     FUIBDatabase.password := FPassword;
-    FUIBDatabase.CharacterSet := csUTF8; // always unicode
+    FUIBDatabase.CharacterSet := GetCharsetFromString(FCharSet); // always unicode
     FUIBDatabase.Connected := True;
     FCurrentTransaction := TUIBTransaction.Create(nil);
     // daniele 30/08/2013

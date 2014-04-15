@@ -30,6 +30,9 @@ type
 
 implementation
 
+uses
+  System.SysUtils;
+
 function TUIBFirebirdPersistStrategy.GetBooleanValueAsString
   (Value: Boolean): String;
 begin
@@ -46,9 +49,14 @@ end;
 
 function TUIBFirebirdPersistStrategy.CreateUIBFacade(Conf: ISuperObject)
   : TUIBFacade;
+var
+  CharSet: String;
 begin
+  CharSet := Trim(LowerCase(Conf.S['charset']));
+  if CharSet = '' then
+    CharSet := 'utf8';
   Result := TUIBFacade.Create('fbclient.dll', Conf.S['username'],
-    Conf.S['password'], Conf.S['database_connection_string']);
+    Conf.S['password'], Conf.S['database_connection_string'], CharSet);
 end;
 
 function TUIBFirebirdTableSequence.GetSequenceFormatTemplate: String;
