@@ -86,16 +86,16 @@
 
 {$if defined(FPC) or defined(VER170) or defined(VER180) or defined(VER190)
   or defined(VER200) or defined(VER210) or defined(VER220) or defined(VER230)
-  or defined(VER240)  or defined(VER250) or defined(VER260)}
+  or defined(VER240)  or defined(VER250) or defined(VER260) or defined(VER270)}
   {$DEFINE HAVE_INLINE}
 {$ifend}
 
 {$if defined(VER210) or defined(VER220) or defined(VER230) or defined(VER240)
-  or defined(VER250) or defined(VER260)}
+  or defined(VER250) or defined(VER260) or defined(VER270)}
   {$define HAVE_RTTI}
 {$ifend}
 
-{$if defined(VER230) or defined(VER240) or defined(VER250) or defined(VER260)}
+{$if defined(VER230) or defined(VER240) or defined(VER250) or defined(VER260) or defined(VER270)}
   {$define NEED_FORMATSETTINGS}
 {$ifend}
 
