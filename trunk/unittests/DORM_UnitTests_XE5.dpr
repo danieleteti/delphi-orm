@@ -1,4 +1,4 @@
-program DORM_UnitTests_XE5;
+program DORM_UnitTests_XE6;
 
 {$IFDEF CONSOLE_TESTRUNNER}
 {$APPTYPE CONSOLE}
@@ -31,8 +31,6 @@ uses
   dorm.Filters in '..\source\dorm.Filters.pas',
   dorm.Mappings in '..\source\dorm.Mappings.pas',
   dorm.Mappings.Strategies in '..\source\dorm.Mappings.Strategies.pas',
-  dorm.CodeGenerator in '..\tools\mappingcreator\lib\dorm.CodeGenerator.pas',
-  dorm.CodeGenerator.Delphi in '..\tools\mappingcreator\lib\dorm.CodeGenerator.Delphi.pas',
   dorm.loggers in '..\source\dorm.loggers.pas',
   dorm.loggers.FileLog in '..\source\dorm.loggers.FileLog.pas',
   dorm.adapters in '..\source\dorm.adapters.pas',

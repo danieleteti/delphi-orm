@@ -28,13 +28,12 @@ uses
 
 type
   TObjStatusSupport = class
-  strict
-    private
+  strict private
     FObjVersion: Integer;
     procedure SetObjVersion(const Value: Integer);
 
   protected
-    FHistory  : TStringList;
+    FHistory: TStringList;
     FObjStatus: TdormObjectStatus;
     procedure SetObjStatus(const Value: TdormObjectStatus);
     procedure AddhistoryEvent(const Value: string);
@@ -60,7 +59,7 @@ type
 
   public
     [Transient]
-    property objstatus : TdormObjectStatus read FObjStatus write SetObjStatus;
+    property objstatus: TdormObjectStatus read FObjStatus write SetObjStatus;
     property ObjVersion: Integer read FObjVersion write SetObjVersion;
   end;
 
@@ -71,38 +70,34 @@ type
   [ListOf('dorm.tests.objstatus.bo.TPhoneOS')]
   TPhonesOS = class(
 
-    {$IF CompilerVersion >= 23}
-
+{$IF CompilerVersion >= 23}
     TObjectList<TPhoneOS>
 
-    {$ELSE}
-
+{$ELSE}
     TdormObjectList<TPhoneOS>
 
-    {$IFEND}
-
+{$IFEND}
     )
   end;
 
   [Entity('cars')]
   TCarOS = class(TObjStatusSupport)
   private
-    FModel   : string;
-    FBrand   : string;
+    FModel: string;
+    FBrand: string;
     FPersonID: Integer;
-    FID      : Integer;
-    FOwner   : TPersonOS;
+    FID: Integer;
+    FOwner: TPersonOS;
     procedure SetBrand(const Value: string);
     procedure SetModel(const Value: string);
     procedure SetPersonID(const Value: Integer);
     procedure SetID(const Value: Integer);
     procedure SetOwner(const Value: TPersonOS);
-    // Private!!!
-    [Column('ID_PERSON')]
-    property PersonID: Integer read FPersonID write SetPersonID;
 
   public
     class function NewCar: TCarOS;
+    [Column('ID_PERSON')]
+    property PersonID: Integer read FPersonID write SetPersonID;
     property ID: Integer read FID write SetID;
     property Brand: string read FBrand write SetBrand;
     property Model: string read FModel write SetModel;
@@ -112,19 +107,17 @@ type
   [Entity('emails')]
   TEmailOS = class(TObjStatusSupport)
   private
-    FValue      : string;
-    FPersonID   : Integer;
-    FID         : Integer;
+    FValue: string;
+    FPersonID: Integer;
+    FID: Integer;
     FCopiedValue: string; // used only for the test
     procedure SetValue(const Value: string);
     procedure SetPersonID(const Value: Integer);
     procedure SetID(const Value: Integer);
-    // Private!!!
-    [Column('ID_PERSON')]
-    property PersonID: Integer read FPersonID write SetPersonID;
-
   public
     class function NewEmail: TEmailOS;
+    [Column('ID_PERSON')]
+    property PersonID: Integer read FPersonID write SetPersonID;
     procedure Validate;
     procedure OnAfterLoad;
     property ID: Integer read FID write SetID;
@@ -137,17 +130,17 @@ type
   [Entity('people')]
   TPersonOS = class(TObjStatusSupport)
   private
-    FLastName     : string;
-    FAge          : Int32;
-    FFirstName    : string;
-    FID           : Integer;
-    FBornDate     : TDate;
-    FPhones       : TPhonesOS;
-    FCar          : TCarOS;
-    FEmail        : TEmailOS;
+    FLastName: string;
+    FAge: Int32;
+    FFirstName: string;
+    FID: Integer;
+    FBornDate: TDate;
+    FPhones: TPhonesOS;
+    FCar: TCarOS;
+    FEmail: TEmailOS;
     FBornTimeStamp: TDateTime;
-    FPhoto        : TStream;
-    FIsMale       : Boolean;
+    FPhoto: TStream;
+    FIsMale: Boolean;
     procedure SetLastName(const Value: string);
     procedure SetAge(const Value: Int32);
     procedure SetFirstName(const Value: string);
@@ -198,9 +191,9 @@ type
   [Entity('phones')]
   TPhoneOS = class(TObjStatusSupport)
   private
-    FNumber  : string;
-    FModel   : string;
-    FID      : Integer;
+    FNumber: string;
+    FModel: string;
+    FID: Integer;
     FPersonID: Integer;
     procedure SetNumber(const Value: string);
     procedure SetModel(const Value: string);
@@ -231,8 +224,8 @@ type
   TDepartmentOS = class(TObjStatusSupport)
   private
     FDepartmentName: string;
-    FID            : string;
-    FEmployees     : TEmployeesOS;
+    FID: string;
+    FEmployees: TEmployeesOS;
     procedure setDepartmentName(const Value: string);
     procedure setEmployees(const Value: TEmployeesOS);
     procedure SetID(const Value: string);
@@ -250,11 +243,11 @@ type
   [Entity('employee')]
   TEmployeeOS = class(TObjStatusSupport)
   private
-    FLastName    : string;
-    FEmployeeID  : string;
-    FAddress     : string;
-    FFirstName   : string;
-    FDepartment  : TDepartmentOS;
+    FLastName: string;
+    FEmployeeID: string;
+    FAddress: string;
+    FFirstName: string;
+    FDepartment: TDepartmentOS;
     FDepartmentID: string;
     procedure setAddress(const Value: string);
     procedure setDepartment(const Value: TDepartmentOS);
@@ -286,14 +279,14 @@ function IsValidEmail(const Value: string): Boolean;
   begin
     Result := false;
     for i := 1 to Length(s) do
-      if not (CharInSet(s[i], ['a' .. 'z', 'A' .. 'Z', '0' .. '9', '_', '-',
+      if not(CharInSet(s[i], ['a' .. 'z', 'A' .. 'Z', '0' .. '9', '_', '-',
         '.'])) then
         Exit;
     Result := true;
   end;
 
 var
-  i                   : Integer;
+  i: Integer;
   NamePart, ServerPart: string;
 begin
   Result := false;
@@ -319,7 +312,7 @@ begin
   FPhones := TPhonesOS.Create(true);
   FCar := TCarOS.Create;
   FEmail := TEmailOS.Create;
-  FEmail.Value := 'd.teti@bittime.it';
+  FEmail.Value := 'daniele.teti@gmail.com';
 end;
 
 constructor TPersonOS.Create(AFirstName, ALastName: string);
