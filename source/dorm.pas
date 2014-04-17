@@ -1299,7 +1299,7 @@ end;
 
 procedure TSession.LoadList<T>(Criteria: ICriteria; AObject: TObject);
 begin
-  LoadList(TypeInfo(T), Criteria, AObject);
+  LoadList(T, Criteria, AObject);
 end;
 
 procedure TSession.LoadRelationsForEachElement(AList: TObject;

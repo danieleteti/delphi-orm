@@ -43,7 +43,7 @@ type
 
   [Entity('CUSTOMERS_OS')]
   TCustomerVal = class(TCustomerOS)
-  protected
+  public
     procedure OnBeforePersist;
     procedure Validate;
   end;
