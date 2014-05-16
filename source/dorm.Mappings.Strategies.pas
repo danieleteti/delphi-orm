@@ -11,11 +11,10 @@ uses
 
 type
 
-  {$RTTI EXPLICIT
+{$RTTI EXPLICIT
   FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
   METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
   PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
-
   IMappingStrategy = interface
     ['{F64D6AF3-C4C2-4098-A241-B3401CE3FB03}']
     procedure GetMapping(const AType: TRttiType; ATable: TMappingTable);
@@ -41,9 +40,9 @@ type
 
   TCacheMappingStrategy = class(TInterfacedObject, ICacheMappingStrategy)
   private
-    FMerger           : TMappingTableMerger;
+    FMerger: TMappingTableMerger;
     FMappingStrategies: TList<IMappingStrategy>;
-    FMappings         : TDictionary<TRttiType, TMappingTable>;
+    FMappings: TDictionary<TRttiType, TMappingTable>;
     function GetMapping(const AType: TRttiType): TMappingTable;
     procedure Add(const AMappingStrategy: IMappingStrategy);
 
@@ -155,7 +154,7 @@ end;
 function TCacheMappingStrategy.GetMapping(const AType: TRttiType): TMappingTable;
 var
   tables: array of TMappingTable;
-  i     : Integer;
+  i: Integer;
 begin
   if not FMappings.TryGetValue(AType, Result) then
   begin
@@ -189,8 +188,8 @@ procedure TFileMappingStrategy.GetMapping(const AType: TRttiType; ATable: TMappi
 var
   jsonArray: TSuperArray;
   jsonTable: ISuperObject;
-  i        : Integer;
-  sl       : TStringList;
+  i: Integer;
+  sl: TStringList;
 begin
   jsonTable := FMapping.O[AType.Name];
   if not Assigned(jsonTable) then
@@ -233,7 +232,7 @@ end;
 procedure TFileMappingStrategy.ParseIdField(ATable: TMappingTable;
   const AJsonTable: ISuperObject; const AType: TRttiType);
 var
-  idField    : TMappingField;
+  idField: TMappingField;
   jsonIDField: ISuperObject;
 begin
   jsonIDField := AJsonTable.O['id'];
@@ -299,7 +298,7 @@ begin
 end;
 
 procedure TFileMappingStrategy.ParseHasMany(const PackageName: string;
-  const AHasMany     : TMappingRelation;
+  const AHasMany: TMappingRelation;
   const AJsonRelation: ISuperObject; const AType: TRttiType);
 var
   RTTICache: TMappingCache;
@@ -363,10 +362,10 @@ end;
 procedure TAttributesMappingStrategy.ParseField(const AType: TRttiType;
   const ATable: TMappingTable; AProp: TRttiProperty);
 var
-  field    : TMappingField;
+  field: TMappingField;
   attribute: TCustomAttribute;
-  C        : Column;
-  t        : TRttiType;
+  C: Column;
+  t: TRttiType;
 begin
   if TdormUtils.HasAttribute<Transient>(AProp) then
     Exit;
@@ -410,15 +409,22 @@ begin
     field.DefaultValue := DefaultValue(attribute).Value;
   end;
 
+  attribute := TdormUtils.GetAttribute<Nullable>(AProp);
+  if Assigned(attribute) then
+  begin
+    field := GetOrCreateField(ATable, AProp);
+    field.Nullable := True;
+  end;
+
 end;
 
 procedure TAttributesMappingStrategy.ParseHasOne(const AType: TRttiType;
   const ATable: TMappingTable; AProp: TRttiProperty);
 var
   hasOneAttribute: TCustomAttribute;
-  isLazy         : Boolean;
-  relation       : TMappingRelation;
-  RTTICache      : TMappingCache;
+  isLazy: Boolean;
+  relation: TMappingRelation;
+  RTTICache: TMappingCache;
 begin
   isLazy := TdormUtils.HasAttribute<Lazy>(AProp);
   hasOneAttribute := TdormUtils.GetAttribute<HasOne>(AProp);
@@ -439,12 +445,12 @@ procedure TAttributesMappingStrategy.ParseHasMany(const AType: TRttiType;
   const ATable: TMappingTable; AProp: TRttiProperty);
 var
   hasManyAttribute: TCustomAttribute;
-  relation        : TMappingRelation;
-  isLazy          : Boolean;
-  RTTICache       : TMappingCache;
-  attr            : ListOf;
-  _type_name      : string;
-  AChildType      : TRttiType;
+  relation: TMappingRelation;
+  isLazy: Boolean;
+  RTTICache: TMappingCache;
+  attr: ListOf;
+  _type_name: string;
+  AChildType: TRttiType;
 begin
   isLazy := TdormUtils.HasAttribute<Lazy>(AProp);
   hasManyAttribute := TdormUtils.GetAttribute<HasMany>(AProp);
@@ -482,9 +488,9 @@ procedure TAttributesMappingStrategy.ParseBelongsTo(const AType: TRttiType;
   const ATable: TMappingTable; AProp: TRttiProperty);
 var
   belongsToAttribute: TCustomAttribute;
-  relation          : TMappingBelongsTo;
-  isLazy            : Boolean;
-  RTTICache         : TMappingCache;
+  relation: TMappingBelongsTo;
+  isLazy: Boolean;
+  RTTICache: TMappingCache;
 begin
   isLazy := TdormUtils.HasAttribute<Lazy>(AProp);
   belongsToAttribute := TdormUtils.GetAttribute<BelongsTo>(AProp);
@@ -518,7 +524,7 @@ end;
 function TCoCMappingStrategy.IsCoCEnabledForType(const AType: TRttiType): Boolean;
 var
   Attrs: TArray<TCustomAttribute>;
-  attr : TObject;
+  attr: TObject;
 begin
   Result := True;
   Attrs := AType.GetAttributes;
@@ -530,7 +536,7 @@ end;
 procedure TCoCMappingStrategy.GetMapping(const AType: TRttiType;
   ATable: TMappingTable);
 var
-  prop              : TRttiProperty;
+  prop: TRttiProperty;
   collectionItemType: TRttiType;
 begin
   if not IsCoCEnabledForType(AType) then
@@ -563,7 +569,7 @@ end;
 
 procedure TCoCMappingStrategy.ParseField(ATable: TMappingTable; AProp: TRttiProperty);
 var
-  field    : TMappingField;
+  field: TMappingField;
   FieldType: string;
   RTTICache: TMappingCache;
 begin
@@ -583,7 +589,7 @@ end;
 procedure TCoCMappingStrategy.ParseHasOne(AType: TRttiType;
   ATable: TMappingTable; AProp: TRttiProperty);
 var
-  relation      : TMappingRelation;
+  relation: TMappingRelation;
   ChildFieldName: string;
 begin
   ChildFieldName := SkipClassPrefix(AType.Name) + 'ID';
@@ -600,7 +606,7 @@ end;
 function TCoCMappingStrategy.ParseBelongsTo(AType: TRttiType; ATable: TMappingTable;
   AProp: TRttiProperty): Boolean;
 var
-  relation    : TMappingBelongsTo;
+  relation: TMappingBelongsTo;
   RefFieldName: string;
 begin
   Result := false;
@@ -626,7 +632,7 @@ end;
 procedure TCoCMappingStrategy.ParseHasMany(AType, ACollectionItemType: TRttiType;
   ATable: TMappingTable; AProp: TRttiProperty);
 var
-  relation      : TMappingRelation;
+  relation: TMappingRelation;
   ChildFieldName: string;
 begin
   ChildFieldName := SkipClassPrefix(AType.Name) + 'ID';
@@ -662,7 +668,7 @@ class
   const AType: TRttiType; out ElementType: TRttiType): Boolean;
 var
   method: TRttiMethod;
-  prop  : TRttiProperty;
+  prop: TRttiProperty;
 begin
   // Check Add
   if not GetMethod(AType, 'Add', 1, method) then
@@ -701,10 +707,10 @@ end;
 procedure TMappingTableMerger.Merge(AOutput: TMappingTable;
   AInput: array of TMappingTable);
 var
-  tableToMerge    : TMappingTable;
-  fieldToMerge    : TMappingField;
-  hasOneToMerge   : TMappingRelation;
-  hasManyToMerge  : TMappingRelation;
+  tableToMerge: TMappingTable;
+  fieldToMerge: TMappingField;
+  hasOneToMerge: TMappingRelation;
+  hasManyToMerge: TMappingRelation;
   belongsToToMerge: TMappingBelongsTo;
 begin
   for tableToMerge in AInput do

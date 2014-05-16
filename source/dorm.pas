@@ -1974,7 +1974,6 @@ begin
           InsertHasManyRelation(_table, _idValue, _Type, AObject);
           InsertHasOneRelation(_table, _idValue, _Type, AObject);
         end;
-
       end
       else
         raise EdormException.CreateFmt

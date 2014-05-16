@@ -77,7 +77,11 @@ type
     procedure DisableLazyLoad(AClass: TClass; const APropertyName: string);
     function Count(AClassType: TClass; ACriteria: ICriteria = nil): Int64;
     procedure DeleteAll(AClassType: TClass);
-
+    // transaction
+    procedure StartTransaction;
+    procedure Commit(RestartAfterCommit: boolean = false);
+    procedure Rollback;
+    function IsInTransaction: boolean;
   end;
 
   TFrom = class;

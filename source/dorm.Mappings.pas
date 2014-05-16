@@ -9,16 +9,15 @@ uses
 
 type
 
-  {$RTTI EXPLICIT
+{$RTTI EXPLICIT
   FIELDS([vcPrivate, vcProtected, vcPublic, vcPublished])
   METHODS([vcPrivate, vcProtected, vcPublic, vcPublished])
   PROPERTIES([vcPrivate, vcProtected, vcPublic, vcPublished])}
-
   // Mapping Attibutes
   Entity = class(TCustomAttribute)
   private
     FTableName: string;
-    FPackage  : string;
+    FPackage: string;
 
   public
     constructor Create(const ATableName: string = ''; const APackageName: string = '');
@@ -28,10 +27,10 @@ type
 
   Column = class(TCustomAttribute)
   private
-    FFieldName   : string;
-    FFieldType   : string;
-    FSize        : Cardinal;
-    FPrecision   : Cardinal;
+    FFieldName: string;
+    FFieldType: string;
+    FSize: Cardinal;
+    FPrecision: Cardinal;
     FDefaultValue: string;
 
   public
@@ -50,9 +49,14 @@ type
   NoAutomapping = class(TCustomAttribute)
   end;
 
+  { if this attribute is present and the value type is integer, float, date, datetime or time, and
+    the value is 0, then in the database is inserted a null instead of 0 }
+  Nullable = class(TCustomAttribute)
+  end;
+
   Size = class(TCustomAttribute)
   private
-    FColumnSize     : Cardinal;
+    FColumnSize: Cardinal;
     FColumnPrecision: Cardinal;
 
   public
@@ -82,7 +86,7 @@ type
   TCustomRelationAttribute = class(TCustomAttribute)
   private
     FChildPropertyName: string;
-    FLazyLoad         : boolean;
+    FLazyLoad: boolean;
 
   public
     constructor Create(const AChildPropertyName: string; ALazyLoad: boolean = False);
@@ -97,7 +101,7 @@ type
   BelongsTo = class(TCustomAttribute)
   private
     FRefPropertyName: string;
-    FLazyLoad       : boolean;
+    FLazyLoad: boolean;
 
   public
     constructor Create(const ARefPropertyName: string; ALazyLoad: boolean = False);
@@ -121,15 +125,17 @@ type
 
   TMappingField = class
   private
-    FPK          : boolean;
-    FName        : string;
-    FFieldType   : string;
+    FPK: boolean;
+    FName: string;
+    FFieldType: string;
     FDefaultValue: string;
-    FIndexType   : TdormIndexType;
-    FPrecision   : Cardinal;
-    FFieldName   : string;
-    FSize        : Cardinal;
-    FRTTICache   : TMappingCache;
+    FIndexType: TdormIndexType;
+    FPrecision: Cardinal;
+    FFieldName: string;
+    FSize: Cardinal;
+    FRTTICache: TMappingCache;
+    FNullable: boolean;
+    procedure SetNullable(const Value: boolean);
 
   public
     constructor Create;
@@ -144,39 +150,40 @@ type
     property IndexType: TdormIndexType read FIndexType write FIndexType;
     property IsPK: boolean read FPK write FPK;
     property RTTICache: TMappingCache read FRTTICache write FRTTICache;
+    property Nullable: boolean read FNullable write SetNullable;
   end;
 
   TMappingRelation = class
   private
-    FName          : string;
+    FName: string;
     FChildClassName: string;
     FChildFieldName: string;
-    FLazyLoad      : boolean;
-    FRTTICache     : TMappingCache;
+    FLazyLoad: boolean;
+    FRTTICache: TMappingCache;
 
   public
-    property name          : string read FName write FName;
+    property name: string read FName write FName;
     property ChildClassName: string read FChildClassName write FChildClassName;
     property ChildFieldName: string read FChildFieldName write FChildFieldName;
-    property LazyLoad      : boolean read FLazyLoad write FLazyLoad;
-    property RTTICache     : TMappingCache read FRTTICache write FRTTICache;
+    property LazyLoad: boolean read FLazyLoad write FLazyLoad;
+    property RTTICache: TMappingCache read FRTTICache write FRTTICache;
     procedure Assign(Source: TMappingRelation);
   end;
 
   TMappingBelongsTo = class
   private
-    FName          : string;
+    FName: string;
     FOwnerClassName: string;
-    FRefFieldName  : string;
-    FLazyLoad      : boolean;
-    FRTTICache     : TMappingCache;
+    FRefFieldName: string;
+    FLazyLoad: boolean;
+    FRTTICache: TMappingCache;
 
   public
-    property name          : string read FName write FName;
+    property name: string read FName write FName;
     property OwnerClassName: string read FOwnerClassName write FOwnerClassName;
-    property RefFieldName  : string read FRefFieldName write FRefFieldName;
-    property LazyLoad      : boolean read FLazyLoad write FLazyLoad;
-    property RTTICache     : TMappingCache read FRTTICache write FRTTICache;
+    property RefFieldName: string read FRefFieldName write FRefFieldName;
+    property LazyLoad: boolean read FLazyLoad write FLazyLoad;
+    property RTTICache: TMappingCache read FRTTICache write FRTTICache;
     procedure Assign(Source: TMappingBelongsTo);
   end;
 
@@ -186,12 +193,12 @@ type
 
   TMappingTable = class
   private
-    FPackage      : string;
-    FTableName    : string;
-    FFields       : TMappingFieldList;
+    FPackage: string;
+    FTableName: string;
+    FFields: TMappingFieldList;
     FBelongsToList: TMappingBelongsToList;
-    FHasManyList  : TMappingRelationList;
-    FHasOneList   : TMappingRelationList;
+    FHasManyList: TMappingRelationList;
+    FHasOneList: TMappingRelationList;
     function GetId: TMappingField;
 
   public
@@ -405,6 +412,7 @@ procedure TMappingField.Assign(Source: TMappingField);
 begin
   FPK := Source.IsPK;
   FName := Source.Name;
+  FNullable := Source.Nullable;
   FFieldType := Source.FieldType;
   FDefaultValue := Source.DefaultValue;
   FIndexType := Source.IndexType;
@@ -424,8 +432,14 @@ begin
   FSize := 0;
   FPrecision := 0;
   FIndexType := itNone;
+  FNullable := False;
   FRTTICache.RTTIField := nil;
   FRTTICache.RTTIProp := nil;
+end;
+
+procedure TMappingField.SetNullable(const Value: boolean);
+begin
+  FNullable := Value;
 end;
 
 function TMappingField.ToString: string;
