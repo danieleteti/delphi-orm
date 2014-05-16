@@ -32,14 +32,14 @@ type
       const Value: TValue; AMappingRelationField: TMappingField = nil): TUIBQuery;
 
   protected
-    FFormatSettings        : TFormatSettings;
-    FB                     : TUIBFacade;
-    FLogger                : IdormLogger;
+    FFormatSettings: TFormatSettings;
+    FB: TUIBFacade;
+    FLogger: IdormLogger;
     FKeysGeneratorClassName: string;
-    FKeysGenerator         : IdormKeysGenerator;
-    FKeyType               : TdormKeyType;
-    FNullKeyValue          : TValue;
-    FLastInsertOID         : TValue;
+    FKeysGenerator: IdormKeysGenerator;
+    FKeyType: TdormKeyType;
+    FNullKeyValue: TValue;
+    FLastInsertOID: TValue;
     procedure InitFormatSettings;
     function CreateUIBFacade(Conf: ISuperObject): TUIBFacade; virtual; abstract;
     function CreateObjectFromUIBQuery(ARttiType: TRttiType; AReader: TUIBQuery;
@@ -48,8 +48,8 @@ type
       AFieldsMapping: TMappingFieldList);
     function GetLogger: IdormLogger;
     procedure SetUIBParameterValue(AFieldType: string; AStatement: TUIBStatement;
-      ParameterIndex: Integer; AValue: TValue);
-
+      ParameterIndex: Integer; AValue: TValue; IsNullable: boolean);
+    function CanBeConsideredAsNull(const AValue: TValue): boolean;
   public
     function GenerateAndFillPrimaryKeyParam(Query: TUIBStatement; ParamIndex: Integer;
       const Entity: string): TValue; overload;
@@ -66,9 +66,9 @@ type
     function Count(AMappingTable: TMappingTable): Int64;
     function Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
       AMappingRelationField: TMappingField; const Value: TValue; AObject: TObject)
-      : Boolean; overload;
+      : boolean; overload;
     function Load(ARttiType: TRttiType; AMappingTable: TMappingTable; const Value: TValue;
-      AObject: TObject): Boolean; overload;
+      AObject: TObject): boolean; overload;
     function List(ARttiType: TRttiType; AMappingTable: TMappingTable; ACriteria: ICriteria)
       : TObjectList<TObject>;
     procedure LoadList(AList: TObject; ARttiType: TRttiType; AMappingTable: TMappingTable;
@@ -78,11 +78,11 @@ type
     procedure StartTransaction;
     procedure Commit;
     procedure Rollback;
-    function InTransaction: Boolean;
+    function InTransaction: boolean;
     procedure SetLogger(ALogger: IdormLogger);
     destructor Destroy; override;
     class procedure register;
-    function IsNullKey(const Value: TValue): Boolean;
+    function IsNullKey(const Value: TValue): boolean;
     function GetNullKeyValue: TValue;
     function GetKeyType: TdormKeyType;
     function RawExecute(SQL: string): Int64;
@@ -121,13 +121,13 @@ end;
 function TUIBBaseAdapter.Update(ARttiType: TRttiType; AObject: TObject;
   AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
 var
-  field           : TMappingField;
-  SQL             : string;
-  Query           : TUIBStatement;
-  I, pk_idx       : Integer;
-  v               : TValue;
+  field: TMappingField;
+  SQL: string;
+  Query: TUIBStatement;
+  I, pk_idx: Integer;
+  v: TValue;
   sql_fields_names: string;
-  pk_field        : string;
+  pk_field: string;
 begin
   sql_fields_names := '';
   for field in AMappingTable.Fields do
@@ -139,8 +139,8 @@ begin
     pk_field]);
   if ACurrentVersion >= 0 then // optlock
     SQL := SQL + ' AND OBJVERSION = ' + IntToStr(ACurrentVersion);
-//  else
-//    raise EdormLockingException.Create('Invalid ObjVersion');
+  // else
+  // raise EdormLockingException.Create('Invalid ObjVersion');
   GetLogger.Debug(AMappingTable.Fields[GetPKMappingIndex(AMappingTable.Fields)].FieldName);
   GetLogger.Debug('PREPARING: ' + SQL);
   Query := FB.Prepare(SQL);
@@ -153,7 +153,7 @@ begin
         Continue
       else
       begin
-        SetUIBParameterValue(field.FieldType, Query, I, v);
+        SetUIBParameterValue(field.FieldType, Query, I, v, field.Nullable);
       end;
       inc(I);
     end;
@@ -167,19 +167,48 @@ begin
   end;
 end;
 
+function TUIBBaseAdapter.CanBeConsideredAsNull(const AValue: TValue): boolean;
+var
+  v: Extended;
+  s: String;
+begin
+  case AValue.Kind of
+    tkInteger:
+      begin
+        Result := AValue.AsInteger = Self.FNullKeyValue.AsInteger;
+      end;
+    tkInt64:
+      begin
+        Result := AValue.AsInt64 = Self.FNullKeyValue.AsInteger;
+      end;
+    tkFloat:
+      begin
+        v := AValue.AsExtended;
+        Result := (Frac(v) = 0) and (Trunc(v) = Self.FNullKeyValue.AsInteger);
+      end;
+    tkString, tkUString, tkWString, tkLString, tkWChar, tkChar:
+      begin
+        Result := AValue.AsString = '';
+      end
+  else
+    Result := false;
+  end;
+end;
+
 procedure TUIBBaseAdapter.Commit;
 begin
   FB.CommitTransaction;
 end;
 
-procedure TUIBBaseAdapter.ConfigureStrategy(ConfigurationInfo: ISuperObject);
+procedure TUIBBaseAdapter.ConfigureStrategy(ConfigurationInfo:
+  ISuperObject);
 var
   ctx: TRttiContext;
-  t  : TRttiType;
+  t: TRttiType;
   obj: TObject;
 begin
   FB := CreateUIBFacade(ConfigurationInfo);
-  FKeysGeneratorClassName := ConfigurationInfo.S['keys_generator'];
+  FKeysGeneratorClassName := ConfigurationInfo.s['keys_generator'];
   t := ctx.FindType(FKeysGeneratorClassName);
   if t = nil then
     raise EdormException.Create('Unknown key generator ' + FKeysGeneratorClassName);
@@ -187,17 +216,17 @@ begin
   if not Supports(obj, IdormKeysGenerator, FKeysGenerator) then
     raise EdormException.Create('Keys generator ' + FKeysGeneratorClassName +
       ' doesn''t implements ''IdormKeysGenerator''');
-  FKeysGenerator.SetPersistStrategy(self);
-  self._Release;
-  if (SameText(ConfigurationInfo.S['key_type'], 'integer')) then
+  FKeysGenerator.SetPersistStrategy(Self);
+  Self._Release;
+  if (SameText(ConfigurationInfo.s['key_type'], 'integer')) then
   begin
     FKeyType := ktInteger;
     FNullKeyValue := ConfigurationInfo.I['null_key_value']
   end
-  else if (SameText(ConfigurationInfo.S['key_type'], 'string')) then
+  else if (SameText(ConfigurationInfo.s['key_type'], 'string')) then
   begin
     FKeyType := ktString;
-    FNullKeyValue := ConfigurationInfo.S['null_key_value']
+    FNullKeyValue := ConfigurationInfo.s['null_key_value']
   end
   else
     raise EdormException.Create('Unknown key type');
@@ -209,7 +238,7 @@ var
   cmd: TUIBQuery;
   SQL: string;
 begin
-  Result := - 1;
+  Result := -1;
   SQL := 'SELECT COUNT(*) FROM ' + AMappingTable.TableName;
   GetLogger.Debug('PREPARING: ' + SQL);
   cmd := FB.Prepare(SQL);
@@ -222,20 +251,25 @@ begin
   end;
 end;
 
-function TUIBBaseAdapter.Delete(ARttiType: TRttiType; AObject: TObject;
-  AMappingTable: TMappingTable; ACurrentVersion: Int64): Int64;
+function TUIBBaseAdapter.Delete(ARttiType: TRttiType;
+  AObject:
+  TObject;
+  AMappingTable:
+  TMappingTable;
+  ACurrentVersion:
+  Int64): Int64;
 var
-  pk_idx                               : Integer;
-  pk_value                             : TValue;
+  pk_idx: Integer;
+  pk_value: TValue;
   pk_attribute_name, pk_field_name, SQL: string;
-  cmd                                  : TUIBStatement;
-  S                                    : Cardinal;
-  I                                    : Cardinal;
-  u                                    : Cardinal;
-  d                                    : Cardinal;
+  cmd: TUIBStatement;
+  s: Cardinal;
+  I: Cardinal;
+  u: Cardinal;
+  d: Cardinal;
 begin
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-  if pk_idx = - 1 then
+  if pk_idx = -1 then
     raise Exception.Create('Invalid primary key for table ' + AMappingTable.TableName);
   pk_attribute_name := AMappingTable.Fields[pk_idx].name;
   pk_field_name := AMappingTable.Fields[pk_idx].FieldName;
@@ -243,15 +277,15 @@ begin
   SQL := 'DELETE FROM ' + AMappingTable.TableName + ' WHERE ' + pk_field_name + ' = ?';
   if ACurrentVersion >= 0 then
     SQL := SQL + ' AND OBJVERSION = ' + IntToStr(ACurrentVersion);
-//  else
-//    raise EdormLockingException.Create('Invalid ObjVersion');
+  // else
+  // raise EdormLockingException.Create('Invalid ObjVersion');
   GetLogger.Debug('PREPARING: ' + SQL);
   cmd := FB.Prepare(SQL);
   try
     FillPrimaryKeyParam(cmd, 0, pk_value);
     GetLogger.Debug('EXECUTING PREPARED: ' + SQL);
     cmd.Execute;
-    cmd.AffectedRows(S, I, u, d);
+    cmd.AffectedRows(s, I, u, d);
     Result := d;
   finally
     cmd.Free;
@@ -270,6 +304,7 @@ end;
 destructor TUIBBaseAdapter.Destroy;
 begin
   FB.Free;
+  FKeysGenerator := nil;
   inherited;
 end;
 
@@ -296,13 +331,13 @@ end;
 
 function TUIBBaseAdapter.ExecuteCommand(ACommand: IdormCommand): Int64;
 var
-  SQL           : string;
-  reader        : TUIBQuery;
+  SQL: string;
+  reader: TUIBQuery;
   CustomCriteria: ICustomCriteria;
-  sr            : Cardinal;
-  ir            : Cardinal;
-  ur            : Cardinal;
-  dr            : Cardinal;
+  sr: Cardinal;
+  ir: Cardinal;
+  ur: Cardinal;
+  dr: Cardinal;
 begin
   SQL := ACommand.GetSQL;
   GetLogger.Debug('EXECUTING: ' + SQL);
@@ -318,8 +353,12 @@ begin
   end;
 end;
 
-function TUIBBaseAdapter.GenerateAndFillPrimaryKeyParam(Query: TUIBStatement; ParamIndex: Integer;
-  const Entity: string): TValue;
+function TUIBBaseAdapter.GenerateAndFillPrimaryKeyParam(Query: TUIBStatement;
+  ParamIndex:
+  Integer;
+  const
+  Entity:
+  string): TValue;
 var
   Value: TValue;
 begin
@@ -338,8 +377,12 @@ begin
   FLastInsertOID := Result;
 end;
 
-function TUIBBaseAdapter.FillPrimaryKeyParam(Query: TUIBStatement; ParamIndex: Integer;
-  const Value: TValue): TValue;
+function TUIBBaseAdapter.FillPrimaryKeyParam(Query: TUIBStatement;
+  ParamIndex:
+  Integer;
+  const
+  Value:
+  TValue): TValue;
 begin
   try
     case FKeyType of
@@ -363,10 +406,11 @@ begin
 end;
 
 function TUIBBaseAdapter.GetDatabaseBuilder(AEntities: TList<string>;
-  AMappings: ICacheMappingStrategy): IDataBaseBuilder;
+  AMappings:
+  ICacheMappingStrategy): IDataBaseBuilder;
 begin
   AEntities.Free; // just to hide the memory leak
-  raise Exception.Create('Not implemented for ' + self.ClassName);
+  raise Exception.Create('Not implemented for ' + Self.ClassName);
 end;
 
 function TUIBBaseAdapter.GetKeysGenerator: IdormKeysGenerator;
@@ -394,14 +438,17 @@ begin
   FLastInsertOID := TValue.Empty;
 end;
 
-function TUIBBaseAdapter.Insert(ARttiType: TRttiType; AObject: TObject;
-  AMappingTable: TMappingTable): TValue;
+function TUIBBaseAdapter.Insert(ARttiType: TRttiType;
+  AObject:
+  TObject;
+  AMappingTable:
+  TMappingTable): TValue;
 var
-  field                                   : TMappingField;
+  field: TMappingField;
   sql_fields_names, sql_fields_values, SQL: ansistring;
-  Query                                   : TUIBStatement;
-  I, pk_idx                               : Integer;
-  v, pk_value                             : TValue;
+  Query: TUIBStatement;
+  I, pk_idx: Integer;
+  v, pk_value: TValue;
 begin
   sql_fields_names := '';
   for field in AMappingTable.Fields do
@@ -428,7 +475,7 @@ begin
         pk_value := GenerateAndFillPrimaryKeyParam(Query, I, AMappingTable.TableName)
       else
       begin
-        SetUIBParameterValue(field.FieldType, Query, I, v);
+        SetUIBParameterValue(field.FieldType, Query, I, v, field.Nullable);
       end;
       inc(I);
     end;
@@ -443,7 +490,7 @@ begin
   Result := pk_value;
 end;
 
-function TUIBBaseAdapter.InTransaction: Boolean;
+function TUIBBaseAdapter.InTransaction: boolean;
 var
   tr: TUIBTransaction;
 begin
@@ -453,15 +500,18 @@ begin
     Result := tr.InTransaction
 end;
 
-function TUIBBaseAdapter.IsNullKey(const Value: TValue): Boolean;
+function TUIBBaseAdapter.IsNullKey(
+  const
+  Value:
+  TValue): boolean;
 begin
   case FKeyType of
     ktInteger:
       Result := Value.AsInt64 = FNullKeyValue.AsInt64;
     ktString:
       Result := Value.AsString = FNullKeyValue.AsString;
-    else
-      raise EdormException.Create('Unknown key type');
+  else
+    raise EdormException.Create('Unknown key type');
   end;
 end;
 
@@ -470,23 +520,32 @@ begin
   Result := FNullKeyValue;
 end;
 
-function TUIBBaseAdapter.List(ARttiType: TRttiType; AMappingTable: TMappingTable;
-  ACriteria: ICriteria): TObjectList<TObject>;
+function TUIBBaseAdapter.List(ARttiType: TRttiType;
+  AMappingTable:
+  TMappingTable;
+  ACriteria:
+  ICriteria): TObjectList<TObject>;
 begin
   Result := NewList();
   LoadList(Result, ARttiType, AMappingTable, ACriteria);
 end;
 
-function TUIBBaseAdapter.Load(ARttiType: TRttiType; ATableName: string;
-  AMappingTable: TMappingTable; const Value: TValue): TObject;
+function TUIBBaseAdapter.Load(ARttiType: TRttiType;
+  ATableName:
+  string;
+  AMappingTable:
+  TMappingTable;
+  const
+  Value:
+  TValue): TObject;
 var
-  pk_idx                               : Integer;
+  pk_idx: Integer;
   pk_attribute_name, pk_field_name, SQL: string;
-  cmd                                  : TUIBQuery;
+  cmd: TUIBQuery;
 begin
   Result := nil;
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-  if pk_idx = - 1 then
+  if pk_idx = -1 then
     raise Exception.Create('Invalid primary key for table ' + ATableName);
   pk_attribute_name := AMappingTable.Fields[pk_idx].name;
   pk_field_name := AMappingTable.Fields[pk_idx].FieldName;
@@ -505,16 +564,22 @@ begin
   end;
 end;
 
-function TUIBBaseAdapter.GetUIBReaderFor(ARttiType: TRttiType; AMappingTable: TMappingTable;
-  const Value: TValue; AMappingRelationField: TMappingField): TUIBQuery;
+function TUIBBaseAdapter.GetUIBReaderFor(ARttiType: TRttiType;
+  AMappingTable:
+  TMappingTable;
+  const
+  Value:
+  TValue;
+  AMappingRelationField:
+  TMappingField): TUIBQuery;
 var
-  pk_idx            : Integer;
+  pk_idx: Integer;
   pk_field_name, SQL: string;
 begin
   if AMappingRelationField = nil then
   begin
     pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-    if pk_idx = - 1 then
+    if pk_idx = -1 then
       raise Exception.Create('Invalid primary key for table ' + AMappingTable.TableName);
     pk_field_name := AMappingTable.Fields[pk_idx].FieldName;
     SQL := 'SELECT ' + GetSelectFieldsList(AMappingTable.Fields, true) + ' FROM ' +
@@ -523,7 +588,7 @@ begin
   else
   begin
     pk_idx := GetPKMappingIndex(AMappingTable.Fields);
-    if pk_idx = - 1 then
+    if pk_idx = -1 then
       raise Exception.Create('Invalid primary key for table ' + AMappingTable.TableName);
     pk_field_name := AMappingTable.Fields[pk_idx].FieldName;
     SQL := 'SELECT ' + GetSelectFieldsList(AMappingTable.Fields, true) + ' FROM ' +
@@ -535,8 +600,16 @@ begin
   FillPrimaryKeyParam(Result, 0, Value);
 end;
 
-function TUIBBaseAdapter.Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
-  AMappingRelationField: TMappingField; const Value: TValue; AObject: TObject): Boolean;
+function TUIBBaseAdapter.Load(ARttiType: TRttiType;
+  AMappingTable:
+  TMappingTable;
+  AMappingRelationField:
+  TMappingField;
+  const
+  Value:
+  TValue;
+  AObject:
+  TObject): boolean;
 var
   reader: TUIBQuery;
 begin
@@ -555,18 +628,23 @@ begin
   end;
 end;
 
-procedure TUIBBaseAdapter.LoadList(AList: TObject; ARttiType: TRttiType;
-  AMappingTable: TMappingTable; ACriteria: ICriteria);
+procedure TUIBBaseAdapter.LoadList(AList: TObject;
+  ARttiType:
+  TRttiType;
+  AMappingTable:
+  TMappingTable;
+  ACriteria:
+  ICriteria);
 var
-  SQL           : string;
-  reader        : TUIBQuery;
+  SQL: string;
+  reader: TUIBQuery;
   CustomCriteria: ICustomCriteria;
 begin
   if assigned(ACriteria) and TInterfacedObject(ACriteria).GetInterface(ICustomCriteria,
     CustomCriteria) then
     SQL := CustomCriteria.GetSQL
   else
-    SQL := self.GetSelectSQL(ACriteria, AMappingTable);
+    SQL := Self.GetSelectSQL(ACriteria, AMappingTable);
   GetLogger.Debug('EXECUTING: ' + SQL);
   reader := FB.Prepare(SQL);
   if reader.Params.ParamCount <> 0 then
@@ -584,12 +662,17 @@ begin
   end;
 end;
 
-procedure TUIBBaseAdapter.LoadObjectFromDBXReader(AObject: TObject; ARttiType: TRttiType;
-  AReader: TUIBQuery; AFieldsMapping: TMappingFieldList);
+procedure TUIBBaseAdapter.LoadObjectFromDBXReader(AObject: TObject;
+  ARttiType:
+  TRttiType;
+  AReader:
+  TUIBQuery;
+  AFieldsMapping:
+  TMappingFieldList);
 var
-  field       : TMappingField;
-  v           : TValue;
-  S           : string;
+  field: TMappingField;
+  v: TValue;
+  s: string;
   sourceStream: TStream;
 begin
   try
@@ -598,22 +681,22 @@ begin
       if CompareText(field.FieldType, 'string') = 0 then
       begin
         v := AReader.Fields.ByNameAsString[field.FieldName];
-        S := field.FieldName + ' as string';
+        s := field.FieldName + ' as string';
       end
       else if CompareText(field.FieldType, 'integer') = 0 then
       begin
         v := AReader.Fields.ByNameAsInteger[field.FieldName];
-        S := field.FieldName + ' as integer';
+        s := field.FieldName + ' as integer';
       end
       else if CompareText(field.FieldType, 'date') = 0 then
       begin
         v := AReader.Fields.ByNameAsDateTime[field.FieldName];
-        S := field.FieldName + ' as date';
+        s := field.FieldName + ' as date';
       end
       else if CompareText(field.FieldType, 'blob') = 0 then
       begin
         // targetStream := nil;
-        S := field.FieldName + ' as blob';
+        s := field.FieldName + ' as blob';
         sourceStream := nil;
         if not AReader.Fields.ByNameIsNull[field.FieldName] then
         begin
@@ -631,23 +714,23 @@ begin
       else if CompareText(field.FieldType, 'decimal') = 0 then
       begin
         v := AReader.Fields.ByNameAsDouble[field.FieldName];
-        S := field.FieldName + ' as decimal';
+        s := field.FieldName + ' as decimal';
       end
       else if CompareText(field.FieldType, 'boolean') = 0 then
       begin
         v := AReader.Fields.ByNameAsInteger[field.FieldName];
         v := v.AsInteger = 1;
-        S := field.FieldName + ' as boolean';
+        s := field.FieldName + ' as boolean';
       end
       else if CompareText(field.FieldType, 'datetime') = 0 then
       begin
         v := AReader.Fields.ByNameAsDateTime[field.FieldName];
-        S := field.FieldName + ' as datetime';
+        s := field.FieldName + ' as datetime';
       end
       else if CompareText(field.FieldType, 'time') = 0 then
       begin
         v := AReader.Fields.ByNameAsDateTime[field.FieldName];
-        S := field.FieldName + ' as time';
+        s := field.FieldName + ' as time';
       end
       else
         raise Exception.Create('Unknown field type for ' + field.FieldName);
@@ -657,7 +740,7 @@ begin
         on E: Exception do
         begin
           raise EdormException.Create(E.Message + sLineBreak + '. Probably cannot write ' +
-            ARttiType.ToString + '.' + S);
+            ARttiType.ToString + '.' + s);
         end;
       end;
     end;
@@ -675,13 +758,16 @@ begin
   Result := FB.Execute(SQL);
 end;
 
-function TUIBBaseAdapter.CreateObjectFromUIBQuery(ARttiType: TRttiType; AReader: TUIBQuery;
-  AMappingTable: TMappingTable): TObject;
+function TUIBBaseAdapter.CreateObjectFromUIBQuery(ARttiType: TRttiType;
+  AReader:
+  TUIBQuery;
+  AMappingTable:
+  TMappingTable): TObject;
 var
-  obj         : TObject;
-  field       : TMappingField;
-  v           : TValue;
-  S           : string;
+  obj: TObject;
+  field: TMappingField;
+  v: TValue;
+  s: string;
   targetStream: TMemoryStream;
 begin
   try
@@ -691,17 +777,17 @@ begin
       if CompareText(field.FieldType, 'string') = 0 then
       begin
         v := AReader.Fields.ByNameAsString[field.FieldName];
-        S := field.FieldName + ' as string';
+        s := field.FieldName + ' as string';
       end
       else if CompareText(field.FieldType, 'integer') = 0 then
       begin
         v := AReader.Fields.ByNameAsInteger[field.FieldName];
-        S := field.FieldName + ' as integer';
+        s := field.FieldName + ' as integer';
       end
       else if CompareText(field.FieldType, 'date') = 0 then
       begin
-        v := trunc(AReader.Fields.ByNameAsDateTime[field.FieldName]);
-        S := field.FieldName + ' as date';
+        v := Trunc(AReader.Fields.ByNameAsDateTime[field.FieldName]);
+        s := field.FieldName + ' as date';
       end
       else if CompareText(field.FieldType, 'blob') = 0 then
       begin
@@ -712,28 +798,28 @@ begin
           AReader.Fields.ReadBlob(field.FieldName, targetStream);
           targetStream.Position := 0;
         end;
-        S := field.FieldName + ' as blob';
+        s := field.FieldName + ' as blob';
         v := targetStream;
       end
       else if CompareText(field.FieldType, 'decimal') = 0 then
       begin
         v := AReader.Fields.ByNameAsDouble[field.FieldName];
-        S := field.FieldName + ' as decimal';
+        s := field.FieldName + ' as decimal';
       end
       else if CompareText(field.FieldType, 'boolean') = 0 then
       begin
         v := AReader.Fields.ByNameAsBoolean[field.FieldName];
-        S := field.FieldName + ' as boolean';
+        s := field.FieldName + ' as boolean';
       end
       else if CompareText(field.FieldType, 'datetime') = 0 then
       begin
         v := AReader.Fields.ByNameAsDateTime[field.FieldName];
-        S := field.FieldName + ' as datetime';
+        s := field.FieldName + ' as datetime';
       end
       else if CompareText(field.FieldType, 'time') = 0 then
       begin
         v := AReader.Fields.ByNameAsDateTime[field.FieldName];
-        S := field.FieldName + ' as datetime';
+        s := field.FieldName + ' as datetime';
       end
       else
         raise Exception.Create('Unknown field type for ' + field.FieldName);
@@ -743,7 +829,7 @@ begin
         on E: Exception do
         begin
           raise EdormException.Create(E.Message + sLineBreak + '. Probably cannot write ' +
-            ARttiType.ToString + '.' + S);
+            ARttiType.ToString + '.' + s);
         end;
       end;
     end;
@@ -756,7 +842,8 @@ begin
   Result := obj;
 end;
 
-class procedure TUIBBaseAdapter.register;
+class
+  procedure TUIBBaseAdapter.register;
 begin
   //
 end;
@@ -766,25 +853,39 @@ begin
   FB.GetCurrentTransaction.Rollback;
 end;
 
-procedure TUIBBaseAdapter.SetUIBParameterValue(AFieldType: string; AStatement: TUIBStatement;
-  ParameterIndex: Integer; AValue: TValue);
+procedure TUIBBaseAdapter.SetUIBParameterValue(AFieldType: string;
+  AStatement:
+  TUIBStatement;
+  ParameterIndex:
+  Integer;
+  AValue:
+  TValue; IsNullable: boolean);
 var
   sourceStream: TStream;
-  str         : TBytesStream;
+  str: TBytesStream;
 begin
   if CompareText(AFieldType, 'string') = 0 then
   begin
-    AStatement.Params.AsString[ParameterIndex] := AValue.AsString;
+    if IsNullable and CanBeConsideredAsNull(AValue) then
+      AStatement.Params.IsNull[ParameterIndex] := true
+    else
+      AStatement.Params.AsString[ParameterIndex] := AValue.AsString;
     GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + AValue.AsString);
   end
   else if CompareText(AFieldType, 'decimal') = 0 then
   begin
-    AStatement.Params.AsDouble[ParameterIndex] := AValue.AsExtended;
+    if IsNullable and CanBeConsideredAsNull(AValue) then
+      AStatement.Params.IsNull[ParameterIndex] := true
+    else
+      AStatement.Params.AsDouble[ParameterIndex] := AValue.AsExtended;
     GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + FloatToStr(AValue.AsExtended));
   end
   else if CompareText(AFieldType, 'integer') = 0 then
   begin
-    AStatement.Params.AsInt64[ParameterIndex] := AValue.AsInt64;
+    if IsNullable and CanBeConsideredAsNull(AValue) then
+      AStatement.Params.IsNull[ParameterIndex] := true
+    else
+      AStatement.Params.AsInteger[ParameterIndex] := AValue.AsInteger;
     GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + IntToStr(AValue.AsInt64));
   end
   else if CompareText(AFieldType, 'boolean') = 0 then
@@ -794,18 +895,27 @@ begin
   end
   else if CompareText(AFieldType, 'date') = 0 then
   begin
-    AStatement.Params.AsDateTime[ParameterIndex] := trunc(AValue.AsExtended);
+    if IsNullable and CanBeConsideredAsNull(AValue) then
+      AStatement.Params.IsNull[ParameterIndex] := true
+    else
+      AStatement.Params.AsDate[ParameterIndex] := Trunc(AValue.AsExtended);
     GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' +
-      EscapeDate(trunc(AValue.AsExtended)));
+      EscapeDate(Trunc(AValue.AsExtended)));
   end
   else if CompareText(AFieldType, 'datetime') = 0 then
   begin
-    AStatement.Params.AsDateTime[ParameterIndex] := AValue.AsExtended;
+    if IsNullable and CanBeConsideredAsNull(AValue) then
+      AStatement.Params.IsNull[ParameterIndex] := true
+    else
+      AStatement.Params.AsDateTime[ParameterIndex] := AValue.AsExtended;
     GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + EscapeDate(AValue.AsExtended));
   end
   else if CompareText(AFieldType, 'time') = 0 then
   begin
-    AStatement.Params.AsDateTime[ParameterIndex] := AValue.AsExtended;
+    if IsNullable and CanBeConsideredAsNull(AValue) then
+      AStatement.Params.IsNull[ParameterIndex] := true
+    else
+      AStatement.Params.AsDateTime[ParameterIndex] := AValue.AsExtended;
     GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + EscapeDateTime(AValue.AsExtended));
   end
   else if CompareText(AFieldType, 'blob') = 0 then
@@ -847,7 +957,10 @@ begin
 end;
 { TFirebirdUIBBaseTableSequence }
 
-function TUIBBaseTableSequence.NewIntegerKey(const Entity: string): UInt64;
+function TUIBBaseTableSequence.NewIntegerKey(
+  const
+  Entity:
+  string): UInt64;
 var
   SequenceName: string;
 begin
@@ -856,18 +969,31 @@ begin
     ',1) FROM RDB$DATABASE');
 end;
 
-function TUIBBaseTableSequence.NewStringKey(const Entity: string): string;
+function TUIBBaseTableSequence.NewStringKey(
+  const
+  Entity:
+  string): string;
 begin
   raise EdormException.Create('String keys not supported');
 end;
 
-procedure TUIBBaseTableSequence.SetPersistStrategy(const PersistentStrategy: IdormPersistStrategy);
+procedure TUIBBaseTableSequence.SetPersistStrategy(
+  const
+  PersistentStrategy
+  :
+  IdormPersistStrategy);
 begin
   FPersistStrategy := PersistentStrategy;
 end;
 
-function TUIBBaseAdapter.Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
-  const Value: TValue; AObject: TObject): Boolean;
+function TUIBBaseAdapter.Load(ARttiType: TRttiType;
+  AMappingTable:
+  TMappingTable;
+  const
+  Value:
+  TValue;
+  AObject:
+  TObject): boolean;
 var
   reader: TUIBQuery;
 begin
