@@ -238,6 +238,8 @@ type
     { Non generic version of  Load<> }
     function Load(AClassType: TClass; Criteria: ICriteria; out AObject: TObject)
       : boolean; overload;
+    function Load(AClassType: TClass; Value: TValue; out AObject: TObject)
+      : boolean; overload;
     { Load 0 or 1 object by OID (first parameter). The Session will create and returned object of type <T> }
     function Load<T: class>(const Value: TValue): T; overload;
     { Load 0 or 1 object by OID (first parameter). The Session doesn't create the object, just fill the instance passed on second parameter. This function return true if the OID was found in database. }
@@ -1029,6 +1031,12 @@ begin
   end;
 end;
 
+function TSession.Load(AClassType: TClass; Value: TValue;
+  out AObject: TObject): boolean;
+begin
+  Result := Load(AClassType.ClassInfo, Value, AObject);
+end;
+
 function TSession.Load<T>(ASQLable: ISQLable): T;
 var
   rt: TRttiType;
@@ -1278,7 +1286,8 @@ function TSession.LoadList(AClassType: TClass; Criteria: ICriteria):
 var
   List: {$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND};
 begin
-  List := {$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND}.Create(true);
+  List := {$IF CompilerVersion > 22}TObjectList<TObject>{$ELSE}TdormObjectList<TObject>{$IFEND}.
+    Create(true);
   try
     LoadList(AClassType, Criteria, List);
     Result := List;
