@@ -1307,8 +1307,17 @@ begin
 end;
 
 procedure TSession.LoadList<T>(Criteria: ICriteria; AObject: TObject);
+{$IF CompilerVersion = 24}
+var rt: TRttiType;
+{$IFEND}
 begin
+  {$IF CompilerVersion = 24}
+  rt := FCTX.GetType(TypeInfo(T));
+  GetLogger.Info(rt.AsInstance.MetaclassType.ClassName);
+  LoadList(rt.AsInstance.MetaclassType, Criteria, AObject);
+  {$ELSE}
   LoadList(T, Criteria, AObject);
+  {$IFEND}
 end;
 
 procedure TSession.LoadRelationsForEachElement(AList: TObject;
@@ -1844,7 +1853,7 @@ begin
     v := TdormUtils.GetField(AObject, _has_many.Name);
     { TODO -oDaniele -cBUG : RTTICache }
     // DANIELE: There is a bug in this RTTICache... Investigate please
-    // v := TdormUtils.GetField(AObject, _has_many.RTTICache);
+    //v := TdormUtils.GetField(AObject, _has_many.RTTICache);
     GetLogger.Debug('-- Inspecting for ' + _has_many.ChildClassName);
     _child_type := FCTX.FindType(_has_many.ChildClassName);
     if not assigned(_child_type) then
