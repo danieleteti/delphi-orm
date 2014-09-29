@@ -90,6 +90,11 @@
   {$DEFINE HAVE_INLINE}
 {$ifend}
 
+{$IF CompilerVersion >= 28} //daniele teti.. starting from DelphiXE7
+  {$DEFINE NEED_FORMATSETTINGS}
+  {$DEFINE HAVE_INLINE}
+{$ENDIF}
+
 {$if defined(VER210) or defined(VER220) or defined(VER230) or defined(VER240)
   or defined(VER250) or defined(VER260) or defined(VER270)}
   {$define HAVE_RTTI}
