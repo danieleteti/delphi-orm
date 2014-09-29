@@ -534,6 +534,7 @@ var
   v           : TValue;
   S           : string;
   sourceStream: TStringStream;
+  f: TField;
 begin
   try
     for field in AFieldsMapping do
@@ -576,8 +577,15 @@ begin
       end
       else if CompareText(field.FieldType, 'boolean') = 0 then
       begin
-        v := AReader.FieldByName(field.FieldName).AsInteger;
-        v := v.AsInteger = 1;
+        f :=AReader.FieldByName(field.FieldName);
+        if f.DataType = ftBoolean then
+        begin
+          v := AReader.FieldByName(field.FieldName).AsBoolean
+        end
+        else
+        begin
+          v := AReader.FieldByName(field.FieldName).AsInteger = 0;
+        end;
         S := field.FieldName + ' as boolean';
       end
       else if CompareText(field.FieldType, 'datetime') = 0 then
@@ -629,6 +637,7 @@ var
   v           : TValue;
   S           : string;
   targetStream: TMemoryStream;
+  f: TField;
 begin
   try
     obj := TdormUtils.CreateObject(ARttiType);
@@ -672,7 +681,15 @@ begin
       end
       else if CompareText(field.FieldType, 'boolean') = 0 then
       begin
-        v := AReader.FieldByName(field.FieldName).AsInteger = 0;
+        f :=AReader.FieldByName(field.FieldName);
+        if f.DataType = ftBoolean then
+        begin
+          v := AReader.FieldByName(field.FieldName).AsBoolean
+        end
+        else
+        begin
+          v := AReader.FieldByName(field.FieldName).AsInteger = 0;
+        end;
         S := field.FieldName + ' as boolean';
       end
       else if CompareText(field.FieldType, 'datetime') = 0 then
