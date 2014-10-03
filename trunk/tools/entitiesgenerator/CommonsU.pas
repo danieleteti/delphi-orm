@@ -11,6 +11,7 @@ type
     class var COLUMNATTRIBUTE: boolean;
     class var OUTPUTFILENAME: String;
     class var PARENTCLASS: String;
+    class var TABLES: String;
   end;
 
 implementation

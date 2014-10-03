@@ -16,7 +16,7 @@ procedure Main;
 var
   ConfigFileName, s: String;
   dm: TdmMain;
-  Tables, sl: TStringList;
+  slTables, sl: TStringList;
   Gen: TGenerator;
 
 begin
@@ -30,6 +30,7 @@ begin
     TConfig.COLUMNATTRIBUTE := sl.Values['COLUMNATTRIBUTE'].trim = '1';
     TConfig.PARENTCLASS := ifthen(not sl.Values['PARENTCLASS'].trim.IsEmpty,
       sl.Values['PARENTCLASS'], 'TObject');
+    TConfig.TABLES := sl.Values['TABLES'].trim;
     TConfig.OUTPUTFILENAME :=
       ifthen(not sl.Values['OUTPUTFILENAME'].trim.IsEmpty,
       sl.Values['OUTPUTFILENAME'], 'GeneratedClasses.pas');
@@ -68,10 +69,15 @@ begin
     // end;
 
     dm.Connection.Connected := True;
-    Tables := TStringList.Create;
+    slTables := TStringList.Create;
     try
-      dm.Connection.GetTableNames('keystone2', 'dbo', '', Tables);
-      Gen := TGenerator.Create(Tables,
+      if TConfig.TABLES.IsEmpty then
+        dm.Connection.GetTableNames('keystone2', 'dbo', '', slTables)
+      else
+      begin
+        slTables.AddStrings(TConfig.TABLES.Split([',']));
+      end;
+      Gen := TGenerator.Create(slTables,
         function(ATableName: String): TDataSet
         begin
           dm.qry.Close;
@@ -85,7 +91,7 @@ begin
         Gen.Free;
       end;
     finally
-      Tables.Free;
+      slTables.Free;
     end;
   finally
     dm.Free;
