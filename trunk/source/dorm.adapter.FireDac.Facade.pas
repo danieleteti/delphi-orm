@@ -14,6 +14,8 @@
   limitations under the License.
 
   Contributor: Marco Mottadelli
+
+  28/10/2014 Marco Mottadelli - Manage empty string like null
   ******************************************************************************** }
 
 unit dorm.adapter.FireDAC.Facade;
@@ -176,6 +178,8 @@ begin
   Result := TFDQuery.Create(nil);
   Result.Connection := GetConnection;
   Result.Transaction := FCurrentTransaction;
+  // M.M. 28/10/2014
+  Result.OptionsIntf.FormatOptions.StrsEmpty2Null:=True;
 end;
 
 function TFireDACFacade.Execute(ASQLQuery: TFDQuery): Int64;
