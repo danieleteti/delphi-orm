@@ -27,9 +27,10 @@ type
   private
     function GetFireDACReaderFor(ARttiType: TRttiType; AMappingTable: TMappingTable;
       const Value: TValue; AMappingRelationField: TMappingField = nil): TFDQuery;
-    function GetSqlFieldNames(AMappingTable: TMappingTable): string;
-    function GetSqlFieldValues(AMappingTable: TMappingTable): string;
-    function GetSqlFieldsForUpdate(AMappingTable: TMappingTable): string;
+    function GetSqlFieldNames(AMappingTable: TMappingTable; AObject: TObject): string;
+    function GetSqlFieldValues(AMappingTable: TMappingTable; AObject: TObject): string;
+    function GetSqlFieldsForUpdate(AMappingTable: TMappingTable; AObject: TObject): string;
+    function NumericFieldType(AFieldType: string): boolean;
   protected
     FFormatSettings: TFormatSettings;
     FD: TFireDACFacade;
@@ -109,8 +110,9 @@ var
   sql_fields_names: string;
   pk_field        : string;
   isTransient: Boolean;
+  isNullable: Boolean;
 begin
-  sql_fields_names := GetSqlFieldsForUpdate(AMappingTable);
+  sql_fields_names := GetSqlFieldsForUpdate(AMappingTable, AObject);
   pk_field := AMappingTable.Fields[GetPKMappingIndex(AMappingTable.Fields)].FieldName;
   SQL := Format('UPDATE %S SET %S WHERE [%S] = :'+pk_field, [AMappingTable.TableName,
                                                              sql_fields_names,
@@ -129,12 +131,22 @@ begin
     begin
       // manage transients fields
       isTransient := TdormUtils.HasAttribute<Transient>(field.RTTICache.RTTIProp);
+      // manage nullable fields
+      isNullable := TdormUtils.HasAttribute<Nullable>(field.RTTICache.RTTIProp);
 
       if (not field.IsPK) and (not isTransient) then
       begin
         v := TdormUtils.GetField(AObject, field.name);
-        SetFireDACParameterValue(field.FieldType, Query, I, v);
-        inc(I);
+        // zeroes is null   I'm not agree but for now it is!!!
+        if (isNullable) and
+           (NumericFieldType(field.FieldType)) and
+           (v.AsExtended=0) then
+          Continue
+        else
+        begin
+          SetFireDACParameterValue(field.FieldType, Query, I, v);
+          inc(I);
+        end;
       end;
     end;
     // Retrieve pk index
@@ -301,6 +313,7 @@ var
   I, pk_idx: Integer;
   v, pk_value: TValue;
   isTransient: Boolean;
+  isNullable: Boolean;
 begin
   sql_fields_names := '';
   sql_fields_values := '';
@@ -309,12 +322,23 @@ begin
   begin
     // manage transients fields
     isTransient := TdormUtils.HasAttribute<Transient>(field.RTTICache.RTTIProp);
+    // manage nullable fields
+    isNullable := TdormUtils.HasAttribute<Nullable>(field.RTTICache.RTTIProp);
 
     if (not field.IsPK) and (not isTransient) then
     begin
-      // Compose Fields Names and Values
-      sql_fields_names := sql_fields_names + ',[' + field.FieldName + ']';
-      sql_fields_values := sql_fields_values + ',:'+field.FieldName;
+      v := TdormUtils.GetField(AObject, field.RTTICache);
+      // zeroes is null   I'm not agree but for now it is!!!
+      if (isNullable) and
+         (NumericFieldType(field.FieldType)) and
+         (v.AsExtended=0) then
+        Continue
+      else
+      begin
+        // Compose Fields Names and Values
+        sql_fields_names := sql_fields_names + ',[' + field.FieldName + ']';
+        sql_fields_values := sql_fields_values + ',:'+field.FieldName;
+      end;
     end;
   end;
   System.Delete(sql_fields_names, 1, 1);
@@ -331,14 +355,25 @@ begin
     I := 0;
     for field in AMappingTable.Fields do
     begin
+      v := TdormUtils.GetField(AObject, field.RTTICache);
       // manage transients fields
       isTransient := TdormUtils.HasAttribute<Transient>(field.RTTICache.RTTIProp);
+      // manage nullable fields
+      isNullable := TdormUtils.HasAttribute<Nullable>(field.RTTICache.RTTIProp);
 
       if (not field.IsPK) and (not isTransient) then
       begin
-        v := TdormUtils.GetField(AObject, field.RTTICache);
-        SetFireDACParameterValue(field.FieldType, Query, I, v);
-        inc(I);
+        // zeroes is null   I'm not agree but for now it is!!!
+        if (isNullable) and
+           (NumericFieldType(field.FieldType)) and
+           (v.AsExtended=0) then
+          Continue
+        else
+        begin
+          v := TdormUtils.GetField(AObject, field.RTTICache);
+          SetFireDACParameterValue(field.FieldType, Query, I, v);
+          inc(I);
+        end;
       end;
     end;
     GetLogger.Debug('EXECUTING PREPARED :' + string(SQL));
@@ -388,58 +423,93 @@ begin
   end;
 end;
 
-function TFireDACBaseAdapter.GetSqlFieldNames(AMappingTable: TMappingTable): string;
+function TFireDACBaseAdapter.GetSqlFieldNames(AMappingTable: TMappingTable; AObject: TObject): string;
 var
+  v: TValue;
   field: TMappingField;
   isTransient: Boolean;
+  isNullable: Boolean;
 begin
   Result := '';
   for field in AMappingTable.Fields do
   begin
     // manage transients fields
     isTransient := TdormUtils.HasAttribute<Transient>(field.RTTICache.RTTIProp);
+    // manage nullable fields
+    isNullable := TdormUtils.HasAttribute<Nullable>(field.RTTICache.RTTIProp);
 
     if (not field.IsPK) and (not isTransient) then
     begin
-      Result := Result + ',[' + field.FieldName + ']';
+      v := TdormUtils.GetField(AObject, field.name);
+      // zeroes is null   I'm not agree but for now it is!!!
+      if (isNullable) and
+         (NumericFieldType(field.FieldType)) and
+         (v.AsExtended=0) then
+        Continue
+      else
+        Result := Result + ',[' + field.FieldName + ']';
     end;
   end;
   System.Delete(Result, 1, 1);
 end;
 
-function TFireDACBaseAdapter.GetSqlFieldValues(AMappingTable: TMappingTable): string;
+function TFireDACBaseAdapter.GetSqlFieldValues(AMappingTable: TMappingTable; AObject: TObject): string;
 var
   field: TMappingField;
   isTransient: Boolean;
+  isNullable: Boolean;
+  v: TValue;
 begin
   Result := '';
   for field in AMappingTable.Fields do
   begin
     // manage transients fields
     isTransient := TdormUtils.HasAttribute<Transient>(field.RTTICache.RTTIProp);
+    // manage nullable fields
+    isNullable := TdormUtils.HasAttribute<Nullable>(field.RTTICache.RTTIProp);
 
     if (not field.IsPK) and (not isTransient) then
     begin
-      Result := Result + ',:'+field.FieldName;
+      v := TdormUtils.GetField(AObject, field.name);
+      // zeroes is null   I'm not agree but for now it is!!!
+      if (isNullable) and
+         (NumericFieldType(field.FieldType)) and
+         (v.AsExtended=0) then
+        Continue
+      else
+        Result := Result + ',:'+field.FieldName;
     end;
   end;
   System.Delete(Result, 1, 1);
 end;
 
-function TFireDACBaseAdapter.GetSqlFieldsForUpdate(AMappingTable: TMappingTable): string;
+function TFireDACBaseAdapter.GetSqlFieldsForUpdate(AMappingTable: TMappingTable; AObject: TObject): string;
 var
   field: TMappingField;
   isTransient: Boolean;
+  isNullable: Boolean;
+  v: TValue;
 begin
   Result := '';
   for field in AMappingTable.Fields do
   begin
     // manage transients fields
     isTransient := TdormUtils.HasAttribute<Transient>(field.RTTICache.RTTIProp);
+    // manage nullable fields
+    isNullable := TdormUtils.HasAttribute<Nullable>(field.RTTICache.RTTIProp);
 
     if (not field.IsPK) and (not isTransient) then
     begin
-      Result := Result + ',[' + field.FieldName + '] = :'+field.FieldName;
+      v := TdormUtils.GetField(AObject, field.name);
+      // zeroes is null   I'm not agree but for now it is!!!
+      if (isNullable) and
+         (NumericFieldType(field.FieldType)) and
+         (v.AsExtended=0) then
+        Continue
+      else
+      begin
+        Result := Result + ',[' + field.FieldName + '] = :'+field.FieldName;
+      end;
     end;
   end;
   System.Delete(Result, 1, 1);
@@ -621,6 +691,20 @@ begin
       raise;
     end;
   end;
+end;
+
+function TFireDACBaseAdapter.NumericFieldType(AFieldType: string): boolean;
+begin
+  if (CompareText(AFieldType, 'decimal') = 0) or
+     (CompareText(AFieldType, 'float') = 0) or
+     (CompareText(AFieldType, 'integer') = 0) or
+     (CompareText(AFieldType, 'boolean') = 0) or
+     (CompareText(AFieldType, 'date') = 0) or
+     (CompareText(AFieldType, 'datetime') = 0) or
+     (CompareText(AFieldType, 'time') = 0) then
+    Result:=True
+  else
+    Result:=False;
 end;
 
 function TFireDACBaseAdapter.RawExecute(SQL: string): Int64;
