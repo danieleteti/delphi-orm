@@ -10,8 +10,8 @@ object dmMain: TdmMain
     Params.Strings = (
       'Database=keystone2'
       'User_Name=sa'
-      'Password=B4s1cs2013'
-      'Server=192.168.3.64\SQLEXPRESS2012'
+      'Password=Password1'
+      'Server=PCWIN701'
       'DriverID=MSSQL')
     ConnectedStoredUsage = []
     LoginPrompt = False

@@ -11,7 +11,13 @@ type
     class var COLUMNATTRIBUTE: boolean;
     class var OUTPUTFILENAME: String;
     class var PARENTCLASS: String;
+    class var CLASSSUFFIX: String;
     class var TABLES: String;
+    class var EXCLUDEDTABLES: String;
+    class var EXCLUDEDCOLUMNS: String;
+    class var INTERFACEUSES: String;
+    class var TABLESCOLUMNSNULLABLE: String;
+    class var FIELDSSERIALIZEASSTRING: String;
   end;
 
 implementation
