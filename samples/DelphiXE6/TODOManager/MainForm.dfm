@@ -2,32 +2,40 @@ object frmMain: TfrmMain
   Left = 0
   Top = 0
   Caption = 'ToDo List - A Sample App using DORM'
-  ClientHeight = 439
-  ClientWidth = 725
+  ClientHeight = 562
+  ClientWidth = 928
   Color = clBtnFace
   Font.Charset = ANSI_CHARSET
   Font.Color = clWindowText
-  Font.Height = -19
+  Font.Height = -24
   Font.Name = 'Segoe UI'
   Font.Style = []
   OldCreateOrder = False
   OnClose = FormClose
   OnCreate = FormCreate
-  PixelsPerInch = 96
-  TextHeight = 25
+  PixelsPerInch = 120
+  TextHeight = 32
   object Panel1: TPanel
     Left = 0
     Top = 0
-    Width = 725
-    Height = 41
+    Width = 928
+    Height = 52
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Align = alTop
     TabOrder = 0
     object Label1: TLabel
       AlignWithMargins = True
-      Left = 4
-      Top = 4
-      Width = 493
-      Height = 33
+      Left = 5
+      Top = 5
+      Width = 631
+      Height = 42
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Align = alLeft
       Alignment = taCenter
       AutoSize = False
@@ -36,10 +44,14 @@ object frmMain: TfrmMain
     end
     object BitBtn2: TBitBtn
       AlignWithMargins = True
-      Left = 418
-      Top = 4
-      Width = 97
-      Height = 33
+      Left = 535
+      Top = 5
+      Width = 124
+      Height = 42
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Action = acNew
       Align = alRight
       Caption = 'New'
@@ -47,10 +59,14 @@ object frmMain: TfrmMain
     end
     object BitBtn3: TBitBtn
       AlignWithMargins = True
-      Left = 624
-      Top = 4
-      Width = 97
-      Height = 33
+      Left = 799
+      Top = 5
+      Width = 124
+      Height = 42
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Action = acDelete
       Align = alRight
       Caption = 'Delete'
@@ -58,10 +74,14 @@ object frmMain: TfrmMain
     end
     object BitBtn5: TBitBtn
       AlignWithMargins = True
-      Left = 521
-      Top = 4
-      Width = 97
-      Height = 33
+      Left = 667
+      Top = 5
+      Width = 124
+      Height = 42
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Action = acEdit
       Align = alRight
       Caption = 'Edit'
@@ -70,17 +90,25 @@ object frmMain: TfrmMain
   end
   object Panel2: TPanel
     Left = 0
-    Top = 392
-    Width = 725
-    Height = 47
+    Top = 502
+    Width = 928
+    Height = 60
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Align = alBottom
     TabOrder = 1
     object BitBtn4: TBitBtn
       AlignWithMargins = True
-      Left = 104
-      Top = 4
-      Width = 94
-      Height = 39
+      Left = 133
+      Top = 5
+      Width = 120
+      Height = 50
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Action = acPersist
       Align = alLeft
       Caption = 'Persist'
@@ -88,10 +116,14 @@ object frmMain: TfrmMain
     end
     object BitBtn1: TBitBtn
       AlignWithMargins = True
-      Left = 4
-      Top = 4
-      Width = 94
-      Height = 39
+      Left = 5
+      Top = 5
+      Width = 120
+      Height = 50
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Action = acRefresh
       Align = alLeft
       Caption = 'Refresh'
@@ -99,10 +131,14 @@ object frmMain: TfrmMain
     end
     object chkFilter: TCheckBox
       AlignWithMargins = True
-      Left = 504
-      Top = 4
-      Width = 217
-      Height = 39
+      Left = 645
+      Top = 5
+      Width = 278
+      Height = 50
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       Align = alRight
       Caption = 'Only not completed'
       TabOrder = 2
@@ -112,9 +148,13 @@ object frmMain: TfrmMain
   object StringGrid1: TStringGrid
     Tag = 3
     Left = 0
-    Top = 41
-    Width = 725
-    Height = 351
+    Top = 52
+    Width = 928
+    Height = 450
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
     Align = alClient
     ColCount = 3
     DoubleBuffered = True
@@ -128,8 +168,8 @@ object frmMain: TfrmMain
     OnDrawCell = StringGrid1DrawCell
     ColWidths = (
       500
-      110
-      60)
+      131
+      96)
   end
   object ActionList1: TActionList
     Left = 192

@@ -13,6 +13,8 @@ type
     FDSCallback: TFunc<String, TDataSet>;
     FCurrentDS: TDataSet;
     procedure EmitGettersSetters;
+    function GetFieldName(AFieldName: String): String;
+    function IsReferenceType(const ATypeName: String): Boolean;
   protected
     procedure EmitInterfaceUses;
     procedure EmitProperty(F: TField);
@@ -22,9 +24,12 @@ type
     procedure EmitProperties(TableName: String);
     procedure EmitClass(TableName: String);
     procedure EmitClassEnd;
+    procedure EmitUtils;
     procedure EmitSettersBody(const AClassName, ATableName: String);
     procedure EmitSetterBody(const AClassName: String; F: TField;
       ATableName: String);
+    procedure EmitHelpComments;
+    procedure EmitComment(const Value: String);
     function GetDelphiType(FT: TFieldType): String;
     function GetProperCase(const Value: String): String;
   public
@@ -81,13 +86,21 @@ begin
   begin
     FCurrentDS := FDSCallback(table);
     EmitClass(table);
-    FOutput.WriteString('  protected' + sLineBreak);
+    FOutput.WriteString('  strict private' + sLineBreak);
     EmitFields;
+    FOutput.WriteString('  strict protected' + sLineBreak);
     EmitGettersSetters;
     FOutput.WriteString('  public' + sLineBreak);
+    FOutput.WriteString('    constructor Create; virtual;' + sLineBreak);
+    FOutput.WriteString('    destructor Destroy; override;' + sLineBreak);
     EmitProperties(table);
     EmitClassEnd;
   end;
+
+  EmitHelpComments;
+
+  FOutput.WriteString('  procedure __WriteToStream(AStream: TStream; const Value: String);' + sLineBreak);
+  FOutput.WriteString('  function __ReadFromStream(AStream: TStream): String;' + sLineBreak);
 
   FOutput.WriteString('implementation' + sLineBreak + sLineBreak);
   for table in FTables do
@@ -97,6 +110,7 @@ begin
     TheClassName := 'T' + TConfig.CLASSSUFFIX + GetProperCase(TheClassName);
     EmitSettersBody(TheClassName, table);
   end;
+  EmitUtils;
   FOutput.WriteString('end.');
 end;
 
@@ -139,6 +153,11 @@ begin
   end;
 end;
 
+function TGenerator.GetFieldName(AFieldName: String): String;
+begin
+  Result := 'F' + GetProperCase(AFieldName);
+end;
+
 function TGenerator.GetProperCase(const Value: String): String;
 var
   Pieces: TArray<String>;
@@ -161,25 +180,16 @@ begin
   end;
 end;
 
+function TGenerator.IsReferenceType(const ATypeName: String): Boolean;
+begin
+  Result := ATypeName.Equals('TStream');
+end;
+
 procedure TGenerator.EmitClass(TableName: String);
 begin
-  {
-    FOutput.WriteString('  [MapperJSONNaming(JSONNameLowerCase)]' + sLineBreak);
-    if trim(TableName) <> '' then
-    begin
-    FOutput.WriteString(Format('  [Entity(''%s'')]', [TableName]) + sLineBreak);
-    end;
-  }
+  FOutput.WriteString('  [Entity(''' + TableName + ''')]' + sLineBreak);
   FOutput.WriteString('  T' + TConfig.CLASSSUFFIX + GetProperCase(TableName) + ' = class(' +
     TConfig.PARENTCLASS + ')' + sLineBreak);
-
-  // if trim(Edit1.Text) = '' then
-  // raise Exception.Create('Invalid class name');
-  // if (Edit3.Text <> '') and (LowerCase(Edit3.Text) <> 'inheritedclass') then
-  // FOutput.WriteString(Edit1.Text + ' = class(TBaseV)' + sLineBreak)
-  // else
-  // FOutput.WriteString(Edit1.Text + ' = class' + sLineBreak);
-
 end;
 
 procedure TGenerator.EmitClassEnd;
@@ -187,9 +197,15 @@ begin
   FOutput.WriteString('  end;' + sLineBreak + sLineBreak);
 end;
 
+procedure TGenerator.EmitComment(const Value: String);
+begin
+  FOutput.WriteString('{ ' + Value.PadRight(120, ' ') + ' }' + sLineBreak);
+end;
+
 procedure TGenerator.EmitField(F: TField);
 var
   PropName: string;
+  LFieldName: string;
 begin
   if (not TConfig.PROPERTYID) and (LowerCase(F.FieldName) = 'id') then
     Exit;
@@ -197,8 +213,8 @@ begin
   then
     Exit;
 
-  PropName := GetProperCase(F.FieldName);
-  FOutput.WriteString('    F' + PropName + ': ' + GetDelphiType(F.DataType) +
+  LFieldName := GetFieldName(F.FieldName);
+  FOutput.WriteString('    ' + LFieldName + ': ' + GetDelphiType(F.DataType) +
     ';' + sLineBreak);
 end;
 
@@ -254,7 +270,7 @@ begin
 
   PropName := GetProperCase(F.FieldName);
   FOutput.WriteString('    procedure Set' + PropName + '(const Value: ' +
-    GetDelphiType(F.DataType) + ');' + sLineBreak);
+    GetDelphiType(F.DataType) + '); virtual;' + sLineBreak);
 end;
 
 procedure TGenerator.EmitSetterBody(const AClassName: String; F: TField;
@@ -326,6 +342,46 @@ begin
   end;
 end;
 
+procedure TGenerator.EmitHelpComments;
+begin
+  EmitComment(StringOfChar('*', 120));
+  EmitComment('Classes generated with the generators must not be changed by hand.');
+  EmitComment('When you add a new table or add/delete/change a table field, ');
+  EmitComment('the generator must regenerate the classes, so you loose all your changes.');
+  EmitComment('If you need logic, events or other cool stuf that DORM provides, you');
+  EmitComment('have to inherit from the classes and add al the stuff you need in THAT class.');
+  EmitComment('It is a good habit starting to use derived classes as soon as you need,');
+  EmitComment('that entity so that you dont have to hange your code when, after some time,');
+  EmitComment('some logic need to be added to the entity.');
+  EmitComment('Also, all the relations between the entities must be implemented ni the derived classes.');
+  EmitComment(StringOfChar('-', 120));
+  EmitComment('Just as *reminder*, here''s all the methods that you can implement in the inherited classes.');
+  EmitComment('Remember, you dont have to override these methods, only (public or protected, it depends');
+  EmitComment('from the available RTTI) implementation is needed. ');
+  EmitComment('DORM will call them for you! Yes, what a great ORM!!');
+  EmitComment('');
+  EmitComment('  // Called at every validations. Validations happends at every CRUD related calls.');
+  EmitComment('  procedure Validate;');
+  EmitComment('  // Called after "Validate" only while inserting');
+  EmitComment('  procedure InsertValidate;');
+  EmitComment('  // Called after "Validate" only while Updating');
+  EmitComment('  procedure UpdateValidate;');
+  EmitComment('  // Called after "Validate" only while Deleting');
+  EmitComment('  procedure DeleteValidate;');
+  EmitComment('  // Events related methods');
+  EmitComment('  procedure OnBeforeLoad;');
+  EmitComment('  procedure OnAfterLoad;');
+  EmitComment('  procedure OnBeforePersist;');
+  EmitComment('  procedure OnAfterPersist;');
+  EmitComment('  procedure OnBeforeInsert;');
+  EmitComment('  procedure OnAfterInsert;');
+  EmitComment('  procedure OnBeforeUpdate;');
+  EmitComment('  procedure OnAfterUpdate;');
+  EmitComment('  procedure OnBeforeDelete;');
+  EmitComment('  procedure OnAfterDelete;');
+  EmitComment(StringOfChar('*', 120));
+end;
+
 procedure TGenerator.EmitInterfaceUses;
 begin
   if TConfig.INTERFACEUSES <> '' then
@@ -336,11 +392,76 @@ end;
 procedure TGenerator.EmitSettersBody(const AClassName, ATableName: String);
 var
   i: Integer;
+  LConstructorBody: TList<String>;
+  LDelphiType: string;
+  row: String;
 begin
-  for i := 0 to FCurrentDS.Fields.Count - 1 do
-  begin
-    EmitSetterBody(AClassName, FCurrentDS.Fields[i], ATableName);
+  LConstructorBody := TList<String>.Create;
+  try
+    for i := 0 to FCurrentDS.Fields.Count - 1 do
+    begin
+      EmitSetterBody(AClassName, FCurrentDS.Fields[i], ATableName);
+      LDelphiType := GetDelphiType(FCurrentDS.Fields[i].DataType);
+      if IsReferenceType(LDelphiType) then
+      begin
+        LConstructorBody.Add(
+          GetFieldName(FCurrentDS.Fields[i].FieldName) + ' := TMemoryStream.Create;');
+      end;
+    end;
+
+    // constructor
+    FOutput.WriteString('constructor ' + AClassName + '.Create;' + sLineBreak);
+    FOutput.WriteString('begin' + sLineBreak);
+    FOutput.WriteString('  inherited;' + sLineBreak);
+    for row in LConstructorBody do
+    begin
+      FOutput.WriteString('  ' + row + sLineBreak);
+    end;
+    FOutput.WriteString('end;' + sLineBreak + sLineBreak);
+
+    // destructor
+    FOutput.WriteString('destructor ' + AClassName + '.Destroy;' + sLineBreak);
+    FOutput.WriteString('begin' + sLineBreak);
+    for row in LConstructorBody do
+    begin
+      FOutput.WriteString('  ' + row.Split([':'])[0].Trim + '.Free;' + sLineBreak);
+    end;
+    FOutput.WriteString('  inherited;' + sLineBreak);
+    FOutput.WriteString('end;' + sLineBreak + sLineBreak);
+
+  finally
+    LConstructorBody.Free;
   end;
+end;
+
+procedure TGenerator.EmitUtils;
+begin
+  // writetostream
+  FOutput.WriteString('procedure __WriteToStream(AStream: TStream; const Value: String);' + sLineBreak);
+  FOutput.WriteString('var' + sLineBreak);
+  FOutput.WriteString('  LStreamWriter: TStreamWriter;' + sLineBreak);
+  FOutput.WriteString('begin' + sLineBreak);
+  FOutput.WriteString('  LStreamWriter := TStreamWriter.Create(AStream);' + sLineBreak);
+  FOutput.WriteString('  try' + sLineBreak);
+  FOutput.WriteString('    LStreamWriter.Write(Value);' + sLineBreak);
+  FOutput.WriteString('  finally' + sLineBreak);
+  FOutput.WriteString('    LStreamWriter.Free;' + sLineBreak);
+  FOutput.WriteString('  end;' + sLineBreak);
+  FOutput.WriteString('end;' + sLineBreak);
+
+  // readfromstream
+  FOutput.WriteString('function __ReadFromStream(AStream: TStream): String;');
+  FOutput.WriteString('var' + sLineBreak);
+  FOutput.WriteString('  LStreamReader: TStreamReader;' + sLineBreak);
+  FOutput.WriteString('begin' + sLineBreak);
+  FOutput.WriteString('  LStreamReader := TStreamReader.Create(AStream);' + sLineBreak);
+  FOutput.WriteString('  try' + sLineBreak);
+  FOutput.WriteString('    Result := LStreamReader.ReadToEnd;' + sLineBreak);
+  FOutput.WriteString('  finally' + sLineBreak);
+  FOutput.WriteString('    LStreamReader.Free;' + sLineBreak);
+  FOutput.WriteString('  end;' + sLineBreak);
+  FOutput.WriteString('end;' + sLineBreak);
+
 end;
 
 end.

@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2013 Daniele Teti
+  Copyright 2010-2015 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -191,7 +191,14 @@ begin
       [ARttiType.ToString]);
   Field := ARttiType.GetField(FieldFor(PropertyName));
   if Assigned(Field) then
-    Field.SetValue(Obj, Value)
+  begin
+	{***** Daniele Spinetti *****}
+	// if the object is not empty, we need to free it ( otherwise memory leak ). 
+    if (Field.GetValue(Obj).IsObject) and (not(Field.GetValue(Obj).IsEmpty))
+    then
+      Field.GetValue(Obj).AsObject.Free;
+    Field.SetValue(Obj, Value);
+  end
   else
   begin
     Prop := ARttiType.GetProperty(PropertyName);

@@ -189,7 +189,6 @@ var
   jsonArray: TSuperArray;
   jsonTable: ISuperObject;
   i: Integer;
-  sl: TStringList;
 begin
   jsonTable := FMapping.O[AType.Name];
   if not Assigned(jsonTable) then
@@ -365,7 +364,6 @@ var
   field: TMappingField;
   attribute: TCustomAttribute;
   C: Column;
-  t: TRttiType;
 begin
   if TdormUtils.HasAttribute<Transient>(AProp) then
     Exit;

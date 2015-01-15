@@ -1,4 +1,4 @@
-{ *******************************************************************************
+﻿{ *******************************************************************************
   Copyright 2010-2013 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
@@ -45,6 +45,10 @@ type
     procedure TestDormObjectFillListEventAfterLoad;
     procedure TestFindOne;
     procedure TestBulkCollectionOperations;
+
+    procedure TestLoadStreamFieldAndFreeTheExistingValue;
+    procedure TestStoreAndLoadUTF8StringAsBlob;
+    procedure TestStoreAndLoadUTF16StringAsBlob;
   end;
 
 implementation
@@ -238,8 +242,8 @@ begin
 
   emails := TObjectList<TEmail>.Create(true);
   try
-    Session.LoadList<TEmail>(TdormCriteria.NewCriteria('ID',
-      coEqual, id), emails);
+    Session.LoadList<TEmail>(TdormCriteria.NewCriteria('ID', coEqual,
+      id), emails);
     CheckEquals(1, emails.Count);
     CheckEquals(UpperCase(emails[0].Value), emails[0].CopiedValue,
       'OnAfterLoad has not been called');
@@ -335,6 +339,114 @@ begin
   finally
     p.Free;
   end;
+end;
+
+procedure TTestDORM.TestLoadStreamFieldAndFreeTheExistingValue;
+var
+  p: TPerson;
+  id: integer;
+begin
+  p := TPerson.NewPerson;
+  p.Photo := TStringStream.Create('photo');
+  try
+    Session.Insert(p);
+    id := p.id;
+    Session.Commit;
+  finally
+    p.Free;
+  end;
+
+  p := Session.Load<TPerson>(id);
+  try
+    // this field should be a memory stream,
+    // this means that dormUtils has freed the field
+    // and recrteated it like a MemoryStream (Photo is a TStream)
+    CheckTrue(p.Photo is TMemoryStream);
+  finally
+    p.Free;
+  end;
+end;
+
+procedure TTestDORM.TestStoreAndLoadUTF16StringAsBlob;
+var
+  p: TPerson;
+  id: integer;
+  ss: TStringStream;
+  str: String;
+begin
+  // ARRANGE
+  str := 'This is a unicode text encoded as UTF16 [Delphi Default] (什么是) end of text';
+  // ACT
+  p := TPerson.NewPerson;
+
+  p.Photo := TStringStream.Create(str, TEncoding.Unicode);
+
+  { *** some others way to do the same thing *** --daniele^2 }
+  // this is if you want to encode the stream in UTF8
+  // p.Photo := TStringStream.Create('', TEncoding.UTF8);
+
+  // this is the same using UTF8Encode function
+  // p.Photo := TStringStream.Create(UTF8Encode(str), TEncoding.UTF8);
+  try
+    Session.Insert(p);
+    id := p.id;
+    Session.Commit;
+  finally
+    p.Free;
+  end;
+
+  p := Session.Load<TPerson>(id);
+  try
+    // ASSERT
+    ss := TStringStream.Create('',
+      TEncoding.Unicode { use the same encoding used while writing } );
+    try
+      ss.LoadFromStream(p.Photo);
+      CheckEquals(str, ss.DataString);
+    finally
+      ss.Free;
+    end;
+
+  finally
+    p.Free;
+  end;
+end;
+
+procedure TTestDORM.TestStoreAndLoadUTF8StringAsBlob;
+var
+  p: TPerson;
+  id: integer;
+  ss: TStringStream;
+  str: UTF8String;
+begin
+  // ARRANGE
+  str := 'This is a unicode text encoded as UTF8 (什么是) end of text';
+  // ACT
+  p := TPerson.NewPerson;
+  p.Photo := TStringStream.Create(str, TEncoding.UTF8);
+  try
+    Session.Insert(p);
+    id := p.id;
+    Session.Commit;
+  finally
+    p.Free;
+  end;
+
+  p := Session.Load<TPerson>(id);
+  try
+    // ASSERT
+    ss := TStringStream.Create('', TEncoding.UTF8);
+    try
+      ss.LoadFromStream(p.Photo);
+      CheckEquals(str, ss.DataString);
+    finally
+      ss.Free;
+    end;
+
+  finally
+    p.Free;
+  end;
+
 end;
 
 // procedure TTestDORM.TestUOW;
