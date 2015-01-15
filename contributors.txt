@@ -3,13 +3,27 @@ Role:		Founder, Lead Developer
 email:		d.teti@bittime.it
 blog: 		www.danieleteti.it
 company:	www.bittimeprofessionals.it
-
+country:	ITALY
 
 Daniele Spinetti
 Role:		Expert, Senior Developer
 email:		d.spinetti@bittime.it
 blog: 		www.danielespinetti.it
 company:	www.bittimeprofessionals.it
+country:	ITALY
+
+Marcos Barreto
+Role:		Contributor
+country:	BRAZIL
 
 Marco Mottadelli
 Role:		Contributor
+country:	ITALY
+
+Mauro Catellani
+Role:		Contributor
+country:	ITALY
+
+Lorenzo Caldon
+Role:		Contributor
+country:	ITALY

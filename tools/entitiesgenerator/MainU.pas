@@ -46,45 +46,25 @@ begin
     TConfig.TABLESCOLUMNSNULLABLE := sl.Values['TABLESCOLUMNSNULLABLE'].trim;
     TConfig.FIELDSSERIALIZEASSTRING :=
       sl.Values['FIELDSSERIALIZEASSTRING'].trim;
+    TConfig.CATALOGNAME := sl.Values['CATALOGNAME'].trim;
+    TConfig.SCHEMANAME := sl.Values['SCHEMANAME'].trim;
     if TConfig.CAPITALIZE and (not TConfig.COLUMNATTRIBUTE) then
       raise Exception.Create
         ('Cannot use CAPITALIZED properties without COLUMN attribute');
-
   finally
     sl.Free;
   end;
 
   dm := TdmMain.Create(nil);
   try
-    // dm.Connection.Open;
     dm.Connection.Params.Clear;
     dm.Connection.Params.LoadFromFile(ConfigFileName);
-    // dm.Connection.DriverName := 'MSSQL';
-    // dm.Connection.Params.Values['DriverID'] := 'MSSQL';
-    // dm.Connection.Params.Values['Database'] := 'keystone2';
-    // dm.Connection.Params.Values['User_Name'] := 'sa';
-    // dm.Connection.Params.Values['Password'] := 'B4s1cs2013';
-    // dm.Connection.Params.Values['Server'] := '192.138.3.64\SQLEXPRESS2012';
-
-    {
-      Database=keystone2
-      User_Name=sa
-      Password=B4s1cs2013
-      Server=192.138.3.64\SQLEXPRESS2012
-      DriverID=MSSQL
-
-    }
-
-    // for s in dm.Connection.Params do
-    // begin
-    // WriteLn(s);
-    // end;
-
     dm.Connection.Connected := True;
     slTables := TStringList.Create;
     try
       if TConfig.TABLES.IsEmpty then
-        dm.Connection.GetTableNames('', '', '', slTables)
+        dm.Connection.GetTableNames(TConfig.CATALOGNAME, TConfig.SCHEMANAME,
+          '', slTables)
       else
       begin
         slTables.AddStrings(TConfig.TABLES.Split([',']));
@@ -120,8 +100,10 @@ begin
           end);
         try
           Gen.Execute;
-          Gen.Output.SaveToFile(TPath.Combine(LRelativePath, TConfig.OUTPUTFILENAME));
-          WriteLn('Generated file saved to ', TPath.Combine(LRelativePath, TConfig.OUTPUTFILENAME));
+          Gen.Output.SaveToFile(TPath.Combine(LRelativePath,
+            TConfig.OUTPUTFILENAME));
+          WriteLn('Generated file saved to ', TPath.Combine(LRelativePath,
+            TConfig.OUTPUTFILENAME));
         finally
           Gen.Free;
         end;

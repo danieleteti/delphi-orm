@@ -18,6 +18,8 @@ type
     class var INTERFACEUSES: String;
     class var TABLESCOLUMNSNULLABLE: String;
     class var FIELDSSERIALIZEASSTRING: String;
+    class var CATALOGNAME: String;
+    class var SCHEMANAME: String;
   end;
 
 implementation
