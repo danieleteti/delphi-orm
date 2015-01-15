@@ -1,5 +1,5 @@
 { *******************************************************************************
-  Copyright 2010-2013 Daniele Teti
+  Copyright 2010-2015 Daniele Teti
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -919,8 +919,7 @@ begin
   rt := FCTX.GetType(ATypeInfo);
   GetLogger.EnterLevel('Load ' + rt.ToString);
   _table := FMappingStrategy.GetMapping(rt);
-  if not IsAlreadyLoaded(ATypeInfo, Value, Result)
-  then { todo: optimize... please }
+  if not IsAlreadyLoaded(ATypeInfo, Value, Result) then { todo: optimize... please }
   begin
     Obj := TdormUtils.CreateObject(rt);
     try
@@ -2172,8 +2171,8 @@ begin
     ParentObject := TdormUtils.GetProperty(AObject, _belongs_to.Name).AsObject;
     if assigned(ParentObject) then
     begin
-      _parent_type := FCTX.FindType(Qualified(AMappingTable,
-        _belongs_to.OwnerClassName));
+      _parent_type := FCTX.FindType({Qualified(AMappingTable,}
+        _belongs_to.OwnerClassName){)};
       if not assigned(_parent_type) then
         raise Exception.Create('Unknown type ' + _belongs_to.OwnerClassName);
       v := GetIdValue(FMappingStrategy.GetMapping(_parent_type).Id,
