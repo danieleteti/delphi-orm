@@ -1,0 +1,15 @@
+Daniele Teti
+Role:		Founder, Lead Developer
+email:		d.teti@bittime.it
+blog: 		www.danieleteti.it
+company:	www.bittimeprofessionals.it
+
+
+Daniele Spinetti
+Role:		Expert, Senior Developer
+email:		d.spinetti@bittime.it
+blog: 		www.danielespinetti.it
+company:	www.bittimeprofessionals.it
+
+Marco Mottadelli
+Role:		Contributor
