@@ -1,0 +1,5 @@
+DriverID=FB
+Database=D:\DEV\businessprocessmanager\data\BPM_DEVELOPMENT.FDB
+User_Name=sysdba
+Password=masterkey
+Server=localhost

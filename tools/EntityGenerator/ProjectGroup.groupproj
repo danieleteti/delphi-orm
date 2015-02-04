@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{6D621C27-FD9B-421C-B922-95225369CF9F}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="eg.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="..\entitiesgenerator\entitiesgen.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="eg">
+        <MSBuild Projects="eg.dproj"/>
+    </Target>
+    <Target Name="eg:Clean">
+        <MSBuild Projects="eg.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="eg:Make">
+        <MSBuild Projects="eg.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="entitiesgen">
+        <MSBuild Projects="..\entitiesgenerator\entitiesgen.dproj"/>
+    </Target>
+    <Target Name="entitiesgen:Clean">
+        <MSBuild Projects="..\entitiesgenerator\entitiesgen.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="entitiesgen:Make">
+        <MSBuild Projects="..\entitiesgenerator\entitiesgen.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="eg;entitiesgen"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="eg:Clean;entitiesgen:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="eg:Make;entitiesgen:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
