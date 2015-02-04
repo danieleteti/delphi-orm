@@ -288,6 +288,7 @@ type
     procedure FillListSQL(APTypeInfo: PTypeInfo; ACollection: TObject;
       ASQLable: ISQLable); overload;
     function Load<T: class>(ASQLable: ISQLable): T; overload;
+    function Load(APTypeInfo: PTypeInfo; ASQLable: ISQLable): TObject; overload;
     function ListAll<T: class>():
 
 {$IF CompilerVersion > 22}TObjectList<T>{$ELSE}TdormObjectList<T>{$IFEND};
@@ -1038,40 +1039,11 @@ end;
 
 function TSession.Load<T>(ASQLable: ISQLable): T;
 var
-  rt: TRttiType;
-  _table: TMappingTable;
-  _fields: TMappingFieldList;
   _type_info: PTypeInfo;
-  SearcherClassname: string;
-  List: IWrappedList;
-  Obj: T;
-  _validateable: TdormValidateable;
-  ACollection: TObjectList<T>;
 begin
-  _type_info := TypeInfo(T);
-  rt := FCTX.GetType(_type_info);
-  _table := FMappingStrategy.GetMapping(rt);
-  _fields := _table.Fields;
   GetLogger.EnterLevel('Load<T>(SQL)');
-  ACollection := TObjectList<T>.Create(false);
-  try
-    GetStrategy.LoadList(ACollection, rt, _table,
-      ASQLable.ToSQL(self.GetMapping, self.GetStrategy));
-    if ACollection.Count > 1 then
-      raise EdormException.Create('Singleton query returned more than 1 row');
-    if ACollection.Count = 1 then
-    begin
-      Obj := ACollection[0];
-      SetObjectStatus(Obj, osClean, false);
-      _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
-      _validateable.OnAfterLoad;
-      Result := Obj;
-    end
-    else
-      Result := nil;
-  finally
-    ACollection.Free;
-  end;
+  _type_info := TypeInfo(T);
+  Result := Load(_type_info, ASQLable) as T;
   GetLogger.ExitLevel('Load<T>(SQL)');
 end;
 
@@ -1307,16 +1279,17 @@ end;
 
 procedure TSession.LoadList<T>(Criteria: ICriteria; AObject: TObject);
 {$IF CompilerVersion = 24}
-var rt: TRttiType;
+var
+  rt: TRttiType;
 {$IFEND}
 begin
-  {$IF CompilerVersion = 24}
+{$IF CompilerVersion = 24}
   rt := FCTX.GetType(TypeInfo(T));
   GetLogger.Info(rt.AsInstance.MetaclassType.ClassName);
   LoadList(rt.AsInstance.MetaclassType, Criteria, AObject);
-  {$ELSE}
+{$ELSE}
   LoadList(T, Criteria, AObject);
-  {$IFEND}
+{$IFEND}
 end;
 
 procedure TSession.LoadRelationsForEachElement(AList: TObject;
@@ -1852,7 +1825,7 @@ begin
     v := TdormUtils.GetField(AObject, _has_many.Name);
     { TODO -oDaniele -cBUG : RTTICache }
     // DANIELE: There is a bug in this RTTICache... Investigate please
-    //v := TdormUtils.GetField(AObject, _has_many.RTTICache);
+    // v := TdormUtils.GetField(AObject, _has_many.RTTICache);
     GetLogger.Debug('-- Inspecting for ' + _has_many.ChildClassName);
     _child_type := FCTX.FindType(_has_many.ChildClassName);
     if not assigned(_child_type) then
@@ -2171,8 +2144,8 @@ begin
     ParentObject := TdormUtils.GetProperty(AObject, _belongs_to.Name).AsObject;
     if assigned(ParentObject) then
     begin
-      _parent_type := FCTX.FindType({Qualified(AMappingTable,}
-        _belongs_to.OwnerClassName){)};
+      _parent_type := FCTX.FindType( { Qualified(AMappingTable, }
+        _belongs_to.OwnerClassName) { ) };
       if not assigned(_parent_type) then
         raise Exception.Create('Unknown type ' + _belongs_to.OwnerClassName);
       v := GetIdValue(FMappingStrategy.GetMapping(_parent_type).Id,
@@ -2256,7 +2229,7 @@ begin
     AChildType := FCTX.FindType(_type_name);
     if not assigned(AChildType) then
       raise Exception.Create('Unknown type ' + _type_name + ' (ListOf ' +
-        attr.Value + ')');
+        attr.Value + ') ' + sLineBreak + 'Hint: Have you used the fully qualified name?');
   end;
 end;
 
@@ -2310,5 +2283,45 @@ begin
 end;
 
 {$IFEND}
+
+
+function TSession.Load(APTypeInfo: PTypeInfo; ASQLable: ISQLable): TObject;
+var
+  rt: TRttiType;
+  _table: TMappingTable;
+  _fields: TMappingFieldList;
+  _type_info: PTypeInfo;
+  SearcherClassname: string;
+  List: IWrappedList;
+  _validateable: TdormValidateable;
+  ACollection: TObjectList<TObject>;
+  Obj: TObject;
+begin
+  _type_info := APTypeInfo;
+  rt := FCTX.GetType(_type_info);
+  _table := FMappingStrategy.GetMapping(rt);
+  _fields := _table.Fields;
+  GetLogger.EnterLevel('Load(SQL)');
+  ACollection := TObjectList<TObject>.Create(false);
+  try
+    GetStrategy.LoadList(ACollection, rt, _table,
+      ASQLable.ToSQL(self.GetMapping, self.GetStrategy));
+    if ACollection.Count > 1 then
+      raise EdormException.Create('Singleton query returned more than 1 row');
+    if ACollection.Count = 1 then
+    begin
+      Obj := ACollection[0];
+      SetObjectStatus(Obj, osClean, false);
+      _validateable := WrapAsValidateableObject(Obj, FValidatingDuck);
+      _validateable.OnAfterLoad;
+      Result := Obj;
+    end
+    else
+      Result := nil;
+  finally
+    ACollection.Free;
+  end;
+  GetLogger.ExitLevel('Load(SQL)');
+end;
 
 end.
