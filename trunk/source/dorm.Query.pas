@@ -61,6 +61,7 @@ type
     function Load(AClassType: TClass; Criteria: ICriteria; out AObject: TObject)
       : boolean; overload;
     function Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject; overload;
+    function Load(APTypeInfo: PTypeInfo; ASQLable: ISQLable): TObject; overload;
     procedure LoadList(AClassType: TClass; Criteria: ICriteria;
       ACollection: TObject); overload;
     function LoadList(AClassType: TClass; Criteria: ICriteria = nil):
