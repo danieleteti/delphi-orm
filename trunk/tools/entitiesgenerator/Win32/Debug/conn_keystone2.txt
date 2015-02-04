@@ -1,0 +1,5 @@
+Database=keystone2
+User_Name=sa
+Password=B4s1cs2013
+Server=192.138.3.64\SQLEXPRESS2012
+DriverID=MSSQL

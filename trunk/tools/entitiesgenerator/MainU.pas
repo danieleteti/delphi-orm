@@ -24,6 +24,7 @@ var
 begin
   ConfigFileName := ParamStr(1);
   LRelativePath := GetCurrentDir; // TPath.GetDirectoryName(ParamStr(0));
+
   WriteLn('Using: ', ConfigFileName);
   WriteLn('Relative path: ', LRelativePath);
   sl := TStringList.Create;

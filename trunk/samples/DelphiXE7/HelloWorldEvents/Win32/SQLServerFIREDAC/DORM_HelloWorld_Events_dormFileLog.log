@@ -1,0 +1,3 @@
+2014-04-01 23.34.03.349 [6884][INFO] TdormFileLog Logger initialized
+2014-04-01 23.34.05.520 [6884][ERROR] Adapter [dorm.adapter.FireDAC.SQLServer.TFireDACSQLServerPersistStrategy] not found. Have you enabled it in dorm.inc?
+2014-04-01 23.34.05.522 [6884][INFO] Shutting down TdormFileLog...
