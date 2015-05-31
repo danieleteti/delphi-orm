@@ -2,7 +2,7 @@
     <PropertyGroup>
         <ProjectGuid>{6E22397B-AA4C-4AD3-AA92-7D61C3E8FBD4}</ProjectGuid>
         <ProjectVersion>17.2</ProjectVersion>
-        <Config Condition="'$(Config)'==''">FIREBIRD_UIB_STRATEGY</Config>
+        <Config Condition="'$(Config)'==''">FIREBIRD_CI</Config>
         <DCC_DCCCompiler>DCC32</DCC_DCCCompiler>
         <MainSource>DORM_UnitTests_XE8.dpr</MainSource>
         <Base>True</Base>
@@ -1300,13 +1300,13 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
             </Deployment>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
