@@ -1,0 +1,5 @@
+Database=dorm
+User_Name=sa
+Password=daniele
+Server=localhost\SQLEXPRESS
+DriverID=MSSQL

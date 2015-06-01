@@ -3,7 +3,6 @@ program entitiesgen;
 {$APPTYPE CONSOLE}
 {$R *.res}
 
-
 uses
   System.SysUtils,
   MainU in 'MainU.pas',
@@ -25,7 +24,12 @@ begin
     Main;
   except
     on E: Exception do
+    begin
       WriteLn(E.ClassName, ': ', E.Message);
+      WriteLn('----------------------------------');
+      WriteLn('Usage: entitiesgen connectionfile');
+      WriteLn('The configuration file must be placed in the current dir and must be named "generator_config.txt"');
+    end;
   end;
 
   // if DebugHook<>0 then

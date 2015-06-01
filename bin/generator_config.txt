@@ -1,0 +1,37 @@
+#Do you want to capitalize your entity objects? (1 or 0)
+CAPITALIZE=1
+
+#Do you want to add property ID to each object? (1 or 0)
+#N.B. If you derive your classes from a base class with ID propety, you should
+#put PROPERTYID=0
+PROPERTYID=1
+
+#Generate OBJVERSION property? (1,0)
+PROPERTYOBJVERSION=1
+
+#Force to generate COLUMN attribute also if it is not necessary? (1,0)
+COLUMNATTRIBUTE=1
+
+#The parent class from all the generated class will derives
+PARENTCLASS=TdormBaseObject
+
+#The path where will be generated the file
+OUTPUTFILENAME=GeneratedClasses.pas
+
+#Tables to generate. If empty all the tables will be generated.
+TABLES=entityData,entityDetail,node
+
+#Tables to exclude
+EXCLUDEDTABLES=dorm.dbo.sysdiagrams
+
+#Columns to exclude
+EXCLUDEDCOLUMNS=CodExt,UtenteCreazione,DataCreazione,UtenteUltimaModifica,DataUltimaModifica
+
+#List of units to put in the interface section
+INTERFACEUSES=System.Classes, dorm.Mappings, ObjectsMappers, System.SysUtils, dorm.Commons
+
+#Fields to be considered as nullable
+TABLESCOLUMNSNULLABLE=table1.field3,table2.field5
+
+#Field that should support string serialization
+FIELDSSERIALIZEASSTRING=table1.field1,table2.field2
