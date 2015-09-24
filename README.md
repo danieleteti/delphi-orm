@@ -31,7 +31,7 @@ Delphi ORM (DORM for short) is a powerful ORM for Delphi. It is quite robust and
 * Fluent interfaces for queries
 * Unit Of Work for multiple operations
 * Use anon methods and generics
-* Tested on Delphi XE8, XE7, XE6, XE5, XE4, XE3 and XE2 (Win32)
+* Tested on Delphi 10Seattle, XE8, XE7, XE6, XE5, XE4, XE3 and XE2 (Win32)
 
 Little introduction to dorm is available [here as PDF](https://github.com/danieleteti/delphi-orm/blob/master/docs/Introduction%20to%20DORM.pdf).
 To understand how dorm works, please check the `HelloWorldSamples.groupproj` project group into the folder `Samples/<YOUR DELPHI VERSION>`. 
