@@ -11,13 +11,13 @@ interface
 
 uses
   SysUtils
-{$IFDEF LINK_FIREBIRD_ADAPTER}
-    ,
-  dorm.adapter.firebird
+{$IFDEF LINK_FIREBIRD_ADAPTER}  // deprecated do not use!!
+  // ,
+  // dorm.adapter.firebird
 {$ENDIF}
-{$IFDEF LINK_INTERBASE_ADAPTER}
-    ,
-  dorm.adapter.interbase
+{$IFDEF LINK_INTERBASE_ADAPTER} // deprecated do not use!!
+  // ,
+  // dorm.adapter.interbase
 {$ENDIF}
 {$IFDEF LINK_FIREBIRDUIB_ADAPTER}
     ,

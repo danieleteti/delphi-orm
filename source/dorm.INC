@@ -10,9 +10,8 @@
   define a comment.
 }
 {$DEFINE LINK_FIREBIRDUIB_ADAPTER }
-{. $DEFINE LINK_INTERBASEUIB_ADAPTER }
-{. $DEFINE LINK_SQLITE3_ADAPTER }
-
+{$DEFINE LINK_INTERBASEUIB_ADAPTER }
+{$DEFINE LINK_SQLITE3_ADAPTER }
 { .$DEFINE LINK_SQLSERVER_ADAPTER } // require delphi ent or better
 // require DevArt dbExpress driver for sqlserver
 { .$DEFINE LINK_SQLSERVERDEVART_ADAPTER }
@@ -22,7 +21,7 @@
 // require delphi ent or better (deprecated, do not use. Use LINK_INTERBASEUIB_ADAPTER)
 
 // requires FireDac for sqlserver
-{.$DEFINE LINK_SQLSERVER_FIREDAC_ADAPTER}
+{ .$DEFINE LINK_SQLSERVER_FIREDAC_ADAPTER }
 
 { **************** end adapters section ************************* }
 
@@ -33,7 +32,7 @@
   then remove the period before the $ that makes the
   define a comment.
 }
-{.$DEFINE LINK_CODESITE }
-{.$DEFINE LINK_SMARTINSPECT }
+{ .$DEFINE LINK_CODESITE }
+{ .$DEFINE LINK_SMARTINSPECT }
 {$DEFINE LINK_FILELOG }
 { **************** end loggers section ************************* }
