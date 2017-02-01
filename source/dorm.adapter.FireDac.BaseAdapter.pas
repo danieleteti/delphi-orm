@@ -499,8 +499,13 @@ begin
   GetLogger.Debug('PREPARING: ' + SQL);
   Result := FD.NewQuery;
   Result.SQL.Text := SQL;
-  Result.Params[0].DataType := ftLargeint;
-  Result.Params[0].AsLargeInt := Value.AsInt64;
+  if Value.IsOrdinal then begin
+    Result.Params[0].DataType := ftLargeint;
+    Result.Params[0].AsLargeInt := Value.AsInt64;
+  end else begin
+    Result.Params[0].DataType := ftString;
+    Result.Params[0].AsString := Value.AsString;
+  end;
 end;
 
 function TFireDACBaseAdapter.Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
@@ -609,7 +614,7 @@ begin
         end
         else
         begin
-          v := AReader.FieldByName(field.FieldName).AsInteger = 0;
+          v := AReader.FieldByName(field.FieldName).AsInteger <> 0;
         end;
         S := field.FieldName + ' as boolean';
       end
@@ -714,7 +719,7 @@ begin
         end
         else
         begin
-          v := AReader.FieldByName(field.FieldName).AsInteger = 0;
+          v := AReader.FieldByName(field.FieldName).AsInteger <> 0;
         end;
         S := field.FieldName + ' as boolean';
       end

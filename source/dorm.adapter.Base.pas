@@ -226,6 +226,8 @@ begin
       SQL := SQL + inttostr(ACriteriaItem.GetValue.AsInteger)
     else if fm.FieldType = 'boolean' then
       SQL := SQL + GetBooleanValueAsString(ACriteriaItem.GetValue.AsBoolean)
+    else if fm.FieldType = 'float' then
+      SQL := SQL + FloatToStr(ACriteriaItem.GetValue.AsExtended)
     else if fm.FieldType = 'date' then
     begin
       d := ACriteriaItem.GetValue.AsExtended;

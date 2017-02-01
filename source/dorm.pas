@@ -751,14 +751,18 @@ end;
 function TSession.GetLoadedObjectHashCode(AObject: TObject;
   AMappingField: TMappingField): string;
 begin
-  Result := AObject.ClassName + '_' +
-    inttostr(GetIdValue(AMappingField, AObject).AsInt64);
+  Result := GetLoadedObjectHashCode(AObject.ClassType.ClassInfo, GetIdValue(AMappingField, AObject));
 end;
 
 function TSession.GetLoadedObjectHashCode(ATypeInfo: PTypeInfo;
   AValue: TValue): string;
 begin
-  Result := string(ATypeInfo.Name) + '_' + inttostr(AValue.AsInt64);
+  Result := string(ATypeInfo.Name) + '_';
+  if AValue.IsOrdinal then begin
+     Result := Result + inttostr(AValue.AsInt64);
+  end else begin
+     Result := Result + AValue.AsString;
+  end;
 end;
 
 function TSession.GetLogger: IdormLogger;
@@ -1024,6 +1028,7 @@ begin
     if List.Count > 1 then
       raise EdormException.Create('Singleton query returned more than 1 row');
     Result := List.Count = 1;
+
     if Result then
       AObject := List.Extract(List.First)
   finally
