@@ -373,6 +373,7 @@ begin
   begin
     field := GetOrCreateField(ATable, AProp);
     field.IsPK := True;
+    field.IsFK := Id(attribute).IsFK;
   end;
 
   attribute := TdormUtils.GetAttribute<Column>(AProp);
@@ -785,6 +786,9 @@ begin
 
     if not outPutField.IsPK and AField.IsPK then
       outPutField.IsPK := AField.IsPK;
+
+    if not outPutField.IsFK and AField.IsFK then
+      outPutField.IsFK := AField.IsFK;
 
     if ((not Assigned(outPutField.RTTICache.RTTIField)) and (Assigned((AField.RTTICache.RTTIField)))
       ) or

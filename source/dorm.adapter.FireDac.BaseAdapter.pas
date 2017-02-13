@@ -319,7 +319,7 @@ begin
     // manage nullable fields
     isNullable := TdormUtils.HasAttribute<Nullable>(field.RTTICache.RTTIProp);
 
-    if (not field.IsPK) and (not isTransient) then
+    if (not field.IsPK or field.IsFK) and (not isTransient) then
     begin
       v := TdormUtils.GetField(AObject, field.RTTICache);
       // Compose Fields Names and Values
@@ -345,7 +345,7 @@ begin
       // manage nullable fields
       isNullable := TdormUtils.HasAttribute<Nullable>(field.RTTICache.RTTIProp);
 
-      if (not field.IsPK) and (not isTransient) then
+      if (not field.IsPK or field.IsFK) and (not isTransient) then
       begin
         v := TdormUtils.GetField(AObject, field.RTTICache);
         SetFireDACParameterValue(field.FieldType, Query, I, v, isNullable);

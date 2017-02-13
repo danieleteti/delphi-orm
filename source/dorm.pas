@@ -1862,7 +1862,10 @@ begin
   GetLogger.Debug('Saving _has_one for ' + ARttiType.ToString);
   for _has_one in AMappingTable.HasOneList do
   begin
-    v := TdormUtils.GetField(AObject, _has_one.RTTICache);
+    { TODO -oDaniele -cBUG : RTTICache }
+    // DANIELE: There is a bug in this RTTICache... Investigate please
+    // v := TdormUtils.GetField(AObject, _has_one.RTTICache);
+    v := TdormUtils.GetField(AObject, _has_one.Name);
     GetLogger.Debug('-- Inspecting for ' + _has_one.ChildClassName);
     _child_type := FCTX.FindType(_has_one.ChildClassName);
     if not assigned(_child_type) then
@@ -2071,7 +2074,11 @@ end;
 function TSession.IsNullKey(ATableMap: TMappingTable;
   const AValue: TValue): boolean;
 begin
-  Result := TdormUtils.EqualValues(AValue, FIdNullValue);
+  if ATableMap.Id.IsFK then begin
+    Result := True;
+  end else begin
+    Result := TdormUtils.EqualValues(AValue, FIdNullValue);
+  end;
 end;
 
 function TSession.IsObjectStatusAvailable(AObject: TObject): boolean;
