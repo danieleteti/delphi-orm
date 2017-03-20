@@ -214,8 +214,13 @@ begin
   Qry := FD.NewQuery;
   try
     Qry.SQL.Text := SQL;
-    Qry.Params[0].DataType := ftLargeint;
-    Qry.Params[0].AsLargeInt := pk_value.AsInt64;
+    if pk_value.IsOrdinal then begin
+      Qry.Params[0].DataType := ftLargeint;
+      Qry.Params[0].AsLargeInt := pk_value.AsInt64;
+    end else begin
+      Qry.Params[0].DataType := ftString;
+      Qry.Params[0].AsString := pk_value.AsString;
+    end;
     GetLogger.Debug('EXECUTING QUERY: ' + SQL);
     Qry.ExecSQL;
     Result := Qry.RowsAffected;
@@ -377,6 +382,7 @@ function TFireDACBaseAdapter.GetLastInsertOID: TValue;
 var
   Qry: TFDQuery;
   SQL: String;
+  field : TField;
 begin
   SQL := 'SELECT @@IDENTITY AS LAST_IDENTITY';
   GetLogger.Debug('PREPARING: ' + SQL);
@@ -387,9 +393,10 @@ begin
     Qry.Open;
     if not Qry.Eof then
     begin
-      if (not Qry.FieldByName('LAST_IDENTITY').IsNull) then
+      field := Qry.FieldByName('LAST_IDENTITY');
+      if (not field.IsNull) then
       begin
-        Result := Qry.FieldByName('LAST_IDENTITY').AsLargeInt;
+        Result := field.AsLargeInt;
       end
       else
         Result := TValue.Empty;

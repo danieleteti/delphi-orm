@@ -354,8 +354,11 @@ var
   rt: TRttiType;
 begin
   rt := FCTX.GetType(AObject.ClassType);
-  with FMappingStrategy.GetMapping(rt) do
-    TdormUtils.SetField(AObject, Id.Name, FIdNullValue);
+  with FMappingStrategy.GetMapping(rt) do begin
+    if not Id.IsFK then begin
+      TdormUtils.SetField(AObject, Id.Name, FIdNullValue);
+    end;
+  end;
   SetObjectStatus(AObject, osDirty, false);
 end;
 
@@ -1368,21 +1371,16 @@ begin
   end
   else
   begin
-    case FIdType of
-      ktInteger:
-        begin
-          if _idValue.AsInteger = FIdNullValue.AsInteger then
-            Insert(AObject)
-          else
-            Update(AObject);
-        end;
-      ktString:
-        begin
-          if _idValue.AsString = FIdNullValue.AsString then
-            Insert(AObject)
-          else
-            Update(AObject);
-        end;
+    if _idValue.IsOrdinal then begin
+      if _idValue.AsInteger = FIdNullValue.AsInteger then
+        Insert(AObject)
+      else
+        Update(AObject);
+    end else begin
+      if _idValue.AsString = FIdNullValue.AsString then
+        Insert(AObject)
+      else
+        Update(AObject);
     end;
   end;
   DoSessionOnAfterPersistObject(AObject);
@@ -2012,7 +2010,7 @@ begin
       AValidaetable.UpdateValidate;
       AValidaetable.OnBeforeUpdate;
       _class_name := _Type.ToString;
-      if not IsNullKey(_table, _idValue) then
+      if _table.Id.IsFK or not IsNullKey(_table, _idValue) then
       begin
         FLogger.Info('Updating ' + AObject.ClassName);
         if not AOnlyChild then
@@ -2077,7 +2075,11 @@ begin
   if ATableMap.Id.IsFK then begin
     Result := True;
   end else begin
-    Result := TdormUtils.EqualValues(AValue, FIdNullValue);
+    if ATableMap.Id.FieldType = 'string' then begin
+      Result := TdormUtils.EqualValues(AValue, '');
+    end else begin
+      Result := TdormUtils.EqualValues(AValue, FIdNullValue);
+    end;
   end;
 end;
 
