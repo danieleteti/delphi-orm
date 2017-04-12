@@ -60,8 +60,6 @@ type
 
   TSession = class(TdormInterfacedObject, IdormSession)
   private
-    FMappingStrategy: ICacheMappingStrategy;
-    FCTX: TRttiContext;
     FConfig: ISuperObject;
     FIdType: TdormKeyType;
     FIdNullValue: TValue;
@@ -95,6 +93,8 @@ type
       var AChildType: TRttiType);
 
   protected
+    FCTX: TRttiContext;
+    FMappingStrategy: ICacheMappingStrategy;
     // events
     procedure DoSessionOnBeforePersistObject(AObject: TObject);
     procedure DoSessionOnAfterPersistObject(AObject: TObject);
@@ -136,7 +136,7 @@ type
       var AObject: TObject);
     procedure LoadBelongsToRelationByPropertyName(AIdValue: TValue;
       ARttiType: TRttiType; AClassName, APropertyName: string;
-      var AObject: TObject);
+      var AObject: TObject); virtual;
     function Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject; overload;
     // Internal use
     procedure SetLazyLoadFor(ATypeInfo: PTypeInfo; const APropertyName: string;
