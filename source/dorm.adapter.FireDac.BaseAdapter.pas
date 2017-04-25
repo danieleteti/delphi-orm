@@ -364,7 +364,9 @@ begin
   end;
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
   pk_value := GetLastInsertOID;
-  TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].RTTICache, pk_value);
+  if pk_idx <> -1 then begin
+    TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].RTTICache, pk_value);
+  end;
   Result := pk_value;
 end;
 

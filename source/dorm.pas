@@ -878,8 +878,12 @@ end;
 function TSession.GetIdValue(AIdMappingField: TMappingField;
   AObject: TObject): TValue;
 begin
-  Assert(AIdMappingField <> nil);
-  Result := TdormUtils.GetField(AObject, AIdMappingField.Name);
+  //Assert(AIdMappingField <> nil);
+  if assigned(AIdMappingField) then begin
+    Result := TdormUtils.GetField(AObject, AIdMappingField.Name);
+  end else begin
+    Result := TValue.Empty;
+  end;
 end;
 
 function TSession.GetEntitiesNames: TList<string>;
@@ -2072,7 +2076,9 @@ end;
 function TSession.IsNullKey(ATableMap: TMappingTable;
   const AValue: TValue): boolean;
 begin
-  if ATableMap.Id.IsFK then begin
+  if not assigned(ATableMap.Id) then begin
+    Result := True;
+  end else if ATableMap.Id.IsFK then begin
     Result := True;
   end else begin
     if ATableMap.Id.FieldType = 'string' then begin
