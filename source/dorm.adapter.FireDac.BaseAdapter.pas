@@ -88,7 +88,7 @@ type
 implementation
 
 uses
-  dorm.Utils;
+  dorm.Utils, System.Types;
 
 procedure TFireDACBaseAdapter.InitFormatSettings;
 begin
@@ -116,15 +116,28 @@ var
   pk_field: string;
   isTransient: boolean;
   isNullable: boolean;
+  pk_mapping_index: Integer;
+  PKMappingIndexes: TIntegerDynArray;
 begin
   sql_fields_names := GetSqlFieldsForUpdate(AMappingTable, AObject);
-  pk_field := AMappingTable.Fields[GetPKMappingIndex(AMappingTable.Fields)].FieldName;
+  // pk_field aufblasen für where
+  PKMappingIndexes := GetPKMappingIndexes(AMappingTable.Fields);
+  if Length(PKMappingIndexes) > 0 then begin
+    pk_mapping_index := PKMappingIndexes[0];
+  end else begin
+    pk_mapping_index := -1;
+  end;
+  pk_field := AMappingTable.Fields[PKMappingIndexes[0]].FieldName;
   SQL := Format('UPDATE %S SET %S WHERE [%S] = :' + pk_field, [AMappingTable.TableName, sql_fields_names, pk_field]);
+  for I := 1 to Length(PKMappingIndexes) - 1 do begin
+    pk_field := AMappingTable.Fields[PKMappingIndexes[I]].FieldName;
+    SQL := SQL + Format(' AND [%S] = ''' +  ARttiType.GetProperty(AMappingTable.Fields[I].name).GetValue(AObject).ToString + '''', [pk_field]);
+  end;
   if ACurrentVersion >= 0 then
   begin
     SQL := SQL + ' AND OBJVERSION = ' + IntToStr(ACurrentVersion);
   end;
-  GetLogger.Debug(AMappingTable.Fields[GetPKMappingIndex(AMappingTable.Fields)].FieldName);
+  GetLogger.Debug(AMappingTable.Fields[PKMappingIndexes[0]].FieldName);
   GetLogger.Debug('NEW QUERY: ' + SQL);
   Query := FD.NewQuery;
   Query.SQL.Text := SQL;

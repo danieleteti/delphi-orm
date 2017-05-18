@@ -30,7 +30,7 @@ uses
   dorm.Collections,
   dorm.Utils,
   dorm.Mappings.Strategies,
-  dorm.ObjectStatus;
+  dorm.ObjectStatus, System.Types;
 
 type
   TDuckTypedList = class;
@@ -278,6 +278,7 @@ type
   end;
 
 function GetPKMappingIndex(const AMappingFields: TMappingFieldList): Integer;
+function GetPKMappingIndexes(const AMappingFields: TMappingFieldList): TIntegerDynArray;
 function GetMappingRelationByPropertyName(ARelationList: TMappingRelationList;
   const APropertyName: string): TMappingRelation;
 function GetMappingBelongsToByPropertyName(ARelationList: TMappingBelongsToList;
@@ -359,6 +360,18 @@ begin
     if AMappingFields[I].IsPK then
       Exit(I);
   Exit(-1);
+end;
+
+function GetPKMappingIndexes(const AMappingFields: TMappingFieldList): TIntegerDynArray;
+var
+  I: Integer;
+begin
+  for I := 0 to AMappingFields.Count - 1 do begin
+    if AMappingFields[I].IsPK then begin
+      SetLength(Result, Length(Result) + 1);
+      Result[Length(Result) - 1] := I;
+    end;
+  end;
 end;
 
 { TdormInterfacedObject }
