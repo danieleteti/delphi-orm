@@ -794,8 +794,13 @@ var
 begin
   if CompareText(AFieldType, 'string') = 0 then
   begin
-    AStatement.Params[ParameterIndex].DataType := ftString;
-    AStatement.Params[ParameterIndex].AsString := AValue.AsString;
+    if length(AValue.AsString) > 8000 then begin
+      AStatement.Params[ParameterIndex].DataType := ftWideMemo;
+      AStatement.Params[ParameterIndex].AsWideMemo := AValue.AsString;
+    end else begin
+      AStatement.Params[ParameterIndex].DataType := ftString;
+      AStatement.Params[ParameterIndex].AsString := AValue.AsString;
+    end;
     GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + AValue.AsString);
   end
   else if CompareText(AFieldType, 'decimal') = 0 then
