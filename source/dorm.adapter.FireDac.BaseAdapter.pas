@@ -116,17 +116,11 @@ var
   pk_field: string;
   isTransient: boolean;
   isNullable: boolean;
-  pk_mapping_index: Integer;
   PKMappingIndexes: TIntegerDynArray;
 begin
   sql_fields_names := GetSqlFieldsForUpdate(AMappingTable, AObject);
   // pk_field aufblasen für where
   PKMappingIndexes := GetPKMappingIndexes(AMappingTable.Fields);
-  if Length(PKMappingIndexes) > 0 then begin
-    pk_mapping_index := PKMappingIndexes[0];
-  end else begin
-    pk_mapping_index := -1;
-  end;
   pk_field := AMappingTable.Fields[PKMappingIndexes[0]].FieldName;
   SQL := Format('UPDATE %S SET %S WHERE [%S] = :' + pk_field, [AMappingTable.TableName, sql_fields_names, pk_field]);
   for I := 1 to Length(PKMappingIndexes) - 1 do begin

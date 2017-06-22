@@ -247,6 +247,8 @@ type
       : boolean; overload;
     { Load 0 or 1 object by Criteria. The Session will create and returned object of type <T> }
     function Load<T: class>(ACriteria: ICriteria): T; overload;
+    { Load 0 or 1 object by SQL-Whereclause. The Session will create and returned object of type <T> }
+    function LoadSQL<T: class>(const _WhereClause : string; _WithNoLock : boolean = false): T;
     { Load all the objects that satisfy the Criteria. The Session will fill the list (ducktype) passed on 2nd parameter with objects of type <T> }
     procedure LoadList<T: class>(Criteria: ICriteria;
       AObject: TObject); overload;
@@ -316,7 +318,7 @@ implementation
 
 uses
   dorm.Adapters,
-  dorm.Utils;
+  dorm.Utils, System.StrUtils;
 { TSession }
 
 procedure TSession.AddAsLoadedObject(AObject: TObject;
@@ -2342,6 +2344,21 @@ begin
     ACollection.Free;
   end;
   GetLogger.ExitLevel('Load(SQL)');
+end;
+
+function TSession.LoadSQL<T>(const _WhereClause : string; _WithNoLock : boolean = false): T;
+var
+  Table: TMappingTable;
+  rt: TRttiType;
+  CustomCrit: ICustomCriteria;
+  ItemTypeInfo: PTypeInfo;
+begin
+  ItemTypeInfo := T.ClassInfo;
+  rt := FCTX.GetType(ItemTypeInfo);
+  Table := FMappingStrategy.GetMapping(rt);
+  CustomCrit := TSQLCustomCriteria.Create('select top 1 * from ' + Table.TableName +
+    IfThen(_WithNoLock, ' with(nolock)','') + ' where ' + _WhereClause); //TODO: Nolock nur für MSSQL!
+  Result := Load<T>(CustomCrit);
 end;
 
 end.

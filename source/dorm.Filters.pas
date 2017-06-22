@@ -131,10 +131,6 @@ function NewCriteria(const Attribute: string; CompareOperator: TdormCompareOpera
 
 implementation
 
-uses
-  dorm.Commons,
-  dorm.Utils;
-
 function NewCriteria(Criteria: ICriteria): ICriteria;
 begin
   Result := TdormCriteria.NewCriteria(Criteria);
