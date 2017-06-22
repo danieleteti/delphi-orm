@@ -109,7 +109,13 @@ type
     property LazyLoad: boolean read FLazyLoad;
   end;
 
-  Id = class(TCustomAttribute);
+  Id = class(TCustomAttribute)
+  private
+    FIsFK : boolean;
+  public
+    constructor Create(_isFK : boolean = false);
+    property IsFK : boolean read FIsFK;
+  end;
   Transient = class(TCustomAttribute);
 
   // Mapping classes
@@ -135,7 +141,9 @@ type
     FSize: Cardinal;
     FRTTICache: TMappingCache;
     FNullable: boolean;
+    FIsFK: boolean;
     procedure SetNullable(const Value: boolean);
+    procedure SetIsFK(const Value: boolean);
 
   public
     constructor Create;
@@ -149,6 +157,7 @@ type
     property Precision: Cardinal read FPrecision write FPrecision;
     property IndexType: TdormIndexType read FIndexType write FIndexType;
     property IsPK: boolean read FPK write FPK;
+    property IsFK: boolean read FIsFK write SetIsFK;
     property RTTICache: TMappingCache read FRTTICache write FRTTICache;
     property Nullable: boolean read FNullable write SetNullable;
   end;
@@ -420,6 +429,7 @@ begin
   FFieldName := Source.FieldName;
   FSize := Source.Size;
   FRTTICache := Source.RTTICache;
+  FIsFK := Source.IsFK;
 end;
 
 constructor TMappingField.Create;
@@ -435,6 +445,12 @@ begin
   FNullable := False;
   FRTTICache.RTTIField := nil;
   FRTTICache.RTTIProp := nil;
+  FIsFK := False;
+end;
+
+procedure TMappingField.SetIsFK(const Value: boolean);
+begin
+  FIsFK := Value;
 end;
 
 procedure TMappingField.SetNullable(const Value: boolean);
@@ -474,6 +490,14 @@ constructor ListOf.Create(const ADefaultValue: string);
 begin
   inherited Create;
   FValue := ADefaultValue;
+end;
+
+{ Id }
+
+constructor Id.Create(_isFK: boolean);
+begin
+  inherited Create;
+  FisFK := _isFK;
 end;
 
 end.

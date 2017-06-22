@@ -10,7 +10,7 @@ uses
 type
 
   TdormCompareOperator = (coEqual, coGreaterThan, coLowerThan, coGreaterOrEqual,
-    coLowerOrEqual, coNotEqual, coLike, coIsNull, coIsNotNull);
+    coLowerOrEqual, coNotEqual, coLike, coIsNull, coIsNotNull, coIN);
   TdormLogicRelation = (lrAnd, lrOr);
 
   ICriteriaItem = interface;
@@ -130,10 +130,6 @@ function NewCriteria(const Attribute: string; CompareOperator: TdormCompareOpera
   : ICriteria; overload;
 
 implementation
-
-uses
-  dorm.Commons,
-  dorm.Utils;
 
 function NewCriteria(Criteria: ICriteria): ICriteria;
 begin

@@ -214,9 +214,12 @@ begin
       SQL := SQL + ' IS NULL';
     coIsNotNull:
       SQL := SQL + ' IS NOT NULL';
+    coIN:
+      SQL := SQL + ' IN (';
+
   end;
 
-  if Not(ACriteriaItem.GetCompareOperator in [coIsNull, coIsNotNull]) then
+  if Not(ACriteriaItem.GetCompareOperator in [coIsNull, coIsNotNull, coIN]) then
   begin
     if fm.FieldType = 'string' then
       SQL := SQL + '''' + EscapeString(ACriteriaItem.GetValue.AsString) + ''''
@@ -226,6 +229,8 @@ begin
       SQL := SQL + inttostr(ACriteriaItem.GetValue.AsInteger)
     else if fm.FieldType = 'boolean' then
       SQL := SQL + GetBooleanValueAsString(ACriteriaItem.GetValue.AsBoolean)
+    else if fm.FieldType = 'float' then
+      SQL := SQL + FloatToStr(ACriteriaItem.GetValue.AsExtended)
     else if fm.FieldType = 'date' then
     begin
       d := ACriteriaItem.GetValue.AsExtended;
@@ -239,7 +244,11 @@ begin
     else
       raise EdormException.CreateFmt('Unknown type %s in criteria',
         [fm.FieldType]);
+  end else if ACriteriaItem.GetCompareOperator = coIN then begin
+    SQL := SQL + EscapeString(ACriteriaItem.GetValue.AsString);
+    SQL := SQL + ')';
   end;
+
   Result := SQL;
 end;
 

@@ -60,8 +60,6 @@ type
 
   TSession = class(TdormInterfacedObject, IdormSession)
   private
-    FMappingStrategy: ICacheMappingStrategy;
-    FCTX: TRttiContext;
     FConfig: ISuperObject;
     FIdType: TdormKeyType;
     FIdNullValue: TValue;
@@ -95,6 +93,8 @@ type
       var AChildType: TRttiType);
 
   protected
+    FCTX: TRttiContext;
+    FMappingStrategy: ICacheMappingStrategy;
     // events
     procedure DoSessionOnBeforePersistObject(AObject: TObject);
     procedure DoSessionOnAfterPersistObject(AObject: TObject);
@@ -136,7 +136,7 @@ type
       var AObject: TObject);
     procedure LoadBelongsToRelationByPropertyName(AIdValue: TValue;
       ARttiType: TRttiType; AClassName, APropertyName: string;
-      var AObject: TObject);
+      var AObject: TObject); virtual;
     function Load(ATypeInfo: PTypeInfo; const Value: TValue): TObject; overload;
     // Internal use
     procedure SetLazyLoadFor(ATypeInfo: PTypeInfo; const APropertyName: string;
@@ -247,6 +247,8 @@ type
       : boolean; overload;
     { Load 0 or 1 object by Criteria. The Session will create and returned object of type <T> }
     function Load<T: class>(ACriteria: ICriteria): T; overload;
+    { Load 0 or 1 object by SQL-Whereclause. The Session will create and returned object of type <T> }
+    function LoadSQL<T: class>(const _WhereClause : string; _WithNoLock : boolean = false): T;
     { Load all the objects that satisfy the Criteria. The Session will fill the list (ducktype) passed on 2nd parameter with objects of type <T> }
     procedure LoadList<T: class>(Criteria: ICriteria;
       AObject: TObject); overload;
@@ -316,7 +318,7 @@ implementation
 
 uses
   dorm.Adapters,
-  dorm.Utils;
+  dorm.Utils, System.StrUtils;
 { TSession }
 
 procedure TSession.AddAsLoadedObject(AObject: TObject;
@@ -354,8 +356,11 @@ var
   rt: TRttiType;
 begin
   rt := FCTX.GetType(AObject.ClassType);
-  with FMappingStrategy.GetMapping(rt) do
-    TdormUtils.SetField(AObject, Id.Name, FIdNullValue);
+  with FMappingStrategy.GetMapping(rt) do begin
+    if not Id.IsFK then begin
+      TdormUtils.SetField(AObject, Id.Name, FIdNullValue);
+    end;
+  end;
   SetObjectStatus(AObject, osDirty, false);
 end;
 
@@ -751,14 +756,18 @@ end;
 function TSession.GetLoadedObjectHashCode(AObject: TObject;
   AMappingField: TMappingField): string;
 begin
-  Result := AObject.ClassName + '_' +
-    inttostr(GetIdValue(AMappingField, AObject).AsInt64);
+  Result := GetLoadedObjectHashCode(AObject.ClassType.ClassInfo, GetIdValue(AMappingField, AObject));
 end;
 
 function TSession.GetLoadedObjectHashCode(ATypeInfo: PTypeInfo;
   AValue: TValue): string;
 begin
-  Result := string(ATypeInfo.Name) + '_' + inttostr(AValue.AsInt64);
+  Result := string(ATypeInfo.Name) + '_';
+  if AValue.IsOrdinal then begin
+     Result := Result + inttostr(AValue.AsInt64);
+  end else begin
+     Result := Result + AValue.AsString;
+  end;
 end;
 
 function TSession.GetLogger: IdormLogger;
@@ -871,8 +880,12 @@ end;
 function TSession.GetIdValue(AIdMappingField: TMappingField;
   AObject: TObject): TValue;
 begin
-  Assert(AIdMappingField <> nil);
-  Result := TdormUtils.GetField(AObject, AIdMappingField.Name);
+  //Assert(AIdMappingField <> nil);
+  if assigned(AIdMappingField) then begin
+    Result := TdormUtils.GetField(AObject, AIdMappingField.Name);
+  end else begin
+    Result := TValue.Empty;
+  end;
 end;
 
 function TSession.GetEntitiesNames: TList<string>;
@@ -1024,6 +1037,7 @@ begin
     if List.Count > 1 then
       raise EdormException.Create('Singleton query returned more than 1 row');
     Result := List.Count = 1;
+
     if Result then
       AObject := List.Extract(List.First)
   finally
@@ -1363,21 +1377,16 @@ begin
   end
   else
   begin
-    case FIdType of
-      ktInteger:
-        begin
-          if _idValue.AsInteger = FIdNullValue.AsInteger then
-            Insert(AObject)
-          else
-            Update(AObject);
-        end;
-      ktString:
-        begin
-          if _idValue.AsString = FIdNullValue.AsString then
-            Insert(AObject)
-          else
-            Update(AObject);
-        end;
+    if _idValue.IsOrdinal then begin
+      if _idValue.AsInteger = FIdNullValue.AsInteger then
+        Insert(AObject)
+      else
+        Update(AObject);
+    end else begin
+      if _idValue.AsString = FIdNullValue.AsString then
+        Insert(AObject)
+      else
+        Update(AObject);
     end;
   end;
   DoSessionOnAfterPersistObject(AObject);
@@ -1857,7 +1866,10 @@ begin
   GetLogger.Debug('Saving _has_one for ' + ARttiType.ToString);
   for _has_one in AMappingTable.HasOneList do
   begin
-    v := TdormUtils.GetField(AObject, _has_one.RTTICache);
+    { TODO -oDaniele -cBUG : RTTICache }
+    // DANIELE: There is a bug in this RTTICache... Investigate please
+    // v := TdormUtils.GetField(AObject, _has_one.RTTICache);
+    v := TdormUtils.GetField(AObject, _has_one.Name);
     GetLogger.Debug('-- Inspecting for ' + _has_one.ChildClassName);
     _child_type := FCTX.FindType(_has_one.ChildClassName);
     if not assigned(_child_type) then
@@ -2004,7 +2016,7 @@ begin
       AValidaetable.UpdateValidate;
       AValidaetable.OnBeforeUpdate;
       _class_name := _Type.ToString;
-      if not IsNullKey(_table, _idValue) then
+      if _table.Id.IsFK or not IsNullKey(_table, _idValue) then
       begin
         FLogger.Info('Updating ' + AObject.ClassName);
         if not AOnlyChild then
@@ -2066,7 +2078,17 @@ end;
 function TSession.IsNullKey(ATableMap: TMappingTable;
   const AValue: TValue): boolean;
 begin
-  Result := TdormUtils.EqualValues(AValue, FIdNullValue);
+  if not assigned(ATableMap.Id) then begin
+    Result := True;
+  end else if ATableMap.Id.IsFK then begin
+    Result := True;
+  end else begin
+    if ATableMap.Id.FieldType = 'string' then begin
+      Result := TdormUtils.EqualValues(AValue, '');
+    end else begin
+      Result := TdormUtils.EqualValues(AValue, FIdNullValue);
+    end;
+  end;
 end;
 
 function TSession.IsObjectStatusAvailable(AObject: TObject): boolean;
@@ -2322,6 +2344,21 @@ begin
     ACollection.Free;
   end;
   GetLogger.ExitLevel('Load(SQL)');
+end;
+
+function TSession.LoadSQL<T>(const _WhereClause : string; _WithNoLock : boolean = false): T;
+var
+  Table: TMappingTable;
+  rt: TRttiType;
+  CustomCrit: ICustomCriteria;
+  ItemTypeInfo: PTypeInfo;
+begin
+  ItemTypeInfo := T.ClassInfo;
+  rt := FCTX.GetType(ItemTypeInfo);
+  Table := FMappingStrategy.GetMapping(rt);
+  CustomCrit := TSQLCustomCriteria.Create('select top 1 * from ' + Table.TableName +
+    IfThen(_WithNoLock, ' with(nolock)','') + ' where ' + _WhereClause); //TODO: Nolock nur für MSSQL!
+  Result := Load<T>(CustomCrit);
 end;
 
 end.

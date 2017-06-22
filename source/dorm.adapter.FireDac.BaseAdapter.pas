@@ -88,7 +88,7 @@ type
 implementation
 
 uses
-  dorm.Utils;
+  dorm.Utils, System.Types;
 
 procedure TFireDACBaseAdapter.InitFormatSettings;
 begin
@@ -116,15 +116,22 @@ var
   pk_field: string;
   isTransient: boolean;
   isNullable: boolean;
+  PKMappingIndexes: TIntegerDynArray;
 begin
   sql_fields_names := GetSqlFieldsForUpdate(AMappingTable, AObject);
-  pk_field := AMappingTable.Fields[GetPKMappingIndex(AMappingTable.Fields)].FieldName;
+  // pk_field aufblasen für where
+  PKMappingIndexes := GetPKMappingIndexes(AMappingTable.Fields);
+  pk_field := AMappingTable.Fields[PKMappingIndexes[0]].FieldName;
   SQL := Format('UPDATE %S SET %S WHERE [%S] = :' + pk_field, [AMappingTable.TableName, sql_fields_names, pk_field]);
+  for I := 1 to Length(PKMappingIndexes) - 1 do begin
+    pk_field := AMappingTable.Fields[PKMappingIndexes[I]].FieldName;
+    SQL := SQL + Format(' AND [%S] = ''' +  ARttiType.GetProperty(AMappingTable.Fields[I].name).GetValue(AObject).ToString + '''', [pk_field]);
+  end;
   if ACurrentVersion >= 0 then
   begin
     SQL := SQL + ' AND OBJVERSION = ' + IntToStr(ACurrentVersion);
   end;
-  GetLogger.Debug(AMappingTable.Fields[GetPKMappingIndex(AMappingTable.Fields)].FieldName);
+  GetLogger.Debug(AMappingTable.Fields[PKMappingIndexes[0]].FieldName);
   GetLogger.Debug('NEW QUERY: ' + SQL);
   Query := FD.NewQuery;
   Query.SQL.Text := SQL;
@@ -214,8 +221,13 @@ begin
   Qry := FD.NewQuery;
   try
     Qry.SQL.Text := SQL;
-    Qry.Params[0].DataType := ftLargeint;
-    Qry.Params[0].AsLargeInt := pk_value.AsInt64;
+    if pk_value.IsOrdinal then begin
+      Qry.Params[0].DataType := ftLargeint;
+      Qry.Params[0].AsLargeInt := pk_value.AsInt64;
+    end else begin
+      Qry.Params[0].DataType := ftString;
+      Qry.Params[0].AsString := pk_value.AsString;
+    end;
     GetLogger.Debug('EXECUTING QUERY: ' + SQL);
     Qry.ExecSQL;
     Result := Qry.RowsAffected;
@@ -319,7 +331,7 @@ begin
     // manage nullable fields
     isNullable := TdormUtils.HasAttribute<Nullable>(field.RTTICache.RTTIProp);
 
-    if (not field.IsPK) and (not isTransient) then
+    if (not field.IsPK or field.IsFK) and (not isTransient) then
     begin
       v := TdormUtils.GetField(AObject, field.RTTICache);
       // Compose Fields Names and Values
@@ -345,7 +357,7 @@ begin
       // manage nullable fields
       isNullable := TdormUtils.HasAttribute<Nullable>(field.RTTICache.RTTIProp);
 
-      if (not field.IsPK) and (not isTransient) then
+      if (not field.IsPK or field.IsFK) and (not isTransient) then
       begin
         v := TdormUtils.GetField(AObject, field.RTTICache);
         SetFireDACParameterValue(field.FieldType, Query, I, v, isNullable);
@@ -359,7 +371,9 @@ begin
   end;
   pk_idx := GetPKMappingIndex(AMappingTable.Fields);
   pk_value := GetLastInsertOID;
-  TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].RTTICache, pk_value);
+  if pk_idx <> -1 then begin
+    TdormUtils.SetField(AObject, AMappingTable.Fields[pk_idx].RTTICache, pk_value);
+  end;
   Result := pk_value;
 end;
 
@@ -377,6 +391,7 @@ function TFireDACBaseAdapter.GetLastInsertOID: TValue;
 var
   Qry: TFDQuery;
   SQL: String;
+  field : TField;
 begin
   SQL := 'SELECT @@IDENTITY AS LAST_IDENTITY';
   GetLogger.Debug('PREPARING: ' + SQL);
@@ -387,9 +402,10 @@ begin
     Qry.Open;
     if not Qry.Eof then
     begin
-      if (not Qry.FieldByName('LAST_IDENTITY').IsNull) then
+      field := Qry.FieldByName('LAST_IDENTITY');
+      if (not field.IsNull) then
       begin
-        Result := Qry.FieldByName('LAST_IDENTITY').AsLargeInt;
+        Result := field.AsLargeInt;
       end
       else
         Result := TValue.Empty;
@@ -499,8 +515,13 @@ begin
   GetLogger.Debug('PREPARING: ' + SQL);
   Result := FD.NewQuery;
   Result.SQL.Text := SQL;
-  Result.Params[0].DataType := ftLargeint;
-  Result.Params[0].AsLargeInt := Value.AsInt64;
+  if Value.IsOrdinal then begin
+    Result.Params[0].DataType := ftLargeint;
+    Result.Params[0].AsLargeInt := Value.AsInt64;
+  end else begin
+    Result.Params[0].DataType := ftString;
+    Result.Params[0].AsString := Value.AsString;
+  end;
 end;
 
 function TFireDACBaseAdapter.Load(ARttiType: TRttiType; AMappingTable: TMappingTable;
@@ -609,7 +630,7 @@ begin
         end
         else
         begin
-          v := AReader.FieldByName(field.FieldName).AsInteger = 0;
+          v := AReader.FieldByName(field.FieldName).AsInteger <> 0;
         end;
         S := field.FieldName + ' as boolean';
       end
@@ -714,7 +735,7 @@ begin
         end
         else
         begin
-          v := AReader.FieldByName(field.FieldName).AsInteger = 0;
+          v := AReader.FieldByName(field.FieldName).AsInteger <> 0;
         end;
         S := field.FieldName + ' as boolean';
       end
@@ -767,8 +788,13 @@ var
 begin
   if CompareText(AFieldType, 'string') = 0 then
   begin
-    AStatement.Params[ParameterIndex].DataType := ftString;
-    AStatement.Params[ParameterIndex].AsString := AValue.AsString;
+    if length(AValue.AsString) > 8000 then begin
+      AStatement.Params[ParameterIndex].DataType := ftWideMemo;
+      AStatement.Params[ParameterIndex].AsWideMemo := AValue.AsString;
+    end else begin
+      AStatement.Params[ParameterIndex].DataType := ftString;
+      AStatement.Params[ParameterIndex].AsString := AValue.AsString;
+    end;
     GetLogger.Debug('Par' + IntToStr(ParameterIndex) + ' = ' + AValue.AsString);
   end
   else if CompareText(AFieldType, 'decimal') = 0 then
