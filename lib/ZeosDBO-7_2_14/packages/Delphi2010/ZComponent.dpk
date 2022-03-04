@@ -1,0 +1,60 @@
+package ZComponent;
+{$R *.res}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO ON}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION ON}
+{$OVERFLOWCHECKS ON}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DESCRIPTION 'Zeos Database Components'}
+{$LIBSUFFIX '140'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  rtl,
+  dbrtl,
+  ZPlain,
+  ZDbc,
+  ZCore,
+  ZParseSql,
+  vclactnband,
+  vcl;
+
+contains
+  ZAbstractConnection in '..\..\src\component\ZAbstractConnection.pas',
+  ZAbstractDataset in '..\..\src\component\ZAbstractDataset.pas',
+  ZAbstractRODataset in '..\..\src\component\ZAbstractRODataset.pas',
+  ZAbstractTable in '..\..\src\component\ZAbstractTable.pas',
+  ZConnection in '..\..\src\component\ZConnection.pas',
+  ZConnectionGroup in '..\..\src\component\ZConnectionGroup.pas',
+  ZDataset in '..\..\src\component\ZDataset.pas',
+  ZDatasetUtils in '..\..\src\component\ZDatasetUtils.pas',
+  ZGroupedConnection in '..\..\src\component\ZGroupedConnection.pas',
+  ZIBEventAlerter in '..\..\src\component\ZIBEventAlerter.pas',
+  ZPgEventAlerter in '..\..\src\component\ZPgEventAlerter.pas',
+  ZSequence in '..\..\src\component\ZSequence.pas',
+  ZSqlMetadata in '..\..\src\component\ZSqlMetadata.pas',
+  ZSqlMonitor in '..\..\src\component\ZSqlMonitor.pas',
+  ZSqlProcessor in '..\..\src\component\ZSqlProcessor.pas',
+  ZSqlStrings in '..\..\src\component\ZSqlStrings.pas',
+  ZSqlUpdate in '..\..\src\component\ZSqlUpdate.pas',
+  ZStoredProcedure in '..\..\src\component\ZStoredProcedure.pas',
+  ZStreamBlob in '..\..\src\component\ZStreamBlob.pas';
+
+end.

@@ -23,6 +23,10 @@ uses
     ,
   dorm.adapter.UIB.firebird
 {$ENDIF}
+{$IFDEF LINK_FIREBIRDZEOSDBO_ADAPTER}
+    ,
+  dorm.adapter.ZeosDBO.firebird
+{$ENDIF}
 {$IFDEF LINK_INTERBASEUIB_ADAPTER}
     ,
   dorm.adapter.UIB.interbase

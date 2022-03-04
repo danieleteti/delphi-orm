@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions name="zproxy" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="zproxy" xmlns:wst="urn:wst_base" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" targetNamespace="zproxy">
+  <types>
+    <xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="zproxy" targetNamespace="zproxy"/>
+  </types>
+  <message name="Connect">
+    <part name="UserName" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Password" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="DbName" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="InProperties" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="ConnectResponse">
+    <part name="OutProperties" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="DbInfo" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="Disconnect">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="DisconnectResponse"/>
+  <message name="SetAutoCommit">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Value" type="xsd:boolean"/>
+  </message>
+  <message name="SetAutoCommitResponse"/>
+  <message name="Commit">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="CommitResponse"/>
+  <message name="Rollback">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="RollbackResponse"/>
+  <message name="SetProperties">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Properties" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="SetPropertiesResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="ExecuteStatement">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="SQL" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Parameters" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="MaxRows" type="xsd:unsignedInt"/>
+  </message>
+  <message name="ExecuteStatementResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetTables">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="SchemaPattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="TableNamePattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Types" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetTablesResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetSchemas">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetSchemasResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetCatalogs">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetCatalogsResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetTableTypes">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetTableTypesResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetColumns">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="SchemaPattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="TableNamePattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="ColumnNamePattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetColumnsResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetTablePrivileges">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="SchemaPattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="TableNamePattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetTablePrivilegesResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetColumnPrivileges">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Schema" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Table" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="ColumnNamePattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetColumnPrivilegesResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetPrimaryKeys">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Schema" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Table" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetPrimaryKeysResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetImportedKeys">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Schema" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Table" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetImportedKeysResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetExportedKeys">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Schema" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Table" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetExportedKeysResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetCrossReference">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="PrimaryCatalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="PrimarySchema" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="PrimaryTable" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="ForeignCatalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="ForeignSchema" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="ForeignTable" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetCrossReferenceResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetIndexInfo">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Schema" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Table" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Unique" type="xsd:boolean"/>
+    <part name="Approximate" type="xsd:boolean"/>
+  </message>
+  <message name="GetIndexInfoResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetSequences">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="SchemaPattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="SequenceNamePattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetSequencesResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetTriggers">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="SchemaPattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="TableNamePattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="TriggerNamePattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetTriggersResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetProcedures">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="SchemaPattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="ProcedureNamePattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetProceduresResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetProcedureColumns">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="Catalog" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="SchemaPattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="ProcedureNamePattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+    <part name="ColumnNamePattern" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetProcedureColumnsResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetCharacterSets">
+    <part name="ConnectionID" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <message name="GetCharacterSetsResponse">
+    <part name="result" type="xsd:string" wst:TypeHint="UnicodeString"/>
+  </message>
+  <portType name="IZeosProxy">
+    <documentation>
+      <GUID value="{DD0144C6-0CD5-483C-A8D9-28A00BAD1C75}"/>
+    </documentation>
+    <operation name="Connect">
+      <input message="tns:Connect"/>
+      <output message="tns:ConnectResponse"/>
+    </operation>
+    <operation name="Disconnect">
+      <input message="tns:Disconnect"/>
+      <output message="tns:DisconnectResponse"/>
+    </operation>
+    <operation name="SetAutoCommit">
+      <input message="tns:SetAutoCommit"/>
+      <output message="tns:SetAutoCommitResponse"/>
+    </operation>
+    <operation name="Commit">
+      <input message="tns:Commit"/>
+      <output message="tns:CommitResponse"/>
+    </operation>
+    <operation name="Rollback">
+      <input message="tns:Rollback"/>
+      <output message="tns:RollbackResponse"/>
+    </operation>
+    <operation name="SetProperties">
+      <input message="tns:SetProperties"/>
+      <output message="tns:SetPropertiesResponse"/>
+    </operation>
+    <operation name="ExecuteStatement">
+      <input message="tns:ExecuteStatement"/>
+      <output message="tns:ExecuteStatementResponse"/>
+    </operation>
+    <operation name="GetTables">
+      <input message="tns:GetTables"/>
+      <output message="tns:GetTablesResponse"/>
+    </operation>
+    <operation name="GetSchemas">
+      <input message="tns:GetSchemas"/>
+      <output message="tns:GetSchemasResponse"/>
+    </operation>
+    <operation name="GetCatalogs">
+      <input message="tns:GetCatalogs"/>
+      <output message="tns:GetCatalogsResponse"/>
+    </operation>
+    <operation name="GetTableTypes">
+      <input message="tns:GetTableTypes"/>
+      <output message="tns:GetTableTypesResponse"/>
+    </operation>
+    <operation name="GetColumns">
+      <input message="tns:GetColumns"/>
+      <output message="tns:GetColumnsResponse"/>
+    </operation>
+    <operation name="GetTablePrivileges">
+      <input message="tns:GetTablePrivileges"/>
+      <output message="tns:GetTablePrivilegesResponse"/>
+    </operation>
+    <operation name="GetColumnPrivileges">
+      <input message="tns:GetColumnPrivileges"/>
+      <output message="tns:GetColumnPrivilegesResponse"/>
+    </operation>
+    <operation name="GetPrimaryKeys">
+      <input message="tns:GetPrimaryKeys"/>
+      <output message="tns:GetPrimaryKeysResponse"/>
+    </operation>
+    <operation name="GetImportedKeys">
+      <input message="tns:GetImportedKeys"/>
+      <output message="tns:GetImportedKeysResponse"/>
+    </operation>
+    <operation name="GetExportedKeys">
+      <input message="tns:GetExportedKeys"/>
+      <output message="tns:GetExportedKeysResponse"/>
+    </operation>
+    <operation name="GetCrossReference">
+      <input message="tns:GetCrossReference"/>
+      <output message="tns:GetCrossReferenceResponse"/>
+    </operation>
+    <operation name="GetIndexInfo">
+      <input message="tns:GetIndexInfo"/>
+      <output message="tns:GetIndexInfoResponse"/>
+    </operation>
+    <operation name="GetSequences">
+      <input message="tns:GetSequences"/>
+      <output message="tns:GetSequencesResponse"/>
+    </operation>
+    <operation name="GetTriggers">
+      <input message="tns:GetTriggers"/>
+      <output message="tns:GetTriggersResponse"/>
+    </operation>
+    <operation name="GetProcedures">
+      <input message="tns:GetProcedures"/>
+      <output message="tns:GetProceduresResponse"/>
+    </operation>
+    <operation name="GetProcedureColumns">
+      <input message="tns:GetProcedureColumns"/>
+      <output message="tns:GetProcedureColumnsResponse"/>
+    </operation>
+    <operation name="GetCharacterSets">
+      <input message="tns:GetCharacterSets"/>
+      <output message="tns:GetCharacterSetsResponse"/>
+    </operation>
+  </portType>
+  <binding name="IZeosProxyBinding" type="tns:IZeosProxy">
+    <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="Connect">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="Disconnect">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="SetAutoCommit">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="Commit">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="Rollback">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="SetProperties">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="ExecuteStatement">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetTables">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetSchemas">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetCatalogs">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetTableTypes">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetColumns">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetTablePrivileges">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetColumnPrivileges">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetPrimaryKeys">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetImportedKeys">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetExportedKeys">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetCrossReference">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetIndexInfo">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetSequences">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetTriggers">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetProcedures">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetProcedureColumns">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+    <operation name="GetCharacterSets">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal" namespace="zproxy"/>
+      </input>
+      <output>
+        <soap:body use="literal" namespace="zproxy"/>
+      </output>
+    </operation>
+  </binding>
+  <service name="IZeosProxy">
+    <port name="IZeosProxyPort" binding="tns:IZeosProxyBinding">
+      <soap:address location="https://www.iks.ag/services/ZeosProxyBinding"/>
+    </port>
+  </service>
+</definitions>
