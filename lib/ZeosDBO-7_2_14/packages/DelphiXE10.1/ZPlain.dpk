@@ -1,0 +1,60 @@
+package ZPlain;
+{$R *.res}
+{$IFDEF IMPLICITBUILDING This IFDEF should not be used by users}
+{$ALIGN 8}
+{$ASSERTIONS ON}
+{$BOOLEVAL OFF}
+{$DEBUGINFO OFF}
+{$EXTENDEDSYNTAX ON}
+{$IMPORTEDDATA ON}
+{$IOCHECKS ON}
+{$LOCALSYMBOLS ON}
+{$LONGSTRINGS ON}
+{$OPENSTRINGS ON}
+{$OPTIMIZATION OFF}
+{$OVERFLOWCHECKS OFF}
+{$RANGECHECKS OFF}
+{$REFERENCEINFO ON}
+{$SAFEDIVIDE OFF}
+{$STACKFRAMES ON}
+{$TYPEDADDRESS OFF}
+{$VARSTRINGCHECKS ON}
+{$WRITEABLECONST OFF}
+{$MINENUMSIZE 1}
+{$IMAGEBASE $400000}
+{$DEFINE DEBUG}
+{$ENDIF IMPLICITBUILDING}
+{$DESCRIPTION 'Zeos Plain Database API'}
+{$LIBSUFFIX '240'}
+{$RUNONLY}
+{$IMPLICITBUILD OFF}
+
+requires
+  ZCore,
+  rtl,
+  vcl;
+
+contains
+  ZOleDB in '..\..\src\plain\ZOleDB.pas',
+  ZPlainAdo in '..\..\src\plain\ZPlainAdo.pas',
+  ZPlainAdoDriver in '..\..\src\plain\ZPlainAdoDriver.pas',
+  ZPlainASAConstants in '..\..\src\plain\ZPlainASAConstants.pas',
+  ZPlainASADriver in '..\..\src\plain\ZPlainASADriver.pas',
+  ZPlainDbLibConstants in '..\..\src\plain\ZPlainDbLibConstants.pas',
+  ZPlainDbLibDriver in '..\..\src\plain\ZPlainDbLibDriver.pas',
+  ZPlainDriver in '..\..\src\plain\ZPlainDriver.pas',
+  ZPlainFirebirdDriver in '..\..\src\plain\ZPlainFirebirdDriver.pas',
+  ZPlainFirebirdInterbaseConstants in '..\..\src\plain\ZPlainFirebirdInterbaseConstants.pas',
+  ZPlainLoader in '..\..\src\plain\ZPlainLoader.pas',
+  ZPlainMySqlConstants in '..\..\src\plain\ZPlainMySqlConstants.pas',
+  ZPlainMySqlDriver in '..\..\src\plain\ZPlainMySqlDriver.pas',
+  ZPlainOracleConstants in '..\..\src\plain\ZPlainOracleConstants.pas',
+  ZPlainOracleDriver in '..\..\src\plain\ZPlainOracleDriver.pas',
+  ZPlainPostgreSqlDriver in '..\..\src\plain\ZPlainPostgreSqlDriver.pas',
+  ZPlainSqLiteDriver in '..\..\src\plain\ZPlainSqLiteDriver.pas',
+  ZPlainProxyDriver in '..\..\src\plain\ZPlainProxyDriver.pas',
+  ZPlainProxyDriverInternalProxy in '..\..\src\plain\ZPlainProxyDriverInternalProxy.pas',
+  ZPlainProxyDriverIntf in '..\..\src\plain\ZPlainProxyDriverIntf.pas';
+
+
+end.

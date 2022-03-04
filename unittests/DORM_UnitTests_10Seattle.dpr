@@ -5,7 +5,7 @@ program DORM_UnitTests_10Seattle;
 {$ENDIF}
 
 uses
-  {$IFNDEF FIREBIRD_CI}
+  {$IFDEF FIREBIRD_CI}
   FastMM4,
   {$ENDIF }
   Forms,
@@ -43,8 +43,7 @@ uses
   dorm.tests.objstatus.bo in 'dorm.tests.objstatus.bo.pas',
   TestDORMObjStatus in 'TestDORMObjStatus.pas',
   dorm.Query in '..\source\dorm.Query.pas',
-  TestDORMObjVersion in 'TestDORMObjVersion.pas',
-  dorm.loggers.CodeSite in '..\source\dorm.loggers.CodeSite.pas';
+  TestDORMObjVersion in 'TestDORMObjVersion.pas';
 
 {$R *.RES}
 

@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <Name Value="zplain"/>
+    <AddToProjectUsesSection Value="True"/>
+    <Author Value="The ZEOS Team - see https://sourceforge.net/projects/zeoslib/"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <SearchPaths>
+        <OtherUnitFiles Value="../../src/plain"/>
+        <UnitOutputDirectory Value="lib/zplain/$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Parsing>
+        <SyntaxOptions>
+          <SyntaxMode Value="Delphi"/>
+          <UseAnsiStrings Value="False"/>
+        </SyntaxOptions>
+      </Parsing>
+    </CompilerOptions>
+    <Description Value="This package contains the Zeos Plain Database APIs.
+
+-----------
+
+Zeos is a set of database components for MySQL, PostgreSQL, Interbase, Firebird, MS SQL, Sybase, Oracle and SQLite for Delphi, FreePascal/Lazarus, Kylix and C++ Builder.
+
+Features:
+Support object for Sequences (Generators)
+Support for Firebird, Interbase and PostgreSQL database events
+Support object for retrieving database objects meta data
+Support object for executing database scripts
+
+-----------
+Installing in Lazarus: Read the README.TXT in packages\lazarus
+
+Project Page: https://sourceforge.net/projects/zeoslib/
+Forum: look in ZeosLib 7.2 Forum on http://zeoslib.sourceforge.net/
+You found a (possible) bug? Use the bugtracker dude! http://sourceforge.net/p/zeoslib/tickets/"/>
+    <License Value="The source code of the ZEOS Libraries and packages are distributed under the Library GNU General Public License Version 2.1  (see the file COPYING) with the following modification:
+
+As a special exception, the copyright holders of this library give you permission to link this library with independent modules to produce an executable, regardless of the license terms of these independent modules, and to copy and distribute the resulting executable under terms of your choice, provided that you also meet, for each linked independent module, the terms and conditions of the license of that module. An independent module is a module which is not derived from or based on this library. If you modify this library, you may extend this exception to your version of the library, but you are not obligated to do so. If you do not wish to do so, delete this exception statement from your version."/>
+    <Version Major="7" Minor="2" Release="14"/>
+    <Files Count="21">
+      <Item5>
+        <Filename Value="../../src/plain/ZOleDB.pas"/>
+        <UnitName Value="ZOleDB"/>
+      </Item5>
+      <Item6>
+        <Filename Value="../../src/plain/ZPlainAdo.pas"/>
+        <UnitName Value="ZPlainAdo"/>
+      </Item6>
+      <Item7>
+        <Filename Value="../../src/plain/ZPlainAdoDriver.pas"/>
+        <UnitName Value="ZPlainAdoDriver"/>
+      </Item7>
+      <Item8>
+        <Filename Value="../../src/plain/ZPlainASAConstants.pas"/>
+        <UnitName Value="ZPlainASAConstants"/>
+      </Item8>
+      <Item9>
+        <Filename Value="../../src/plain/ZPlainASADriver.pas"/>
+        <UnitName Value="ZPlainASADriver"/>
+      </Item9>
+      <Item10>
+        <Filename Value="../../src/plain/ZPlainDbLibConstants.pas"/>
+        <UnitName Value="ZPlainDbLibConstants"/>
+      </Item10>
+      <Item11>
+        <Filename Value="../../src/plain/ZPlainDbLibDriver.pas"/>
+        <UnitName Value="ZPlainDbLibDriver"/>
+      </Item11>
+      <Item12>
+        <Filename Value="../../src/plain/ZPlainDriver.pas"/>
+        <UnitName Value="ZPlainDriver"/>
+      </Item12>
+      <Item13>
+        <Filename Value="../../src/plain/ZPlainFirebirdDriver.pas"/>
+        <UnitName Value="ZPlainFirebirdDriver"/>
+      </Item13>
+      <Item14>
+        <Filename Value="../../src/plain/ZPlainFirebirdInterbaseConstants.pas"/>
+        <UnitName Value="ZPlainFirebirdInterbaseConstants"/>
+      </Item14>
+      <Item15>
+        <Filename Value="../../src/plain/ZPlainLoader.pas"/>
+        <UnitName Value="ZPlainLoader"/>
+      </Item15>
+      <Item16>
+        <Filename Value="../../src/plain/ZPlainMySqlConstants.pas"/>
+        <UnitName Value="ZPlainMySqlConstants"/>
+      </Item16>
+      <Item17>
+        <Filename Value="../../src/plain/ZPlainMySqlDriver.pas"/>
+        <UnitName Value="ZPlainMySqlDriver"/>
+      </Item17>
+      <Item18>
+        <Filename Value="../../src/plain/ZPlainOracleConstants.pas"/>
+        <UnitName Value="ZPlainOracleConstants"/>
+      </Item18>
+      <Item19>
+        <Filename Value="../../src/plain/ZPlainOracleDriver.pas"/>
+        <UnitName Value="ZPlainOracleDriver"/>
+      </Item19>
+      <Item20>
+        <Filename Value="../../src/plain/ZPlainPostgreSqlDriver.pas"/>
+        <UnitName Value="ZPlainPostgreSqlDriver"/>
+      </Item20>
+      <Item21>
+        <Filename Value="../../src/plain/ZPlainSqLiteDriver.pas"/>
+        <UnitName Value="ZPlainSqLiteDriver"/>
+      </Item21>
+    </Files>
+    <RequiredPkgs Count="1">
+      <Item1>
+        <PackageName Value="zcore"/>
+        <MinVersion Major="7" Minor="2" Valid="True"/>
+      </Item1>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IgnoreBinaries Value="False"/>
+    </PublishOptions>
+    <CustomOptions Items="ExternHelp" Version="2">
+      <_ExternHelp Items="Count"/>
+    </CustomOptions>
+  </Package>
+</CONFIG>

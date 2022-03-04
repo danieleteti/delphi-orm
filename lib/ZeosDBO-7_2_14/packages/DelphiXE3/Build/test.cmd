@@ -1,0 +1,3 @@
+@echo off
+echo Testing ZEOSDBO DelphiXE3...
+ZTestAll -b

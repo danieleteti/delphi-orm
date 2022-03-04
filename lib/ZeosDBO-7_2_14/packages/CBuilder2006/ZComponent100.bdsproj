@@ -1,0 +1,401 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">CPlusPlusBuilder.Personality</Option>
+			<Option Name="ProjectType">CppPackage</Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{392EEC95-4163-4986-B225-204262C48361}</Option>
+		</Option>
+	</PersonalityInfo>
+	<CPlusPlusBuilder.Personality>
+		<Source>
+			<Source Name="MainSource">ZComponent100.cpp</Source>
+		</Source>
+		<BCBPROJECT>
+      <project version="10.0">
+        <property category="build.config" name="active" value="0"/>
+        <property category="build.config" name="count" value="1"/>
+        <property category="build.config" name="excludedefaultforzero" value="0"/>
+        <property category="build.config.0" name="builddir" value="Debug"/>
+        <property category="build.config.0" name="key" value="Debug_Build"/>
+        <property category="build.config.0" name="name" value="Debug Build"/>
+        <property category="build.config.0" name="settings.win32b" value="default"/>
+        <property category="build.config.0" name="type" value="Toolset"/>
+        <property category="build.config.0" name="win32.win32b.builddir" value="bpl"/>
+        <property category="build.config.1" name="key" value="Release_Build"/>
+        <property category="build.config.1" name="name" value="Release Build"/>
+        <property category="build.config.1" name="settings.win32b" value="default"/>
+        <property category="build.config.1" name="type" value="Toolset"/>
+        <property category="build.config.1" name="win32.win32b.builddir" value="bpl"/>
+        <property category="build.node" name="name" value="ZComponent100.bpl"/>
+        <property category="build.node" name="packages" value="rtl;dbrtl;vcl;designide;xmlrtl;vclactnband;vclx;vcldb"/>
+        <property category="build.node" name="sparelibs" value="rtl.lib vcl.lib dbrtl.lib vcldb.lib"/>
+        <property category="build.node" name="use_packages" value="1"/>
+        <property category="build.platform" name="active" value="win32"/>
+        <property category="build.platform" name="win32.Debug_Build.toolset" value="win32b"/>
+        <property category="build.platform" name="win32.Release_Build.toolset" value="win32b"/>
+        <property category="build.platform" name="win32.default" value="win32b"/>
+        <property category="build.platform" name="win32.enabled" value="1"/>
+        <property category="build.platform" name="win32.win32b.enabled" value="1"/>
+        <property category="win32.*.win32b.dcc32" name="param.filenames.merge" value="1"/>
+        <property category="win32.*.win32b.tasm32" name="param.listfile.merge" value="1"/>
+        <property category="win32.*.win32b.tasm32" name="param.objfile.merge" value="1"/>
+        <property category="win32.*.win32b.tasm32" name="param.xreffile.merge" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.D.arg.1" value="_DEBUG"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.D.arg.merge" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.D.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.Od.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.k.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.r.enabled" value="0"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.v.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.vi.enabled" value="0"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.y.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="option.$D.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="option.$O.enabled" value="0"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="option.D.arg.1" value="DEBUG"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="option.D.arg.merge" value="1"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="option.D.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="param.filenames.merge" value="1"/>
+        <property category="win32.Debug_Build.win32b.ilink32" name="option.L.arg.1" value="$(BDS)\lib\debug"/>
+        <property category="win32.Debug_Build.win32b.ilink32" name="option.L.arg.merge" value="1"/>
+        <property category="win32.Debug_Build.win32b.ilink32" name="option.L.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.tasm32" name="option.z.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.tasm32" name="option.zd.enabled" value="0"/>
+        <property category="win32.Debug_Build.win32b.tasm32" name="option.zi.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.tasm32" name="param.listfile.merge" value="1"/>
+        <property category="win32.Debug_Build.win32b.tasm32" name="param.objfile.merge" value="1"/>
+        <property category="win32.Debug_Build.win32b.tasm32" name="param.xreffile.merge" value="1"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.D.arg.1" value="NDEBUG"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.D.arg.merge" value="1"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.D.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.O2.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.k.enabled" value="0"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.r.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.vi.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.dcc32" name="option.$D.enabled" value="0"/>
+        <property category="win32.Release_Build.win32b.dcc32" name="option.V.enabled" value="0"/>
+        <property category="win32.Release_Build.win32b.dcc32" name="param.filenames.merge" value="1"/>
+        <property category="win32.Release_Build.win32b.ilink32" name="option.L.arg.1" value="$(BDS)\lib\release"/>
+        <property category="win32.Release_Build.win32b.ilink32" name="option.L.arg.merge" value="1"/>
+        <property category="win32.Release_Build.win32b.ilink32" name="option.L.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.tasm32" name="option.z.enabled" value="0"/>
+        <property category="win32.Release_Build.win32b.tasm32" name="option.zd.enabled" value="0"/>
+        <property category="win32.Release_Build.win32b.tasm32" name="option.zi.enabled" value="0"/>
+        <property category="win32.Release_Build.win32b.tasm32" name="option.zn.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.tasm32" name="param.listfile.merge" value="1"/>
+        <property category="win32.Release_Build.win32b.tasm32" name="param.objfile.merge" value="1"/>
+        <property category="win32.Release_Build.win32b.tasm32" name="param.xreffile.merge" value="1"/>
+        <optionset name="all_configurations">
+          <property category="node" name="displayname" value="All Configurations"/>
+          <property category="win32.*.win32b.bcc32" name="container.SelectedOptimizations.containerenabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="container.SelectedWarnings.containerenabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.4.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.5.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.6.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.A.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.AK.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.AU.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.H=.arg.1" value="$(ZEOSDBO)\lib\CBuilder2006.csm"/>
+          <property category="win32.*.win32b.bcc32" name="option.H=.arg.merge" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.H=.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.Hc.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.1" value="..\..\src\component"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.2" value="Include"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.3" value="$(ZEOSDBO)\Include"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.4" value="$(BDS)\include"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.5" value="$(BDS)\include\dinkumware"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.6" value="$(BDS)\include\vcl"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.7" value="$(BDS)\Indy10"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.8" value="$(QREP)"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.merge" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.Jgi.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.Jgx.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.O1.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.O2.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.Od.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.V0.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.V1.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.Vmd.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.Vmm.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.Vms.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.align-1.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.align-2.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.align-3.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.align-5.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.b.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.disablewarns.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.n.arg.1" value="$(ZEOSDBO)\Lib"/>
+          <property category="win32.*.win32b.bcc32" name="option.n.arg.merge" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.n.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.noregistervars.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.p.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.pm.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.pr.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.ps.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.rd.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.sysdefines.arg.1" value="_RTLDLL"/>
+          <property category="win32.*.win32b.bcc32" name="option.sysdefines.arg.2" value="USEPACKAGES"/>
+          <property category="win32.*.win32b.bcc32" name="option.sysdefines.arg.3" value="NO_STRICT"/>
+          <property category="win32.*.win32b.bcc32" name="option.sysdefines.arg.merge" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.sysdefines.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.tW.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.tWC.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.tWD.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.tWM.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.w.enabled" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.$Z1.enabled" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.$Z2.enabled" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.$Z4.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.1" value="..\Delphi2005\Include"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.2" value="..\..\src\component"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.3" value="..\..\src\dbc"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.4" value="..\..\src\parsesql"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.5" value="Include"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.6" value="..\..\src\core"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.7" value="C:\Program Files\BCBCompNew\ZeosDBO\packages\CBuilder2006"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.enabled" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.N0.arg.1" value="$(ZEOSDBO)\Lib"/>
+          <property category="win32.*.win32b.dcc32" name="option.N0.arg.merge" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.N0.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.NH.arg.1" value="$(ZEOSDBO)\Include"/>
+          <property category="win32.*.win32b.dcc32" name="option.NH.arg.merge" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.NH.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.NO.arg.1" value="$(ZEOSDBO)\Lib"/>
+          <property category="win32.*.win32b.dcc32" name="option.NO.arg.merge" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.NO.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.1" value="..\Delphi2005\Include"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.2" value="..\..\src\component"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.3" value="..\..\src\dbc"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.4" value="..\..\src\parsesql"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.5" value="Include"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.6" value="..\..\src\core"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.7" value="C:\Program Files\BCBCompNew\ZeosDBO\packages\CBuilder2006"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.enabled" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.1" value="..\Delphi2005\Include"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.2" value="..\..\src\component"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.3" value="..\..\src\dbc"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.4" value="..\..\src\parsesql"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.5" value="Include"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.6" value="..\..\src\core"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.7" value="C:\Program Files\BCBCompNew\ZeosDBO\packages\CBuilder2006"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.enabled" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.1" value="..\Delphi2005\Include"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.2" value="..\..\src\component"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.3" value="..\..\src\dbc"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.4" value="Include"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.5" value="..\..\src\core"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.6" value="..\..\src\parsesql"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.7" value="..\..\src\plain"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.additional_switches.arg" value="-LUDesignIDE"/>
+          <property category="win32.*.win32b.dcc32" name="option.additional_switches.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.additional_switches.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="param.filenames.merge" value="1"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.1" value="..\Delphi2005\Include"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.10" value="Files\BCBCompNew\ZeosDBO\packages\CBuilder2006"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.2" value="..\..\src\component"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.3" value="..\..\src\dbc"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.4" value="..\..\src\parsesql"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.5" value="Include"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.6" value="..\..\src\core"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.7" value="C:\Program"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.8" value="Files\BCBCompNew\ZeosDBO\packages\CBuilder2006"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.9" value="C:\Program"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.merge" value="1"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="container.SelectedWarnings.containerenabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.-w-.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.D.arg" value="Zeos Database Components"/>
+          <property category="win32.*.win32b.ilink32" name="option.D.arg.merge" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.D.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.GB.arg" value=""/>
+          <property category="win32.*.win32b.ilink32" name="option.GB.arg.merge" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.GB.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.Gi.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.Gl.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.Gpd.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.GpdGpr.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.Gpr.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.I.arg.1" value="$(ZEOSDBO)\Tmp"/>
+          <property category="win32.*.win32b.ilink32" name="option.I.arg.merge" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.I.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.arg.1" value="..\..\src\component"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.arg.2" value="Include"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.arg.3" value="$(ZEOSDBO)\Lib"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.arg.4" value="$(BDS)\lib"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.arg.5" value="$(BDS)\lib\obj"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.arg.6" value="$(BDS)\lib\psdk"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.arg.merge" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.Tpd.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.Tpe.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.Tpp.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.aa.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.ap.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.dynamicrtl.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.j.arg.1" value="..\Delphi2005\Include"/>
+          <property category="win32.*.win32b.ilink32" name="option.j.arg.2" value="..\..\src\component"/>
+          <property category="win32.*.win32b.ilink32" name="option.j.arg.3" value="..\..\src\dbc"/>
+          <property category="win32.*.win32b.ilink32" name="option.j.arg.4" value="..\..\src\parsesql"/>
+          <property category="win32.*.win32b.ilink32" name="option.j.arg.5" value="Include"/>
+          <property category="win32.*.win32b.ilink32" name="option.j.arg.6" value="..\..\src\core"/>
+          <property category="win32.*.win32b.ilink32" name="option.j.arg.7" value="C:\Program Files\BCBCompNew\ZeosDBO\packages\CBuilder2006"/>
+          <property category="win32.*.win32b.ilink32" name="option.j.arg.merge" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.j.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.l.arg.1" value="$(ZEOSDBO)\Lib"/>
+          <property category="win32.*.win32b.ilink32" name="option.l.arg.merge" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.l.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.m.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.map_segments.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.outputdir.arg.1" value="$(ZEOSDBO)\Bpl"/>
+          <property category="win32.*.win32b.ilink32" name="option.outputdir.arg.merge" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.outputdir.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.s.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="option.w.enabled" value="0"/>
+          <property category="win32.*.win32b.ilink32" name="param.libfiles.1" value="$(LIBRARIES)"/>
+          <property category="win32.*.win32b.ilink32" name="param.libfiles.2" value="import32.lib"/>
+          <property category="win32.*.win32b.ilink32" name="param.libfiles.3" value="cp32mti.lib"/>
+          <property category="win32.*.win32b.ilink32" name="param.libfiles.merge" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="param.objfiles.1" value="c0pkg32.obj"/>
+          <property category="win32.*.win32b.ilink32" name="param.objfiles.2" value="$(PACKAGES)"/>
+          <property category="win32.*.win32b.ilink32" name="param.objfiles.3" value="memmgr.lib"/>
+          <property category="win32.*.win32b.ilink32" name="param.objfiles.4" value="sysinit.obj"/>
+          <property category="win32.*.win32b.ilink32" name="param.objfiles.merge" value="1"/>
+        </optionset>
+      </project>
+      <FILELIST>
+        <FILE FILENAME="ZComponent100.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="ZComponent100" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="C:\Users\src\core\rtl.bpi" CONTAINERID="BPITool" LOCALCOMMAND="" UNITNAME="rtl" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="ZComponent100.res" CONTAINERID="ResTool" LOCALCOMMAND="" UNITNAME="ZComponent100.res" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="C:\Users\src\dbc\dbrtl.bpi" CONTAINERID="BPITool" LOCALCOMMAND="" UNITNAME="dbrtl" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZAbstractConnection.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZAbstractConnection" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZAbstractDataset.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZAbstractDataset" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZAbstractRODataset.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZAbstractRODataset" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZAbstractTable.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZAbstractTable" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZConnection.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZConnection" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZConnectionGroup.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZConnectionGroup" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZDataset.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZDataset" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZDatasetUtils.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZDatasetUtils" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZGroupedConnection.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZGroupedConnection" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZSequence.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZSequence" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZSqlMetadata.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZSqlMetadata" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZSqlMonitor.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZSqlMonitor" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZSqlProcessor.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZSqlProcessor" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZSqlStrings.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZSqlStrings" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZSqlUpdate.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZSqlUpdate" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZStoredProcedure.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZStoredProcedure" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZStreamBlob.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZStreamBlob" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="C:\Borland\BDS\4.0\lib\release\Lib\vcl.bpi" CONTAINERID="BPITool" LOCALCOMMAND="" UNITNAME="vcl" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="C:\Borland\BDS\4.0\lib\release\Lib\designide.bpi" CONTAINERID="BPITool" LOCALCOMMAND="" UNITNAME="designide" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="C:\Borland\BDS\4.0\lib\release\Lib\xmlrtl.bpi" CONTAINERID="BPITool" LOCALCOMMAND="" UNITNAME="xmlrtl" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="C:\Borland\BDS\4.0\lib\release\Lib\vclactnband.bpi" CONTAINERID="BPITool" LOCALCOMMAND="" UNITNAME="vclactnband" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="C:\Borland\BDS\4.0\lib\release\Lib\vclx.bpi" CONTAINERID="BPITool" LOCALCOMMAND="" UNITNAME="vclx" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="C:\Borland\BDS\4.0\lib\release\Lib\vcldb.bpi" CONTAINERID="BPITool" LOCALCOMMAND="" UNITNAME="vcldb" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZIBEventAlerter.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZIBEventAlerter" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZPgEventAlerter.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZPgEventAlerter" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZComponentReg.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZComponentReg" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZPropertyEditor.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZPropertyEditor" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZUpdateSqlEditor.pas" CONTAINERID="PascalCompiler" LOCALCOMMAND="" UNITNAME="ZUpdateSqlEditor" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\src\component\ZComponent.dcr" CONTAINERID="DcrTool" LOCALCOMMAND="" UNITNAME="ZComponent" FORMNAME="" DESIGNCLASS=""/>
+      </FILELIST>
+      <IDEOPTIONS>
+        <VersionInfo>
+          <VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+          <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+          <VersionInfo Name="MajorVer">7</VersionInfo>
+          <VersionInfo Name="MinorVer">2</VersionInfo>
+          <VersionInfo Name="Release">14</VersionInfo>
+          <VersionInfo Name="Build">0</VersionInfo>
+          <VersionInfo Name="Debug">False</VersionInfo>
+          <VersionInfo Name="PreRelease">False</VersionInfo>
+          <VersionInfo Name="Special">False</VersionInfo>
+          <VersionInfo Name="Private">False</VersionInfo>
+          <VersionInfo Name="DLL">False</VersionInfo>
+          <VersionInfo Name="Locale">1046</VersionInfo>
+          <VersionInfo Name="CodePage">1252</VersionInfo>
+        </VersionInfo>
+        <VersionInfoKeys>
+          <VersionInfoKeys Name="CompanyName"></VersionInfoKeys>
+          <VersionInfoKeys Name="FileDescription"></VersionInfoKeys>
+          <VersionInfoKeys Name="FileVersion">7.2.14.0</VersionInfoKeys>
+          <VersionInfoKeys Name="InternalName"></VersionInfoKeys>
+          <VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys>
+          <VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
+          <VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys>
+          <VersionInfoKeys Name="ProductName"></VersionInfoKeys>
+          <VersionInfoKeys Name="ProductVersion">7.2.14.0</VersionInfoKeys>
+          <VersionInfoKeys Name="Comments"></VersionInfoKeys>
+        </VersionInfoKeys>
+        <Debugging>
+          <Debugging Name="DebugSourceDirs"></Debugging>
+        </Debugging>
+        <Parameters>
+          <Parameters Name="RunParams"></Parameters>
+          <Parameters Name="Launcher"></Parameters>
+          <Parameters Name="UseLauncher">False</Parameters>
+          <Parameters Name="DebugCWD"></Parameters>
+          <Parameters Name="HostApplication"></Parameters>
+          <Parameters Name="RemoteHost"></Parameters>
+          <Parameters Name="RemotePath"></Parameters>
+          <Parameters Name="RemoteParams"></Parameters>
+          <Parameters Name="RemoteLauncher"></Parameters>
+          <Parameters Name="UseRemoteLauncher">False</Parameters>
+          <Parameters Name="RemoteCWD"></Parameters>
+          <Parameters Name="RemoteDebug">False</Parameters>
+          <Parameters Name="Debug Symbols Search Path"></Parameters>
+          <Parameters Name="LoadAllSymbols">True</Parameters>
+          <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+        </Parameters>
+        <Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\Borland\BDS\4.0\Bin\dbx100.bpl">Borland SQL Explorer UI Package</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\BCBCompNew\TMS\bpl\tmsexd2006.bpl">TMS Component Pack Extra</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\Borland\BDS\4.0\Bin\dclmid100.bpl">Borland MyBase DataAccess Components</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dcldbx100.bpl">Borland dbExpress Components</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\Borland\BDS\4.0\Indy10\C10\dclIndyCore100.bpl">Indy 10 Core Design Time</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\Borland\BDS\4.0\Bin\dclwbm100.bpl">Borland InternetExpress Components</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\Borland\BDS\4.0\Indy10\C10\dclIndyProtocols100.bpl">Indy 10 Protocols Design Time</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dclie100.bpl">Internet Explorer Components</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\bin\dclado100.bpl">Borland ADO DB Components</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\Borland\BDS\4.0\Bin\dclbde100.bpl">Borland BDE DB Components</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dcl31w100.bpl">Delphi 1.0 Compatibility Components</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\BCBCompNew\TMS\Delphi2006\TMSXlsD2006.bpl">TMS TAdvStringGrid Excel support</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\BCBCompNew\TMS\Delphi2006\TMSDeD2006.bpl">TMS Component Pack design time support</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\BCBCompNew\TMS\Delphi2006\TMSWizD2006.bpl">TMS Component Pack Wizards</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\BCBCompNew\TeeChart\Delphi10\Bin\DclTeePro710.bpl">TeeChart Pro 7 Components</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\BIN\QR5DesignC2006.bpl">QR5DesignC2006</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\BCBCompNew\EHS\ehs_b6.bpl">ehs_b6</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dclwebsnap100.bpl">Borland WebSnap Components</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\bcbie100.bpl">Borland C++Builder Internet Explorer 5 Components Package</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dclsmpedit100.bpl">Borland Editor Script Enhancements</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dclsmp100.bpl">Borland Sample Components</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\Borland\BDS\4.0\Bin\dclintraweb_80_100.bpl">Intraweb 8.0 Design Package for Borland Development Studio 2006</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\bcbofficexp100.bpl">Borland C++Builder Office XP Servers Package</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\applet100.bpl">Borland Control Panel Applet Package</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dclmcn100.bpl">Borland DataSnap Connection Components</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dclemacsedit100.bpl">Borland Editor Emacs Enhancements</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dclib100.bpl">Borland InterBase Express Components</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dclmlwiz100.bpl">Borland Markup Language Wizards</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dclbcbsmp100.bpl">Borland Sample Controls Design Time Package</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\dcldbxcds100.bpl">Borland SimpleDataset Component (DBX)</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\RaveReports\Lib\dclRave.bpl">Rave Reports 6.5 BE Package</Excluded_Packages>
+          <Excluded_Packages Name="C:\Program Files\HelpandManual4\Delphi\HelpmanRCI_D2006.bpl">Help &amp; Manual Project Wizard</Excluded_Packages>
+          <Excluded_Packages Name="c:\program files\borland\bds\4.0\Bin\unittestide100.bpl">(untitled)</Excluded_Packages>
+        </Excluded_Packages>
+        <Linker>
+          <Linker Name="LibPrefix"></Linker>
+          <Linker Name="LibSuffix"></Linker>
+          <Linker Name="LibVersion"></Linker>
+        </Linker>
+      </IDEOPTIONS>
+    </BCBPROJECT>
+		<buildevents/>
+	</CPlusPlusBuilder.Personality>
+	<StarTeamAssociation></StarTeamAssociation>
+	<StarTeamNonRelativeFiles></StarTeamNonRelativeFiles>
+</BorlandProject>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <Package Version="4">
+    <Name Value="zparsesql"/>
+    <AddToProjectUsesSection Value="True"/>
+    <Author Value="The ZEOS Team - see https://sourceforge.net/projects/zeoslib/"/>
+    <CompilerOptions>
+      <Version Value="11"/>
+      <SearchPaths>
+        <OtherUnitFiles Value="../../src/parsesql"/>
+        <UnitOutputDirectory Value="lib/zparsesql/$(TargetCPU)-$(TargetOS)"/>
+      </SearchPaths>
+      <Parsing>
+        <SyntaxOptions>
+          <SyntaxMode Value="Delphi"/>
+          <UseAnsiStrings Value="False"/>
+        </SyntaxOptions>
+      </Parsing>
+    </CompilerOptions>
+    <Description Value="This package contains the Zeos SQL Parsing Classes and Interfaces.
+
+-----------
+
+Zeos is a set of database components for MySQL, PostgreSQL, Interbase, Firebird, MS SQL, Sybase, Oracle and SQLite for Delphi, FreePascal/Lazarus, Kylix and C++ Builder.
+
+Features:
+Support object for Sequences (Generators)
+Support for Firebird, Interbase and PostgreSQL database events
+Support object for retrieving database objects meta data
+Support object for executing database scripts
+
+-----------
+Installing in Lazarus: Read the README.TXT in packages\lazarus
+
+Project Page: https://sourceforge.net/projects/zeoslib/
+Forum: look in ZeosLib 7.2 Forum on http://zeoslib.sourceforge.net/
+You found a (possible) bug? Use the bugtracker dude! http://sourceforge.net/p/zeoslib/tickets/"/>
+    <License Value="The source code of the ZEOS Libraries and packages are distributed under the Library GNU General Public License Version 2.1  (see the file COPYING) with the following modification:
+
+As a special exception, the copyright holders of this library give you permission to link this library with independent modules to produce an executable, regardless of the license terms of these independent modules, and to copy and distribute the resulting executable under terms of your choice, provided that you also meet, for each linked independent module, the terms and conditions of the license of that module. An independent module is a module which is not derived from or based on this library. If you modify this library, you may extend this exception to your version of the library, but you are not obligated to do so. If you do not wish to do so, delete this exception statement from your version."/>
+    <Version Major="7" Minor="2" Release="14"/>
+    <Files Count="17">
+      <Item1>
+        <Filename Value="../../src/parsesql/ZSybaseToken.pas"/>
+        <UnitName Value="ZSybaseToken"/>
+      </Item1>
+      <Item2>
+        <Filename Value="../../src/parsesql/ZGenericSqlAnalyser.pas"/>
+        <UnitName Value="ZGenericSqlAnalyser"/>
+      </Item2>
+      <Item3>
+        <Filename Value="../../src/parsesql/ZGenericSqlToken.pas"/>
+        <UnitName Value="ZGenericSqlToken"/>
+      </Item3>
+      <Item4>
+        <Filename Value="../../src/parsesql/ZInterbaseAnalyser.pas"/>
+        <UnitName Value="ZInterbaseAnalyser"/>
+      </Item4>
+      <Item5>
+        <Filename Value="../../src/parsesql/ZInterbaseToken.pas"/>
+        <UnitName Value="ZInterbaseToken"/>
+      </Item5>
+      <Item6>
+        <Filename Value="../../src/parsesql/ZMySqlAnalyser.pas"/>
+        <UnitName Value="ZMySqlAnalyser"/>
+      </Item6>
+      <Item7>
+        <Filename Value="../../src/parsesql/ZMySqlToken.pas"/>
+        <UnitName Value="ZMySqlToken"/>
+      </Item7>
+      <Item8>
+        <Filename Value="../../src/parsesql/ZOracleAnalyser.pas"/>
+        <UnitName Value="ZOracleAnalyser"/>
+      </Item8>
+      <Item9>
+        <Filename Value="../../src/parsesql/ZOracleToken.pas"/>
+        <UnitName Value="ZOracleToken"/>
+      </Item9>
+      <Item10>
+        <Filename Value="../../src/parsesql/ZPostgreSqlAnalyser.pas"/>
+        <UnitName Value="ZPostgreSqlAnalyser"/>
+      </Item10>
+      <Item11>
+        <Filename Value="../../src/parsesql/ZPostgreSqlToken.pas"/>
+        <UnitName Value="ZPostgreSqlToken"/>
+      </Item11>
+      <Item12>
+        <Filename Value="../../src/parsesql/ZScriptParser.pas"/>
+        <UnitName Value="ZScriptParser"/>
+      </Item12>
+      <Item13>
+        <Filename Value="../../src/parsesql/ZSelectSchema.pas"/>
+        <UnitName Value="ZSelectSchema"/>
+      </Item13>
+      <Item14>
+        <Filename Value="../../src/parsesql/ZSqLiteAnalyser.pas"/>
+        <UnitName Value="ZSqLiteAnalyser"/>
+      </Item14>
+      <Item15>
+        <Filename Value="../../src/parsesql/ZSqLiteToken.pas"/>
+        <UnitName Value="ZSqLiteToken"/>
+      </Item15>
+      <Item16>
+        <Filename Value="../../src/parsesql/ZSybaseAnalyser.pas"/>
+        <UnitName Value="ZSybaseAnalyser"/>
+      </Item16>
+      <Item17>
+        <Filename Value="../../src/parsesql/ZAdoToken.pas"/>
+        <UnitName Value="ZAdoToken"/>
+      </Item17>
+    </Files>
+    <RequiredPkgs Count="2">
+      <Item1>
+        <PackageName Value="zcore"/>
+        <MaxVersion Major="7" Minor="2"/>
+        <MinVersion Major="7" Minor="2" Valid="True"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="FCL"/>
+        <MinVersion Major="1" Valid="True"/>
+      </Item2>
+    </RequiredPkgs>
+    <UsageOptions>
+      <UnitPath Value="$(PkgOutDir)"/>
+    </UsageOptions>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IgnoreBinaries Value="False"/>
+    </PublishOptions>
+    <CustomOptions Items="ExternHelp" Version="2">
+      <_ExternHelp Items="Count"/>
+    </CustomOptions>
+  </Package>
+</CONFIG>
