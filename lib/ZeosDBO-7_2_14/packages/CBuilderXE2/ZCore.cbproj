@@ -1,0 +1,408 @@
+﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+		<PropertyGroup>
+			<ProjectGuid>{38D6B829-BF46-4A3F-82ED-087FBD6FCFDA}</ProjectGuid>
+			<ProjectType>CppPackage</ProjectType>
+			<MainSource>ZCore.cpp</MainSource>
+			<Config Condition="'$(Config)'==''">Release</Config>
+			<ProjectVersion>13.4</ProjectVersion>
+			<FrameworkType>VCL</FrameworkType>
+			<Base>True</Base>
+			<Platform Condition="'$(Platform)'==''">Win32</Platform>
+			<TargetedPlatforms>1</TargetedPlatforms>
+			<AppType>Package</AppType>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Base)'=='true') or '$(Base_Win32)'!=''">
+			<Base_Win32>true</Base_Win32>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Debug' or '$(Cfg_1)'!=''">
+			<Cfg_1>true</Cfg_1>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_1)'=='true') or '$(Cfg_1_Win32)'!=''">
+			<Cfg_1_Win32>true</Cfg_1_Win32>
+			<CfgParent>Cfg_1</CfgParent>
+			<Cfg_1>true</Cfg_1>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Config)'=='Release' or '$(Cfg_2)'!=''">
+			<Cfg_2>true</Cfg_2>
+			<CfgParent>Base</CfgParent>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="('$(Platform)'=='Win32' and '$(Cfg_2)'=='true') or '$(Cfg_2_Win32)'!=''">
+			<Cfg_2_Win32>true</Cfg_2_Win32>
+			<CfgParent>Cfg_2</CfgParent>
+			<Cfg_2>true</Cfg_2>
+			<Base>true</Base>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base)'!=''">
+			<DCC_UnitSearchPath>..\..\src\core;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<IncludePath>..\..\src\core\;$(IncludePath)</IncludePath>
+			<ILINK_LibraryPath>..\..\src\core\;$(ILINK_LibraryPath)</ILINK_LibraryPath>
+			<VerInfo_Build>5971</VerInfo_Build>
+			<BRCC_OutputDir>$(ZEOSDBO)\$(Platform)\$(Config)\Lib</BRCC_OutputDir>
+			<VerInfo_Release>6</VerInfo_Release>
+			<DynamicRTL>true</DynamicRTL>
+			<DllSuffix>160</DllSuffix>
+			<VerInfo_MinorVer>2</VerInfo_MinorVer>
+			<VerInfo_MajorVer>7</VerInfo_MajorVer>
+			<DCC_BpiOutput>$(ZEOSDBO)\$(Platform)\$(Config)\Lib</DCC_BpiOutput>
+			<VerInfo_Locale>1033</VerInfo_Locale>
+			<DCC_Namespace>Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;System;Xml;Data;Datasnap;Web;Soap;$(DCC_Namespace)</DCC_Namespace>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=7.2.14.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=7.2.14.0;Comments=;Last Compile=</VerInfo_Keys>
+			<VerInfo_IncludeVerInfo>true</VerInfo_IncludeVerInfo>
+			<IntermediateOutputDir>$(ZEOSDBO)\$(Platform)\$(Config)\Tmp</IntermediateOutputDir>
+			<BPILibOutputDir>$(ZEOSDBO)\$(Platform)\$(Config)\Lib</BPILibOutputDir>
+			<DCC_DcuOutput>$(ZEOSDBO)\Lib</DCC_DcuOutput>
+			<FinalOutputDir>$(ZEOSDBO)\$(Platform)\$(Config)\Bpl</FinalOutputDir>
+			<DCC_HppOutput>$(ZEOSDBO)\$(Platform)\$(Config)\Include</DCC_HppOutput>
+			<BCC_AutoDepCheck>false</BCC_AutoDepCheck>
+			<LinkPackageImports>rtl.bpi</LinkPackageImports>
+			<RuntimeOnlyPackage>true</RuntimeOnlyPackage>
+			<PackageImports>bcbie;$(PackageImports)</PackageImports>
+			<BRCC_Defines>NO_STRICT;_VIS_NOLIB;USEPACKAGES;$(BRCC_Defines)</BRCC_Defines>
+			<DCC_ObjOutput>$(ZEOSDBO)\$(Platform)\$(Config)\Lib</DCC_ObjOutput>
+			<ILINK_FullDebugInfo>true</ILINK_FullDebugInfo>
+			<TASM_Defines>NO_STRICT;_VIS_NOLIB;USEPACKAGES;$(TASM_Defines)</TASM_Defines>
+			<DCC_CBuilderOutput>JPHNE</DCC_CBuilderOutput>
+			<BCC_Defines>NO_STRICT;_VIS_NOLIB;$(BCC_Defines)</BCC_Defines>
+			<ILINK_AppType>Windows</ILINK_AppType>
+			<DCC_IncludePath>.\;$(BDS)\lib;$(BDS)\lib\obj;$(DCC_IncludePath)</DCC_IncludePath>
+			<BRCC_IncludePath>..\..\src\core;$(BDS)\include;$(BDS)\include\vcl;$(BDS)\include\dinkumware;$(BRCC_IncludePath)</BRCC_IncludePath>
+			<ILINK_GenerateLibFile>true</ILINK_GenerateLibFile>
+			<BCC_SourceDebuggingOn>true</BCC_SourceDebuggingOn>
+			<BRCC_UserSuppliedOptions> -I..\..\src\core;$(BDS)\include;$(BDS)\include\vcl;$(BDS)\include\dinkumware</BRCC_UserSuppliedOptions>
+			<TASM_IncludePath>..\..\src\core;$(BDS)\include;$(BDS)\include\vcl;$(BDS)\include\dinkumware;$(TASM_IncludePath)</TASM_IncludePath>
+			<UsePackages>true</UsePackages>
+			<BCC_IncludePath>$(BDS)\include;$(BDS)\include\windows\vcl;$(BDS)\include\dinkumware;$(BCC_IncludePath)</BCC_IncludePath>
+			<ILINK_GenerateImportLibrary>true</ILINK_GenerateImportLibrary>
+			<BCC_GenerateMultithreaded>true</BCC_GenerateMultithreaded>
+			<AllPackageLibs>rtl.lib</AllPackageLibs>
+			<BCC_DisableOptimizations>true</BCC_DisableOptimizations>
+			<TASM_AdditionalSwitches> /w2</TASM_AdditionalSwitches>
+			<TASM_Debugging>Full</TASM_Debugging>
+			<ILINK_Description>Zeos Core Classes and Interfaces</ILINK_Description>
+			<ILINK_WinAppType>Package</ILINK_WinAppType>
+			<Multithreaded>true</Multithreaded>
+			<BCC_UserSuppliedOptions> -Q -6 -Vx -r- -k -Ve</BCC_UserSuppliedOptions>
+			<BCC_DebugLineNumbers>true</BCC_DebugLineNumbers>
+			<OutputExt>bpl</OutputExt>
+			<BCC_OutputDir>$(ZEOSDBO)\$(Platform)\$(Config)\Lib</BCC_OutputDir>
+			<BCC_InlineFunctionExpansion>false</BCC_InlineFunctionExpansion>
+			<DCC_AdditionalSwitches> -M</DCC_AdditionalSwitches>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Base_Win32)'!=''">
+			<VerInfo_MajorVer>1</VerInfo_MajorVer>
+			<VerInfo_MinorVer>0</VerInfo_MinorVer>
+			<VerInfo_Build>0</VerInfo_Build>
+			<VerInfo_Release>0</VerInfo_Release>
+			<IncludePath>$(BDSINCLUDE)\windows\vcl;$(IncludePath)</IncludePath>
+			<Icon_MainIcon>ZCore_Icon.ico</Icon_MainIcon>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=7.2.14.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=7.2.14.0;Comments=</VerInfo_Keys>
+			<DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1)'!=''">
+			<VerInfo_Build>0</VerInfo_Build>
+			<VerInfo_MajorVer>1</VerInfo_MajorVer>
+			<VerInfo_MinorVer>0</VerInfo_MinorVer>
+			<VerInfo_Release>0</VerInfo_Release>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=7.2.14.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=7.2.14.0;Comments=;Last Compile=</VerInfo_Keys>
+			<BCC_Defines>_DEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
+			<DCC_Define>DEBUG;$(DCC_Define);$(DCC_Define)</DCC_Define>
+			<DCC_AdditionalSwitches> -M -V</DCC_AdditionalSwitches>
+			<ILINK_DisableIncrementalLinking>true</ILINK_DisableIncrementalLinking>
+			<TASM_DisplaySourceLines>true</TASM_DisplaySourceLines>
+			<DCC_DebugInfoInExe>true</DCC_DebugInfoInExe>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+			<LinkPackageStatics>rtl.lib</LinkPackageStatics>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=7.2.14.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=7.2.14.0;Comments=</VerInfo_Keys>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2)'!=''">
+			<VerInfo_Build>0</VerInfo_Build>
+			<VerInfo_MinorVer>0</VerInfo_MinorVer>
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=7.2.14.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=7.2.14.0;Comments=;Last Compile=</VerInfo_Keys>
+			<VerInfo_MajorVer>1</VerInfo_MajorVer>
+			<VerInfo_Release>0</VerInfo_Release>
+			<BCC_Defines>NDEBUG;$(BCC_Defines);$(BCC_Defines)</BCC_Defines>
+			<BCC_UserSuppliedOptions> -Q -6 -Vx -r- -k -Ve -r</BCC_UserSuppliedOptions>
+			<BCC_OptimizeForSpeed>true</BCC_OptimizeForSpeed>
+			<DCC_AdditionalSwitches> -M -$O+</DCC_AdditionalSwitches>
+			<TASM_Debugging>None</TASM_Debugging>
+			<BCC_InlineFunctionExpansion>true</BCC_InlineFunctionExpansion>
+		</PropertyGroup>
+		<PropertyGroup Condition="'$(Cfg_2_Win32)'!=''">
+			<VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=7.2.14.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=7.2.14.0;Comments=</VerInfo_Keys>
+			<LinkPackageStatics>rtl.lib</LinkPackageStatics>
+		</PropertyGroup>
+		<ItemGroup>
+			<PackageImport Include="bcbie.bpi">
+				<BuildOrder>32</BuildOrder>
+				<BuildOrder>3</BuildOrder>
+			</PackageImport>
+			<PackageImport Include="dbrtl.bpi">
+				<BuildOrder>9</BuildOrder>
+				<BuildOrder>8</BuildOrder>
+			</PackageImport>
+			<PackageImport Include="rtl.bpi">
+				<BuildOrder>11</BuildOrder>
+				<BuildOrder>10</BuildOrder>
+			</PackageImport>
+			<PackageImport Include="vcl.bpi">
+				<BuildOrder>9</BuildOrder>
+				<BuildOrder>8</BuildOrder>
+			</PackageImport>
+			<CppCompile Include="ZCore.cpp">
+				<BuildOrder>2</BuildOrder>
+				<BuildOrder>11</BuildOrder>
+			</CppCompile>
+			<ResFiles Include="ZCore.res">
+				<BuildOrder>5</BuildOrder>
+				<BuildOrder>12</BuildOrder>
+			</ResFiles>
+			<DelphiCompile Include="..\..\src\core\ZClasses.pas">
+				<BuildOrder>17</BuildOrder>
+				<BuildOrder>16</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZCollections.pas">
+				<BuildOrder>20</BuildOrder>
+				<BuildOrder>17</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZCompatibility.pas">
+				<BuildOrder>23</BuildOrder>
+				<BuildOrder>14</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZExpression.pas">
+				<BuildOrder>35</BuildOrder>
+				<BuildOrder>0</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZExprParser.pas">
+				<BuildOrder>38</BuildOrder>
+				<BuildOrder>1</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZExprToken.pas">
+				<BuildOrder>41</BuildOrder>
+				<BuildOrder>4</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZFunctions.pas">
+				<BuildOrder>7</BuildOrder>
+				<BuildOrder>44</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZFunctionsConvert.pas">
+				<BuildOrder>7</BuildOrder>
+				<BuildOrder>44</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZFunctionsDateTime.pas">
+				<BuildOrder>7</BuildOrder>
+				<BuildOrder>44</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZFunctionsMath.pas">
+				<BuildOrder>7</BuildOrder>
+				<BuildOrder>44</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZFunctionsOther.pas">
+				<BuildOrder>7</BuildOrder>
+				<BuildOrder>44</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZFunctionsStrings.pas">
+				<BuildOrder>7</BuildOrder>
+				<BuildOrder>44</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZMatchPattern.pas">
+				<BuildOrder>26</BuildOrder>
+				<BuildOrder>15</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZMessages.pas">
+				<BuildOrder>6</BuildOrder>
+				<BuildOrder>53</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZSysUtils.pas">
+				<BuildOrder>29</BuildOrder>
+				<BuildOrder>2</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZTokenizer.pas">
+				<BuildOrder>8</BuildOrder>
+				<BuildOrder>47</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZURL.pas">
+				<BuildOrder>20</BuildOrder>
+				<BuildOrder>18</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZVariables.pas">
+				<BuildOrder>50</BuildOrder>
+				<BuildOrder>5</BuildOrder>
+			</DelphiCompile>
+			<DelphiCompile Include="..\..\src\core\ZVariant.pas">
+				<BuildOrder>14</BuildOrder>
+				<BuildOrder>13</BuildOrder>
+			</DelphiCompile>
+			<BuildConfiguration Include="Release">
+				<Key>Cfg_2</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Base">
+				<Key>Base</Key>
+			</BuildConfiguration>
+			<BuildConfiguration Include="Debug">
+				<Key>Cfg_1</Key>
+				<CfgParent>Base</CfgParent>
+			</BuildConfiguration>
+		</ItemGroup>
+		<Import Condition="Exists('$(BDS)\Bin\CodeGear.Cpp.Targets')" Project="$(BDS)\Bin\CodeGear.Cpp.Targets"/>
+		<ProjectExtensions>
+			<Borland.Personality>CPlusPlusBuilder.Personality.12</Borland.Personality>
+			<Borland.ProjectType>CppPackage</Borland.ProjectType>
+			<BorlandProject>
+				<CPlusPlusBuilder.Personality>
+					<VersionInfo>
+						<VersionInfo Name="IncludeVerInfo">True</VersionInfo>
+						<VersionInfo Name="AutoIncBuild">False</VersionInfo>
+						<VersionInfo Name="MajorVer">7</VersionInfo>
+						<VersionInfo Name="MinorVer">2</VersionInfo>
+						<VersionInfo Name="Release">14</VersionInfo>
+						<VersionInfo Name="Build">0</VersionInfo>
+						<VersionInfo Name="Debug">False</VersionInfo>
+						<VersionInfo Name="PreRelease">False</VersionInfo>
+						<VersionInfo Name="Special">False</VersionInfo>
+						<VersionInfo Name="Private">False</VersionInfo>
+						<VersionInfo Name="DLL">False</VersionInfo>
+						<VersionInfo Name="Locale">1033</VersionInfo>
+						<VersionInfo Name="CodePage">1252</VersionInfo>
+					</VersionInfo>
+					<VersionInfoKeys>
+						<VersionInfoKeys Name="CompanyName"/>
+						<VersionInfoKeys Name="FileDescription"/>
+						<VersionInfoKeys Name="FileVersion">7.2.14.0</VersionInfoKeys>
+						<VersionInfoKeys Name="InternalName"/>
+						<VersionInfoKeys Name="LegalCopyright"/>
+						<VersionInfoKeys Name="LegalTrademarks"/>
+						<VersionInfoKeys Name="OriginalFilename"/>
+						<VersionInfoKeys Name="ProductName"/>
+						<VersionInfoKeys Name="ProductVersion">7.2.14.0</VersionInfoKeys>
+						<VersionInfoKeys Name="Comments"/>
+						<VersionInfoKeys Name="Last Compile">2015-01-24 10:55</VersionInfoKeys>
+					</VersionInfoKeys>
+					<HistoryLists_hlIncludePath>
+						<HistoryLists_hlIncludePath Name="Count">2</HistoryLists_hlIncludePath>
+						<HistoryLists_hlIncludePath Name="Item0">..\..\src\core;$(BCB)\include;$(BCB)\include\vcl</HistoryLists_hlIncludePath>
+						<HistoryLists_hlIncludePath Name="Item1">$(BCB)\include;$(BCB)\include\vcl</HistoryLists_hlIncludePath>
+					</HistoryLists_hlIncludePath>
+					<HistoryLists_hlLibraryPath>
+						<HistoryLists_hlLibraryPath Name="Count">4</HistoryLists_hlLibraryPath>
+						<HistoryLists_hlLibraryPath Name="Item0">$(BCB)\Projects\Lib;..\..\src\core;$(BCB)\lib\obj;$(BCB)\lib</HistoryLists_hlLibraryPath>
+						<HistoryLists_hlLibraryPath Name="Item1">$(BCB)\Projects\Lib;..\..\src\core;$(BCB)\lib\obj;$(BCB)\lib</HistoryLists_hlLibraryPath>
+						<HistoryLists_hlLibraryPath Name="Item2">..\..\src\core;$(BCB)\lib\obj;$(BCB)\lib</HistoryLists_hlLibraryPath>
+						<HistoryLists_hlLibraryPath Name="Item3">$(BCB)\lib\obj;$(BCB)\lib</HistoryLists_hlLibraryPath>
+					</HistoryLists_hlLibraryPath>
+					<HistoryLists_hlDebugSourcePath>
+						<HistoryLists_hlDebugSourcePath Name="Count">1</HistoryLists_hlDebugSourcePath>
+						<HistoryLists_hlDebugSourcePath Name="Item0">$(BCB)\source\vcl</HistoryLists_hlDebugSourcePath>
+					</HistoryLists_hlDebugSourcePath>
+					<HistoryLists_hlConditionals>
+						<HistoryLists_hlConditionals Name="Count">1</HistoryLists_hlConditionals>
+						<HistoryLists_hlConditionals Name="Item0">_DEBUG</HistoryLists_hlConditionals>
+					</HistoryLists_hlConditionals>
+					<HistoryLists_hlIntOutputDir>
+						<HistoryLists_hlIntOutputDir Name="Count">1</HistoryLists_hlIntOutputDir>
+						<HistoryLists_hlIntOutputDir Name="Item0"/>
+					</HistoryLists_hlIntOutputDir>
+					<HistoryLists_hlFinalOutputDir>
+						<HistoryLists_hlFinalOutputDir Name="Count">2</HistoryLists_hlFinalOutputDir>
+						<HistoryLists_hlFinalOutputDir Name="Item0"/>
+						<HistoryLists_hlFinalOutputDir Name="Item1"/>
+					</HistoryLists_hlFinalOutputDir>
+					<HistoryLists_hIBPIOutputDir>
+						<HistoryLists_hIBPIOutputDir Name="Count">1</HistoryLists_hIBPIOutputDir>
+						<HistoryLists_hIBPIOutputDir Name="Item0"/>
+					</HistoryLists_hIBPIOutputDir>
+					<Debugging>
+						<Debugging Name="DebugSourceDirs">$(BCB)\source\vcl</Debugging>
+					</Debugging>
+					<Parameters>
+						<Parameters Name="RunParams"/>
+						<Parameters Name="Launcher"/>
+						<Parameters Name="UseLauncher">False</Parameters>
+						<Parameters Name="DebugCWD"/>
+						<Parameters Name="HostApplication"/>
+						<Parameters Name="RemoteHost"/>
+						<Parameters Name="RemotePath"/>
+						<Parameters Name="RemoteLauncher"/>
+						<Parameters Name="RemoteCWD"/>
+						<Parameters Name="RemoteDebug">False</Parameters>
+						<Parameters Name="RemoteParams"/>
+						<Parameters Name="UseRemoteLauncher">False</Parameters>
+						<Parameters Name="Debug Symbols Search Path"/>
+						<Parameters Name="LoadAllSymbols">True</Parameters>
+						<Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+					</Parameters>
+					<Compiler>
+						<Compiler Name="ShowInfoMsgs">0</Compiler>
+						<Compiler Name="LinkDebugVcl">0</Compiler>
+						<Compiler Name="LinkCGLIB">0</Compiler>
+					</Compiler>
+					<ProjectProperties>
+						<ProjectProperties Name="AutoShowDeps">False</ProjectProperties>
+						<ProjectProperties Name="ManagePaths">True</ProjectProperties>
+						<ProjectProperties Name="VerifyPackages">True</ProjectProperties>
+					</ProjectProperties>
+					<Source>
+						<Source Name="MainSource">ZCore.cpp</Source>
+					</Source>
+					<Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\ExpertsCreators160.bpl">Embarcadero Experts Creators Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\ExpertsUI160.bpl">Embarcadero Experts UI Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclnet160.bpl">Embarcadero Internet Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Marcelo\BCBCompNew\EHS-XE2\.\ehs_b6.bpl">EC Software Help Suite for CBuilder 6</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclie160.bpl">Internet Explorer Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dcl31w160.bpl">Delphi 1.0 Compatibility Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dcldbx160.bpl">Embarcadero dbExpress Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclwbm160.bpl">Embarcadero InternetExpress Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclact160.bpl">Embarcadero ActionBar Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\svnide160.bpl">Embarcadero Subversion Integration</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\applet160.bpl">Embarcadero Control Panel Applet Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclbindcompfmx160.bpl">Embarcadero LiveBindings Components FireMonkey</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclbindcompvcl160.bpl">Embarcadero LiveBindings Components VCL</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclemacsedit160.bpl">Embarcadero Editor Emacs Enhancements</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclmlwiz160.bpl">Embarcadero Markup Language Wizards</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclsmpedit160.bpl">Embarcadero Editor Script Enhancements</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dcltouch160.bpl">Embarcadero Touch Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\samplevisualizers160.bpl">Embarcadero Sample Debugger Visualizers</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclmcn160.bpl">Embarcadero DataSnap Connection Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclib160.bpl">Embarcadero InterBase Express Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclIntraweb_120_160.bpl">IntraWeb 12.0 Design Package for RAD Studio XE2</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclwebsnap160.bpl">Embarcadero WebSnap Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclsoap160.bpl">Embarcadero SOAP Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclribbon160.bpl">Embarcadero Ribbon Controls</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclfmxstd160.bpl">Embarcadero FMX Standard Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclDBXDrivers160.bpl">Embarcadero Driver Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclDBXDriversInt160.bpl">Embarcadero Intro Driver Components</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dcldbxcds160.bpl">Embarcadero SimpleDataset Component (DBX)</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclCloudService160.bpl">Embarcadero Cloud management components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Program Files (x86)\Raize\CS5\Bin\CodeSiteExpressPkg_Design160.bpl">CodeSite Express 5.1</Excluded_Packages>
+						<Excluded_Packages Name="C:\Program Files (x86)\FastReports\FastReport 4 Embarcadero edition\LibD16\dclfs16.bpl">FastScript 1.9 Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Program Files (x86)\FastReports\FastReport 4 Embarcadero edition\LibD16\dclfrx16.bpl">FastReport 4.0 Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Program Files (x86)\FastReports\FastReport 4 Embarcadero edition\LibD16\dclfsDB16.bpl">FastScript 1.9 DB Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Program Files (x86)\FastReports\FastReport 4 Embarcadero edition\LibD16\dclfrxDB16.bpl">FastReport 4.0 DB Components</Excluded_Packages>
+						<Excluded_Packages Name="C:\Program Files (x86)\FastReports\FastReport 4 Embarcadero edition\LibD16\dclfrxe16.bpl">FastReport 4.0 Exports</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\dclIPIndyImpl160.bpl">IP Abstraction Indy Implementation Design Time</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Marcelo\BCBCompNew\TMS\BuilderXE2\TMSXlsDXE2.bpl">TMS TAdvStringGrid Excel support</Excluded_Packages>
+						<Excluded_Packages Name="$(BDS)\RaveReports\Lib\dclRave.bpl">Rave Reports 10.0 BE Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\bcboffice2k160.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+						<Excluded_Packages Name="$(BDSBIN)\bcbofficexp160.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+						<Excluded_Packages Name="C:\Users\Marcelo\BCBCompNew\TeeChart-XE2\Delphi16.win32\Bin\DclFMXTeePro916.bpl">TeeChart Pro 2012 for FireMonkey Components</Excluded_Packages>
+					</Excluded_Packages>
+				</CPlusPlusBuilder.Personality>
+				<Platforms>
+					<Platform value="Win32">True</Platform>
+				</Platforms>
+			</BorlandProject>
+			<ProjectFileVersion>12</ProjectFileVersion>
+		</ProjectExtensions>
+		<Import Condition="Exists('$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj')" Project="$(APPDATA)\Embarcadero\$(BDSAPPDATABASEDIR)\$(PRODUCTVERSION)\UserTools.proj"/>
+	</Project>

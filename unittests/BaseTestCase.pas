@@ -118,6 +118,11 @@ begin
   Result := 'dorm_firebird_uib_ci.conf';
 
   {$ENDIF}
+  {$IFDEF FIREBIRD_ZEOSDBO_STRATEGY}
+
+  Result := 'dorm_firebird_zeosdbo.conf';
+
+  {$ENDIF}
   {$IFDEF SQLSERVER_STRATEGY}
 
   Result := 'dorm_sqlserver.conf';
@@ -142,6 +147,7 @@ begin
   {$IFNDEF INTERBASE_UIB_STRATEGY}
   {$IFNDEF FIREBIRD_STRATEGY}
   {$IFNDEF FIREBIRD_UIB_STRATEGY}
+  {$IFNDEF FIREBIRD_ZEOSDBO_STRATEGY}
   {$IFNDEF SQLITE3_STRATEGY}
   {$IFNDEF SQLSERVER_STRATEGY}
   {$IFNDEF SQLSERVER_DEVART_STRATEGY}
@@ -152,6 +158,7 @@ begin
   {$MESSAGE ERROR '**>>> There are not strategy conditionals defined '}
   {$MESSAGE ERROR '**>>> You should select a REAL BUILD configuration'}
   {$MESSAGE ERROR '**************************************************'}
+  {$ENDIF}
   {$ENDIF}
   {$ENDIF}
   {$ENDIF}

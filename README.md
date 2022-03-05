@@ -10,7 +10,7 @@ Delphi ORM (DORM for short) is a powerful ORM for Delphi. It is quite robust and
 * External (file) or internal (resource, json stream) configuration
 * Interfaces based!
 * Supports for
- * FirebirdSQL (using UIB)
+ * FirebirdSQL (using UIB, ZeosDBO)
  * Interbase (using UIB)
  * SQLServer (using FireDAC driver)
  * SQLite3 (using this SQLite3 wrapper)

@@ -1,0 +1,229 @@
+=============================================================
+# ZeosDBO
+##  C++Builder Packages Installation Manual
+
+
+  By
+    Marcelo Augusto Cicogna
+    HydroByte Software
+
+=============================================================
+## Goals
+  - New C++Builder packages.
+  - Reorganize C++ compiled files derived from ZeosDBO's
+    Object Pascal source.
+  - Allow more than one version or build to coexist on
+    Windows.
+  - Allow our project to be easily setup to use ZeosDBO,
+    focused in checking items in
+    "Project > Options > Packages" list.
+
+  Tested with ZeosDBO 7.2.6 Revision 5971 from SVN.
+
+-------------------------------------------------------------
+## Notation
+  * [Name]: IDE name or localization tag.
+  * {Path}: Shortcut for paths names.
+  
+  Note: here {Path} is not like IDE's macros $(Path).
+  
+  See APPENDIX A for IDE Names and Localization.
+
+-------------------------------------------------------------
+## Pre Conditions
+
+  a) If compiling from new source code, remove ZeosDBO
+     package from Installed Packages before start.
+  b) Clean target Bpl, Lib and Include folders.
+
+-------------------------------------------------------------
+## 1. C++Builder Version
+
+  a) Unpack ZeosDBO, or get a SVN version, in a folder of
+     your choice.
+     Let's call it "{ZeosDBOFolder}".
+     For example:
+       "C:\MyComponents\ZeosDBO"
+
+  b) Choose your C++Builder version in ZeosDBO "\packages"
+     folder. For example:
+       "{ZeosDBOFolder}\packages\Delphi2006".
+     Let's call this entire path of {CBZeosPath}.
+
+    Note: for BDS 2006, use Delphi2006 packages within Delphi 
+    personality.
+    Also edit Components\ZAbstractConnection.pas and comment:
+      {.$IFDEF ENABLE_MYSQL}
+      {  ZDbcMySql,
+    Build following step 3.
+    Copy the *.hpp files created inside "{ZeosDBOFolder}\src"
+    folders to "{CBZeosPath}\Include". You can use the 
+    "MoveSrcHppToInclude.bat" helper batch.
+    If you try to use CBuilder2006 you will have problems
+    with dynamic linked packages. 
+
+-------------------------------------------------------------
+## 2. Environment Setup
+
+  a) Open your IDE.
+
+  b) Access IDE's "Environment Variables".
+
+  c) Under "System variables" click "Add Override"
+     and add "{CBZeosPath}\Bpl;" to "Path".
+     For example:
+       "C:\MyComponents\ZeosDBO\packages\Delphi2006\Bpl"
+     See Troubleshoot 6.b and 6.f.
+
+  d) Under "User overrides" create "ZEOSDBO" variable with
+     value equals to {CBZeosPath} (see Step 1.b).
+
+  e) Under IDE's [Include Path] proceed:
+       Add
+         "$(ZEOSDBO)\Include"
+       
+     Under IDE's [Library Path] proceed:
+       Add 
+         "$(ZEOSDBO)\Lib"       
+     See Troubleshoot 6.c.  
+     
+  f) Access Windows' "Environment Variables".
+     In "User variables for <user>" add
+       "{CBZeosPath}\Bpl;" to "Path".
+     For example:
+       "C:\MyComponents\ZeosDBO\packages\Delphi2006\Bpl"
+     See Troubleshoot 6.f.
+
+-------------------------------------------------------------
+## 3. Install (Win32)
+
+  a) Open "{CBZeosPath}\ZeosDbo.groupproj" group project.
+
+  b) Build all projects, except "ZComponentDesign{XXX}.bpl".
+     Note: don't Make all. Build them.
+     See Troubleshoot 6.c and 6.e.
+
+  c) Right click on "ZComponentDesign{XXX}.bpl" project, in
+     Project Manager, and choose "Install". If the
+     installation succeeds, you will receive a dialog
+     confirmation about the ZeosDBO Installed Components.     
+     See Troubleshoot 6.b.
+
+-------------------------------------------------------------
+## 4. Your Project
+
+  a) It is important to check one option in your project that
+     will use ZeosDBO.
+     Under [C++ Linker], set or check these option:
+       "Link with Dynamic RTL" = true;
+       "Link with the Delphi Runtime Library" = false
+
+     In other words, this option must be equal to those found
+     in ZeosDBO Packages, at IDE's [C++ Linker].
+     By default, C++Builder ZeosDBO packages set these
+     options to true and false, respectively.     
+     See Troubleshoot 6.a.
+
+-------------------------------------------------------------
+## 5. Deploy
+
+  a) If you are using dynamic build packages, deploy the
+     "Z*{XXX}.bpl" files, except "ZComponentDesign{XXX}.bpl", 
+     where "{XXX}" relates to CBuilder Compiler version, with 
+     your application.
+     The packages "Z*{XXX}.bpl" are located in folder:
+       "{CBZeosPath}\Bpl".
+
+-------------------------------------------------------------
+## 6. Troubleshoot
+
+  a) Project <Prj.exe> raised exception class <$Address> with
+     message 'access violation at <0xAddress>: read of
+     address <0xAddress>
+     - See Step 4 about [C++ Linker] and "Link with Dynamic RTL"
+       Make sure your project has the same option as ZeosDBO
+       Packages (by default, Dynamic RTL is set to false).
+
+  b) Installing "ZComponentDesign{XXX}.bpl" raises errors about
+     ZCore.bpl could not be found.
+     - Check if the "{CBZeosPath}\Bpl;" wasincluded into "Path" 
+     as determined at Step 2.c.
+
+  c) Errors complaining about *.dcu missing files.
+     - Check Step 2.e.
+     - Check Step 3.b.
+
+  d) ilink64 errors complaining about unresolved external *.o files.
+     - Remove Z*.bpi from Requires list (Project Manager treeview)
+       and Add Reference... again.
+
+  e) At compiling start, dialog asking to remove units.
+     Mark "View details" and check which package name is shown as
+     "required" in the end of de list. 
+     - Uncheck Zeos from installed packages.
+     - if error persists, check and clean BPL files from
+       Embarcadero "Public Documents" directory.
+         C:\Users\Public\Documents\Embarcadero\Studio\19.0\BPL
+     - If error persists, restart the IDE.
+     
+  f) Errors complaining about Z*.bpl missing files when running
+     your app.
+     - If inside IDE, check Path in Step 2.c.
+     - If outside IDE, check Path in Step 2.f.
+
+-------------------------------------------------------------
+## 7. Clean Up
+
+  For BDS 2006, C++Builder personality, you will find
+  "PostBuildCleanUp.bat" auxiliary batch.
+
+-------------------------------------------------------------
+## 8. Debug
+
+  If you want to debug ZeosDBO source code, take these steps:
+
+  a) Setup your IDE Environment.
+     See Steps 2.c and 2.e.
+     Under "User overrides" create "ZEOSDBOSOURCE" variable
+     with value equals to:
+       "{ZeosDBOFolder}\src"
+
+  b) Open "{CBZeosPath}\ZeosDbo.groupproj" group project and
+     change the "Build Configuration" to "Debug".
+     Build all projects.
+     See also Setp 1.c.
+
+  c) Under [Debugger], add items to "Source path":
+      $(ZEOSDBOSOURCE)
+      $(ZEOSDBOSOURCE)\core
+      $(ZEOSDBOSOURCE)\plain
+      $(ZEOSDBOSOURCE)\parsesql
+      $(ZEOSDBOSOURCE)\dbc
+      $(ZEOSDBOSOURCE)\component
+
+  d) Into your project, with Debug configuration, do:
+     - Under [C++ Linker] set
+       "Link with Dynamic RTL" to false.
+     - Under [Runtime Packages] set
+       "Build/Link with runtime packages" to false.
+
+
+=============================================================
+## APPENDIX
+
+-------------------------------------------------------------
+## A. IDE Names and Localization
+
+  - CBuilder2006
+
+    [Include Path] = Include search path (-I):
+    "Project > Options > C++ Compiler > Paths and Defines"
+
+    [Libray Path] = Search Path:
+    "Tools > Options > Env. Options > C++ Options > Paths and Directories"
+
+    [C++ Linker]
+    "Project > Options > Linker > Linking"
+
+    [Runtime Packages]
+    "Project > Options > Packages"
