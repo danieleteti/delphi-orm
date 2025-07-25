@@ -1,7 +1,10 @@
-#DORM, the "Delphi ORM"
+>THIS PROJECT IS NOT MANTAINED!
+># USE [DMVCFramework](https://github.com/danieleteti/delphimvcframework) and its [MVCActiveRecord](https://github.com/danieleteti/delphimvcframework/tree/master/samples/activerecord_showcase) to handle data in a very OOP oriented approach
+
+# DORM, the "Delphi ORM"
 Delphi ORM (DORM for short) is a powerful ORM for Delphi. It is quite robust and tested because used since 2010 in production for many business critical systems.
 
-##Features
+## Features
 * Open Source Apache License 2.0
 * Database agnostic (Do not require database changes!)
 * Has one, has many and belongs to relations support
